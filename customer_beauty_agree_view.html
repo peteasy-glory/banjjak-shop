@@ -1,0 +1,276 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+$shop_title	= ($_GET["docType"] == "1")? "호텔 동의서" : "미용 동의서";
+
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+if($_GET["aid"] == "" || $_GET["uid"] == "" || $_GET["pid"] == ""){
+    // 경고 얼럿창으로 변경
+    alert("잘못된 접근입니다.");
+    //echo "<script>location.replace('../mainpage/index.php');</script>";
+}
+
+//$s_artist_id = $_SESSION["gobeauty_user_id"];
+//$s_user_id = $_SESSION["bjj_cellphone"];
+//$s_pet_id = $_SESSION["bjj_pet_seq"];
+
+$s_artist_id = ($_GET["aid"] != "")? $_GET["aid"] : "";
+$s_user_id = ($_GET["uid"] != "")? $_GET["uid"] : "";
+$s_pet_id = ($_GET["pid"] != "")? $_GET["pid"] : "";
+$s_docType = ($_GET["docType"] != "")? $_GET["docType"] : "0";
+$r_ba_seq = ($_GET["ba_seq"])? $_GET["ba_seq"] : "";
+$pay_seq =  ($_GET["payment_seq"])? $_GET["payment_seq"] : "";
+
+
+//미용동의서정보
+$que = "SELECT * FROM tb_beauty_agree WHERE ba_seq = {$r_ba_seq}";
+$ba = sql_fetch_array($que);
+
+//결제정보
+$que = "SELECT * FROM tb_payment_log WHERE customer_id = '{$ba['customer_id']}' AND pet_seq = '{$s_pet_id}' AND cellphone = '{$s_user_id}' AND artist_id = '{$s_artist_id}'";
+//echo $que;
+$pl = sql_fetch_array($que);
+
+//펫정보
+$que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$s_pet_id}'";
+$pet = sql_fetch_array($que);
+
+//회원정보
+$que = "SELECT * FROM tb_customer WHERE id = '{$s_user_id}'";
+//echo $que;
+$res = sql_query($que);
+$cus = sql_fetch($res);
+if(empty($cus['id'])) {
+    $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$s_user_id}'";
+    $res = sql_query($que);
+    $cus = sql_fetch($res);
+}
+
+$que = "SELECT * FROM tb_beauty_agree WHERE ba_seq = '{$r_ba_seq}'";
+//echo $que;
+$ba = sql_fetch_array($que);
+
+$que = "SELECT * FROM tb_beauty_sign WHERE bs_seq = '{$ba[0]['bs_seq']}'";
+//echo $que;
+$bs = sql_fetch_array($que);
+print_r($bs);
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="customer-view-wrap">
+			
+			<div class="grid-layout btn-grid-group">
+				<div class="grid-layout-inner">
+					<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">다운로드</a></div>
+					<div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree?aid=<?php echo $s_artist_id;?>&uid=<?php echo $s_user_id;?>&pid=<?php echo $s_pet_id;?>&docType=<?php echo $ba[0]['doc_type'];?>&ba_seq=<?php echo $r_ba_seq;?>&payment_seq=<?php echo $pay_seq;?>&backurl=<?php echo $_GET['backurl'];?>" class="btn btn-outline-purple btn-middle-size btn-round">수정</a></div>
+				</div>
+			</div>
+			<!-- 고객정보 -->
+			<div class="basic-data-group customer-view-user">
+				<div class="con-title-group">
+					<h4 class="con-title">고객 정보</h4>
+				</div>
+				<div class="flex-table">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">고객명</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php echo $ba[0]['customer_name'];?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php echo $s_user_id;?>
+								</div>		
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //고객정보 -->
+			<!-- 펫정보 -->
+			<div class="basic-data-group customer-view-pet">
+				<div class="con-title-group">
+					<h4 class="con-title">펫 정보</h4>
+				</div>
+				<!-- 20211227 수정 -->
+				<div class="customer-view-pet-picture">
+					<div class="item-thumb">
+						<div class="user-thumb large"><img src="<?php echo (!empty($pic['file_path']))?$pic['file_path']:$pet['photo']; ?>" alt=""></div>
+					</div>
+					<div class="item-user-info">
+						<div class="item-user-info-inner">
+							<div class="user-name"><?php echo $pet[0]['name'];?></div>
+							<div class="user-cate"><?php echo $pet[0]['pet_type'];?></div>
+						</div>
+					</div>
+				</div>
+				<!-- //20211227 수정 -->
+				
+				<div class="flex-table">
+					<!-- 20211227 수정
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">펫 이름</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									콩이									
+								</div>		
+							</div>
+						</div>
+					</div>
+					-->
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">성별</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php echo $pet[0]['gender'];?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">중성화 여부</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php echo ($pet[0]['neutral']==0)?'X':'O';?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">예방접종</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php echo $pet[0]['vaccination'];?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">질병기록</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php
+                                        if($pet[0]['dermatosis']){ echo '피부병 '; }
+                                        if($pet[0]['heart_trouble']){ echo ', 심장질환 ';}
+                                        if($pet[0]['etc_for_disease']){ echo $pet[0]['etc_for_disease'];}
+                                    ?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">특이사항</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?php echo $pet[0]['etc_for_owner'];?>
+								</div>		
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //펫정보 -->
+			<!-- 미용동의서 상세내용 -->
+			<div class="basic-data-group customer-view-agree">
+				<div class="con-title-group">
+					<h4 class="con-title">미용동의서 상세내용</h4>
+				</div>
+				<div class="customer-view-agree-info">가게이름 은(는) 미용요청견의 나이가 10세 이상인 노령견이나, 질병이 있는 경우 건강상태를 고려하여 안내사항을 말씀드리고, 미용 동의서를 받고자 합니다.</div>
+				<div class="pay-card-group">
+					<div class="pay-card-cell all"><label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em><strong>모두 동의</strong></em></span></label></div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em>미용 동의서</em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em>개인정보 수집 및 허용</em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="customer-view-agree-date">
+					<div class="item-date"><?php echo date('Y.m.d',strtotime($ba[0]['reg_date']));?></div>
+					<div class="item-name"><?php echo $ba[0]['customer_name'];?></div>
+				</div>
+			</div>
+			<!-- //미용동의서 상세내용 -->
+			<!-- 서명 -->
+			<div class="basic-data-group small">
+				<div class="con-title-group">
+					<h4 class="con-title">서명</h4>
+				</div>
+				<div class="user-sign-wrap">
+                    <img src="<?php echo $bs[0]['image'];?>" alt="">
+				</div>
+			</div>
+			<!-- //서명 -->
+		</div>
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+<script>
+    $(document).ready(function(){
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
+   });
+</script>
+</body>
+</html>

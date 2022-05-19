@@ -1,0 +1,961 @@
+<?
+$title = "펫샵 상세보기";
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
+
+$emoji = new TEmoji();
+$obj = new module();
+
+$backurl = isset($_GET['backurl']) ? $_GET['backurl'] : "";
+$user_id = isset($_SESSION['gobeauty_user_id']) ? $_SESSION['gobeauty_user_id'] : "";
+$user_name = isset($_SESSION['gobeauty_user_nickname']) ? $_SESSION['gobeauty_user_nickname'] : "";
+    
+$top = isset($_GET['top']) ? $_GET['top'] : "";
+$middle = isset($_GET['middle']) ? $_GET['middle'] : "";
+$lat = isset($_GET['lat']) ? $_GET['lat'] : "";
+$lng = isset($_GET['lng']) ? $_GET['lng'] : "";
+
+$artist_id = isset($_GET['artist_id']) ? $_GET['artist_id'] : "";
+$type = isset($_GET["type"]) ? $_GET["type"] : "";
+$sequence = isset($_GET['sequence']) ? $_GET['sequence'] : "";
+if ($type == null || $type == "") {
+    $type = "beauty";
+}
+if (!$sequence) {
+    $sequence = 1;
+}
+    
+
+global $etc_area_count;
+global $review_images_all_str;
+global $review_images_all_array;
+global $review_rows_check;
+
+?>   
+
+<?
+$artist_photo = "";
+$artist_sql = "select *, shop.photo as photo2 from tb_shop shop, tb_customer customer where shop.customer_id = '" . $artist_id . "';";
+$artist_result = mysqli_query($connection, $artist_sql);
+
+if ($artist_datas = mysqli_fetch_object($artist_result)) {
+//        print_r($artist_datas);
+        $artist_id = $artist_datas->customer_id;
+        $artist_photo = $artist_datas->photo2;
+        $is_vat = $artist_datas->is_vat;
+
+        $front_image = img_link_change($artist_datas->front_image);
+
+
+        $crypto = new Crypto();
+        $enc_artist_id = $crypto->encode($artist_id, $access_key, $secret_key);
+        $offline_shop_query = "SELECT is_got_offline_shop FROM tb_request_artist WHERE customer_id = '{$enc_artist_id}'";
+        $offline_shop_result = mysqli_query($connection, $offline_shop_query);
+        $offline_shop_data = mysqli_fetch_object($offline_shop_result);
+//        print_r($offline_shop_data);
+
+        $is_got_offline_shop = $offline_shop_data->is_got_offline_shop;
+
+        $heart = new Heart();
+        $is_like = $heart->is_like_artist($user_id, $artist_id);
+}
+
+?>      
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="shop_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+    <div class="page-title"><?=$title?></div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- 대표미이지 -->
+		<div class="product-view-group product-view-gallery">
+			<div class="label-group">
+				<div class="label-group-inner">
+                    <?
+                    $shop_service_sql = "
+                        SELECT COUNT(*) AS beauty,
+                        (
+                            SELECT COUNT(*) FROM tb_playroom_product
+                            WHERE artist_id = '".$artist_id."' AND is_delete = '2'
+                        ) AS play,
+                        (
+                            SELECT COUNT(*) FROM tb_hotel_product
+                            WHERE artist_id = '".$artist_id."' AND is_delete = '2'
+                        ) AS hotel
+                        FROM tb_product_dog_static WHERE customer_id = '".$artist_id."' AND second_type != ''
+                    ";
+                    $shop_service_result = mysqli_query($connection, $shop_service_sql);
+                    $shop_service_row = mysqli_fetch_object($shop_service_result);
+
+                    $beauty = $shop_service_row-> beauty;
+                    $hotel = $shop_service_row-> hotel;
+                    $play = $shop_service_row-> play;
+
+                    if($beauty > 0){
+                    ?>
+					<div class="label label-yellow middle">미용</div>
+                    <?
+                    }
+                    if($hotel > 0){
+                    ?>
+					<div class="label label-yellow middle">호텔</div>
+                    <?
+                    }
+                    if($play > 0){
+                    ?>
+                    <div class="label label-yellow middle">유치원</div>
+                    <?
+                    }
+                    ?>
+				</div>
+			</div>
+			<div class="gallery-list">
+				<div class="swiper-container">
+					<div class="swiper-wrapper">
+                        <?
+                        $shop_front_sql = "select * from tb_shop_frontimage where customer_id = '" . $artist_id . "'";
+                        $shop_front_result = mysqli_query($connection, $shop_front_sql);
+                        if($front_image) { ?>
+                            <div class="swiper-slide" style="text-align: center;"><div class="slider-item"><img src="<?= "https://image.banjjakpet.com".$front_image ?>" style="min-height:200px;" onerror="src='https://usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'"></div></div>
+                            <?
+                            while ($shop_front_datas = mysqli_fetch_object($shop_front_result)) {
+                                $image_value = img_link_change($shop_front_datas->image);
+                                if ($front_image != $image_value) {            
+                            ?>
+                            <div class="swiper-slide" style="text-align: center;" ><div class="slider-item"><img src="<?= "https://image.banjjakpet.com".$image_value ?>" style="min-height:200px;" onerror="src='https://usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'"></div></div>
+                            <?
+                                }
+                            }
+                        } else  {                                                  
+                            ?>
+                            <div class="swiper-slide"><img src="../images/img_not_found.jpg"></div>
+                        <? 
+                        } ?>    
+					</div>
+				</div>
+			</div>
+			<div class="swiper-page"></div>
+		</div>
+		<!-- //대표미이지 -->
+        <?php
+        $avg_value = "0";
+        $avg_sql = "select avg(rating) as avg_rating from tb_usage_reviews where artist_id = '" . $artist_id . "' and is_delete = 0;";
+        $avg_result = mysqli_query($connection, $avg_sql);
+        if ($avg_rows = mysqli_fetch_object($avg_result)) {
+            $avg_value = $avg_rows->avg_rating;
+            $avg_value = substr($avg_value, 0, 3);
+        }
+        if (!$avg_value) {
+            $avg_value = '0';
+        }
+
+        ?>
+
+		<!-- 상품 정보 -->
+		<div class="product-view-group product-info-data">
+			<div class="item-name"><?= $artist_datas->name ?></div>
+			<div class="item-grade">
+				<div class="icon-star-group">
+                    <?
+                    $avg_value = round((float) $avg_value, 1);
+                    if ($avg_value < 1) {
+                        echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>";
+                    } else if ($avg_value < 2){
+                        echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>";
+                    } else if($avg_value < 3){
+                        echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>";
+                    } else if($avg_value < 4){
+                        echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-gray'></div>";
+                    } else{
+                        echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>
+                            <div class='icon icon-size-16 icon-star-yellow'></div>";
+                    }
+                    ?>
+				</div>
+				<em><?= strval($avg_value) ?></em>
+			</div>
+            
+			<div class="item-desc"><?= $emoji->emojiDBToStr($artist_datas->self_introduction) ?></div>
+			<?php /* ?>
+            <div class="item-btns">
+				<ul>
+                    <?
+                    $enc_id = $crypto->encode($artist_id, $access_key, $secret_key);
+                    $phone_query = "SELECT * FROM tb_request_artist WHERE customer_id = '{$enc_id}'";
+                    $phone_result = mysqli_query($connection, $phone_query);
+                    $phone_data = mysqli_fetch_object($phone_result);
+
+                    $dec_phone = "";
+                    if ($phone_data != null && isset($phone_data)) {
+                        $dec_phone = $crypto->decode($phone_data->offline_shop_phonenumber, $access_key, $secret_key);
+                        $dec_phone = add_hyphen($dec_phone);
+                    }
+                    ?>
+					<li><span  onclick="javascript:change_heart('<?= $user_id ?>', '<?= $artist_id ?>');" class="btn-item-nav btn-view-like <? echo ($is_like ? "actived" : "" ) ?>">좋아요<div class="txt"></div></span></li>
+					<li><a href="tel:<? echo $dec_phone ? $dec_phone : ""; ?>" class="btn-item-nav"><div class="icon icon-size-36 icon-tel"></div><div class="txt">전화</div></a></li>
+					<li><a href="mypage_reserve_map?artist_id=<?= $artist_id ?>&backurl=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-item-nav"><div class="icon icon-size-36 icon-location"></div><div class="txt">위치</div></a></li>
+					<li><a href="#" class="btn-item-nav"><div class="icon icon-size-36 icon-share"></div><div class="txt">공유</div></a></li>
+
+				</ul>
+			</div>
+        <?php // */ ?>
+        </div>
+		<!-- //상품 정보-->
+		<!-- 매장 정보 -->
+		<div class="product-view-group product-view-store">
+			<div class="con-title-group">
+				<div class="con-title">매장 정보</div>
+			</div>
+			<div class="text-list-wrap">
+                <?
+                $working_sql = "select * from tb_working_schedule tws, tb_regular_holiday trh where tws.customer_id = '" . $artist_id . "' and trh.customer_id = '" . $artist_id . "';";
+                $working_result = mysqli_query($connection, $working_sql);
+                if ($working_datas = mysqli_fetch_object($working_result)) {
+                    $working_start = $working_datas->working_start;
+                    $working_end = $working_datas->working_end;
+                    $rest_public_holiday = $working_datas->rest_public_holiday;
+                    $working_text = "";
+                    if($artist_id == "tami3500@nate.com"){
+                        $working_text = "평일 : 9시 ~ 새벽 3시 / 정기휴일 : ";
+                    }else{
+                        $working_text = "평일 : " . $working_start . "시 ~ " . $working_end . "시 / 정기휴일 : ";
+                    }
+                    if ($working_datas->is_monday) {
+                        $working_text = $working_text . " 월요일";
+                    }
+                    if ($working_datas->is_tuesday) {
+                        $working_text = $working_text . " 화요일";
+                    }
+                    if ($working_datas->is_wednesday) {
+                        $working_text = $working_text . " 수요일";
+                    }
+                    if ($working_datas->is_thursday) {
+                        $working_text = $working_text . " 목요일";
+                    }
+                    if ($working_datas->is_friday) {
+                        $working_text = $working_text . " 금요일";
+                    }
+                    if ($working_datas->is_saturday) {
+                        $working_text = $working_text . " 토요일";
+                    }
+                    if ($working_datas->is_sunday) {
+                        $working_text = $working_text . " 일요일";
+                    }
+                    if (!$working_datas->is_monday && !$working_datas->is_tuesday && !$working_datas->is_wednesday && !$working_datas->is_thursday && !$working_datas->is_friday && !$working_datas->is_saturday && !$working_datas->is_sunday) {
+                        $working_text = $working_text . "없음";
+                    }
+                    //print_r($working_text);
+                }
+                ?>                      
+				<div class="text-list-cell"><div class="item-title">영업시간</div><div class="item-data"><?= $working_text?></div></div>
+                <?
+                $enc_artist_id = $crypto->encode(trim($artist_id), $access_key, $secret_key);
+                $off_sql = "select * from tb_request_artist where customer_id = '" . $enc_artist_id . "';";
+                $off_result = mysqli_query($connection,$off_sql);
+                $address_off;
+                if ($off_rows = mysqli_fetch_object($off_result)){
+                    $address_off = $crypto->decode($off_rows->offline_shop_address, $access_key, $secret_key);
+                    if($address_off){ ?>
+                        <div class="text-list-cell"><div class="item-title">주소</div><div class="item-data"><?= $address_off?></div></div>
+                <?        
+                    }
+                }
+                ?>
+				<div class="text-list-cell"><div class="item-title">종류</div><div class="item-data">소형견, 중형견, 특수견, 고양이</div></div>
+			</div>
+		</div>
+		<!-- //매장 정보-->
+		<!--포트폴리오 -->
+		<div class="product-view-group product-view-portfolio">
+			<div class="con-title-group">
+				<div class="con-title">포트폴리오</div>
+				<!-- <a href="#" class="btn-content-more">전체보기</a> -->
+			</div>
+			<div class="portfolio-list-wrap">
+				<div class="list-inner">
+                    <?
+                    $portfolio_img_list = array();
+                    $shop_sql = "SELECT image 
+                                    FROM tb_portfolio 
+                                    WHERE customer_id = '" . $artist_id . "' 
+                                        AND enable_flag = true
+                                    ORDER BY sort_number;";
+                    $shop_result = mysqli_query($connection, $shop_sql);
+                    for ($ii = 0; $shop_datas = mysqli_fetch_object($shop_result); $ii++) {
+                        $image_value = img_link_change($shop_datas->image);
+                        $portfolio_img_list[] = "https://image.banjjakpet.com".$image_value;
+                    ?>
+					<div class="list-cell">
+                        <a onclick="javascript:showPortfolioGallery(<?= $ii ?>);" class="btn-portfolio-item">
+                            <img src="<?= "https://image.banjjakpet.com".$image_value ?>" alt="" onerror="src='https://usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'"/>
+                        </a>
+                    </div>
+                    <?php } ?>                    
+				</div>
+			</div>
+		</div>
+		<!-- //포트폴리오-->
+		<!-- 서비스 가격 -->
+		<div class="product-view-group product-view-service">
+			<?
+			$data = array();
+			$dog_product_arr = array(
+				"kgs" => "무게", 
+				"bath" => "목욕", 
+				"part" => "부분<br/>미용", 
+				"bath_part" => "부분<br/>+목욕", 
+				"all" => "전체<br/>미용", 
+				"spoting" => "스포팅", 
+				"scissors" => "가위컷",
+				"sanitation" => "위생", 
+				"summercut" => "썸머컷" 
+			);
+
+			$sql = "
+				SELECT *, shop.photo AS photo2 
+				FROM tb_shop shop, tb_customer customer 
+				WHERE shop.customer_id = '" . $artist_id . "'
+					#AND shop.customer_id = customer.id
+			";
+			$result = mysqli_query($connection,$sql);
+			$data["shop"] = mysqli_fetch_assoc($result);
+
+			$vat_class = new VAT();
+			$is_vat = $vat_class->is_vat($artist_id);
+
+			$sql = "
+				SELECT *,
+					if(second_type = '소형견미용', 1, 
+						if(second_type = '중형견미용', 2, 
+							if(second_type = '대형견미용', 3, 
+								if(second_type = '특수견미용', 4, 9)
+							)
+						)
+					) AS sort
+				FROM tb_product_dog_static 
+				WHERE customer_id = '".$data["shop"]["customer_id"]."'
+				ORDER BY sort ASC
+			";
+			$result = mysqli_query($connection, $sql);
+			while($row = mysqli_fetch_assoc($result)){
+				$data["dog_static"][] = $row;
+			}
+
+			$sql = "
+				SELECT *
+				FROM tb_product_cat
+				WHERE customer_id = '".$data["shop"]["customer_id"]."'
+			";
+			$result = mysqli_query($connection,$sql);
+			while($row = mysqli_fetch_assoc($result)){
+				$data["cat"][] = $row;
+			}
+
+			?>
+			<div class="con-title-group">
+				<div class="con-title">서비스 가격</div>
+			</div>
+			<div class="con-title-info">추가 옵션별 요금은 [예약화면]에서 확인 가능합니다.</div>
+			<ul class="accordion-list">
+				<?php foreach($data["dog_static"] AS $key => $value){ ?>
+					<li class="accordion-cell">			
+						<button type="button" class="btn-accordion-menu">
+							<span class="accordion-menu-subject"><?=$value["second_type"]?></span>
+						</button>
+						<div class="accordion-content">
+							<div class="accordion-detail">
+								<div class="read-table">
+									<table>
+										<colgroup>
+											<col style="width:auto;">
+											<col style="width:auto;">
+											<col style="width:auto;">
+											<col style="width:auto;">
+											<col style="width:auto;">
+											<col style="width:auto;">
+											<col style="width:auto;">
+										</colgroup>
+										<thead>
+											<tr>
+												<?php 
+													$header_count = 0;
+													foreach($dog_product_arr AS $key2 => $value2){ 
+														if($key2 == "kgs" || $value[$key2."_price"] != ""){
+															$header_count++;
+												?>
+													<th><?=$value2?></th>
+												<?php 
+														}
+													} 
+												?>
+											</tr>
+										</thead>
+										<tbody>
+											<? 
+											// product_sort_data
+											foreach($dog_product_arr AS $key2 => $value2){
+												if($key2 == "kgs" || $value[$key2."_price"] != ""){
+													$product_data_arr[$key2."_price"] = ($key2 == "kgs")? explode(",", $value["kgs"]) : explode(",", $value[$key2."_price"]);
+													$consult_data_arr["is_consult_".$key2] = ($key2 == "kgs")? explode(",", $value["kgs"]) : explode(",", $value["is_consult_".$key2]);
+												}
+											} 
+											for($_i = 0; $_i < count($product_data_arr["kgs_price"]); $_i++){
+											?>
+											<tr>
+												<?
+													foreach($dog_product_arr AS $key2 => $value2){
+														if($key2 == "kgs"){
+															if($value["is_kgs_by_price"] == "1"){
+																echo "<td>".$product_data_arr[$key2."_price"][$_i]."Kg 당</td>";
+															}else{
+																echo "<td>~".$product_data_arr[$key2."_price"][$_i]."Kg</td>";
+															}
+														}else{
+															if($value[$key2."_price"] != ""){
+																if(count($consult_data_arr["is_consult_".$key2]) > $_i && $consult_data_arr["is_consult_".$key2][$_i] == "1"){
+																	echo "<td>상담</td>";
+																}else{
+																	echo ($product_data_arr[$key2."_price"][$_i] != "")? "<td >".number_format($product_data_arr[$key2."_price"][$_i] / 1000, 1)."</td>" : "<td> - </td>";
+																}
+															}
+														}
+													}					
+												?>
+											</tr>
+											<? } ?>
+											<!--Kg당 추가 메뉴-->
+											<?php if ($value["is_over_kgs"] == "1") { ?>
+												<tr>
+													<td><?= $value["what_over_kgs"] ?>Kg~</td>
+													<td colspan="6" align="center">Kg당 <?= number_format($value["over_kgs_price"]) ?>원 추가</td>
+												</tr>
+											<?php } ?>
+
+										</tbody>
+									</table>
+									<div class="read-table-info"><?=($data["shop"]["is_vat"] == "1")? '<span>* 부가세 10%별도</span>' : ''; ?> (단위, 천원) </div>
+
+								</div>
+							</div>
+						</div>			
+					</li>    
+				<? } ?>					
+			</ul>
+		</div>
+		<!-- //서비스 가격 -->
+		<!-- 이용후기 -->
+		<div class="product-view-group product-view-review">
+            <?
+            $review_rows_check = false;
+            $review_sql = "SELECT * FROM tb_usage_reviews WHERE artist_id = '" . $artist_id . "' AND is_delete = 0 ORDER BY review_seq DESC;";
+            $review_result = mysqli_query($connection,$review_sql);
+            $total_reviews = mysqli_num_rows($review_result);
+            ?>
+			<div class="con-title-group">
+				<div class="con-title">이용 후기 <?= $total_reviews ?>개</div>
+                <? if($total_reviews > 3) { ?>
+				    <a href="reserve_view_recoment?artist_id=<?php echo $artist_id; ?>" class="btn-content-more">전체보기</a>
+                <? } ?>
+			    </div>
+			</div>
+			<div class="comment-list-wrap">
+                <?
+                for ($k = 0; $review_rows = mysqli_fetch_object($review_result); $k++) {
+                    if($review_rows->rating != ""){
+                        if($k < 3){ // 최근 3개만 노출 하도록
+                        $review_rows_check = true;
+                        ?>                        
+                        <div id="review_<?=$review_rows->review_seq?>" class="comment-cell">
+                            <div class="comment-item">
+                                <div class="item-user-info">
+                                    <div class="user-thumb-wrap">
+                                        <? if ($review_rows->photo) { ?>
+                                            <div class="user-thumb"><img src="<?= "https://image.banjjakpet.com".img_link_change($review_rows->photo) ?>" alt="" onerror="this.style.display='none';"/></div>
+                                            <? } else { ?>
+                                            <div class="user-thumb"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div>
+                                        <? } ?>
+                                    </div>
+                                    <div class="user-data">
+                                        <div class="data-inner">
+                                            <div class="user-name"><?= $review_rows->nickname ?></div>
+                                            <div class="user-grade">
+                                                <div class="icon-star-group">
+                                                    <?
+                                                    $show_rating = false;
+                                                    if($review_rows->is_blind == "0"){
+                                                        $show_rating = true;
+                                                    }else{
+                                                        if($review_rows->customer_id == $user_id || $review_rows->artist_id == $user_id){
+                                                            $show_rating = true;
+                                                        }
+                                                    }
+                                                    if($show_rating){
+                                                        if ($review_rows->rating < 1) {
+                                                            echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>";
+                                                        } else if ($review_rows->rating < 2){
+                                                            echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>";
+                                                        } else if($review_rows->rating < 3){
+                                                            echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>";
+                                                        } else if($review_rows->rating < 4){
+                                                            echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-gray'></div>";
+                                                        } else{
+                                                            echo "<div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>
+                                                                <div class='icon icon-size-16 icon-star-yellow'></div>";
+                                                        }
+                                                    }
+                                                    ?>
+                                                </div>
+                                                <!-- <div class="time">5시간 전</div> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="item-gallery">
+                                    <div class="portfolio-list-wrap">
+                                        <div class="list-inner">
+                                            <?
+                                            $review_images_array;
+                                            if ($review_rows->review_images != null) {
+                                                $review_images_array = explode("|", $review_rows->review_images);
+                                                $RI_size = sizeof($review_images_array);
+                                            } else {
+                                                $RI_size = 0;
+                                            }
+                                            
+                                            
+                                            ?>
+                                            <?php if($review_rows->is_blind == "0"){ ?>
+                                                <?php if ($RI_size > 0) { ?>
+                                                    <?php for ($i = 0; $i < $RI_size; $i++) { 
+                                                        $img = img_link_change($review_images_array[$i]);  ?>
+                                                        <div class="list-cell">
+	                                                        <div class="btn-portfolio-item" onclick="showReviewGallery('<?= $i ?>', '<? echo img_link_change($review_rows->review_images)  ?>');">
+		                                                        <img src="<?= $img ?>" onerror="src='//usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'">
+		                                                    </div>
+		                                                </div>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                            <?php }else{ ?>
+                                            <?php	if($review_rows->customer_id == $user_id || $review_rows->artist_id == $user_id){ ?>
+                                                <?php if ($RI_size > 0) { ?>
+                                                    <?php for ($i = 0; $i < $RI_size; $i++) { 
+                                                        $img = img_link_change($review_images_array[$i]); ?>
+                                                        <div class="list-cell">
+	                                                        <div class="btn-portfolio-item" onclick="showReviewGallery('<?= $i ?>', '<? echo img_link_change($review_rows->review_images)  ?>');">
+		                                                        <img src="<?= $img ?>" onerror="src='//usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'">
+		                                                    </div><
+		                                                /div>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                            <?php	} ?>
+                                            <?php } ?>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php if($review_rows->is_blind == "0"){ ?>
+                                    <div class="item-detail"><?= $emoji->emojiDBToStr(strip_tags($review_rows->review)) ?></div>
+                                <?php }else{ ?>
+                                <?php	if($review_rows->customer_id == $user_id || $review_rows->artist_id == $user_id){ ?>
+                                    <div class="item-detail"><?= $emoji->emojiDBToStr(strip_tags($review_rows->review)) ?></div>
+                                <?php	}else{ ?>
+                                    <div class="blind item-detail"><i class="fas fa-lock"></i> 펫샵 사장님에게만 보이는 리뷰입니다.</div>
+                                <?php	} ?>
+                                <?php } ?>
+        
+<!--                                <div class="item-ui"><button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button></div>-->
+                            </div>
+                            <?php if ($review_rows->artist_reply) { 
+                                $img = img_link_change($artist_photo); ?>
+                            <div class="recomment-list">
+                                <div class="recomment-cell">
+                                    <div class="recomment-item">
+                                        <div class="user-thumb-wrap">
+                                            <div class="user-thumb"><img src="<?= "https://image.banjjakpet.com".$img ?>" alt="" onerror="this.style.display='none';"/></div>
+                                        </div>		
+                                        <div class="recomment-data">
+                                            <div class="item-name"><?= $artist_datas->name ?><span class="date">1일 전</span></div>
+                                            <?php if($review_rows->is_blind == "0"){ ?>
+                                                <div class="item-detail"><?= $emoji->emojiDBToStr($review_rows->artist_reply) ?></div>
+                                            <?php }else{ ?>
+                                            <?php	if($review_rows->customer_id == $user_id || $review_rows->artist_id == $user_id){ ?>
+                                                <div class="item-detail"><?= $emoji->emojiDBToStr($review_rows->artist_reply) ?></div>
+                                            <?php	}else{ ?>
+                                                <div class="item-detail blind"><i class="fas fa-lock"></i> 리뷰 작성자에게만 보이는 리뷰입니다.</div>
+                                            <?php	} ?>
+                                            <?php } ?>            
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                        <?}
+                    }
+
+                }
+                ?>
+
+			</div> 
+            <!-- comment-list-wrap -->
+            <?php
+                $blog_query = "SELECT * FROM tb_blog WHERE customer_id = '{$artist_id}' AND del_yn = 'N' ORDER BY post_date DESC";
+                $blog_result = mysqli_query($connection, $blog_query);
+                $blog_count = mysqli_num_rows($blog_result);
+
+                $blog_list = array();
+                while ($blog_data = mysqli_fetch_object($blog_result)) {
+                    $blog_list[] = $blog_data;
+                }
+            ?>        
+            <div class="product-view-group product-view-blog">
+                <div class="con-title-group">
+                    <div class="con-title">블로그 리뷰 <?= $blog_count ?>개</div>
+                    <? if($blog_count > 5) { ?>
+                        <a href="reserve_view_blog?artist_id=<?php echo $artist_id; ?> ?>" class="btn-content-more">전체보기</a>
+                    <? } ?>
+                </div>
+                
+                
+                <div class="vertical-list-wrap line">    
+                    <div class="list-inner">
+                <?
+                if ($blog_count > 0) {
+                
+                    $end = ($blog_count >= 5) ? 5 : $blog_count;
+                    for ($i = 0; $i < $end; $i++) {
+                        $blog = $blog_list[$i];
+
+                        $image = $blog->thumbnail;
+                        $link = $blog->link;
+                        $title = $blog->title;
+                        $contents = mb_substr(strip_tags($blog->desc), 0, 60);  ?>
+                                <div class="list-cell">
+                                    <a href="#" class="basic-list-item blog" onclick="javascript:openView('<?php echo $link; ?>');">
+<!--                                        <div class="thumb">-->
+<!--                                            <img src="--><?php //echo $image; ?><!--" alt="" onerror="src='//usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'">-->
+<!--                                        </div>-->
+                                        <div class="info-wrap">
+                                            <div class="item-name"><?= $title ?> </div>
+                                            <div class="item-desc"><?= $contents ?> </div>
+                                            <div class="item-blog-option">
+                                                <div class="name"><div class="ellipsis"><?= $blog->blogger_name ?></div></div>
+                                                <div class="date"><?= $blog->post_date ?></div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                    <? }
+        
+                } ?>
+                    </div>
+                </div> 
+
+            </div>
+		</div>
+		<!-- //이용후기-->
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		    <!--<a href="reserve_write1?artist_id=<?= urlencode($artist_id) ?>&backurl=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn-reserve reservation_button">예약하기</a>-->
+	</div>
+	<!-- //page-bottom -->
+
+	<!--  갤러리 -->
+	<div class="gallery-pop-wrap">
+		<div class="gallery-pop-inner">
+			<div class="gallery-pop-data">
+				<div class="gallery-pop-slider">
+					<div class="swiper-container">
+						<div class="swiper-wrapper">
+							<div class="swiper-slide">
+								<div class="slider-item">
+									<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>
+									<img src="/static/pub/images/gate_picture.jpg" alt=""/>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="swiper-page"></div>
+					<button type="button" class="btn-swiper-slider-prev"></button>
+					<button type="button" class="btn-swiper-slider-next"></button>
+				</div>
+				<div class="gallery-pop-ui">					
+					<button type="button" class="btn-gallery-pop-nav btn-gallery-mode" onclick="gallery.viewModeChange(this);">
+						<span class="icon icon-size-24 icon-viewall-white off"></span>
+						<span class="icon icon-size-24 icon-viewmax-white on"></span>
+					</button>
+					<button type="button" class="btn-gallery-pop-nav" onclick="gallery.close();"><span class="icon icon-size-24 icon-close-white"></span></button>
+				</div>
+			</div>
+			<div class="gallery-thumb-data">
+				<div class="gallery-thumb-list">
+					<button type="button" class="btn-gallery-thumb-nav">
+						<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>						
+						<img src="/static/pub/images/user_thumb.png" alt="">
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //갤러리 -->    
+
+</section>
+<!-- //container -->
+
+
+<script src="/static/pub/js/imagesloaded.pkgd.min.js"></script>
+<script>
+	<?if(isset($_GET["rev"])){ ?>
+    var offset = $('#review_<?=$_GET["rev"]?>').offset();
+    console.log(offset);
+        if(offset){
+            $('html, body').animate({
+            scrollTop: offset.top
+        }, 400);
+    }
+    <?}?>
+
+
+    var gallery = {
+        
+        element : null,
+        swiper : null,
+        swiperCur : 0,
+        swiperLen : -1,
+
+        init : function(){
+            gallery.element = $('.gallery-pop-wrap');
+            gallery.swiperLen = gallery.element.find('.swiper-slide').length;
+            gallery.swiper = new Swiper( gallery.element.find('.swiper-container')[0] , {
+                loop : false,
+                slidesPerView : 1 ,
+                spaceBetween : 0,
+                simulateTouch : true,
+                speed : 450,
+                navigation: {
+                nextEl: gallery.element.find('.btn-swiper-slider-next')[0],
+                prevEl: gallery.element.find('.btn-swiper-slider-prev')[0]
+                }
+            });
+            gallery.swiper.on('slideChange' , function(){
+                gallery.swiperCur = this.realIndex;
+                gallery.pageSort();
+            });
+            gallery.pageSort();
+
+            $(document).on('click' , '.btn-gallery-thumb-nav' , function(){
+                var $index = $(this).index();
+                gallery.swiper.slideTo($index , 450);
+            });
+        },
+        pageSort : function(){
+            var _value = '<em>' + String((gallery.swiperCur + 1) + '</em> / ' + gallery.swiperLen);
+            gallery.element.find('.swiper-page').html(_value);
+            gallery.element.find('.gallery-thumb-list > .btn-gallery-thumb-nav').eq(gallery.swiperCur).addClass('actived').siblings().removeClass('actived');
+        },
+
+        dataSet : function(imgList){
+            //샘플링 데이타
+            // -> <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/gate_picture.jpg" alt=""/></div></div>
+            var i = 0;
+            var len = Math.floor(Math.random() * (14 - 1)) + 1;
+            var result = '';
+            var resultThumb = '';
+            for(i = 0; i < imgList.length; i++){
+                result += '<div class="swiper-slide"><div class="slider-item hide">';
+                result += '<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>	';
+                result += '<img src=' +  imgList[i] +  ' alt="" />';
+                result += '</div></div>';
+
+                resultThumb += '<button type="button" class="btn-gallery-thumb-nav hide">';
+                resultThumb += '<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>';
+                resultThumb += '<img src=' + imgList[i] +' alt="" >';
+                resultThumb += '</button>';
+            };
+
+            //데이타 삽입
+            gallery.element.find('.swiper-wrapper').html(result);
+            gallery.element.find('.gallery-thumb-list').html(resultThumb);
+
+            gallery.element.find('.swiper-wrapper .slider-item').each(function(){
+                $(this).imagesLoaded().always(function(instance){
+                    //console.log('model image loaded');
+                }).done(function(instance){
+                    $(instance.elements).removeClass('hide');
+                }).fail( function(){
+                    //alert('프로필 이미지가 없습니다.');
+                }).progress(function(instance,image){
+
+                });
+            });
+
+            gallery.element.find('.gallery-thumb-list .btn-gallery-thumb-nav').each(function(){
+                $(this).imagesLoaded().always(function(instance){
+                    //console.log('model image loaded');
+                }).done(function(instance){
+                    $(instance.elements).removeClass('hide');
+                }).fail( function(){
+                    //alert('프로필 이미지가 없습니다.');
+                }).progress(function(instance,image){
+
+                });
+            });
+            
+            /*
+            $('#heroModel').imagesLoaded().always(function(instance){
+                //console.log('model image loaded');
+            }).done(function(instance){
+                $('#heroModel').removeClass('loading');
+            }).fail( function(){
+                //alert('프로필 이미지가 없습니다.');
+            }).progress(function(instance,image){
+
+            });
+            */
+
+            //데이타 삽입 후 재설정
+            gallery.swiperCur = 0;
+            gallery.swiperLen = i;
+
+            //데이타 삽입 후 재정렬
+            gallery.viewUpdate();
+            gallery.pageSort();
+        },
+
+        open : function(startIndex){
+            gallery.element.addClass('actived');
+            gallery.viewUpdate();
+            gallery.swiper.slideTo(startIndex,0);
+        },
+        close : function(){
+            gallery.element.removeClass('actived');
+        },
+        viewModeChange : function(obj){
+            if($(obj).hasClass('actived')){
+                //리스트 비활성화
+                $(obj).removeClass('actived');
+                gallery.element.removeClass('thumb');
+            }else{
+                //리스트 활성화
+                $(obj).addClass('actived')
+                gallery.element.addClass('thumb');
+            }
+            
+            setTimeout(function(){
+                if(gallery.swiper) gallery.viewUpdate();
+            } , 300);
+        },
+        viewUpdate : function(){
+            gallery.swiper.update();
+            gallery.swiper.updateSize();
+            gallery.swiper.updateSlides();
+            gallery.swiper.updateProgress();
+        }
+    };    
+
+	$(document).on("click", ".reservation_button", function(){
+        // popalert.open('firstRequestMsg1', '모바일 웹이나 앱으로 이용해주세요.');
+	});
+    
+	// $(document).on("click", ".cantusereservation_btn", function(){
+    //    popalert.open('firstRequestMsg1', '모바일 웹이나 앱으로 이용해주세요.');
+	// });
+
+    function change_heart(customer_id, artist_id) {
+        $.ajax({
+            url: '/data/change_artist_heart',
+            data: {
+                customer_id: customer_id,
+                artist_id: artist_id
+            },
+            type: 'POST',
+            success: function(data) {
+                // location.reload();
+                console.log(customer_id);
+            },
+            error: function(xhr, status, error) {}
+        });
+    }; 
+    
+    function openView(link) {
+        window.open(link, "_blank");
+    };
+
+
+    function showPortfolioGallery(startIndex){
+
+        let img_list = '<? echo json_encode($portfolio_img_list)  ?>';
+        let ar = JSON.parse(img_list);
+        gallery.dataSet(ar);
+        gallery.open(startIndex);
+    };
+
+    function showReviewGallery(startIndex, img_list){
+	    var imgs	= img_list.split('|');
+        imgs.forEach(element => {
+            element = img_link_change(element);
+        });
+            console.log(imgs);
+        gallery.dataSet(imgs);
+        gallery.open(startIndex);
+    };
+
+    $(function(){
+        gallery.init();
+    });
+
+
+</script>
+
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer.php");
+?>

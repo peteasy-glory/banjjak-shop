@@ -1,0 +1,491 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "이용상담 정보";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$crypto = new Crypto();
+
+$get_pet_seq	= (isset($_GET['get_pet_seq'])) ? $_GET['get_pet_seq'] : "";
+
+$pet_sql = "SELECT tpl.payment_log_seq, tpl.customer_id, tpl.approval, tpl.update_time, tpl.etc_memo, tm.*, tc.id, tc.cellphone
+		FROM tb_payment_log tpl, tb_mypet tm, tb_customer tc
+		WHERE tpl.pet_seq = '{$get_pet_seq}'
+		AND tpl.pet_seq = tm.pet_seq 
+		AND tpl.customer_id = tc.id
+		AND tpl.artist_id = '{$user_id}'";
+// error_log('----- $pet_sql : ' . $pet_sql);
+// error_log('----- $pet_sql : ' . $pet_sql);
+
+
+$pet_result = mysqli_query($connection,$pet_sql);
+if ($pet_datas = mysqli_fetch_object($pet_result)) {
+	$payment_log_seq = $pet_datas->payment_log_seq;
+	$customer_id = $pet_datas->customer_id;
+	$approval = $pet_datas->approval;
+	$etc_memo = $pet_datas->etc_memo;
+	$update_time = $pet_datas->update_time;
+	$update_time = strtotime($update_time);
+	$str_update_time = date('Y년 m월 d일 H시 i분', $update_time);
+
+	$name_for_owner = $pet_datas->name_for_owner;
+	$type = $pet_datas->type;
+	$pet_type = $pet_datas->pet_type;
+	$pet_type2 = $pet_datas->pet_type2;
+	$year = $pet_datas->year;
+	$month = $pet_datas->month;
+	$day = $pet_datas->day;
+	$gender = $pet_datas->gender;
+	$neutral = $pet_datas->neutral;
+	$weight = $pet_datas->weight;
+	$array_weight = explode('.', $weight);
+
+	$etc_for_owner = $pet_datas->etc_for_owner;
+	$beauty_exp = $pet_datas->beauty_exp;
+	$vaccination = $pet_datas->vaccination;
+	$luxation = $pet_datas->luxation;
+	$bite = $pet_datas->bite;
+	$dt_eye = $pet_datas->dt_eye;
+	$dt_nose = $pet_datas->dt_nose;
+	$dt_mouth = $pet_datas->dt_mouth;
+	$dt_ear = $pet_datas->dt_ear;
+	$dt_neck = $pet_datas->dt_neck;
+	$dt_body = $pet_datas->dt_body;
+	$dt_leg = $pet_datas->dt_leg;
+	$dt_tail = $pet_datas->dt_tail;
+	$dt_genitalia = $pet_datas->dt_genitalia;
+	$dermatosis = $pet_datas->dermatosis;
+	$heart_trouble = $pet_datas->heart_trouble;
+	$marking = $pet_datas->marking;
+	$mounting = $pet_datas->mounting;
+	$photo_counseling = $pet_datas->photo_counseling;
+
+	$cellphone = $pet_datas->cellphone;
+	$cellphone = $crypto->decode($cellphone, $access_key, $secret_key);
+
+	// error_log('----- : ' . json_encode($pet_datas, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
+}
+?>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- reserve-advice-view -->  
+		<div class="reserve-advice-view">
+			<div class="reserve-advice-view-info">* 상담신청 후 12시간 이내에 상담 완료를 꼭 눌러주세요.<button type="button" class="btn-data-helper" onclick="pop.open('reserveAdviceMsg1');">도움말</button></div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">신청고객정보</h4>
+				</div>
+				<div class="flex-table type-2">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= add_hyphen($cellphone) ?>
+								</div>												
+								<div class="flex-table-data-side">
+									<div class="btn-ui-group">
+										<button type="button" onclick="document.location.href='tel:<?php echo $cellphone; ?>';" class="btn-data-tel">전화하기</button>
+										<button type="button" onclick="location.href='sms:<?php echo $cellphone; ?>';" class="btn-data-message">메시지보내기</button>
+									</div>
+								</div>												
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<form id="form_reservation" action="counseling_save_mypet.php" method="POST">
+            <input type="hidden" id="artist_id" name="artist_id" value="<?= $artist_id ?>" />
+            <input type="hidden" id="customer_id" name="customer_id" value="<?= $user_id ?>" />
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">기본 정보</h4>
+				</div>
+				<div class="flex-table type-2">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">이름</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $name_for_owner ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">품종</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $pet_type ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<?php
+                    if ($pet_type == "기타") {
+                    ?>
+                    <div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">기타 품종명</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $pet_type2 ? $pet_type2 : "(미기입)" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<?}?>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">생일</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $year ?>년 <?= $month ?>월 <?= $day ?>일
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">성별</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $gender == '남아' || $gender == '중성화' ? "남아" : "여아" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">중성화</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $neutral == '1' || $gender == '중성화' ? "중성화 O" : "X" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">몸무게</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $array_weight[0] ?>.<?= $array_weight[1] ?> KG
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">미용경험</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $beauty_exp ? $beauty_exp : "(미기입)" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">예방접종</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $vaccination ? $vaccination : "(미기입)" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">입질</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php
+                                        if ($bite == "0") {
+                                            echo "안해요";
+                                        } else if ($bite == "1") {
+                                            echo "해요";
+                                        } else {
+                                            echo "(미기입)";
+                                        }
+                                        ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">싫어하는 부위</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php
+                                    $dt_check_list = "";
+                                    $dt_count = 0;
+                                    if ($dt_eye) {
+                                        $dt_check_list .= "눈, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_nose) {
+                                        $dt_check_list .= "코, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_mouth) {
+                                        $dt_check_list .= "입, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_ear) {
+                                        $dt_check_list .= "귀, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_neck) {
+                                        $dt_check_list .= "목, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_body) {
+                                        $dt_check_list .= "몸통, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_leg) {
+                                        $dt_check_list .= "다리, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_tail) {
+                                        $dt_check_list .= "꼬리, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_genitalia) {
+                                        $dt_check_list .= "생식기, ";
+                                        $dt_count++;
+                                    }
+
+                                    if ($dt_count > 0) {
+                                        $dt_check_list = substr($dt_check_list, 0, -2);
+                                    } else {
+                                        $dt_check_list = "없음";
+                                    }
+                                    ?>
+                                    <?= $dt_check_list ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">슬개골탈구</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?= $luxation ? $luxation : "(미기입)" ?>
+								</div>														
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">특이사항</h4>
+				</div>
+				<div class="con-title-group">
+					<h5 class="con-title">
+						<?php
+                            $special_check_list = "";
+                            $special_count = 0;
+                            if ($dermatosis) {
+                                $special_check_list .= "피부병, ";
+                                $special_count++;
+                            }
+
+                            if ($heart_trouble) {
+                                $special_check_list .= "심장질환, ";
+                                $special_count++;
+                            }
+
+                            if ($marking) {
+                                $special_check_list .= "마킹, ";
+                                $special_count++;
+                            }
+
+                            if ($mounting) {
+                                $special_check_list .= "마운팅, ";
+                                $special_count++;
+                            }
+
+                            if ($special_count > 0) {
+                                $special_check_list = substr($special_check_list, 0, -2);
+                            } else {
+                                $special_check_list = "없음";
+                            }
+                            ?>
+                            <?= $special_check_list ?>
+					</h5>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">원하는 미용</h4>
+				</div>
+				<div class="con-title-group">
+					<h5 class="con-title"><?=$etc_memo ?></h5>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">현재 아이 모습</h4>
+				</div>
+				<div class="basic-data-group vvsmall2">
+					<div class="portfolio-list-wrap">
+						<div class="list-inner img_list">업로드된 이미지가 없습니다.</div>
+					</div>
+				</div>
+			</div>
+			<?php
+            if ($approval != "2") {
+            ?>
+
+            <div class="basic-data-group">
+				<button type="button" onclick="cancel()" class="btn btn-outline-red btn-middle-size btn-round">예약 거부</button>
+			</div>
+            <?php
+            }
+            ?>
+			</form>
+				<!--  첫이용 상담 안내 -->
+	<article id="reserveAdviceMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-title"> 첫이용 상담 안내</div>
+						<div class="msg-txt text-align-left">* 미용이 가능한 강아지로 판단되시면 “상담완료”를 꼭 눌러주세요.<br><br>* 아래 정보로 미용 가능 판단이 부족하시면 통화나 문자아이콘을 눌러 상담해 주세요<br><br>* 부득이한 경우 “예약거부”를 누르시면 됩니다. 이때 견주에게는 거부로 날아가지 않으니 안심하셔도 됩니다. 다만 이 고객의 재방문 가능성은 매우 낮아집니다. <br><br>* 자동취소나 거부했던 지난 이용상담도 원하시면 언제든 “상담완료”처리 하실수 있습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //첫이용 상담 안내 -->
+		</div>
+		<!-- //reserve-advice-view -->  
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<?php
+    if ($approval != "2") {
+    ?>
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" onclick="approval()" class="btn-page-bottom">상담완료</a>
+	</div>
+	<!-- //page-bottom -->
+	<?}?>
+</section>
+<!-- //container -->
+
+
+<script>
+	var img_list = [];
+	img_list = ('<?=$photo_counseling ?>' != "")? JSON.parse('<?=json_encode($photo_counseling) ?>').split(',') : [];
+
+	$(document).ready(function() {
+		get_file_list(img_list); // call photo_counseling image
+	});
+
+	function get_file_list(img_lists){
+		
+		if(img_lists != ""){
+			$.ajax({
+				url: '<?=$mainpage_directory?>/fileupload_ajax.php',
+				data: {
+					mode: "get_file_list",
+					file_list: img_lists.join(",")
+				},
+				type: 'POST',
+				dataType: 'JSON',
+				success: function(data) {
+					if(data.code == "000000"){
+						console.log(data.data);
+						var html = '';
+						var idx = 0;
+						if(data.data.length>0){
+							$('.img_list').html("");
+						}
+						$.each(data.data, function(i, v){
+							html = `<div class="list-cell"><a href="${v.file_path}" class="btn-portfolio-item"><img src="/upload/mypet/thumb/${v.file_name}" alt=""></a></div>`;
+							/*
+							html += '<div class="upload_file_wrap">';
+							html += '	<a data-fancybox="gallery" href="'+v.file_path+'">';
+							html += '		<img src="/pet/upload/mypet/thumb/'+v.file_name+'" alt="'+v.file_name+'" title="'+v.file_name+'" />';
+							html += '	</a>';
+							//html += '	<div class="set_delete_file_btn" data-seq="'+v.f_seq+'"><i class="fas fa-times"></i></div>';
+							html += '</div>';
+							*/
+							$('.img_list').append(html);
+							idx++;
+						});
+
+						
+						
+					}else{
+						alert(data.data+"("+data.code+")");
+						console.log(data.data);
+					}
+				},
+				error: function(xhr, status, error) {
+					//alert(error + "네트워크에러");
+					if(xhr.status != 0){
+						alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+					}
+				}
+			});
+		}
+	}
+
+	function approval() {
+		popalert.confirm('pop2','이 고객이 예약하는 것을 허용하고 상담을 완료합니다.','data/approval_counseling_request?get_pl_seq=<?= $payment_log_seq ?>&get_tc_id=<?= $customer_id ?>');
+		
+	}
+
+	function cancel() {
+		popalert.confirm('pop2','이 고객이 예약하는 것을 거부합니다.','data/cancellation_counseling_request?get_pl_seq=<?= $payment_log_seq ?>&get_tc_id=<?= $customer_id ?>');
+	}
+</script>
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

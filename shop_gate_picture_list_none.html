@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">SHOP 대문 사진 관리</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- page-contents -->  
+		<div class="page-contents">
+			<div class="shop-gate-picture-wrap">
+				<div class="shop-gate-picture-view">					
+					<!-- 이미지 있을 때
+					<img src="/static/pub/images/gate_picture.jpg" alt=""/>
+					-->
+					<!-- 이미지 없을 때 -->
+					<div class="common-none-data">
+						<div class="none-inner">
+							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"/></div>
+							<div class="item-info">등록된 이미지가 없습니다.</div>
+						</div>
+					</div>
+					<!-- //이미지 없을 때 -->
+				</div>
+				<div class="shop-gate-info-title">Shop 대문 사진함</div>
+				<div class="shop-gate-info-desc">아래 사진 중 원하시는 사진을 SHOP 대문사진으로 설정해 주세요. 보관함에 있는 사진들도 언제든지 대문사진 변경 가능합니다.</div>
+				<div class="shop-gate-picture-select">
+					<div class="list-inner">
+						<!--
+						<div class="list-cell">
+							<div class="picture-thumb-view">
+								<div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""/></div>
+								<div class="picture-ui">
+									<button type="button" class="btn-picture-ui"></button>									
+								</div>
+								<div class="picture-ui-list">
+									<div class="picture-ui-list-inner">
+										<a href="#" class="btn-picture-ui-nav">대표 사진 등록</a>
+										<a href="#" class="btn-picture-ui-nav">삭제</a>
+									</div>
+								</div>
+								<div class="check-point"></div>
+							</div>
+						</div>
+						-->
+						<div class="list-cell"><a href="#" class="btn-gate-picture-register"><span><em>이미지 추가</em></span></a></div>
+					</div>				
+				</div>
+				<div class="picture-add-info">이미지는 최대 25개까지 등록할 수 있습니다.<br>gif, png, jpg, jpeg 형식의 절차 이미지만 등록됩니다.</div>
+			</div>
+		</div>
+		<!-- //page-contents -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+	
+</body>
+</html>

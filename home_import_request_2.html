@@ -1,0 +1,263 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$user_id = $_SESSION['gobeauty_user_id'];
+?>     
+
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">반짝 입점 신청하기</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="import-request">		
+			<form class="form-group" id="form_data">
+				<div class="form-group-cell middle">
+					<div class="form-group-item">
+						<div class="form-item-label">사업자명 (사업자 등록상 이름)</div>
+						<div class="form-item-data">
+							<input type="text" name="business_name" class="form-control"/>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell middle">
+					<div class="form-group-item">
+						<div class="form-item-label">사업자 번호</div>
+						<div class="form-item-data">
+							<div class="form-cell-group">	
+								<div class="form-cell-group-inner">	
+									<input type="number" name="business_number1" class="form-control flex-2"/>
+									<input type="number" name="business_number2" class="form-control flex-1"/>
+									<input type="number" name="business_number3" class="form-control flex-3"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell middle">
+					<div class="form-group-item">
+						<div class="form-item-label">사업자 등록증 업로드</div>
+						<div class="form-item-data type-2">
+							<div class="picture-add-data">
+								<!-- 사진 없을 때 -->
+								<div id="photo_upload" style="display:block">
+									<a href="javascript:file_view();" class="btn-picture-add">
+										<div>
+											<div class="icon icon-size-24 icon-camera-gray"></div>
+											<div class="add-label">이미지 첨부</div>
+										</div>
+									</a>
+								</div>
+								<!-- 사진 있을 때 -->
+								<div id="photo_change" style="display:none">
+                                    <a href="javascript:file_view();">
+                                        <div class="picture-view-wrap">
+                                            <div class="picture-view">
+                                                <img id="upload_photo" src="/static/pub/images/user_thumb.png" alt=""/>
+                                            </div>
+                                        </div>
+                                    </a>
+								</div>
+                                <input type="hidden" name="business_photo" value="">
+							</div>		
+						</div>
+					</div>
+				</div>	
+			</form>
+            <input type="file" name="imgupfile" id="addimgfile" value="" style="display:none">
+		</div>
+		
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:next_request();" class="btn-page-bottom">다음</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script>
+    var user_id = "<?=$user_id?>";
+
+    ////////////////
+    // android
+    function galleryup() {
+        window.Android.openGallery();
+    }
+
+    function cameraup() {
+        window.Android.openCamera();
+    }
+
+    //안드에서 업로드가 끝나면 무조건 호출..
+    function uploadEnd(fileName) {
+        // var filename = $("input[name=imgupfile]")[0].files[0].name;
+        var newfilename = GetPhotoFilename('customer_photo', '<?= $user_id ?>', fileName);
+        //              alert(newfilename);
+
+
+
+        /*$('#myfile').val(myfile);
+        $('#filepath').val(filepath);
+        $('#pet_seq').val(_pet_seq);
+        $('#payment_log_seq').val(_payment_log_seq);
+        $('#artist_id').val(_artist_id);*/
+        var formData = new FormData();
+        formData.append("myfile", fileName);
+        formData.append("filepath", newfilename);
+
+        //document.f.submit();
+        //alert(fileName+' : '+newfilename+' : '+_pet_seq+' : '+_payment_log_seq+' : '+_artist_id)
+        $.ajax({
+            url: './data/upload_business_photo',	// 미용사진 갤러리 전용 업로드
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false,
+            type: 'POST',
+            success: function(data) {
+
+                if(data != "Fail") { // 성공
+                    location.reload();
+
+                } else {
+                    alert('미용사진 업로드에 실패하였습니다.');
+                    //rv = false;
+                }
+
+            },
+            error: function(xhr, status, error) {
+                alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+    ////////////////
+
+
+
+    function file_view(){
+        var is_android = checkMobile();
+        if(is_android == true){
+            galleryup();
+        } else {
+            $("#addimgfile").click();
+
+        }
+    }
+
+    function checkMobile(){
+
+        var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+
+        if ( varUA.indexOf('android') > -1) {
+            //안드로이드
+            return true;
+        } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+            //IOS
+            return 'ios';
+        } else {
+            //아이폰, 안드로이드 외
+            return 'other';
+        }
+
+    }
+
+    $(document).on("change", "#addimgfile", function(e){
+//$('#addimgfile').bind('change', function(e) {
+
+        console.log('start')
+        $(".pet-img div.normal").hide();
+        var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+            alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+            $(".pet-img div.normal").show();
+            return;
+        }
+
+        // 용량 체크
+        if( $("input[name=imgupfile]")[0].files[0].size > 10000000) { // 20mb 제한
+            alert('이미지는 최대 10mb까지 허용 중입니다.');
+            return;
+        }
+
+        var filename = $("input[name=imgupfile]")[0].files[0].name;
+        var newfilename = GetPhotoFilename('customer_photo', '<?= $user_id ?>', filename);
+
+        console.log(newfilename)
+        //
+        //var _prnt_titl = $.trim( $("#dialog_pet_gallery_form #pet_data_form .prnt_title").val() );
+        //
+        var formData = new FormData();
+        formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+        formData.append("filepath", newfilename);
+        //formData.append("prnt_title", _prnt_titl);
+        console.log($("input[name=imgupfile]")[0].files[0])
+        $.ajax({
+            url: './data/upload_business_photo',	// 미용사진 갤러리 전용 업로드
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false,
+            type: 'POST',
+            success: function(data) {
+
+
+                if(data != "Fail") { // 성공
+                    // location.reload();
+                    console.log(data);
+                    $("#photo_upload").css("display", "none");
+                    $("#photo_change").css("display", "block");
+                    $("#upload_photo").attr("src", data);
+                    $("input[name=business_photo]").val(data);
+                } else {
+                    alert('사업자등록증 업로드에 실패하였습니다.');
+                    //rv = false;
+                }
+
+            },
+            error: function(xhr, status, error) {
+                alert(error+"에러발생");
+                //rv = false;
+            }
+        });
+
+
+        //return rv;
+    });
+
+    function next_request(){
+        var post_data = decodeURIComponent($("#form_data").serialize());
+        if($("input[name=business_name]").val() == ''){
+            alert("사업자명을 입력해주세요.")
+            return false;
+        }
+        if($("input[name=business_number1]").val() == '' || $("input[name=business_number2]").val() == '' || $("input[name=business_number3]").val() == ''){
+            alert("사업자 번호를 입력해주세요.")
+            return false;
+        }
+        location.href = "home_import_request_3?"+post_data;
+    }
+</script>
+
+<?
+$footer_menu = false;
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

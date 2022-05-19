@@ -1,0 +1,58 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "회원정보관리";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+?>
+<header id="header">
+    <div class="header-left">
+        <a href="home_main" class="btn-page-ui btn-page-prev" id="btn_page_prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+    </div>
+<!--    <div class="page-title">--><?//=$shop_title?><!--</div>-->
+</header>
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- set-main-wrap -->
+        <div class="set-main-wrap">
+            <div class="grid-layout">
+                <div class="grid-layout-inner">
+                    <div class="grid-layout-cell grid-2"><a href="mypage_pw_change" class="btn-set-main-menu"><div class="txt">비밀번호 변경</div><div class="icon icon-set-menu-7"></div></a></div>
+                    <div class="grid-layout-cell grid-2"><a href="data/logout_process.php" class="btn-set-main-menu"><div class="txt">로그아웃</div><div class="icon icon-set-menu-8"></div></a></div>
+                    <div class="grid-layout-cell grid-2"><a href="terms3" class="btn-set-main-menu"><div class="txt">개인정보보호지침</div><div class="icon icon-set-menu-9"></div></a></div>
+                    <div class="grid-layout-cell grid-2"><a href="terms4" class="btn-set-main-menu"><div class="txt">이용약관</div><div class="icon icon-set-menu-10"></div></a></div>
+                    <div class="grid-layout-cell grid-2"><a href="mypage_hack" class="btn-set-main-menu"><div class="txt">탈퇴하기</div><div class="icon icon-set-menu-11"></div></a></div>
+                </div>
+            </div>
+        </div>
+        <!-- //set-main-wrap -->
+    </div>
+    <!-- //page-body -->
+</section>
+<!-- //container -->
+
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_no_gnb.php");
+?>

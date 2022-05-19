@@ -1,0 +1,146 @@
+<?php
+$shop_title	= "예약 접수";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$first_type = $_REQUEST['first_type'];
+$second_type = $_REQUEST['second_type'];
+if (!$second_type) {
+    $second_type = '추가공통옵션';
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+$result = mysqli_query($connection, $sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+
+?>
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- reserve-accept-wrap -->
+        <div class="reserve-accept-wrap">
+            <div class="wide-tab">
+                <div class="wide-tab-inner">
+                    <!-- 활성화시 actived클래스 추가 -->
+                    <div class="tab-cell actived"><a href="#" class="btn-tab-item">기존 고객 예약</a></div>
+                    <div class="tab-cell"><a href="./reserve_accept_2?worker=<?php echo $_GET['worker'];?>&workTime=<?php echo $_GET['workTime'];?>&workDate=<?php echo $_GET['workDate'];?>&backurl=<?php echo $_GET['backurl'];?>" class="btn-tab-item">신규 고객 예약</a></div>
+                </div>
+            </div>
+            <div class="basic-data-group vmiddle">
+                <div class="form-btns">
+                    <input type="text" id="search_word" onkeypress="if( event.keyCode == 13 ){search();}"  placeholder="전화번호 뒷자리 입력 또는 펫이름">
+                    <button type="button" class="btn-data-send btn-data-search"  onclick="search();"><span class="icon icon-size-24 icon-page-search">검색</span></button>
+                </div>
+            </div>
+            <div class="basic-data-group vmiddle">
+                <!-- 검색결과 있을 때 -->
+                <div class="customer-card-list" id="search_list">
+
+
+
+                </div>
+                <!-- //검색결과 있을 때 -->
+            </div>
+        </div>
+        <!-- //reserve-accept-wrap -->
+    </div>
+    <!-- //page-body -->
+</section>
+<!-- //container -->
+
+<script>
+    function search() {
+        var search_word = $("#search_word").val();
+        if(search_word == ""){
+            return false;
+        }
+
+        insertParam("searchTxt",search_word);
+        $("#searchList").html('');
+
+        $.ajax({
+            url: 'data/get_reserve_accept_ajax.php',
+            data: {
+                mode: 'get_search_all',
+                search: search_word,
+                artist_id: "<?=$user_id?>",
+                worker : '<?php echo $_GET['worker'];?>',
+                workTime : '<?php echo $_GET['workTime'];?>',
+                workDate : '<?php echo $_GET['workDate'];?>',
+                searchTxt : search_word
+            },
+            dataType: 'html',
+            type: 'POST',
+            success: function(data) {
+                $('#search_list').empty().append(data)
+            },
+            error: function() {
+                alert('Error');
+            }
+        });
+    }
+
+    $(document).ready(function(){
+        var search_word = '<?php echo $_GET['searchTxt'];?>';
+        if(search_word!='') {
+            $('#search_word').val(search_word);
+            insertParam("searchTxt", search_word);
+            $("#searchList").html('');
+
+            $.ajax({
+                url: 'data/get_reserve_accept_ajax.php',
+                data: {
+                    mode: 'get_search_all',
+                    search: search_word,
+                    artist_id: "<?=$user_id?>",
+                    worker: '<?php echo $_GET['worker'];?>',
+                    workTime: '<?php echo $_GET['workTime'];?>',
+                    workDate: '<?php echo $_GET['workDate'];?>',
+                    backurl: '<?php echo $_GET['backurl'];?>'
+                },
+                dataType: 'html',
+                type: 'POST',
+                success: function (data) {
+                    $('#search_list').empty().append(data)
+                },
+                error: function () {
+                    alert('Error');
+                }
+            });
+        }
+
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>')
+    });
+</script>
+</body>
+</html>

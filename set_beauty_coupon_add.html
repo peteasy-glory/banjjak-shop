@@ -1,0 +1,558 @@
+<?php
+$shop_title	= "쿠폰상품 등록/수정";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include ($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
+
+$emoji = new TEmoji();
+
+$backurl = $_GET['backurl'];
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$first_type = $_REQUEST['first_type'];
+$second_type = $_REQUEST['second_type'];
+if (!$second_type) {
+    $second_type = '추가공통옵션';
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+$result = mysqli_query($connection, $sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+
+$sql = "
+	SELECT * 
+	FROM tb_request_artist 
+	WHERE customer_id = '" . $user_id . "'
+";
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)) {
+    $data['request_artist'] = $row;
+    $is_offline = ($row['is_got_offline_shop'] == NULL) ? 0 : $row['is_got_offline_shop'];
+}
+
+// 오프라인 매장 여부 - 쿠폰, 정액제 사용 구분
+$sql = "
+	SELECT is_got_offline_shop 
+	FROM tb_request_artist 
+	WHERE customer_id = '".$user_id."'
+";
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+$is_got_offline_shop = $row['is_got_offline_shop'];
+
+
+$sql = "SELECT * FROM tb_coupon WHERE customer_id = '{$user_id}' AND product_type = 'B' AND del_yn = 'N' AND type = 'C'";
+//echo $sql;
+$res = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_array($res)){
+    $data['product_coupon'][] = $row;
+}
+
+$sql = "SELECT * FROM tb_coupon WHERE customer_id = '{$user_id}' AND product_type = 'B' AND del_yn = 'N' AND type = 'F'";
+//echo $sql;
+$res = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_array($res)){
+    $data['product_flat'][] = $row;
+}
+
+$sql = "SELECT * FROM tb_coupon_memo WHERE customer_id = '{$user_id}' ";
+//echo $sql;
+$res = mysqli_query($connection, $sql);
+$row = sql_fetch($res);
+$data['product_coupon_cmt'][] = $row;
+
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->
+    <form action="./data/save_coupon_add.php" name="f" method="post">
+        <input type="hidden" name="product_type" value="B">
+        <input type="hidden" name="mode" value="beautyCouponAdd">
+        <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
+	<div class="page-body">
+		<!-- set-coupon-add -->  
+		<div class="set-coupon-add">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">쿠폰(횟수) 상품</h4>
+				</div>
+				<div class="basic-data-group vvsmall3 coupon-add">
+
+					<!-- //하나의 영역 -->
+					<!-- 하나의 영역 -->
+
+                    <?php
+                    if(count($data['product_coupon'])>0){
+                    for($a=0;$a<count($data['product_coupon']);$a++){
+//                        print_r($data['product_coupon']);
+                    ?>
+					<div class="form-vertical-cell middle">
+						<div class="grid-layout basic">
+							<div class="grid-layout-inner">
+								<div class="grid-layout-cell grid-100">
+									<div class="form-group-item card">
+										<div class="form-item-label">상품명</div>
+										<div class="form-item-data">
+											<input type="text" name="coupon_name[]" value="<?php echo $emoji->emojiDBToStr($data['product_coupon'][$a]['name']);?>" class="coupon-name" placeholder="입력">
+                                            <input type="hidden" name="no[]" value="<?php echo $data['product_coupon'][$a]['coupon_seq'];?>">
+										</div>
+									</div>
+								</div>
+								<div class="grid-layout-cell grid-30">
+									<div class="form-group-item card">
+										<div class="form-item-label">이용횟수</div>
+										<div class="form-item-data">
+                                            <select name="given[]" class="coupon-given" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1 ; $i <= 20 ; $i++ ){ ?>
+                                                    <option value="<?php echo $i; ?>" <?php echo ($data['product_coupon'][$a]['given'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+										</div>
+									</div>
+								</div>
+								<div class="grid-layout-cell grid-40">
+									<div class="form-group-item card">
+										<div class="form-item-label">요금(단위:원)</div>
+										<div class="form-item-data">
+                                            <select name="price[]" class="coupon-price" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>" <?php echo ($data['product_coupon'][$a]['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+										</div>
+									</div>
+								</div>
+								<div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large" data-no="<?php echo $data['product_coupon'][$a]['coupon_seq'];?>">휴지통</button></div>
+							</div>
+						</div>
+					</div>
+                    <?php }} else { ?>
+                        <div class="form-vertical-cell middle">
+                            <div class="grid-layout basic">
+                                <div class="grid-layout-inner">
+                                    <div class="grid-layout-cell grid-100">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">상품명</div>
+                                            <div class="form-item-data">
+                                                <input type="text" name="coupon_name[]" value="" class="coupon-name" placeholder="입력">
+                                                <input type="hidden" name="no[]" value="" class="coupon-name" placeholder="입력">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell grid-30">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">이용횟수</div>
+                                            <div class="form-item-data">
+                                                <select name="given[]" class="coupon-given" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 1 ; $i <= 20 ; $i++ ){ ?>
+                                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell grid-40">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">요금(단위:원)</div>
+                                            <div class="form-item-data">
+                                                <select name="price[]" class="coupon-price" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                        <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+					<!-- //하나의 영역 -->
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round beauty-area-add">추가하기</button>
+				</div>
+
+                <div id="add_coupon_div" style="display:none">
+                    <div class="form-vertical-cell middle coupon-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner">
+                                <div class="grid-layout-cell grid-100">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">상품명</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="coupon_name[]" class="coupon-name"  placeholder="입력">
+                                            <input type="hidden" name="no[]" value=""  placeholder="입력">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell grid-30">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">이용횟수</div>
+                                        <div class="form-item-data">
+                                            <select name="given[]" class="coupon-given"  >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1 ; $i <= 20 ; $i++ ){ ?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell grid-40">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">요금(단위:원)</div>
+                                        <div class="form-item-data">
+                                            <select name="price[]" class="coupon-price"  >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="basic-data-group vmiddle">
+                    <div class="form-group-cell">
+                        <div class="form-group-item">
+                            <div class="form-item-label">추가설명</div>
+                            <div class="form-item-data">
+                                <textarea name="coupon_memo" id="coupon_memo" class="form-control"><?php echo $emoji->emojiDBToStr($data['product_coupon_cmt'][0]['coupon_memo']); ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+					<!--<div class="form-group middle">
+						<div class="form-group-cell middle">
+							<div class="form-group-item">
+								<div class="form-item-label">추가설명</div>
+								<div class="form-item-data">
+									<input type="text" name="coupon_memo" value="<?php /*echo nl2br($data['product_coupon_cmt'][0]['coupon_memo']);*/?>" class="form-control" placeholder="입력">
+									<div class="form-input-info">0/1000</div>									
+									<div class="form-bottom-info">*월관리는 좀 더 저렴한 미용이용과 강아지에게는 스트레스 해소에 좋습니다.</div>									
+								</div>
+							</div>
+						</div>
+					</div>-->
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">정액 적립 요금 상품</h4>
+				</div>
+				<div class="basic-data-group vvsmall3 all-div">
+
+					<!-- 하나의 영역 -->
+                    <?php
+                    if(count($data['product_flat'])>0){
+                    for($a=0;$a<count($data['product_flat']);$a++){
+                        if(!empty($data['product_flat'][$a]['name'])){
+                    ?>
+					<div class="form-vertical-cell middle">
+						<div class="grid-layout basic">
+							<div class="grid-layout-inner">
+								<div class="grid-layout-cell grid-100">
+									<div class="form-group-item card">
+										<div class="form-item-label">상품명</div>
+										<div class="form-item-data">
+											<input type="text" name="flat_name[]" value="<?php echo $emoji->emojiDBToStr($data['product_flat'][$a]['name']);?>" class="flat-name" placeholder="입력">
+                                            <input type="hidden" name="flat_no[]" value="<?php echo $data['product_flat'][$a]['coupon_seq'];?>" class="coupon-name" placeholder="입력">
+										</div>
+									</div>
+								</div>
+                                <div class="grid-layout-cell grid-30">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">적립금</div>
+                                        <div class="form-item-data">
+                                            <select name="flat_given[]" class="flat-given" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>"  <?php echo ($data['product_flat'][$a]['given'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+								<div class="grid-layout-cell grid-40">
+									<div class="form-group-item card">
+										<div class="form-item-label">요금(단위:원)</div>
+										<div class="form-item-data">
+                                            <select name="flat_price[]" class="flat-price" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>"  <?php echo ($data['product_flat'][$a]['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+										</div>
+									</div>
+								</div>
+								<div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large" data-no="<?php echo $data['product_flat'][$a]['coupon_seq'];?>">휴지통</button></div>
+							</div>
+						</div>
+					</div>
+                    <?php }}} else { ?>
+                        <div class="form-vertical-cell middle">
+                            <div class="grid-layout basic">
+                                <div class="grid-layout-inner">
+                                    <div class="grid-layout-cell grid-100">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">상품명</div>
+                                            <div class="form-item-data">
+                                                <input type="text" name="flat_name[]" value="<?php echo $data['product_flat'][$a]['name'];?>" class="flat-name" placeholder="입력">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell grid-30">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">적립금</div>
+                                            <div class="form-item-data">
+                                                <select name="flat_given[]" class="flat-given" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                        <option value="<?php echo $i; ?>"  <?php echo ($data['product_flat'][$a]['given'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell grid-40">
+                                        <div class="form-group-item card">
+                                            <div class="form-item-label">요금(담위:원)</div>
+                                            <div class="form-item-data">
+                                                <select name="flat_price[]" class="flat-price" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                        <option value="<?php echo $i; ?>"  <?php echo ($data['product_flat'][$a]['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large" data-no="<?php echo $data['product_flat'][$a]['coupon_seq'];?>">휴지통</button></div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+					<!-- //하나의 영역 -->
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round all-add">추가하기</button>
+				</div>
+                <div id="all_add" style="display:none">
+                    <div class="form-vertical-cell middle all-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner">
+                                <div class="grid-layout-cell grid-100">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">상품명</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="flat_name[]" class="" placeholder="입력">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell grid-30">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">적립금</div>
+                                        <div class="form-item-data">
+                                            <select name="flat_given[]" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell grid-40">
+                                    <div class="form-group-item card">
+                                        <div class="form-item-label">요금(담위:원)</div>
+                                        <div class="form-item-data">
+                                            <select name="flat_price[]" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 1000 ; $i <= 2500000 ; $i+=1000 ){ ?>
+                                                    <option value="<?php echo $i; ?>"><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="basic-data-group vmiddle">
+                    <div class="form-group-cell">
+                        <div class="form-group-item">
+                            <div class="form-item-label">추가설명</div>
+                            <div class="form-item-data">
+                                <textarea name="flat_memo" id="flat_memo" class="form-control"><?php echo $data['product_coupon_cmt'][0]['flat_memo']; ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+					<!--<div class="form-group middle">
+						<div class="form-group-cell middle">
+							<div class="form-group-item">
+								<div class="form-item-label">추가설명</div>
+								<div class="form-item-data">
+									<input type="text" name="flat_memo" value="<?php /*echo nl2br($data['product_coupon_cmt'][0]['flat_memo']);*/?>" class="form-control" placeholder="입력">
+									<div class="form-input-info">0/1000</div>														
+								</div>
+							</div>
+						</div>
+					</div>-->
+				</div>
+			</div>
+		</div>
+		<!-- //set-coupon-add -->  
+	</div>
+    </form>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom" onclick="save_data(document.f);">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+    <script>
+
+        function save_data(f){
+            var cname = cprice = cgiven = fname = fprice = fgiven = 0;
+            $('.coupon-add .coupon-name').each(function(){
+                if($(this).val() == ''){
+                    cname++;
+                }
+            });
+            if(cname > 0){
+                alert('쿠폰 상품명을 입력해주세요.');
+                return false;
+            }
+            $('.coupon-add .coupon-given').each(function(){
+                if($('.coupon-given option:selected').val() == ''){
+                    cprice++;
+                }
+            });
+            if(cprice > 0){
+                alert('쿠폰 이용횟수를 선택해주세요.');
+                return false;
+            }
+            $('.coupon-add .coupon-price').each(function(){
+                if($('.coupon-price option:selected').val() == ''){
+                    cgiven++;
+                }
+            });
+            if(cgiven > 0){
+                alert('쿠폰 요금을 선택해주세요.');
+                return false;
+            }
+
+
+            $('.flat-name').each(function(){
+                if($(this).val() == ''){
+                   fname++;
+                }
+            });
+            if(fname > 0){
+                alert('정액상품 상품명을 입력해주세요.');
+                return false;
+            }
+            $('.flat-given').each(function(){
+                if($('.flat-given option:selected').val() == ''){
+                    fgiven++;
+                }
+            });
+            if(fgiven > 0){
+                alert('정액상품 적립금을 선택해주세요.');
+                return false;
+            }
+            $('.flat-price').each(function(){
+                if($('.flat-price option:selected').val() == ''){
+                    fprice++;
+                }
+            });
+            if(fprice > 0){
+                alert('정액상품 이용요금을 선택해주세요.');
+                return false;
+            }
+
+            document.f.submit();
+
+        }
+        
+        //행삭제
+        $(document).on('click' , '.btn-data-trash' , function(){
+            var no = $(this).data('no');
+            $.ajax({
+                type : 'post',
+                url : './data/save_coupon_add',
+                data : {'mode':'deleteOne','no':no},
+                dataType : 'json',
+                success : function(data){
+
+
+                }, error(xhr, errors){
+                    console.log(xhr)
+                    console.log(errors)
+                }
+            });
+
+            $(this).parents('.form-vertical-cell').remove();
+
+        });
+
+        //쿠폰 추가
+        $(document).on('click','.beauty-area-add',function(){
+            var bt_div = $('#add_coupon_div .coupon-cell').clone();
+            $('.coupon-add').append(bt_div);
+        });
+
+        //정액적립금 추가
+        $(document).on('click','.all-add',function(){
+            var bt_div = $('#all_add .all-cell').clone();
+            $('.all-div').append(bt_div);
+        });
+    </script>
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

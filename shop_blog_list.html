@@ -1,0 +1,136 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "샵 연동 블로그 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$shop_sql = "SELECT * FROM tb_shop WHERE customer_id = '{$user_id}'";
+$shop_result = mysqli_query($connection, $shop_sql);
+if ($shop_datas = mysqli_fetch_object($shop_result)) {
+    $query = "SELECT * FROM tb_blog WHERE customer_id = '{$user_id}' AND del_yn = 'N'";
+    $result = mysqli_query($connection, $query);
+    $blog_list = array();
+
+    while($data = mysqli_fetch_object($result)){
+        $blog_list[] = $data;
+    }
+}
+
+?>
+
+    <!-- container -->
+    <section id="container">
+        <!-- page-body -->
+        <div class="page-body">
+            <!-- page-contents -->
+            <div class="page-contents">
+                <div class="shop-blog-wrap">
+                    <a href="shop_blog_review_add" class="btn btn-outline-purple btn-middle-size btn-border-radius-5"><em>추가하기</em></a>
+                    <?if(count($blog_list)){?>
+                        <!-- 내용이 있을 때 -->
+
+                        <div>
+                            <div class="vertical-list-wrap line">
+                                <div class="list-inner">
+                                    <?php
+                                    foreach($blog_list as $index => $data){
+                                        $image = $data->thumbnail;
+                                        $title = $data->title;
+                                        $desc = $data->desc;
+                                        $link = $data->link;
+                                        $seq = $data->blog_seq;
+                                        $blogger_name = $data->blogger_name;
+                                        ?>
+                                        <div class="list-cell">
+                                            <!-- basic-item 클래스에 actived클래스 추가시 ui 활성화 -->
+                                            <div class="basic-item">
+                                                <a href="<?php echo $link; ?>" target="_blank" class="basic-list-item blog">
+                                                    <?php if($image != null && $image != ""){?>
+                                                        <div class="thumb">
+                                                            <img src="<?=img_link_change($image)?>" alt="">
+                                                        </div>
+                                                    <?}?>
+                                                    <div class="info-wrap">
+                                                        <div class="item-name"><?php echo $title; ?></div>
+                                                        <div class="item-desc"><?php echo $desc ?></div>
+                                                        <div class="item-blog-option">
+                                                            <div class="name"><div class="ellipsis"><?php echo $blogger_name;?></div></div>
+                                                            <!--div class="date">2020.11.20</div-->
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="basic-item-ui">
+                                                    <button type="button" class="btn-basic-item-ui-nav"><span class="icon icon-size-16 icon-dot-more"></span></button>
+                                                    <div class="basic-item-ui-list">
+                                                        <a href="#" class="btn-basic-item-ui-item" onclick="del_blog(<?=$seq?>);">삭제</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?}?>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- //내용이 있을 때 -->
+                    <?}else{?>
+                        <div class="common-none-data">
+                            <div class="none-inner">
+                                <div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+                                <div class="item-info">마이샵에 노출되는 블로그가 없습니다.<br><span>추가하기를 통해 네이버 블로그를<br>연동하여 샵에 노출해 주세요!</span></div>
+                            </div>
+                        </div>
+                    <?}?>
+                </div>
+            </div>
+            <!-- //page-contents -->
+        </div>
+        <!-- //page-body -->
+    </section>
+    <!-- //container -->
+    <script>
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','shop_main')
+        })
+    </script>
+    <script>
+        function del_blog(no){
+            $.ajax({
+                async: false,
+                type: 'post',
+                url: 'data/blog_event.php',
+                data: 'idx=' + no,
+                error: function () {
+                    alert('잠시 후 다시 시도해주세요.');
+                },
+                success: function (result) {
+                    if(result){
+                        location.reload();
+                    }
+                }
+            });
+        }
+    </script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

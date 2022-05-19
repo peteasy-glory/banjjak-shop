@@ -1,0 +1,1568 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "작업/결제관리";
+$header_right	= '
+	
+';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$notice_yn = "Y";
+
+$customer_user_id = $user_id;	// 사진 변경용 정회원번호
+$customer_tmp_seq = "";			// 사진 변경용 가회원번호
+
+$thisTimeStart = $_GET['thisTimeStart'];
+$thisTimeEnd = $_GET['thisTimeEnd'];
+$order_id = $_GET['order_id'];
+
+$backurl = urldecode($_GET['backurl']);
+$backurl_4_gallery = urlencode("/pet/shop/view_payment_customer_info_pc.php?payment_log_seq={$payment_log_seq}&thisTimeStart={$thisTimeStart}&thisTimeEnd={$thisTimeEnd}");	// 갤러리용 backurl
+
+//승인여부 확인하기
+$que = "SELECT * FROM tb_grade_reserve_approval_mgr WHERE idx = {$_GET['reserve_approval_idx']}";
+//echo $que;
+$gram = sql_fetch_array($que);
+
+if($gram[0]['is_approve'] > 0){
+    echo '<script>alert("승인대기중인 결제건이 아닙니다.");location.href="/";</script>';
+}
+
+//결제 정보 구하기
+$que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$gram[0]['payment_log_seq']}";
+//echo $que;
+$res = sql_query($que);
+$pay = sql_fetch($res);
+
+$payment_log_seq = $gram[0]['payment_log_seq'];
+    
+$notice_yn		= $pay['notice_yn'];
+
+
+$crypto = new Crypto();
+//회원정보
+if($pay['customer_id']) {
+    $que = "SELECT * FROM tb_customer a LEFT JOIN tb_grade_of_customer b ON a.id = b.customer_id WHERE a.id = '{$pay['customer_id']}'";
+} else {
+    $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$pay['cellphone']}'";
+}
+//echo $que;
+$res = sql_query($que);
+$cus = sql_fetch($res);
+
+
+//펫정보
+$que = "SELECT * FROM tb_customer_family WHERE to_customer_id = '{$pay['customer_id']}' AND to_cellphone = '{$cus['cellphone']}' AND is_delete = 0";
+//echo $que;
+$arr = sql_fetch_array($que);
+if(count($arr)>0){
+    foreach($arr as $fam){
+        $tel['title'][] = $fam['from_nickname'];
+        $tel['tel'][] = $fam['from_cellphone'];
+    }
+}
+
+//메모
+$que = "SELECT * FROM tb_shop_customer_memo WHERE (customer_id = '{$pay['customer_id']}' OR tmp_seq = '{$cus['tmp_seq']}')AND artist_id = '{$pay['artist_id']}' AND cellphone = '{$pay['cellphone']}' AND is_delete = 1";
+//echo $que;
+$arr = sql_fetch_array($que);
+if(count($arr)>0){
+    foreach($arr as $fam){
+        $tel['title'][] = $fam['from_nickname'];
+        $tel['tel'][] = $fam['from_cellphone'];
+    }
+}
+
+
+//페이미지
+$que = "SELECT * FROM tb_mypet_beauty_photo WHERE artist_id = '{$pay['aritst_id']}' AND pet_seq = {$pay['pat_seq']} ORDER BY upload_dt DESC LIMIT 1";
+$res = sql_query($que);
+$pic = sql_fetch($res);
+if(!$pic['file_path']){
+
+}
+$que = "SELECT * FROM tb_mypet WHERE pet_seq = {$pay['pet_seq']}";
+$res1 = sql_query($que);
+$pet = sql_fetch($res1);
+//print_r($pet);
+
+//미용사 정보
+$que = "SELECT * FROM tb_artist_list WHERE name = '{$pay['worker']}' GROUP BY artist_id ";
+//echo $que;
+$ar = sql_fetch_array($que);
+
+//상점정보
+$que = "SELECT * FROM tb_shop WHERE customer_id = '{$pay['artist_id']}'";
+$sh = sql_fetch_array($que);
+
+//미용선택정보 가져오기
+$beauty_info = explode("|",$pay['product']);
+//print_r($beauty_info);
+
+
+
+//미용동의서
+$que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$pay['artist_id']}' AND pet_id = '{$pay['pet_seq']}'";
+$bag = sql_fetch_array($que);
+
+
+//견주메모관련
+$que = "SELECT * FROM tb_shop_customer_memo WHERE customer_id = '{$cus['id']}' AND tmp_seq = '{$cus['tmp_seq']}' AND cellphone = '{$pay['cellphone']}' AND artist_id = '{$pay['artist_id']}'";
+//echo $que;
+$scm = sql_fetch_array($que);
+?>
+
+    <!-- container -->
+    <section id="container">
+        <!-- page-body -->
+        <div class="page-body">
+            <div class="reserve-pay-management">
+                <!-- 예약자 정보 -->
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">예약자 정보</h4>
+                    </div>
+                    <div class="flex-table type-2">
+                        <!--<div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">아이디</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php /*echo (!empty($cus['id']))?$cus['id']:$cus['tmp_seq'];*/?>
+                                    </div>
+                                    <?php /*if($pay['is_no_show']>0){ */?>
+                                        <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php /*echo $pay['is_no_show'];*/?>회</div></div>
+                                    <?php /*} */?>
+                                </div>
+                            </div>
+                        </div>-->
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">등급</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <div class="user-grade-item">
+                                            <div class="icon icon-grade-vip"></div>
+                                            <div class="icon-grade-label">
+                                                <?php
+                                                    if(!$cus['grade_idx']){
+                                                        echo 'VIP';
+                                                    } else {
+
+                                                    }
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <!--
+                                        <div class="user-grade-item">
+                                            <div class="icon icon-grade-normal"></div>
+                                            <div class="icon-grade-label">Normal</div>
+                                        </div>
+                                        <div class="user-grade-item">
+                                            <div class="icon icon-grade-normalb"></div>
+                                            <div class="icon-grade-label">Normal_B</div>
+                                        </div>
+                                        -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">연락처</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php echo $pay['cellphone'];?>
+                                    </div>
+                                    <div class="flex-table-data-side">
+                                        <div class="btn-ui-group">
+                                            <a href="tel:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                            <a href="sms:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell no-padding">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">보조 연락처</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php for($i=0;$i<count($tel);$i++){ ?>
+                                            <div class="flex-table-item middle">
+                                                <div class="flex-table-data">
+                                                    <div class="flex-table-data-inner">
+                                                        <div class="flex-table-txt"><em><?php echo $tel['title'][$i];?></em><?php echo $tel['tel'][$i];?></div>
+                                                    </div>
+                                                    <div class="flex-table-data-side">
+                                                        <div class="btn-ui-group">
+                                                            <button type="button" class="btn-data-tel" href="tel:<?php echo $tel['tel'][$i];?>">전화하기</button>
+                                                            <button type="button" class="btn-data-message" href="sms:<?php echo $tel['tel'][$i];?>">메시지보내기</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- //예약자 정보 -->
+                <!-- 예약동물 정보 -->
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">예약동물 정보</h4>
+                    </div>
+                    <div class="customer-view-pet-group">
+                        <div class="customer-view-pet-picture">
+                            <div class="item-thumb">
+                                <div class="user-thumb large">
+                                    <?php
+
+                                    if(!empty($pet['photo'])){
+                                        $img = $pet['photo'];
+                                    } else {
+                                        $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet['pet_seq']}' ORDER BY upload_dt DESC LIMIT 1";
+                                        $rw = sql_fetch_array($sql);
+                                        if(!empty($rw[0]['file_path'])){
+                                            $img = $rw[0]['file_path'];
+                                        } else {
+                                            if ($pet['type'] == 'dog') {
+                                                $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
+                                            } else {
+                                                $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    <img src="<?php echo $img; ?>" alt="" onclick="show_img('<?php echo $img;?>');">
+                                </div>
+                            </div>
+                            <div class="item-user-info">
+                                <div class="item-user-info-inner">
+                                    <div class="user-name"><?php echo $pet['name'];?></div>
+                                    <div class="user-cate"><?php echo $pet['pet_type'];?></div>
+                                </div>
+                            </div>
+                            <div class="item-action">
+                                <div class="grid-layout btn-grid-group">
+                                    <div class="grid-layout-inner">
+                                        <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./reserve_beauty_gallery';">미용 갤러리</a></div>
+                                        <?php
+                                        if($bag[0]['is_agree']==1){
+                                            ?>
+                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree_view?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&ba_seq=<?php echo $bag[0]['ba_seq'];?>" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 보기</a></div>
+                                        <?php } else { ?>
+                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 작성</a></div>
+                                        <?php } ?>
+                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $pay['pet_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2';">펫 정보 수정</a></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table type-2">
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">성별</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo $pet['gender'];?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">중성화</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo ($pet['neutral']==1)?'O':'X';?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">무게</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo $pet['weight'];?>Kg
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">생일</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">나이</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php
+                                            calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
+                                            ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
+                        <div class="customer-view-pet-detail">
+                            <button type="button" class="btn-detail-toggle" id="pet-info-view">펫 정보 자세히 보기</button>
+                            <div class="service-selected-wrap">
+                                <div class="service-selected-group">
+                                    <div class="list-title">미용 경험</div>
+                                    <div class="list-data"><?php echo $pet['beauty_exp'];?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">예방 접종</div>
+                                    <div class="list-data"><?php echo $pet['vaccination'];?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">입질</div>
+                                    <div class="list-data"><?php echo $pet['bite'];?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">싫어하는 부위</div>
+                                    <div class="list-data">
+                                        <?php
+                                        if($pet['nothing']==1){
+                                            //$is_hate = '없음';
+                                        } else {
+                                            if ($pet['dt_eye'] == 1) $hate[] = '눈';
+                                            if ($pet['dt_nose'] == 1) $hate[] = '코';
+                                            if ($pet['dt_mouth'] == 1) $hate[] = '입';
+                                            if ($pet['dt_neck'] == 1) $hate[] = '목';
+                                            if ($pet['dt_body'] == 1) $hate[] = '몸';
+                                            if ($pet['dt_leg'] == 1) $hate[] = '다리';
+                                            if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
+                                            if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
+                                            $is_hate = implode(",",$hate);
+                                        }
+                                        echo $is_hate;
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">슬개골 탈구</div>
+                                    <div class="list-data"><?php echo $pet['luxation'];?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">특이사항</div>
+                                    <div class="list-data">
+                                        <?php
+
+                                        if ($pet['dermatosis'] == 1) $dis[] = '피부병';
+                                        if ($pet['heart_trouble'] == 1) $dis[] = '심장질환';
+                                        if ($pet['marking'] == 1) $dis[] = '마킹';
+                                        if ($pet['mounting'] == 1) $dis[] = '마운팅';
+
+                                        $is_dis = implode(",",$dis);
+
+                                        echo ($is_dis)?$is_dis:'';
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">기타</div>
+                                    <div class="list-data"><?php echo $pet['etc'];?></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="basic-data-group vmiddle">
+                            <div class="form-group">
+                                <div class="form-group-cell middle">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">특이사항</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="etc_memo" id="etc_memo" class="form-control" placeholder="입력" value="<?php echo $pay['etc_memo'];?>">
+                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
+                                        </div>
+                                        <div class="form-item-data type-8">
+                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc1" data-seq="<?php echo $payment_log_seq;?>">저장</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group-cell middle">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">견주관련 메모</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="etc2_memo" id="etc2_memo" value="<?php echo $scm[0]['memo'];?>" class="form-control" placeholder="입력">
+                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
+                                        </div>
+                                        <div class="form-item-data type-8">
+                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc2" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- //예약동물 정보 -->
+
+                <!-- 이전 특이 사항 -->
+                <?php
+
+                $sql = "
+                            SELECT *
+                            FROM tb_payment_log 
+                            WHERE artist_id = '" . $artist_id . "' 
+                                AND is_no_show = 0 
+                                AND is_cancel = 0 
+                                AND is_cancel = 0
+                                AND approval = 1
+                                AND etc_comment = ''
+                                AND pet_seq = {$pet['pet_seq']}                                
+                        ";
+                //echo $sql;
+                $arr = sql_fetch_array($sql);
+                if(count($arr)>0){
+                    ?>
+                    <div class="basic-data-group" id="prev_cmt">
+                        <?php
+                        foreach($arr as $rs){
+                            ?>
+                            <div class="con-title-group">
+                                <h4 class="con-title">이전 특이사항</h4>
+                            </div>
+                            <div class="special-note-list">
+                                <?php
+                                $tp_cnt = 0;
+                                for($k=0;$k<count($rs);$k++){
+                                    $date = $rs['year'].'-'.$rs['month'].'-'.$rs['day'];
+                                    $prev_beauty = explode("|",$rs['product']);
+                                    $kg = explode(":",$prev_beauty[5]);
+                                    ?>
+                                    <div class="special-note">
+                                        <div class="note-desc"><em><?php echo date('Y.m.d',strtotime($date));?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
+                                    </div>
+                                    <?php $tp_cnt++;} ?>
+                            </div>
+                            <div class="basic-data-group vmiddle">
+                                <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
+                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple">더보기</button>
+                            </div>
+                        <?php } ?>
+                    </div>
+                <?php } ?>
+
+                <!-- 이전 미용 -->
+                <?php
+                $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$pay['pet_seq']} AND artist_id = '{$artist_id}' AND cellphone = '{$pay['cellphone']}' AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 ";
+                //echo $que;
+                $arr = sql_fetch_array($que);
+                if(count($arr)>0) {
+                    foreach ($arr as $arr) {
+                        $data['total_payment'][] = $arr;
+                    }
+                }
+
+                if (count($data["total_payment"]) > 0) {
+                    ?>
+
+                    <div class="basic-data-group" id="prev_beauty_info" style="display:none">
+                        <div class="con-title-group">
+                            <h4 class="con-title">이전 미용</h4>
+                        </div>
+                        <?php
+
+                        $before_date = "";
+                        ?>
+                        <div class="memo-item-list">
+                            <?php
+                            $tp_cnt = 0;
+                            for($k=0;$k<count($data["total_payment"]);$k++){
+                                if($data["total_payment"][$k]['is_cancel']==0 && $data["total_payment"][$k]['is_no_show'] == 0 && $data["total_payment"][$k]['data_delete']==0 &&  $data["total_payment"][$k]['approval']!=1 ){
+                                    $date = $data["total_payment"][$k]['year'].'-'.$data["total_payment"][$k]['month'].'-'.$data["total_payment"][$k]['day'];
+                                    $prev_beauty = explode("|",$data["total_payment"][$k]['product']);
+                                    $kg = explode(":",$prev_beauty[5]);
+                                    ?>
+                                    <div class="memo-item"><?php echo date('Y.m.d',strtotime($date));?> / <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($kg[1]);?>원</div>
+                                    <?php $tp_cnt++;}} ?>
+                        </div>
+                        <div class="basic-data-group vmiddle">
+                            <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
+                            <button type="button" class="btn btn-middle-size btn-round btn-outline-purple"><?php echo ($tp_cnt>5)?'더보기':'닫기';?></button>
+                        </div>
+                    </div>
+                <?php } ?>
+
+                <div class="basic-data-group">
+                    <div class="user-receipt-item">
+                        <div class="con-title-group">
+                            <h5 class="con-title">예약 내용</h5>
+                            <button type="button" class="btn-side btn btn-outline-purple btn-msmall-size btn-inline btn-border-radius-16">알림톡 발송 이력</button>
+                        </div>
+                        <div class="text-list-wrap type-2">
+                            <div class="text-list-cell"><div class="item-title unit">날짜</div><div class="item-data"><?php echo date('Y.m.d',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day']));?></div></div>
+                            <div class="text-list-cell"><div class="item-title unit">선생님</div><div class="item-data"><?php echo $ar[0]['nicname'];?></div></div>
+                            <div class="text-list-cell"><div class="item-title unit">시간</div><div class="item-data"><?php echo $rev_date = date('H:i',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'])); ?> ~ <?php echo $rev_date = date('H:i',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['to_hour'].':'.$pay['to_minute'])); ?></div></div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+        <!-- //page-body -->
+        <div class="page-bottom">
+            <div class="grid-layout btn-grid-group">
+                <div class="grid-layout-inner">
+                    <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round apporval-reserve" data-type="2" data-mgr="<?php echo $_GET['reserve_approval_idx'];?>">예약 확정</button></div>
+                    <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round apporval-reserve" data-type="3" data-mgr="<?php echo $_GET['reserve_approval_idx'];?>">예약신청 취소</button></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- [필수사항]을(를) 입력해주세요.  -->
+        <article id="firstRequestMsg1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt"></div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+        <!--  기본 메세지 팝업(버튼2) -->
+        <article id="only_change_time" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-title">확인</div>
+                            <div class="msg-txt">예약시간을 변경 하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-cc" onclick="popalert.close();">취소</button>
+                            <button type="button" class="btn btn-confirm btn-cf" onclick="set_change_time();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        <!-- //기본 메세지 팝업(버튼2) -->
+
+        <!--  기본 메세지 팝업(버튼2) -->
+        <article id="noshow" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-title">확인</div>
+                            <div class="msg-txt">해당 예약정보를 노쇼로 등록을 하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-cc" onclick="popalert.close();">취소</button>
+                            <button type="button" class="btn btn-confirm btn-cf" onclick="set_noshow();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        <!-- //기본 메세지 팝업(버튼2) -->
+
+        <!--  기본 메세지 팝업(버튼2) -->
+        <article id="change_rev" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-title">확인</div>
+                            <div class="msg-txt">
+                                * 변경을 위해 주간스케줄로 이동합니다. 현재 페이지에서 저장하지 않은 정보는 분실될 수 있으니 변경 전에 확인해주세요.
+                                <p>
+                                    * 변경을 완료하기 전에 다른 페이지로 이동하면 오류가 발생할 수 있으니 주의해주세요.
+                                <p>
+                                    변경하시겠습니까?
+                                <p>
+                                    <span style="color:red">(주의) 주간 스케줄표에서만 변경 가능합니다!</span>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-cc" onclick="popalert.close();">취소</button>
+                            <button type="button" class="btn btn-confirm btn-cf" onclick="change_rev();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        <!-- //기본 메세지 팝업(버튼2) -->
+        <article id="confirmOnlyOkNoLink" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        <article id="confirmOnlyOkReload" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+        <article id="confirmOnlyOkLink" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();go_url();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+
+        <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">
+                                <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+        <article id="reservePayManagementMsg8" class="layer-pop-wrap" style="z-index: 100000;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-title">펫샵적립금 적립시점 안내</div>
+                            <div class="msg-txt text-align-left">해당 미용종료시간 10분이 지나면 자동으로 직접 설정하신 기준에 따라 자동 적립됩니다.<br>(설정방법: <strong>상세설정 &gt; 적립금설정</strong>)</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">닫기</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+    </section>
+    <!-- //container -->
+
+    <script>
+
+        $(document).ready(function(){
+            $(".btn-page-prev").click(function(){
+                history.back();
+                return false;
+            });
+        });
+
+
+        $(document).on('click','.service-type',function(){
+            var petType = '';
+            var serviceType = '';
+            var service = $(this).val();
+            var time = $(this).data('time');
+            $('input[name="pet_kind"]').each(function(){
+                if($(this).is(':checked')==true) {
+                    petType = $(this).val();
+                }
+            });
+
+            if(!petType){
+                petType = '<?php echo $pet['type'];?>';
+            }
+
+            $('.pet-size').each(function(){
+                var checked = $(this).prop('checked');
+                if(checked==true) {
+                    serviceType = $(this).val();
+                }
+            });
+
+
+            if(!petType || !serviceType){
+                alert('크기를 선택해주세요.');
+                return false;
+            }
+
+            //해당 미용 시간으로 예약시간을 변경한다.
+
+
+
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    if(json.flag == true){
+                        $('#kgs_list').empty().append(json.data);
+                        console.log(time)
+                        $('#to_time').val(time).prop('selected',true);
+                    }
+                }
+            });
+        });
+
+        $(document).on('click','.set-noshow',function(){
+            popalert.open('noshow');
+        });
+
+        function set_noshow(){
+            var seq = '<?php echo $payment_log_seq;?>';
+            $.ajax({
+                type : 'post',
+                url : './data/pay_make_ajax',
+                data : {'mode':'regNoshow','seq':seq},
+                dataType : 'json',
+                success : function(json){
+                    console.log(json)
+                    if(json.flag == true){
+                        location.reload();
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+        //특이사항 저장
+        $(document).on('click','.save-etc1',function(){
+            var memo = $('#etc_memo').val();
+            var seq = $(this).data('seq');
+            $.ajax({
+                type : 'post',
+                url : './data/pay_make_ajax',
+                data : {'mode':'etc1','seq':seq,'memo':memo},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.open('confirmOnlyOkNoLink','특이사항이 저장되었습니다.');
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+
+        });
+
+        //특이사항 저장
+        $(document).on('click','.save-etc2',function(){
+            var memo = $('#etc2_memo').val();
+            var cid = $(this).data('cid');
+            var aid = $(this).data('aid');
+            var phone = $(this).data('phone');
+            var tseq = $(this).data('tseq');
+            $.ajax({
+                type : 'post',
+                url : './data/pay_make_ajax',
+                data : {'mode':'etc2','cid':cid,'memo':memo, 'aid':aid, 'phone':phone, 'tseq':tseq},
+                dataType : 'json',
+                success : function(json){
+                    console.log(json)
+                    if(json.flag == true){
+                        popalert.open('confirmOnlyOkNoLink','견주관련 메모가 저장되었습니다.');
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        });
+
+        //시간만 변경
+        //특이사항 저장
+        $(document).on('click','.only-change-time',function(){
+            popalert.open('only_change_time');
+        });
+
+        function set_change_time(){
+            var start_time = $('#from_time option:selected').val();
+            var end_time = $('#to_time option:selected').val();
+            var seq = $('.only-change-time').data('seq');
+            $.ajax({
+                type : 'post',
+                url : './data/pay_make_ajax',
+                data : {'mode':'onlyTimeChange','startTime':start_time,'endTime':end_time, 'seq':seq},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.close();
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+        //날짜 미용사 변경
+        $(document).on('click','.change-rev',function(){
+            popalert.open('change_rev');
+        });
+
+        function change_rev(){
+            location.href='./reserve_main_week?payment_log_seq=<?php echo $payment_log_seq;?>&artist_id=<?php echo $pay['artist_id'];?>';
+        }
+
+        // 카카오톡알림발송
+        function sendAllimtalk() {
+            var timer = $("input[name=timer]:checked").val();
+
+            if (timer != "" && timer != undefined) {
+                var data = $("#shop_form").serialize();
+
+                $.ajax({
+                    type: 'post',
+                    data: data,
+                    url: '<?=$shop_directory?>/send_notice_talk.php',
+                    dataType: 'json',
+                    error: function() {
+                        $.MessageBox('알림톡 발송이 실패했습니다.');
+                    },
+                    success: function(json) {
+                        if (json.result) {
+                            $.MessageBox({
+                                buttonDone: '확인',
+                                message: '발송 되었습니다.'
+                            }).done(function(){
+                                location.href = 'view_payment_customer_info.php'+location.search;
+                            });
+                        } else {
+                            $.MessageBox('알림톡 발송이 실패했습니다.');
+                        }
+                    }
+                });
+            } else {
+                alert("시간을 선택해주세요.");
+            }
+
+            return;
+        }
+
+        //펫정보
+        function get_pet_info(no){
+            $.ajax({
+                type : 'post',
+                url : './data/get_pet_info',
+                data : {'mode':'petInfo','no':no,'cellphone':'<?php echo $cellPhone;?>'},
+                dataType : 'json',
+                success : function(json){
+
+                    if(json.result['flag'] == true){
+                        var kg = json.data['weight'].split('.');
+                        $('#pet_name').val(json.data['name']);
+                        $('#pet_type').val(json.data['pet_type']);
+                        if(json.data['type']=='dog'){
+                            $('#breed1').prop('checked',true);
+                        } else {
+                            $('#breed2').prop('checked',true);
+                        }
+
+                        $('#pet_year').val(json.data['year']);
+                        $('#pet_month').val(json.data['month']);
+                        $('#pet_day').val(json.data['day']);
+
+                        if(json.data['gender']=='남아'){
+                            $('#gender1').prop('checked',true);
+                        } else {
+                            $('#gender2').prop('checked',true);
+                        }
+
+                        if(json.data['neutral']==1){
+                            $('#neutralize1').prop('checked',true);
+                        } else {
+                            $('#neutralize2').prop('checked',true);
+                        }
+
+                        $('#pet_weight1').val(kg[0]);
+                        $('#pet_weight2').val(kg[1]);
+
+
+                        if(json.beauty != ''){
+                            $('#prev_beauty_info').empty().append(json.beauty).css('display','block');
+                        } else {
+                            $('#prev_beauty_info').empty().css('display','none');
+                        }
+
+                        $('#customer_id').val(json.data['customer_id']);
+                        //get_coupon($('#customer_id').val());
+                        //품종 타입별 크기선택 불러오기
+                        get_type_load(json.data['type']);
+                        // make_beauty_chk();
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+        //크기 정보 구하기
+        function get_type_load(gt){
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'getTypeSize','type':gt},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        $('#serviceType').empty().append(json.data);
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+        //쿠폰 정보 구하기
+        function get_coupon(cusid){
+            console.log(cusid)
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'getCoupon','cid':cusid},
+                dataType : 'json',
+                success : function(json){
+                    console.log(json)
+                    if(json.flag == true){
+                        if(!json.cnt){
+                            $('#coupon_div').css('display','none');
+                        } else {
+                            $('#coupon_name').empty().append(json.select_name);
+                            $('#coupon_div').css('display','block');
+                        }
+                        $('#serviceType').empty().append(json.data);
+
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+        //쿠폰 선택시
+        $('#coupon_name').change(function(){
+            var cid = $(this).val();
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'getCouponBalance','cid':cid},
+                dataType : 'json',
+                success : function(json){
+                    console.log(json)
+                    if(json.flag == true){
+                        $('#coupon_balance').empty().append(json.select_name);
+                        $('#use_coupon').empty().append(json.select_use);
+
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        });
+
+        //쿠폰사용
+        $(document).on('click','.use-coupon',function(){
+            if(confirm('쿠폰을 사용하시겠습니까?')){
+                var cnt = $('#use_coupon option:selected').val();
+                var cid = $('#coupon_name option:selected').val();
+                if(!cnt){
+                    alert('쿠폰차감 횟수를 선택해주세요.');
+                    return false;
+                }
+                $.ajax({
+                    type : 'post',
+                    url : './data/get_book_data_ajax',
+                    data : {'mode':'useCoupon','cid':cid,'cnt':cnt},
+                    dataType : 'json',
+                    success : function(json){
+                        console.log(json)
+                        if(json.flag == true){
+                            var cid = json.cid;
+                            $.ajax({
+                                type : 'post',
+                                url : './data/get_book_data_ajax',
+                                data : {'mode':'getCouponBalance','cid':cid},
+                                dataType : 'json',
+                                success : function(json){
+                                    if(json.flag == true){
+                                        $('#coupon_balance').empty().append(json.select_name);
+                                        $('#use_coupon').empty().append(json.select_use);
+                                        $('#remind_coupon').text($('#coupon_balance option:selected').val());
+
+                                    }
+                                }, error : function(xhr, error){
+                                    console.log('error'+xhr)
+                                }
+                            });
+                        }
+                        $('#coupon_seq').val(cid);
+                    }, error : function(xhr, error){
+                        console.log('error'+xhr)
+                    }
+                });
+            }
+        });
+
+        //크기 정보 구하기
+        function get_type_load(gt){
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'getTypeSize','type':gt},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        $('#serviceType').empty().append(json.data);
+
+
+                    }
+                }, error : function(xhr, error){
+                    console.log('error'+xhr)
+                }
+            });
+        }
+
+
+        //강아지 사이즈 선택시 무게 값을 가져온다.
+        $(document).on('click','.pet-size',function(){
+
+            var petType = '';
+            var serviceType = '';
+            var service = '';
+            $('input[name="pet_kind"]').each(function(){
+                if($(this).is(':checked')==true) {
+                    petType = $(this).val();
+                }
+            });
+
+            $('.pet-size').each(function(){
+                if($(this).is(':checked')==true) {
+                    serviceType = $(this).val();
+                }
+            });
+
+            $('.service-type').each(function(){
+                if($(this).is(':checked')==true) {
+                    service = $(this).val();
+                }
+            });
+
+            if(!petType){
+                petType = '<?php echo $pet['type'];?>';
+            }
+
+            $('.pet-size').each(function(){
+                var checked = $(this).prop('checked');
+                if(checked==true) {
+                    serviceType = $(this).val();
+                }
+            });
+
+
+            if(petType || serviceType || service){
+                $.ajax({
+                    type: 'post',
+                    url: 'data/get_book_data_ajax',
+                    data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
+                    dataType: 'json',
+                    error: function() {
+                        alert('Error');
+                    },
+                    success: function(json) {
+                        if(json.flag == true){
+                            $('#kgs_list').empty().append(json.data);
+                        }
+                    }
+                });
+            }
+        });
+
+        //품종선택시
+        $(document).on('click','input[name="pet_kind"]',function(){
+            //기본서비스 정보를 초기화 한다.
+
+            if($(this).val() == 'dog'){
+                get_type_load($(this).val());
+                $('.is-dog').css('display','block');
+                $('.is-cat').css('display','none');
+            } else {
+                get_type_load($(this).val());
+                $('.is-cat').css('display','block');
+                $('.is-dog').css('display','none');
+            }
+
+            //
+        });
+
+        //이전 미용 정보 불러오기
+        function get_prev_beauty_info(){
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    if(json.flag == true){
+                        $('#kgs_list').empty().append(json.data);
+
+                    }
+                }
+            });
+        }
+
+        //무게 선택시
+        $(document).ready(function(){
+            //get_coupon('<?php echo $pay['customer_id'];?>');
+        });
+
+
+        $(document).on('click','#pet-info-view',function(){
+            console.log($(this).hasClass('actived'))
+            if($('.customer-view-pet-detail').hasClass('actived') == true){
+                $('.customer-view-pet-detail').removeClass('actived');
+            } else {
+                $('.customer-view-pet-detail').addClass('actived');
+            }
+        });
+
+
+        $(document).on('click','.btn-tab-item',function(){
+            var checked = false;
+            var value = '';
+            $('.btn-tab-item').each(function(index){
+                $(this).parent().removeClass('actived').removeClass('hit');
+            });
+            $(this).parent().addClass('actived').addClass('hit');
+            $('.tab-data-cell').css('display','none');
+            $('.btn-tab-item').each(function(index){
+                if($(this).parent().hasClass('actived') == true){
+                    $('.tab-data-cell:eq('+index+')').css('display','block');
+                }
+            });
+        });
+
+        //서비스 정보 업데이트
+        $(document).on('click','.update-service-btn',function(){
+            document.service_update.submit();
+        });
+
+
+        //할인퍼센트 선택시
+        $('#percent_type').change(function(){
+            var total_price = parseInt($('#total_pay_money').text().replace(",",""));
+            var per = $(this).val();
+            var dis_price = 0;
+
+            $('#percent_radio').prop('checked',true);
+            dis_price =( total_price * (per/100));
+            $('#won_type').val('');
+            $('#discount_price').text($.numberWithCommas(dis_price));
+
+        });
+
+        //금액 선택시
+        $('#won_type').change(function(){
+            var total_price = parseInt($('#total_pay_money').text().replace(",",""));
+            var per = $(this).val();
+            var dis_price = 0;
+
+            $('#won_radio').prop('checked',true);
+            dis_price =( total_price - per);
+            $('#percent_type').val('');
+            $('#discount_price').text($.numberWithCommas(per));
+
+        });
+
+        //할인금액적용하기
+        $(document).on('click','.set_update_discount_btn',function(){
+            var cid = $(this).data('seq');
+            var type = 0;
+            var num = 0;
+            if($('#percent_type').val() != ''){
+                type = 1;
+                num = $('#percent_type').val();
+            } else if($('#won_type').val() != ''){
+                type = 2;
+                num = $('#won_type').val();
+            }
+
+            if(type == 0 ){
+                alert('할인 퍼센트 또는 할인 금액을 선택해주세요.');
+                return false;
+            }
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'saveDiscount','seq':cid,'type':type,'num':num},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    if(json.flag == true){
+                        var dp = parseInt($('#discount_price').text().replace(",", ""));
+                        var tpp = parseInt($('#total_pay_money').text().replace(",", ""));
+                        $('#total_discount_price').text($.numberWithCommas(dp));
+
+                        $('#total_pay_price').val(tpp-dp);
+                        $('#total_pay_price_disp').text($.numberWithCommas(tpp-dp)+'원');
+                    }
+                }
+            });
+        });
+
+        //적립금모두사용
+        $(document).on('click','.all-use-reserve',function(){
+            var price = $(this).data('price');
+            if($('#use_reserve').prop('disabled') == true){
+                alert('사용하실 수 없습니다.');
+                return false;
+            }
+            $('#use_reserve').val(price);
+        });
+
+        //적립금 사용 저장
+        $(document).on('click','.reserve-save-btn',function(){
+            var price = $('#use_reserve').val().replace(",", "");
+            var cur_price = parseInt($('#cur_reserve').text().replace(",", ""));
+            var cid = $(this).data('cid');
+            var tid = $(this).data('tid');
+            var phone = $(this).data('phone');
+            var seq = $(this).data('seq');
+            var type = $(this).data('service');
+            var aid = $(this).data('aid');
+            if(!cid || !phone){
+                alert('저립금 사용을 위한 데이터가 없습니다. 새로고침 후 다시 이용해주세요.');
+                return false;
+            }
+
+            if(cur_price < price){
+                alert('보유한 적립금보다 큰 금액은 입력하실 수 없습니다.');
+                return false;
+            }
+            //적립금 사용시 해당 금액을 고정한다. 재설정시 사용가능하게 처리한다.
+            $('#use_reserve').prop('disabled',true);
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'useReserve','cid':cid,'aid':aid,'tid':tid,'phone':phone,'price':price,'seq':seq,'type':type},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    if(json.flag == true){
+                        var dp = parseInt($('#use_reserve').val().replace(",", ""));
+                        var tpp = parseInt($('#total_pay_price').val());
+                        $('#user_reserve_price').val(json.price);
+                        $('#cur_reserve').text($.numberWithCommas(json.cur_price));
+                        $('.reserve-save-cancel').prop('disabled',false);
+                        $('.reserve-save-btn').prop('disabled',true);
+                        $('#total_reserve_price').text($.numberWithCommas(price));
+                        $('#total_pay_price').val(tpp-dp);
+                        $('#total_pay_price_disp').text($.numberWithCommas(tpp-dp)+'원');
+                        $('#use_card').val(dp);
+                    }
+                }
+            });
+        });
+
+        //적립금 사용 재설정
+        $(document).on('click','.reserve-save-cancel',function(){
+            if(confirm('적립금 사용을 재설정하시겠습니다.')){
+                $('#use_reserve').prop('disabled',false);
+                var price = $('#use_reserve').val().replace(",", "");
+                var cid = $(this).data('cid');
+                var tid = $(this).data('tid');
+                var phone = $(this).data('phone');
+                var seq = $(this).data('seq');
+                var type = $(this).data('service');
+                var aid = $(this).data('aid');
+                if(!cid || !phone){
+                    alert('저립금 사용을 위한 데이터가 없습니다. 새로고침 후 다시 이용해주세요.');
+                    return false;
+                }
+
+                $.ajax({
+                    type: 'post',
+                    url: 'data/get_book_data_ajax',
+                    data: {'mode':'useReserveCancel','cid':cid,'aid':aid,'tid':tid,'phone':phone,'price':price,'seq':seq,'type':type},
+                    dataType: 'json',
+                    error: function() {
+                        alert('Error');
+                    },
+                    success: function(json) {
+                        if(json.flag == true){
+                            var dp = parseInt($('#use_reserve').val().replace(",", ""));
+                            var tpp = parseInt($('#total_pay_price').val());
+                            $('#user_reserve_price').val(json.price);
+                            $('#use_reserve').val('0');
+                            $('.all-use-reserve').data('price',json.cur_price)
+                            $('#cur_reserve').text($.numberWithCommas(json.cur_price));
+                            $('.reserve-save-cancel').prop('disabled',true);
+                            $('.reserve-save-btn').prop('disabled',false);
+                            $('#total_reserve_price').text('0');
+                            $('#total_pay_price').val(tpp-dp);
+                            $('#total_pay_price_disp').text($.numberWithCommas(tpp+dp)+'원');
+                            $('#use_card').val('0');
+                        }
+                    }
+                });
+            }
+        })
+
+        //제품 +-
+        function cnt_change(obj, type){
+            var name = $('#'+obj+'_cnt');
+            var org_cnt = parseInt($('#'+obj+'_cnt').val());
+            if(type == 'm'){
+                if(name.val() > 0){
+                    name.val(org_cnt-1);
+                }
+            } else {
+                if(name.val() < 100){
+                    name.val(org_cnt+1);
+                }
+            }
+        }
+
+
+        //제품 선택 여부를 확인한다.
+        function chk_box_press(obj, num){
+            if(obj == 'gd'){
+                if($('#gd_chkbox_y_'+num).is(':checked')==true){
+                    $('#gd_chkbox_n_'+num).prop('disabled',true);
+                } else {
+                    console.log('unchecked')
+                    $('#gd_chkbox_n_'+num).prop('disabled',false).prop('checked',true);
+                }
+            }
+
+            if(obj == 'snack'){
+                if($('#snack_chkbox_y_'+num).is(':checked')==true){
+                    $('#snack_chkbox_n_'+num).prop('disabled',true);
+                } else {
+                    console.log('unchecked')
+                    $('#snack_chkbox_n_'+num).prop('disabled',false).prop('checked',true);
+                }
+            }
+
+            if(obj == 'feed'){
+                if($('#feed_chkbox_y_'+num).is(':checked')==true){
+                    $('#feed_chkbox_n_'+num).prop('disabled',true);
+                } else {
+                    console.log('unchecked')
+                    $('#feed_chkbox_n_'+num).prop('disabled',false).prop('checked',true);
+                }
+            }
+
+            if(obj == 'etc'){
+                if($('#et_chkbox_y_'+num).is(':checked')==true){
+                    $('#et_chkbox_n_'+num).prop('disabled',true);
+                } else {
+                    console.log('unchecked')
+                    $('#et_chkbox_n_'+num).prop('disabled',false).prop('checked',true);
+                }
+            }
+
+        }
+
+        //최종 결제금액 저장
+        $(document).on('click','.save-final-price',function(){
+            var seq = $(this).data('seq');
+            var card = $('#use_card').val();
+            var cash = $('#use_cash').val();
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'savePayResult','card':card,'cash':cash,'seq':seq},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    alert(json.error);
+                }
+            });
+        });
+
+        //결제완료처리
+        $(document).on('click','#pay_confirm',function(){
+            var seq = $(this).data('seq');
+            var con = 0;
+            if($(this).is(':checked')==true){
+                con = 1;
+            }
+            $.ajax({
+                type: 'post',
+                url: 'data/get_book_data_ajax',
+                data: {'mode':'savePayConfirm','seq':seq, 'con':con},
+                dataType: 'json',
+                error: function() {
+                    alert('Error');
+                },
+                success: function(json) {
+                    alert(json.error);
+                    location.reload();
+                }
+            });
+        });
+
+        //현금 카드 전환하기
+        $(document).on('click','.btn-data-change',function(){
+            var tmp = $('#use_card').val();
+            $('#use_card').val($('#use_cash').val());
+            $('#use_cash').val(tmp);
+        });
+
+
+        //미용 종료 알림 발송
+        $(document).on('click','.sendComplete',function(){
+            var chk_time = '';
+            var seq = $(this).data('seq');
+            $('.timer').each(function(){
+                console.log($(this).val())
+                if($(this).is(':checked')==true){
+                    chk_time = $(this).val();
+                }
+            });
+
+            console.log(chk_time)
+            if (chk_time != "" && chk_time != undefined) {
+
+                $.ajax({
+                    type: 'post',
+                    data: {'timer':chk_time,'payment_log_seq':seq},
+                    url: './data/send_notice_talk',
+                    dataType: 'json',
+                    error: function(xhr, error) {
+                        alert('알림톡 발송이 실패했습니다. '+xhr+' : '+error);
+                    },
+                    success: function(json) {
+                        if (json.result) {
+                            popalert.open('confirmOnlyOkNoLink','발송되었습니다.');
+                        } else {
+                            popalert.open('confirmOnlyOkNoLink','알림톡 발송이 실패했습니다.');
+                        }
+                    }
+                });
+            } else {
+                alert("시간을 선택해주세요.");
+            }
+        });
+
+        $(document).on('click','.apporval-reserve',function(){
+            var idx = $(this).data('mgr');
+            var gubun = $(this).data('type');
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'reserveStatusChange','no':idx,'type':gubun},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.open('confirmOnlyOkLink',json.error);
+
+                        return false;
+                    }
+                    alert(json.error);
+                }
+            });
+        });
+
+        function go_url(){
+            location.href = '<?php echo $_SESSION['backurl'];?>?payment_log_seq=<?php echo $payment_log_seq;?>';
+        }
+        $.numberWithCommas = function (x) {
+            return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
+        });
+
+    </script>
+
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

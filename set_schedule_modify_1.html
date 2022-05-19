@@ -1,0 +1,499 @@
+<?php
+$shop_title	= "일정관리 설정";
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$sql = "
+						SELECT *
+						FROM tb_working_schedule
+						WHERE customer_id = '".$user_id."'
+					"; // 영업시간, 공휴일 영업여부
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$data["day_start"] = $row["working_start"];
+$data["day_end"] = $row["working_end"];
+$data["is_rest_holiday"] = $row["rest_public_holiday"];
+$data["id_1"] = mysqli_num_rows($result);
+
+$sql = "
+						SELECT *
+						FROM tb_time_off
+						WHERE customer_id = '".$user_id."'
+					"; // 점심시간/휴식시간 설정
+//echo $sql;
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$data["rest_time"] = $row["res_time_off"];
+$data["id_2"] = mysqli_num_rows($result);
+$break_time = explode(",",$data["rest_time"]);
+
+$sql = "
+						SELECT *
+						FROM tb_time_schedule
+						WHERE artist_id = '".$user_id."'
+					"; // 타임제 스케줄
+$result = mysqli_query($connection,$sql);
+//					$row = mysql_fetch_assoc($result);
+//					$data["rest_time_schedule"] = $row["res_time_off"];
+
+while($row = mysqli_fetch_assoc($result)){
+//						$tmp_data["res_time_off"] = $row["res_time_off"];
+    $data["rest_time_schedule"][] = $row["res_time_off"];
+    $data["artist_name"][] = $row["artist_name"];
+}
+$data["id_3"] = mysqli_num_rows($result);
+
+$sql = "
+						SELECT *
+						FROM tb_shop
+						WHERE customer_id = '".$user_id."'
+					"; // 자유시간제/타임제 여부
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$data["is_time_type"] = $row["is_time_type"];
+
+$sql = "
+						SELECT *
+						FROM tb_regular_holiday
+						WHERE customer_id = '".$user_id."'
+					"; // 정기휴일 여부
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$data["weekend_holiday"] = $row["is_sunday"].$row["is_monday"].$row["is_tuesday"].$row["is_wednesday"].$row["is_thursday"].$row["is_friday"].$row["is_saturday"];
+$data["id_4"] = mysqli_num_rows($result);
+$w_text = array();
+if($row["is_monday"]==1){
+    $w_text[] = '월';
+}
+if($row["is_tuesday"]==1){
+    $w_text[] = '화';
+}
+if($row["is_wednesday"]==1){
+    $w_text[] = '수';
+}
+if($row["is_thursday"]==1){
+    $w_text[] = '목';
+}
+if($row["is_friday"]==1){
+    $w_text[] = '금';
+}
+if($row["is_saturday"]==1){
+    $w_text[] = '토';
+}
+if($row["is_sunday"]==1){
+    $w_text[] = '일';
+}
+
+?>
+<!-- container -->
+<section id="container">
+	<!-- page-body -->
+    <form action="./data/set_schedule_ajax.php" method="post" name="f" target="hiddenFrame">
+	<div class="page-body">
+		<!-- set-schedule-wrap -->
+		<div class="set-schedule-wrap">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">기본 영업시간 설정</h4>
+				</div>
+				<div class="form-group">
+					<div class="form-group-cell middle">
+						<div class="form-group-item">
+							<div class="form-item-label">영업시간</div>
+							<div class="form-item-data type-2">
+								<div class="form-datepicker-group">
+									<div class="form-datepicker">
+										<select name="day_start">
+                                            <?php
+                                                for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
+                                            ?>
+											<option value="<?php echo date('G',$i);?>" <?php echo ($data["day_start"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+                                            <?php } ?>
+										</select>
+									</div>
+									<div class="form-unit">~</div>
+									<div class="form-datepicker">
+										<select name="day_end">
+                                            <?php
+                                            for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
+                                            ?>
+                                                <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_end"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+                                            <?php } ?>
+										</select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell middle">
+						<div class="form-group-item">
+							<div class="form-item-label">공휴일 휴무 설정</div>
+							<div class="form-item-data type-2">
+								<div class="memo-item type-2">
+									<div class="flex align-items-center justify-content-space-between">
+										<div>
+                                            <?php if ($data["is_rest_holiday"]==0) {?>
+											<div id="nowork" >*공휴일도 일해요.</div>
+                                            <?php }else{?>
+                                                <div id="nowork" >*공휴일은 쉬어요.</div>
+                                            <?php } ?>
+										</div>
+										<div><label for="switch-toggle" class="form-switch-toggle">
+                                                <input type="checkbox" name="rest_public_holiday" value="<?=$data["is_rest_holiday"]?>"
+                                                       id="switch-toggle" <?php echo ($data["is_rest_holiday"]==0)?'checked':'';?> >
+                                                <span class="bar"></span></label></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell middle">
+						<div class="form-group-item">
+							<div class="form-item-label">휴게시간 설정</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout toggle-button-group">
+									<div class="grid-layout-inner">
+                                        <?php
+                                            for($i=strtotime($data["day_start"].':00');$i<=strtotime($data["day_end"].':00');$i+=1800){
+                                                $break_value = date('g:i',$i).'~'.date('g:i',$i+1800);
+                                                if(in_array($break_value,$break_time)){
+                                                    $selected = 'checked';
+                                                } else {
+                                                    $selected = '';
+                                                }
+                                        ?>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle">
+                                                <input type="checkbox" name="break_time[]" value="<?php echo $break_value;?>" <?php echo $selected;?>>
+                                                <em><?php echo (date('H:i',$i)>'12:00')?'오후':'오전';?> <?php echo date('g:i',$i);?></em></label>
+                                        </div>
+                                        <?php } ?>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">예약 스케줄 운영방식 선택</h4>
+				</div>
+				<div class="form-check-group">
+					<div class="form-check-inner">
+						<div class="check-cell"><label class="form-radiobox"><input type="radio" name="time2" class="time-schedule" value="1" <?php echo ($data["is_time_type"]==1)?'checked':'';?>><span class="form-check-icon"><em>자유시간제</em></span></label></div>
+						<div class="check-cell"><label class="form-radiobox"><input type="radio" name="time2" class="time-schedule" value="2" <?php echo ($data["is_time_type"]==2)?'checked':'';?>><span class="form-check-icon"><em>타임제</em></span></label></div>
+					</div>
+				</div>
+				<!-- display:none 으로 기본 처리 -->
+				<!-- 타임제 -->
+
+				<div class="form-item-data type-2" id="is_time_schedule" style="display:<?php echo ($data["is_time_type"]==2)?'block':'none'; ?>;">
+
+					<div class="grid-layout basic">
+						<div class="grid-layout-inner">
+                            <?php
+                            $artist_cnt = 0;
+                            $que = " SELECT * FROM `tb_artist_list` WHERE artist_id='{$artist_id}' AND is_view = '2' AND is_out = '2' GROUP BY name ORDER BY sequ_prnt asc, is_main DESC, nicname ASC";
+                            //echo $que;
+                            $result = mysqli_query($connection, $que);
+                            while ($artist_rows = mysqli_fetch_assoc($result)) {
+                                $data['artist'][] = $artist_rows;
+                            }
+                            foreach ((array) $data['artist'] as $key => $artist) {
+                            ?>
+                                <div class="grid-layout-cell flex-auto"><label class="form-toggle-box">
+                                        <input type="radio" name="artist_id" class="artist-id" data-index="<?php echo $artist_cnt;?>" <?php echo ($artist_cnt==0)?'checked':'';?> value="<?= $artist['name'] ?>"><em><?= $artist['nicname'] ?></em></label></div>
+                            <?php $artist_cnt++;} ?>
+
+						</div>
+					</div>
+					<div class="basic-data-group vvsmall3 line">
+                        <?php
+                        $artist_cnt = 0;
+                        foreach ((array) $data['artist'] as $key => $artist) {
+                            $sql = "
+                                SELECT *
+                                FROM tb_time_schedule
+                                WHERE artist_name = '" . $artist['name'] . "'
+                            "; // 타임제 스케줄
+                            //echo $sql;
+                            $res = sql_query($sql);
+                            $rs = sql_fetch($res);
+                            $sche[$artist_cnt] = explode(',',$rs['res_time_off']);
+                        ?>
+						<div id="artist_sc_<?php echo $artist_cnt;?>" class="artist-schedule-div" style="display:<?php echo ($artist_cnt == 0)?'block':'none'?>;">
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+                                    <?php
+                                    for($i=strtotime($data["day_start"].':00');$i<=strtotime($data["day_end"].':00');$i+=1800){
+                                        $selected = '';
+                                        $break_value = date('H:i',$i).'~'.date('H:i',$i+1800);
+                                        if(in_array($break_value,$sche[$artist_cnt])){
+                                            $selected = 'checked';
+                                        }
+                                        ?>
+                                        <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle">
+                                                <input type="checkbox" name="artist_break_time_<?php echo $artist_cnt;?>[]" class="artist-schedule"  value="<?php echo $break_value;?>" <?php echo $selected;?>>
+                                                <em><?php echo (date('H:i',$i)>'12:00')?'오후':'오전';?> <?php echo date('g:i',$i);?></em></label>
+                                        </div>
+                                    <?php } ?>
+								</div>
+							</div>
+						</div>
+                        <?php $artist_cnt++; } ?>
+
+					</div>
+				</div>
+				<!-- //타임제 -->
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">정기휴일 설정</h4>
+				</div>
+				<div class="basic-data-group vvsmall">
+					<div class="grid-layout basic">
+						<div class="grid-layout-inner">
+							<div class="grid-layout-cell flex-auto"><label class="form-toggle-box"><input type="radio" name="time4" value="1" <?php echo ($row['week_type']==1)?'checked':'';?>><em>매주</em></label></div>
+							<div class="grid-layout-cell flex-auto"><label class="form-toggle-box"><input type="radio" name="time4" value="2" <?php echo ($row['week_type']==2)?'checked':'';?>><em>1/3주</em></label></div>
+							<div class="grid-layout-cell flex-auto"><label class="form-toggle-box"><input type="radio" name="time4" value="3" <?php echo ($row['week_type']==3)?'checked':'';?>><em>2/4주</em></label></div>
+						</div>
+					</div>
+				</div>
+				<!-- display:none 으로 기본 처리 -->
+				<!-- 매주 -->
+				<div class="basic-data-group vvsmall3" style="display:block;">
+					<div class="form-week-select">
+						<div class="form-week-select-inner">
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_monday" value="1" type="checkbox" <?php echo ($row['is_monday']==1)?'checked':'';?> name="week"><em>월</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_tuesday" value="1" type="checkbox" <?php echo ($row['is_tuesday']==1)?'checked':'';?> name="week"><em>화</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_wednesday" value="1" type="checkbox" <?php echo ($row['is_wednesday']==1)?'checked':'';?> name="week"><em>수</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_thursday" value="1" type="checkbox" <?php echo ($row['is_thursday']==1)?'checked':'';?> name="week"><em>목</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_friday" value="1" type="checkbox" <?php echo ($row['is_friday']==1)?'checked':'';?> name="week"><em>금</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_saturday" value="1" type="checkbox" <?php echo ($row['is_saturday']==1)?'checked':'';?> name="week"><em>토</em></label></div>
+							<div class="form-week-select-cell"><label class="form-toggle-box circle"><input name="is_sunday" value="1" type="checkbox" <?php echo ($row['is_sunday']==1)?'checked':'';?> name="week"><em>일</em></label></div>
+						</div>
+					</div>
+				</div>
+				<!-- //매주 -->
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">임시휴일 설정</h4>
+				</div>
+				<div class="basic-data-group vvsmall">
+					<a href="set_schedule_modify_2" class="btn btn-icons btn-outline-gray btn-middle-size btn-round"><div class="txt">사정이 있어서 쉬어요</div><div class="icon icon-share-middle-black"></div></a>
+				</div>
+				<!-- 임시휴일 있을 경우 -->
+				<div class="basic-data-group vvsmall4">
+					<div class="memo-item-list">
+                        <?php
+                        $que = "
+                                    SELECT 
+                                    ph.ph_seq AS phh_seq,
+                                    ph.customer_id AS artist_id,
+                                    ph.worker, 
+                                    (SELECT nicname FROM tb_artist_list WHERE NAME = ph.worker AND artist_id = ph.customer_id GROUP BY artist_id) AS worker_name,
+                                    if(ph.type = 'notall', '2', '1') AS is_allday,
+                                    date_format(concat(ph.start_year,'.',ph.start_month,'.',ph.start_day), '%Y-%m-%d') AS check_in_date,
+                                    time_format(concat(ph.start_hour,':',IFNULL(ph.start_minute, '00'),':00'), '%H:%i:%s') AS check_in_time,
+                                    date_format(concat(ph.end_year,'.',ph.end_month,'.',ph.end_day), '%Y-%m-%d') AS check_out_date,
+                                    time_format(concat(ph.end_hour,':',IFNULL(ph.end_minute, '00'),':00'), '%H:%i:%s') AS check_out_time,
+                                    ph.update_time AS update_dt
+                                FROM tb_private_holiday AS ph
+                                WHERE ph.customer_id = '{$user_id}'
+                                    AND ph.type <> 'not' GROUP BY ph.worker, check_in_date
+                        ";
+                        //echo $que;
+                        $arr = sql_fetch_array($que);
+                        if(count($arr)>0) {
+                            foreach ($arr as $list) {
+                                if(!empty($list['worker_name'])) {
+                                    if ($list['is_allday'] == 1) {
+                                        //$rows[$list['worker']][] = $list['check_in_date'].' ~ '.$list['check_out_date'].' ('.$list['worker_name'].')';
+                                        echo '<div class="memo-item modify rev-'.$list['phh_seq'].'">' . $list['check_in_date'] . ' ~ ' . $list['check_out_date'] . ' (' . $list['worker_name'] . ')<button type="button" class="btn-memo-del"><span class="icon icon-close-small-black" data-seq="'.$list['phh_seq'].'"></span></button></div>';
+                                    } else {
+                                        echo '<div class="memo-item modify rev-'.$list['phh_seq'].'">' . $list['check_in_date'] . ' ' . substr($list['check_in_time'],0,5) . ' ~ ' . $list['check_out_date'] . ' ' . substr($list['check_out_time'],0,5) . ' (' . $list['worker_name'] . ')<button type="button" class="btn-memo-del"><span class="icon icon-close-small-black" data-seq="'.$list['phh_seq'].'"></span></button></div>';
+                                        //$rows[$list['worker']][] = $list['check_in_date'].' '.$list['check_in_time'].' ~ '.$list['check_out_date'].' '.$list['check_out_time'].' ('.$list['worker_name'].')';
+                                    }
+                                }
+                            }
+                        }
+                    ?>
+					</div>
+				</div>
+				<!-- //임시휴일 있을 경우 -->
+				<div class="form-bottom-info">휴가를 가거나 급한 사정이 있어서 쉴 때 이용하세요.<br>예약이 잡혀 있는데 쉬시려면 고객의 예약취소/변경이 먼저 등록되어야 합니다.</div>
+			</div>
+		</div>
+		<!-- //set-schedule-wrap -->
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+    </form>
+	<div class="page-bottom">
+		<!--
+		//	비활성화시
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:chk_frm();" class="btn-page-bottom">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+    <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="$('#is_time_schedule').css('display','none');popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+
+    <article id="talkExam1" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="$('#is_time_schedule').css('display','block');popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+    <article id="talkExam2" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.href='./set_schedule_list';popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+</section>
+<!-- //container -->
+<iframe src="" name="hiddenFrame" style="display:none;" frameborder="0"></iframe>
+<script>
+    $(document).on('click','.time-schedule',function(){
+        if($(this).val() == 1){
+            popalert.open('talkExam','예약 스케줄을 자유시간제로 변경합니다.');
+        } else {
+            popalert.open('talkExam1','예약 스케줄을 타임제로 변경합니다.');
+        }
+    });
+
+    $(document).on('click','.artist-id',function(){
+        /*$.ajax({
+            type : 'post',
+            url : './data/set_schedule_ajax',
+            data : {'mode':'setScheduleArtist',}
+        });*/
+    });
+
+    //선택된 스케줄 저장하기
+    $(document).on('click','.artist-schedule',function(){
+        var cnt = 0;
+        var schedule = new Array();
+        $('.artist-schedule').each(function(){
+            if($(this).is(':checked')==true){
+                schedule.push($(this).val());
+                cnt++;
+            }
+        });
+    });
+
+    //예약스케줄 미용사 선택시
+    $(document).on('click','.artist-id',function(){
+        var idx = $(this).data('index');
+        $('.artist-schedule-div').css('display','none');
+        $('#artist_sc_'+idx).css('display','block');
+    });
+
+    //임시휴일 삭제
+    $(document).on('click','.icon-close-small-black',function(){
+        var seq = $(this).data('seq');
+        $.ajax({
+            type: 'post',
+            url: './data/get_book_data_ajax.php',
+            data: {'mode':'privateDel', 'seq':seq},
+            dataType: 'json',
+            error: function(request,status,error) {
+
+                console.log("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error)
+                //document.location.reload(true);
+            },
+            success: function(json) {
+                if (json !== undefined) {
+                    if (json.flag == true) {
+                        $('.rev-'+seq).remove();
+                        popalert.open('talkExam','임시휴일이 정상적으로 삭제되었습니다.');
+                    } else {
+                        popalert.open('talkExam','임시휴일 삭제시 오류가 발생했습니다.');
+                    }
+                    //obj_dialog_time_cancel.dialog("close");
+                }
+            }
+        });
+    });
+    $(document).ready(function(){
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').prop('href','set_schedule_list')
+        $('#switch-toggle').on('click',function(){
+            if($(this).is(':checked')==true){
+                $('#nowork').text('공휴일도 일해요');
+                $('#switch-toggle').val("0");
+            } else {
+                $('#nowork').text('공휴일은 쉬어요');
+                $('#switch-toggle').val("1");
+            }
+        });
+    });
+
+    function chk_frm(){
+        var cnt = 0;
+        $('.artist-schedule').each(function(){
+            if($(this).is(':checked')==true){
+                cnt++;
+            }
+        });
+
+        if(cnt < 3){
+            popalert.open('talkExam','최소 2개의 타임을 선택해주세요.');
+            return false;
+        }
+
+        document.f.submit();
+    }
+    
+    function call_back(){
+        popalert.open('talkExam2','수정되었습니다.');
+    }
+
+</script>
+</body>
+</html>

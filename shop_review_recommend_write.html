@@ -1,0 +1,149 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TEmoji.php");
+
+$emoji = new TEmoji();
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "샵 이용 후기 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$payment_log_seq = $_GET['payment_log_seq'];
+$artist_id = $_GET['artist_id'];
+
+$memo = "";
+$update_time = "";
+$rating = "5";
+$sql = "SELECT * FROM tb_usage_reviews 
+        WHERE artist_id='" . $user_id . "' 
+        AND payment_log_seq = '" . $payment_log_seq . "' 
+        AND is_delete = 0;";
+// error_log('----- sql : ' . $sql);
+$result = mysqli_query($connection, $sql);
+if ($rows = mysqli_fetch_object($result)) {
+    $memo = $emoji->emojiDBToStr($rows->artist_reply);
+    $rating = $rows->rating;
+    $update_time = $rows->update_time;
+}
+
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		
+		<div class="master-review-wrap">
+			<div class="review-write-form">
+				<form name="regFrm" method="post" action="data/insert_usage_review_reply_pc.php">
+					<input type="hidden" name="payment_log_seq" value="<?= $payment_log_seq ?>">
+					<input type="hidden" name="artist_id" value="<?= $artist_id ?>">
+				<div class="form-group">					
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">내용</div>
+							<div class="form-item-data">
+								<!-- 20211223 수정 -->
+                                <textarea name="memo" id="memo" cols="30" rows="10"><?= $memo ?></textarea>
+								<!--<input type="text" name="memo" value="<?/*= $memo */?>" class="form-control" placeholder="내용을 입력해 주세요">-->
+								<!-- //20211223 수정 -->
+							</div>
+						</div>
+					</div>
+				</div>
+				</form>
+			</div>
+		</div>
+
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom disabled btn-submit">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+    <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            내용을 입력해주세요.
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+    <article id="talkExam1" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            저장하시겠습니까?
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="document.regFrm.submit()">확인</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close()">취소</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+</section>
+<!-- //container -->
+<script>
+	$(document).ready(function(){
+        $('.btn-submit').on('click',function(){
+            if($('#memo').val() == ''){
+                popalert.open('talkExam');
+                return false;
+            }
+            popalert.open('talkExam1');
+
+        });
+	})
+    $(document).ready(function(){
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').prop('href','shop_review_list')
+    });
+</script>
+		
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

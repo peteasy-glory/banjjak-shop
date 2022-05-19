@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">매장상품 등록/수정</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-hotel-shop-add -->  
+		<div class="set-hotel-shop-add">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">용품</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap">
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">간식</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap">
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">사료</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap">
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">기타</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap">
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+							<!-- 추가 타입 -->
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+											<select>
+												<option value="">선택안함</option>
+												<option value="">선택안함</option>
+											</select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<!-- //추가 타입 -->
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+				</div>
+			</div>
+		</div>
+		<!-- //set-hotel-shop-add -->  
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script src="/static/pub/js/Sortable.min.js"></script>
+<script>
+$(function(){
+	//https://github.com/SortableJS/Sortable
+
+	$('.drag-sort-wrap').each(function(){
+		var sortable = Sortable.create($(this)[0] , {
+			delay : 0,
+			ghostClass: 'guide',
+			draggable : '.form-vertical-cell',
+			handle : '.btn-data-handler',
+			onStart : function(evt){
+				//드래그 시작 
+				console.log('drag start');
+			},
+			onEnd : function(evt){
+				//드래그 끝
+				console.log('drag end');
+				//evt.to;    // 현재 아이템
+				//evt.from;  // 이전 아이템
+				//evt.oldIndex;  // 이전 인덱스값
+				//evt.newIndex;  // 새로운 인덱스값
+			},
+			onUpdate : function(evt){
+				console.log('update');
+			},
+			onUpdate : function(evt){
+				console.log('onChange');
+			},
+			onRemove: function (/**Event*/evt) {
+				console.log('remove');
+			}
+			
+		});
+	});
+
+	$(document).on('click' , '.btn-data-trash' , function(){
+		$(this).parents('.form-vertical-cell').remove();
+	});
+});
+
+function sampleAdd(){
+	var _html = "";
+	_html += '<div class="form-vertical-cell">';
+	_html += '	<div class="grid-layout basic">';
+	_html += '		<div class="grid-layout-inner flex-nowrap">';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>';
+	_html += '			<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>';
+	_html += '			<div class="grid-layout-cell flex-1">';
+	_html += '				<select>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '				</select>';
+	_html += '			</div>';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>';
+	_html += '		</div>';
+	_html += '	</div>';
+	_html += '</div>';
+
+	$('#sample1').append(_html);
+
+};
+</script>
+
+</body>
+</html>

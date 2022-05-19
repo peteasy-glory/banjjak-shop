@@ -1,0 +1,515 @@
+<?php
+    $shop_title	= "미용 추가옵션 등록/수정";
+
+    include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+    include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+    include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+    $backurl = $_GET['backurl'];
+    $user_id = $_SESSION['gobeauty_user_id'];
+    $user_name = $_SESSION['gobeauty_user_nickname'];
+
+    $professional_name = $_GET['first_type'];
+    $second_type = $_GET['second_type'];
+
+    $data = array();
+    $sql = "
+        SELECT *
+        FROM tb_shop
+        WHERE customer_id = '".$user_id."'		
+    ";
+
+    $result = mysqli_query($connection,$sql);
+    $shop_cnt = mysqli_num_rows($result);
+    $data['shop'] = mysqli_fetch_assoc($result);
+    if($shop_cnt <= 0){
+        ?>
+        <script>
+            $.MessageBox({
+                buttonDone: "확인",
+                message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+            }).done(function() {
+                location.href = "<?= $mainpage_directory ?>/index.php";
+            });
+        </script>
+        <?php
+    }
+
+    $is_offline = 0;
+    $crypto = new Crypto();
+    $enc_artist_id = $crypto->encode(trim($user_id), $access_key, $secret_key);
+    $sql = "
+        SELECT * 
+        FROM tb_request_artist 
+        WHERE customer_id = '" . $enc_artist_id . "'
+    ";
+    $result = mysqli_query($connection, $sql);
+    while($row = mysqli_fetch_assoc($result)) {
+        $data['request_artist'] = $row;
+        $is_offline = ($row['is_got_offline_shop'] == NULL) ? 0 : $row['is_got_offline_shop'];
+    }
+
+    // 기본 요금제 호출 - 고양이
+    $sql = "
+        SELECT * 
+        FROM tb_product_cat 
+        WHERE customer_id = '".$user_id."'		
+    ";
+    //echo $sql;
+    $result = mysqli_query($connection, $sql);
+    while($row = mysqli_fetch_assoc($result)){
+        $data["product_cat"][] = $row;
+    }
+
+    if(!isset($data['product_cat'])){
+        $total_option_cnt = 2;
+    } else {
+        //등록된 옵션의 갯수를 구한다.
+        $section = get_explode_data($data['product_cat'][0]['section']);
+        $total_option_cnt = count($section);
+
+    }
+
+
+    //무게당
+    $n_extra_tmp = get_explode_data($data['product_cat'][0]['addition_option_product']);
+    for($i=0;$i<count($n_extra_tmp);$i++) {
+        $tmp = explode(":",$n_extra_tmp[$i]);
+        $n_extra['name'][] = $tmp[0];
+        $n_extra['price'][] = $tmp[1];
+    }
+
+    //현장결제 추가
+    $n_work_tmp = get_explode_data($data['product_cat'][0]['addition_work_product']);
+    for($i=0;$i<count($n_work_tmp);$i++) {
+        $tmp = explode(":",$n_work_tmp[$i]);
+        $n_work['name'][] = $tmp[0];
+        $n_work['price'][] = $tmp[1];
+    }
+
+
+?>
+
+<!-- container -->
+<section id="container">
+	<!-- page-body -->
+    <form action="./data/save_beauty_option_add2" name="f" method="post">
+        <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
+	<div class="page-body">
+		<!-- set-option-add -->
+		<div class="set-option-add">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">상품분류</h4>
+				</div>
+				<div class="basic-data-group vvsmall2">
+					<div class="wide-tab">
+						<div class="wide-tab-inner">
+							<!-- 활성화시 actived클래스 추가 -->
+							<div class="tab-cell"><a href="./set_beauty_option_add?backurl=<?php echo $_GET['backurl'];?>" class="btn-tab-item">강아지</a></div>
+							<div class="tab-cell actived"><a href="./set_beauty_option_add2?backurl=<?php echo $_GET['backurl'];?>" class="btn-tab-item">고양이</a></div>
+						</div>
+					</div>
+					<div class="basic-data-group vmiddle">
+						<div class="form-group">
+							<div class="form-group-cell middle">
+								<div class="form-group-item">
+									<div class="form-item-label">제공방식</div>
+									<div class="form-item-data type-2">
+										<div class="grid-layout toggle-button-group">
+											<div class="grid-layout-inner">
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="01" <?php echo (($data['product_cat'][0]['in_shop_product']=='0' && $data['product_cat'][0]['out_shop_product']=='1') || !isset($data['product_dog_static'][0]['in_shop_product']) )?'checked':''; ?>><em>매장상품</em></label></div>
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="10" <?php echo ($data['product_cat'][0]['in_shop_product']=='1' && $data['product_cat'][0]['out_shop_product']=='0')?'checked':''; ?>><em>출장상품</em></label></div>
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="11" <?php echo ($data['product_cat'][0]['in_shop_product']=='1' && $data['product_cat'][0]['out_shop_product']=='1')?'checked':''; ?>><em>출장/매장</em></label></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="basic-data-group">
+						<div class="con-title-group">
+							<h4 class="con-title">추가요금</h4>
+						</div>
+						<div class="basic-data-group vvsmall3">
+							<div class="form-vertical-group">
+								<div class="form-vertical-header">
+									<div class="grid-layout basic">
+										<div class="grid-layout-inner flex-nowrap">
+											<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+											<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+											<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+											<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+										</div>
+									</div>
+								</div>
+								<div class="form-vertical-body drag-sort-wrap" id="extra_div">
+									<div class="form-vertical-cell">
+										<div class="grid-layout basic">
+											<div class="grid-layout-inner flex-nowrap">
+												<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+												<div class="grid-layout-cell flex-1"><input type="text" value="발톱"  disabled placeholder="입력"></div>
+												<div class="grid-layout-cell flex-1">
+                                                    <select name="p_toenail_price">
+                                                        <option value="">선택안함</option>
+                                                        <?php
+                                                        for ($pi = 0; $pi < 150001; $pi = $pi + 500) {
+                                                            echo "<option value='" . $pi . "'";
+                                                            if ($pi == $data["product_cat"][0]["toenail_price"] && !empty($data["product_cat"][0]["toenail_price"])) {
+                                                                echo " selected";
+                                                            }
+                                                            echo ">" . $pi . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+												</div>
+												<div class="grid-layout-cell flex-auto w-px-55"></div>
+											</div>
+										</div>
+									</div>
+									<!-- 추가 타입 -->
+                                    <?php
+                                    $tmp = explode(",",$data["product_cat"][0]['addition_option_product']);
+
+                                    for($a=0;$a<count($tmp);$a++){
+                                        $extra_tmp = explode(":",$tmp[$a]);
+                                        $extra['text'][] = $extra_tmp[0];
+                                        $extra['price'][] = $extra_tmp[1];
+                                        ?>
+                                        <div class="form-vertical-cell">
+                                            <div class="grid-layout basic">
+                                                <div class="grid-layout-inner flex-nowrap">
+                                                    <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" value="<?php echo $extra['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1">
+                                                        <select name="extra_price[]">
+                                                            <option value="">선택안함</option>
+                                                            <?php
+                                                            for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                                echo "<option value='" . $pi . "'";
+                                                                if ($pi == $extra['price'][$a] && !empty($extra['price'][$a])) {
+                                                                    echo " selected";
+                                                                }
+                                                                echo ">" . $pi . "</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+									<!-- //추가 타입 -->
+								</div>
+							</div>
+						</div>
+						<div class="btn-basic-action">
+							<button type="button" class="btn btn-outline-purple btn-middle-size btn-round extra-fee-btn" >추가하기</button>
+						</div>
+                        <div id="add_fee" style="display:none">
+                            <div class="form-vertical-cell extra-cell">
+                                <div class="grid-layout basic">
+                                    <div class="grid-layout-inner flex-nowrap">
+                                        <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1">
+                                            <select name="extra_price[]" >
+                                                <option value="">선택안함</option>
+                                                <?php
+                                                for ($pi = 0; $pi < 150001; $pi = $pi + 500) {
+                                                    echo "<option value='" . $pi . "'";
+                                                    if ($data["product_dog_common"][0]["long_hair_price"] != "" && $pi == intval($data["product_dog_common"][0]["long_hair_price"])) {
+                                                        //echo " selected";
+                                                    }
+                                                    echo ">" . $pi . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+					</div>
+                    <div class="basic-data-group">
+                        <div class="con-title-group">
+                            <h4 class="con-title">현장판단 후 현장결제 추가 기능 옵션</h4>
+                        </div>
+                        <div class="basic-data-group vvsmall3">
+                            <div class="form-vertical-group">
+                                <div class="form-vertical-header">
+                                    <div class="grid-layout basic">
+                                        <div class="grid-layout-inner flex-nowrap">
+                                            <div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+                                            <div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+                                            <div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+                                            <div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-vertical-body drag-sort-wrap out-add">
+                                    <div class="form-vertical-cell">
+                                        <div class="grid-layout basic">
+                                            <div class="grid-layout-inner flex-nowrap">
+                                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" value="털엉킴" disabled placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1">
+                                                    <select name="p_hair_clot_price" id="p_hair_clot_price">
+                                                        <option value="">선택안함</option>
+                                                        <?php
+                                                        for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                            echo "<option value='" . $pi . "'";
+                                                            if ($pi == $data["product_cat"][0]["hair_clot_price"] && !empty($data["product_cat"][0]["hair_clot_price"])) {
+                                                                echo " selected";
+                                                            }
+                                                            echo ">" . $pi . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="grid-layout-cell flex-auto w-px-55"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-vertical-cell">
+                                        <div class="grid-layout basic">
+                                            <div class="grid-layout-inner flex-nowrap">
+                                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" value="사나움" disabled placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1">
+                                                    <select name="p_ferocity_price" id="p_ferocity_price">
+                                                        <option value="">선택안함</option>
+                                                        <?php
+                                                        for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                            echo "<option value='" . $pi . "'";
+                                                            if ($pi == $data["product_cat"][0]["ferocity_price"] && !empty($data["product_cat"][0]["ferocity_price"])) {
+                                                                echo " selected";
+                                                            }
+                                                            echo ">" . $pi . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="grid-layout-cell flex-auto w-px-55"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-vertical-cell">
+                                        <div class="grid-layout basic">
+                                            <div class="grid-layout-inner flex-nowrap">
+                                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" value="진드기" disabled placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1">
+                                                    <select name="p_tick_price" id="p_tick_price">
+                                                        <option value="">선택안함</option>
+                                                        <?php
+                                                        for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                            echo "<option value='" . $pi . "'";
+                                                            if ($pi == $data["product_cat"][0]["tick_price"] && !empty($data["product_cat"][0]["tick_price"])) {
+                                                                echo " selected";
+                                                            }
+                                                            echo ">" . $pi . "</option>";
+                                                        }
+                                                        ?>
+                                                    </select>
+                                                </div>
+                                                <div class="grid-layout-cell flex-auto w-px-55"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- 추가 타입 -->
+                                    <?php
+                                    $tmp = explode(",",$data["product_cat"][0]['addition_work_product']);
+                                    for($a=0;$a<count($tmp);$a++){
+                                        $work_tmp = explode(":",$tmp[$a]);
+                                        $work['text'][] = $work_tmp[0];
+                                        $work['price'][] = $work_tmp[1];
+
+                                        ?>
+                                        <div class="form-vertical-cell out-cell" >
+                                            <div class="grid-layout basic">
+                                                <div class="grid-layout-inner flex-nowrap">
+                                                    <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" value="<?php echo $work['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1">
+                                                        <select name="out_price[]">
+                                                            <option value="" >선택안함</option>
+                                                            <?php
+                                                            for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                                echo "<option value='" . $pi . "'";
+                                                                if ($pi == $work['price'][$a] && !empty($work['price'][$a])) {
+                                                                    echo " selected";
+                                                                }
+                                                                echo ">" . $pi . "</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                    <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+                                    <!-- //추가 타입 -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-basic-action">
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round save-out-btn">추가하기</button>
+                        </div>
+
+                        <div id="out_add" style="display:none">
+                            <div class="form-vertical-cell out-cell" >
+                                <div class="grid-layout basic">
+                                    <div class="grid-layout-inner flex-nowrap">
+                                        <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1">
+                                            <select name="out_price[]">
+                                                <option value="" <?= ($data["product_dog_common"][0]["dyeing_price"] == "" || $data["product_dog_common"][0]["dyeing_price"] == null) ? "selected" : "" ?>>선택안함</option>
+                                                <?php
+                                                for ($pi = 0; $pi < 150001; $pi = $pi + 500) { // [change] 2019.01.08 : developlay - 50000으로 늘림
+                                                    echo "<option value='" . $pi . "'";
+                                                    if ($data["product_dog_common"][0]["dyeing_price"] != "" && $pi == intval($data["product_dog_common"][0]["dyeing_price"])) {
+                                                        echo " selected";
+                                                    }
+                                                    echo ">" . $pi . "</option>";
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                        <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+					<div class="basic-data-group">
+                        <div class="form-group-cell">
+                            <div class="form-group-item">
+                                <div class="form-item-label">추가설명</div>
+                                <div class="form-item-data">
+                                    <textarea name="add_comment" id="add_comment" class="form-control"><?php echo $data['product_cat'][0]['add_comment']; ?></textarea>
+                                </div>
+                            </div>
+                        </div>
+						<!--<div class="form-group middle">
+
+							<div class="form-group-cell middle">
+								<div class="form-group-item">
+									<div class="form-item-label">추가설명</div>
+									<div class="form-item-data">
+										<input type="text" name="add_comment" value="<?php /*echo nl2br($data['product_cat'][0]['add_comment']);*/?>" class="form-control" placeholder="입력">
+										<div class="form-input-info">0/1000</div>
+									</div>
+								</div>
+							</div>
+						</div>-->
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- //set-option-add -->
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+    </form>
+	<div class="page-bottom">
+		<!--
+		//	비활성화시
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom btn-save">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script src="/static/pub/js/Sortable.min.js"></script>
+<script>
+$(function(){
+	//https://github.com/SortableJS/Sortable
+//저장하기 클릭시
+    $(document).on('click','.btn-save',function(){
+
+        if(confirm('저장하시겠습니까?')){
+            document.f.submit();
+        }
+    });
+	$('.drag-sort-wrap').each(function(){
+		var sortable = Sortable.create($(this)[0] , {
+			delay : 0,
+			ghostClass: 'guide',
+			draggable : '.form-vertical-cell',
+			handle : '.btn-data-handler',
+			onStart : function(evt){
+				//드래그 시작
+				console.log('drag start');
+			},
+			onEnd : function(evt){
+				//드래그 끝
+				console.log('drag end');
+				//evt.to;    // 현재 아이템
+				//evt.from;  // 이전 아이템
+				//evt.oldIndex;  // 이전 인덱스값
+				//evt.newIndex;  // 새로운 인덱스값
+			},
+			onUpdate : function(evt){
+				console.log('update');
+			},
+			onUpdate : function(evt){
+				console.log('onChange');
+			},
+			onRemove: function (/**Event*/evt) {
+				console.log('remove');
+			}
+
+		});
+	});
+
+	$(document).on('click' , '.btn-data-trash' , function(){
+		$(this).parents('.form-vertical-cell').remove();
+	});
+
+    //추가요금 추가하기
+    $(document).on('click','.extra-fee-btn',function(){
+        var bt_div = $('#add_fee .extra-cell').clone();
+        $('#extra_div').append(bt_div);
+    });
+
+    //현장판단 후 추가결제
+    $(document).on('click','.save-out-btn',function(){
+        var bt_div = $('#out_add .out-cell').clone();
+        $('.out-add').append(bt_div);
+    });
+});
+
+function sampleAdd(){
+	var _html = "";
+	_html += '<div class="form-vertical-cell">';
+	_html += '	<div class="grid-layout basic">';
+	_html += '		<div class="grid-layout-inner flex-nowrap">';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>';
+	_html += '			<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>';
+	_html += '			<div class="grid-layout-cell flex-1">';
+	_html += '				<select>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '				</select>';
+	_html += '			</div>';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>';
+	_html += '		</div>';
+	_html += '	</div>';
+	_html += '</div>';
+
+	$('#sample1').append(_html);
+
+};
+</script>
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

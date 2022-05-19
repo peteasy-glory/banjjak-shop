@@ -1,0 +1,309 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+?>
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">계정 생성</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="join-wrap">
+			<div class="account-create">
+				<div class="form-group">
+                    <form action="/login/registration_2_process.php" id="next_form" method="POST">
+                        <input type="hidden" name="gobeauty_nickname" id="gobeauty_nickname" value="">
+                        <div class="form-group-cell">
+                            <div class="form-group-item">
+                                <div class="form-item-label">이메일 입력</div>
+                                <div class="form-item-data">
+                                    <div class="form-control-btns">
+                                        <input type="text" name="gobeauty_4_check_email" id="gobeauty_4_check_email" class="form-control" placeholder="">
+                                        <button type="button" class="btn btn-outline-purple btn-round btn-inline btn-member-phone" onclick="ck_id();"><em>중복확인</em></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-cell">
+                            <div class="form-group-item">
+                                <div class="form-item-label">비밀번호</div>
+                                <div class="form-item-data">
+                                    <input type="password" class="form-control" placeholder="비밀번호입력(6~16자 영문, 숫자조합)" name="gobeauty_pwd" id="gobeauty_pwd">
+                                </div>
+                                <div style="display:none;" id="div_pw">
+                                    <div class="form-input-valid font-color-error" id="pw">숫자를 포함해주세요.</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group-cell">
+                            <div class="form-group-item">
+                                <div class="form-item-label">비밀번호 확인</div>
+                                <div class="form-item-data">
+                                    <input type="password" class="form-control" placeholder="비밀번호 확인" name="gobeauty_pwd_ck" id="gobeauty_pwd_ck">
+                                </div>
+                                <div style="display:none" id="div_pw2">
+                                    <div class="form-input-valid font-color-error" id="pw2">비밀번호가 일치하지 않습니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom disabled" id="next_div">다음</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+    <script>
+        var is_email_check = 0;
+        var is_pw_check = 0;
+
+        $("form").keypress(function(e) {
+            //Enter key disable
+            if (e.which == 13) {
+                return false;
+            }
+        });
+
+
+        $('#gobeauty_4_check_email').on("keyup", function(){ // 공백제거
+            $(this).val($.trim($(this).val()));
+        });
+
+        var email_regex = /^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+
+        function ck_id() {
+            var input_email = $.trim(document.getElementById("gobeauty_4_check_email").value);
+
+            if (!input_email) {
+                popalert.open('firstRequestMsg1',"이메일을 입력해주세요.");
+                $('#next_div').addClass("disabled");
+                return;
+            }
+
+            if (email_regex.test(input_email) === false) {
+                popalert.open('firstRequestMsg1',"이메일 형식을 확인해 주세요.");
+                $('#next_div').addClass("disabled");
+                return;
+            }
+            $.ajax({
+                type: "post",
+                url: "/login/check_id.php",
+                data: {
+                    id: input_email
+                },
+                dataType: "JSON",
+                success: function s(a) {
+                    if (a.result == "error") {
+                        is_email_check = 0;
+
+                        popalert.open('firstRequestMsg1', a.msg);
+
+                        //비밀번호 앞 얻기
+                        var first_nick = input_email.split("@")[0];
+                        //*** 처리
+                        var fn_ch = first_nick.substring(0, first_nick.length - 4) + "****";
+                        document.getElementById("gobeauty_nickname").value = fn_ch;
+                    } else {
+                        is_email_check = 1;
+
+                        popalert.open('firstRequestMsg1',a.msg);
+                    }
+
+                    /*
+                    if (a.result == "error") {
+                        popalert.open('firstRequestMsg1',a.msg);
+                        $('#next_div').addClass("disabled");
+                        return;
+                    } else {
+                        popalert.open('firstRequestMsg1',a.msg);
+                        $('#next_div').removeClass("disabled");
+                        var first_nick = input_email.split("@")[0];
+                        document.getElementById("gobeauty_nickname").value = first_nick.substring(0, first_nick.length - 4) + "****";
+                    }
+                    */
+
+                    check_next_btn();
+                },
+                error: function error() {
+                    alert('시스템 문제발생');
+                }
+            });
+        }
+
+
+
+        function login_submit() {
+
+            check_pw_error();
+
+            document.getElementById('next_form').submit();
+        }
+
+        //비밀번호 에러체크
+        function check_pw_error(){
+
+            //초기화
+            $("#div_pw").hide();
+            $("#div_pw2").hide();
+
+            //진행
+            var pwd = document.getElementById("gobeauty_pwd");
+            var MsgPw = document.getElementById("MsgPw");
+            var pwd_str = pwd.value;
+
+            //==============================================================
+            // 비밀번호 유효성
+
+            //6자 미만인 경우
+            if(pwd_str.length < 6){
+                pw_error_msg1("6자이상 입력바랍니다.");
+                return false;
+            }
+
+            //16자이하 입력바랍니다.
+            if(pwd_str.length > 20){
+                pw_error_msg1("20자이하 입력바랍니다.");
+                return false;
+            }
+
+            // 숫자
+            var pattern1 = /[0-9]/;
+            if(!pattern1.test(pwd_str)){
+                pw_error_msg1("숫자를 포함해주세요.");
+                return false;
+            }
+
+            // 문자
+            var pattern2 = /[a-zA-Z]/;
+            if(!pattern2.test(pwd_str)){
+                pw_error_msg1("영문을 포함해주세요.");
+                return false;
+            }
+
+            $("#div_pw").hide();
+
+            //==============================================================
+            // 비밀번호 확인 유효성
+
+            var pwd_ck = document.getElementById("gobeauty_pwd_ck");
+            var pwd = document.getElementById("gobeauty_pwd").value;
+            var MsgPwck = document.getElementById("MsgPwck");
+
+            if (pwd_ck.value != pwd || pwd_ck.value == "") {
+                pw_error_msg2("비밀번호가 일치하지 않습니다.");
+                check_next_btn();
+                return false;
+            }else{
+                $("#div_pw2").hide();
+            }
+
+            check_next_btn();
+        }
+
+        //비밀번호 확인 에러체크
+        function check_pw_error2(){
+
+            //초기화
+            $("#div_pw2").hide();
+
+            var pwd_ck = document.getElementById("gobeauty_pwd_ck");
+            var pwd = document.getElementById("gobeauty_pwd").value;
+            var MsgPwck = document.getElementById("MsgPwck");
+
+            if (pwd_ck.value != pwd || pwd_ck.value == "") {
+                pw_error_msg2("비밀번호가 일치하지 않습니다.");
+                is_pw_check = 0;
+                check_next_btn();
+                return false;
+            }else{
+                is_pw_check = 1;
+                $("#div_pw2").hide();
+            }
+
+            check_next_btn();
+        }
+
+        //비밀번호 에러 메세지 표시
+        function pw_error_msg1(msg){
+            $("#div_pw").show();
+            $("#pw").html(msg);
+        }
+
+        //비밀번호 호가인 에러 메세지 표시
+        function pw_error_msg2(msg){
+            $("#div_pw2").show();
+            $("#pw2").html(msg);
+        }
+
+        function checkPasswordPattern(str) {
+            var pattern1 = /[0-9]/; // 숫자
+            var pattern2 = /[a-zA-Z]/; // 문자
+            //if(!pattern1.test(str) || !pattern2.test(str) || !pattern3.test(str) || str.length < 8) {
+            if(!pattern1.test(str) || !pattern2.test(str) || str.length < 6 || str.length > 20) {
+                //alert("비밀번호는 8자리 이상 문자, 숫자, 특수문자로 구성하여야 합니다.");
+                return false;
+            }
+            else {
+                return true;
+            }
+        }
+
+        //다음 버튼 활성화 체크
+        function check_next_btn(){
+            if(is_email_check == 1 && is_pw_check == 1){
+                $('#next_div').removeClass("disabled");
+            }else{
+                //비활성
+                $('#next_div').addClass("disabled");
+            }
+        }
+
+        $(document).ready(function(){
+            $("#next_div").click(function(){
+                if(!$(this).hasClass("disabled")){
+                    login_submit();
+                }
+            });
+
+
+            //비멀번호 변화 감지
+            $("#gobeauty_pwd").keyup(function(){
+                //console.log("change");
+                check_pw_error();
+            });
+
+            //비멀번호 변화 감지
+            $("#gobeauty_pwd_ck").keyup(function(){
+                //console.log("change");
+                check_pw_error2();
+            });
+        })
+
+    </script>
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_no_gnb.php");
+?>

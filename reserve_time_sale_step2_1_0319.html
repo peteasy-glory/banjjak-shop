@@ -1,0 +1,291 @@
+<?php
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+print_r($_POST);
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="reserve-sale-wrap">
+			<input type="hidden" name="chkArray" value="<?=$check_time_sale_day?>">
+			<div class="con-title-group">
+				<h4 class="con-title">2. 판매할 고객을 선택하세요</h4>
+			</div>			
+			<div>
+				<div class="con-title-group">
+					<h5 class="con-title">정렬방식</h5>
+					<select class="arrow"  name="search_btn" id="search_btn" >
+						<option value="1">최신순</option>
+						<option value="2">가나다순</option>
+						<option value="3">이용횟수별</option>
+						<option value="4">견종별</option>
+						<option value="5">등급별</option>
+					</select>
+				</div>
+				<div class="reserve-data-all-select">
+					<label class="form-radiobox large"><input type="checkbox" name="checkAll"><span class="form-check-icon"><em>전체선택</em></span></label>
+				</div>
+				<div>					
+					<div class="customer-all-inquiry-list">
+						<table class="customer-table">
+							<colgroup>
+								<col style="width:26%">
+								<col style="width:20%">
+								<col style="width:25%">
+								<col style="width:28%">
+							</colgroup>
+							<thead>
+								<tr>
+									<th>펫이름/등급</th>
+									<th>견종</th>
+									<th>전화번호</th>
+									<th>펫 보유 수</th>
+								</tr>
+							</thead>
+							<tbody class="customer_list_wrap">
+                                <tr>
+                                    <td>펫이름/등급</td>
+                                    <td>견종</td>
+                                    <td>전화번호</td>
+                                    <td>펫 보유 수</td>
+                                </tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:fn_submit();" class="btn-page-bottom"><span>0</span>명 선택</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script>
+	var search_btn = "<?=$r_search ?>";
+	var artist_id = '<?=$artist_id ?>';
+	var pet_type_arr = JSON.parse('<?=json_encode($pet_type_arr) ?>');
+
+	$(document).ready(function() {
+		var search_btn = $("#search_btn option:selected").val();
+		
+		get_customer_list(artist_id, search_btn);
+	})	
+	
+	$("input[name='checkAll']").click(function() {
+		if($("input[name='checkAll']").is(":checked")) {
+			$("input[name=check_customer]").prop("checked", true);
+
+			var total = $("input[name=check_customer]").length;
+			$(".btn-page-bottom span").text(total);
+		} else {
+			$("input[name=check_customer]").prop("checked", false);
+			$(".btn-page-bottom span").text("0");
+		}
+	});
+	
+	$(".customer_list_wrap").on("click","input[name='check_customer']", function(event){
+		var count = $(".btn-page-bottom span").text();
+
+		if ($(this).is(':checked')) {
+			count++;
+		} else {
+			count--;
+		}
+		
+		$(".btn-page-bottom span").text(count);
+		
+		var total = $("input[name=check_customer]").length;
+		var checked = $("input[name=check_customer]:checked").length;
+		
+		if(total != checked) $("input[name='checkAll']").prop("checked", false);
+		else $("input[name='checkAll']").prop("checked", true);
+	})
+
+	function get_customer_list(artist_id, search_btn) {
+		$("#loading").css("display", "flex");
+
+		$.ajax({
+			url: 'data/manage_customer_allview_ajax',
+			data: {
+				mode: "get_customer_list",
+				artist_id: artist_id,
+				search_btn: search_btn
+			},
+			type: 'POST',
+			dataType: 'JSON',
+			beforeSend: function(){
+				$("#loading").css("display", "flex");
+				$(".customer_list_wrap").html("");
+			},
+			success: function(data) {
+				$("#loading").hide();
+				if(data.code == "000000"){
+					console.log(data.data);
+					var html = '';
+					var code_cnt = 0;
+					var this_code = 0;
+					var no_data = 0;
+					var this_type = "";
+					var chk_end = 0;
+					
+					$.each(data.data, function(i, v) {
+						var pet_name = (v.pet_name == "" || v.pet_name == null)? "[이름없음]" : v.pet_name;
+						var pet_type = (v.pet_type == "" || v.pet_type == null)? "[미기입]" : v.pet_type;
+						var service = (v.service == "" || v.service == null)? "" : v.service;
+						var service2 = (v.service2 == "" || v.service2 == ":0" || v.service2 == "all:0" || v.service2 == null)? "" : ((v.type == "dog")? v.service2 : "");
+						var ba_seq = (v.ba_seq && v.ba_seq != "")? '<a class="beauty_view_btn" href="<?=$shop_directory ?>/beauty_sign_view.php?ba_seq='+v.ba_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">미용동의서 보기</a>' : '';
+						var is_cancel = (v.is_cancel == "1")? ' is_cancel ' : ''; 
+						var user_reserve = (v.user_reserve && v.user_reserve != "")? v.user_reserve : '0';
+						/*
+						if(v.payment_type == 'beauty'){ border_color = '#daebff'; }
+						if(v.payment_type == 'hotel'){ border_color = '#ffdae3'; }
+						if(v.payment_type == 'playroom'){ border_color = '#fef9e9'; }
+
+						if(search_btn == "2"){ // 가나다순
+							code_cnt = String(pet_name).charAt(0).charCodeAt(0);
+							if(hangul_code_arr[0] < code_cnt){
+								$.each(hangul_code_arr, function(i, v2){
+									if(v2 > code_cnt){
+										if(this_code != v2){
+											this_code = v2;
+											html += '<tr>';
+											html += '	<td colspan="6" class="sub_line">'+hangul_arr[i-1]+'</td>';
+											html += '</tr>';
+										}
+										return false;
+									}else{
+										if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt && chk_end == 0){
+											html += '<tr>';
+											html += '	<td colspan="6" class="sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
+											html += '</tr>';
+											chk_end++;
+											return false;
+										}
+									}
+								});
+							}else{
+								if(no_data == 0){
+									html += '<tr>';
+									html += '	<td colspan="6" class="sub_line">[이름없음]</td>';
+									html += '</tr>';
+									no_data++;
+								}
+							}
+						}else if(search_btn == "4"){ // 견종별
+							code_cnt = String(pet_type).charAt(0).charCodeAt(0);
+							if(hangul_code_arr[0] < code_cnt){
+								$.each(hangul_code_arr, function(i, v2){
+									if(v2 > code_cnt){
+										if(this_code != v2){
+											this_code = v2;
+											html += '<tr>';
+											html += '	<td colspan="6" class="sub_line">'+pet_type_arr[v.type]+' - '+hangul_arr[i-1]+'</td>';
+											html += '</tr>';
+										}
+										return false;
+									}else{
+										if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt){
+											html += '<tr>';
+											html += '	<td colspan="6" class="sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
+											html += '</tr>';
+											return false;
+										}
+									}
+									if(this_type != v.type){
+										this_type = v.type;
+									}
+								});
+							}else{
+								if(no_data == 0){
+									html += '<tr>';
+									html += '	<td colspan="6" class="sub_line">[미기입]</td>';
+									html += '</tr>';
+									no_data++;
+								}
+							}
+						}
+						*/
+						// pet 여러마리 일때 (일단 미용고객만 선 조치) 20210812 start
+						if(v.payment_type == 'beauty'){
+							var test_i = ".test_name_"+(i+1);
+							var test = "";
+							test_pet_list(test_i, test, artist_id, v.cellphone);
+						}
+						// pet 여러마리 일때 (일단 미용고객만 선 조치) 20210812 end
+
+						if (v.mypet_seq) {
+							html += '<tr class="customer-table-cell">';		
+							html += '		<td>';
+							html += '			<div class="customer-table-toggle">';
+							html += '				<span class="toggle-title"><span class="ellipsis">' + pet_name + '</span></span>';
+							html += '				<span class="toggle-grade">';
+							html += '					<label class="form-radiobox large"><input type="checkbox" name="check_customer"><span class="form-check-icon"><em></em></span></label>';
+							html += '					<span class="icon icon-grade-vip"></span>';
+							html += '				</span>';
+							html += '			</div>';
+							html += '		</td>';
+							html += '		<td>';
+							html += '			<div class="customer-table-txt"><strong>' + pet_type_arr[v.type] + '</strong></div>';
+							html += '			<div class="customer-table-txt">' + pet_type + '</div>';
+							html += '		</td>';
+							html += '		<td>';
+							html += '			<div class="customer-table-txt">' + v.cellphone + '</div>';
+							html += '		</td>';
+							html += '		<td>';
+							html += '			<div class="customer-table-txt">미용</div>';
+							html += '			<div class="customer-table-txt">3</div>';
+							html += '		</td>';
+							html +=	'</tr>';	
+						}
+					});
+
+					$(".customer_list_wrap").html("").html(html);
+				}else{
+					$("#loading").hide();
+					alert(data.data+"("+data.code+")");
+					console.log(data.data);
+				}
+			},
+			error: function(xhr, status, error) {
+				//alert(error + "네트워크에러");
+				if(xhr.status != 0){
+					alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+				}
+			}
+		});
+	}
+
+	function fn_submit() {
+		var count = $(".btn-page-bottom span").text();
+		if (count < 1) {
+			alert("고객을 선택해주세요.");
+			return false;
+		}
+
+		var chkArray = $("input[name=chkArray]").val();
+		location.href = "reserve_time_sale_step3_1?chkArray=" + chkArray;
+	}
+</script>
+	
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

@@ -1,0 +1,380 @@
+<?php
+$shop_title	= "일정관리";
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$backurl = ($_GET['backurl'] && $_GET['backurl'] != "")? $_GET['backurl'] : "";
+
+
+$sql = "
+						SELECT *
+						FROM tb_working_schedule
+						WHERE customer_id = '".$user_id."'
+					"; // 영업시간, 공휴일 영업여부
+//echo $sql;
+$tws = sql_fetch_array($sql);
+
+$sql = "
+						SELECT *
+						FROM tb_time_off
+						WHERE customer_id = '".$user_id."'
+					"; // 점심시간/휴식시간 설정
+//echo $sql;
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$data["rest_time"] = $row["res_time_off"];
+$data["id_2"] = mysqli_num_rows($result);
+$break_time = explode(",",$data["rest_time"]);
+
+$sql = "
+						SELECT *
+						FROM tb_time_schedule
+						WHERE artist_id = '".$user_id."'
+					"; // 타임제 스케줄
+//echo $sql;
+$result = mysqli_query($connection, $sql);
+//					$row = mysql_fetch_assoc($result);
+//					$data["rest_time_schedule"] = $row["res_time_off"];
+
+while($row = mysqli_fetch_assoc($result)){
+//						$tmp_data["res_time_off"] = $row["res_time_off"];
+    $data["rest_time_schedule"][] = $row["res_time_off"];
+    $data["artist_name"][] = $row["artist_name"];
+}
+$data["id_3"] = mysqli_num_rows($result);
+//print_r($data["rest_time_schedule"]);
+
+
+$sql = "
+						SELECT *
+						FROM tb_shop
+						WHERE customer_id = '".$user_id."'
+					"; // 자유시간제/타임제 여부
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+$data["is_time_type"] = $row["is_time_type"];
+
+$sql = "
+						SELECT *
+						FROM tb_regular_holiday
+						WHERE customer_id = '".$user_id."'
+					"; // 정기휴일 여부
+//echo $sql;
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+//print_r($row);
+//$week_text = '월•화•수•목•금•토•일';
+$w_text = array();
+if($row["is_monday"]==1){
+    $w_text[] = '월';
+}
+if($row["is_tuesday"]==1){
+    $w_text[] = '화';
+}
+if($row["is_wednesday"]==1){
+    $w_text[] = '수';
+}
+if($row["is_thursday"]==1){
+    $w_text[] = '목';
+}
+if($row["is_friday"]==1){
+    $w_text[] = '금';
+}
+if($row["is_saturday"]==1){
+    $w_text[] = '토';
+}
+if($row["is_sunday"]==1){
+    $w_text[] = '일';
+}
+
+$data["weekend_holiday"] = $row["is_sunday"].$row["is_monday"].$row["is_tuesday"].$row["is_wednesday"].$row["is_thursday"].$row["is_friday"].$row["is_saturday"];
+$data["id_4"] = mysqli_num_rows($result);
+
+
+?>
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- set-schedule-wrap -->
+        <div class="set-schedule-wrap">
+            <div class="con-title-group">
+                <h4 class="con-title">서비스 선택</h4>
+            </div>
+            <div class="basic-data-group vvsmall2">
+                <div class="wide-tab">
+                    <div class="wide-tab-inner">
+                        <!-- 활성화시 actived클래스 추가 -->
+                        <div class="tab-cell actived"><a href="#" class="btn-tab-item">미용</a></div>
+                        <div class="tab-cell"><a href="javascript:popalert.open('talkExam');" class="btn-tab-item">호텔</a></div>
+                        <div class="tab-cell"><a href="javascript:popalert.open('talkExam');" class="btn-tab-item">유치원/놀이터</a></div>
+                    </div>
+                </div>
+            </div>
+            <div class="basic-data-group middle">
+                <!-- 내용이 있을 경우 -->
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">영업시간</h4>
+                    </div>
+                    <div class="flex-table read w-90">
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">기본영업시간</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php echo ($tws[0]["working_start"]>='12')?'오후':'오전';?>
+                                        <?php echo sprintf('%02d',$tws[0]["working_start"]);?>:00 ~
+                                        <?php echo ($tws[0]["working_end"]>=13)?'오후':'오전';?>
+                                        <?php echo sprintf('%02d',$tws[0]["working_end"]-12);?>:00
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">휴게시간</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php
+                                        $break_time = explode(",",$data["rest_time"]);
+                                        for($i=0;$i<=count($break_time);$i++){
+                                            $tmp = explode("~",$break_time[$i]);
+                                            if(!empty($tmp[0])){
+                                                ?>
+                                                <p>
+                                                    <?php
+                                                    $d = '오전';
+                                                    $d_time = explode(":",$tmp[0]);
+                                                    if(substr($tmp[0],0,2)>=12){
+                                                        $d = '오후';
+                                                    }
+                                                    if(substr($tmp[0],0,2)>12){
+                                                        $d_time[0] = $d_time[0] -12;
+                                                    }
+                                                    echo $d.' '.$d_time[0].":".$d_time[1].' ~ ';
+
+                                                    $d1 = '오전';
+                                                    $d_time1 = explode(":",$tmp[1]);
+                                                    if(substr($tmp[1],0,2)>=12){
+                                                        $d1 = '오후';
+                                                    }
+                                                    if(substr($tmp[1],0,2)>12){
+                                                        $d_time1[0] = $d_time1[0] -12;
+                                                    }
+                                                    echo $d1.' '.$d_time1[0].":".$d_time1[1];
+                                                    ?>
+                                                </p>
+                                            <?php }} ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">공휴일 휴무</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php echo ($tws[0]['rest_public_holiday']==1)?'공휴일은 쉬어요':'공휴일도 일해요';?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">예약스케줄 운영시간</h4>
+                    </div>
+                    <div class="flex-table read w-90">
+                        <div class="flex-table-cell" style="display: <?php echo ($data["is_time_type"]==1)?'block':'none';?>">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">자유시간제</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <?php
+                        if($data["is_time_type"]==2){
+                            $que = " SELECT * FROM `tb_artist_list` WHERE artist_id='{$user_id}' AND is_view = '2' AND is_out = '2' GROUP BY name ORDER BY sequ_prnt asc, is_main DESC, nicname ASC";
+                            //echo $que;
+                            $result = mysqli_query($connection, $que);
+                            while ($artist_rows = mysqli_fetch_assoc($result)) {
+                                $data['artist'][] = $artist_rows;
+                            }
+                            foreach ((array) $data['artist'] as $key => $artist) {
+                                ?>
+                                <div class="flex-table-cell">
+                                    <div class="flex-table-item">
+
+                                        <div class="flex-table-title"><div class="txt"><?= $artist['nicname'] ?></div></div>
+                                        <div class="flex-table-data">
+                                            <div class="flex-table-data-inner">
+                                                <?php
+                                                unset($tmp);
+                                                $sql = "SELECT *
+                                                    FROM tb_time_schedule
+                                                    WHERE artist_id = '{$user_id}' AND artist_name = '" . $artist['name'] . "' ";
+                                                $rw = sql_fetch_array($sql);
+                                                if(!empty($rw[0]['res_time_off'])){
+                                                    $ex = explode(",",$rw[0]['res_time_off']);
+                                                    for($i=0;$i<count($ex);$i++){
+                                                        $tmp = explode("~",$ex[$i]);
+
+                                                        ?>
+                                                        <p>
+                                                            <?php
+                                                            $d = '오전';
+                                                            if($tmp[0]>='12:00'){
+                                                                $d = '오후';
+                                                            }
+                                                            echo $d.' '.date('g:i',strtotime($tmp[0]));
+                                                            echo ' ~ ';
+                                                            $d1 = '오전';
+                                                            if($tmp[1]>='12:00'){
+                                                                $d1 = '오후';
+                                                            }
+                                                            echo $d1.' '.date('g:i',strtotime($tmp[1]));
+                                                            ?>
+                                                        </p>
+                                                    <?php }} ?>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            <?php }} ?>
+                    </div>
+                </div>
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">정기휴무</h4>
+                    </div>
+                    <div class="flex-table read w-90">
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">요일</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php echo implode("•",$w_text);?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">임시휴무</h4>
+                    </div>
+                    <div class="flex-table read w-90">
+                        <?php
+                        $que = "
+                                    SELECT
+                                    ph.ph_seq AS phh_seq,
+                                    ph.customer_id AS artist_id,
+                                    ph.worker,
+                                    (SELECT nicname FROM tb_artist_list WHERE NAME = ph.worker AND artist_id = ph.customer_id GROUP BY artist_id) AS worker_name,
+                                    if(ph.type = 'notall', '2', '1') AS is_allday,
+                                    date_format(concat(ph.start_year,'.',ph.start_month,'.',ph.start_day), '%Y-%m-%d') AS check_in_date,
+                                    time_format(concat(ph.start_hour,':',IFNULL(ph.start_minute, '00'),':00'), '%H:%i:%s') AS check_in_time,
+                                    date_format(concat(ph.end_year,'.',ph.end_month,'.',ph.end_day), '%Y-%m-%d') AS check_out_date,
+                                    time_format(concat(ph.end_hour,':',IFNULL(ph.end_minute, '00'),':00'), '%H:%i:%s') AS check_out_time,
+                                    ph.update_time AS update_dt
+                                FROM tb_private_holiday AS ph
+                                WHERE ph.customer_id = '{$user_id}'
+                                    AND ph.type <> 'not' GROUP BY ph.worker, check_in_date
+                        ";
+                        //echo $que;
+                        $arr = sql_fetch_array($que);
+                        if(count($arr)>0) {
+                            foreach ($arr as $list) {
+                                if(!empty($list['worker_name'])) {
+                                    ?>
+                                    <div class="flex-table-cell">
+                                        <div class="flex-table-item">
+                                            <div class="flex-table-title"><div class="txt"><?php echo $list['worker_name'];?></div></div>
+                                            <div class="flex-table-data">
+                                                <div class="flex-table-data-inner">
+                                                    <?php if ($list['is_allday'] == 1) {
+                                                        echo date('Y.m.d',strtotime($list['check_in_date'])) . ' ~ ' . date('Y.m.d',strtotime($list['check_out_date']));
+                                                    } else {
+                                                        echo date('Y.m.d',strtotime($list['check_in_date'])) . ' ' . substr($list['check_in_time'],0,5) . ' ~ ' . date('Y.m.d',strtotime($list['check_out_date'])) . ' ' . substr($list['check_out_time'],0,5);
+                                                    } ?>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                        }
+                        ?>
+                    </div>
+                </div>
+                <!-- //내용이 있을 경우 -->
+                <!-- 내용이 없을 경우 -->
+                <?php
+                if(empty($row)){
+                    ?>
+                    <a href="./set_schedule_modify_1" class="btn btn-purple btn-round btn-middle-size">영업시간 등록하기</a>
+                    <div class="common-none-data">
+                        <div class="none-inner">
+                            <div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+                            <div class="item-info">영업시간이 등록되지 않았습니다.</div>
+                            <div class="item-desc">미용, 호텔, 유치원/놀이터의 각 서비스 유형에 맞춰 영업시간을 설정할 수 있습니다. 영업시간 내 휴식 및 점심간은 휴게시간으로 간편하게 설정하세요.</div>
+                        </div>
+                    </div>
+                <?php } ?>
+                <!-- //내용이 없을 경우 -->
+            </div>
+        </div>
+        <!-- //set-schedule-wrap -->
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="./set_schedule_modify_1" class="btn-page-bottom">수정하기</a>
+    </div>
+    <!-- //page-bottom -->
+
+    <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            준비중입니다.
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+</section>
+<!-- //container -->
+
+<script>
+    $(document).ready(function(){
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').prop('href','set_main')
+    });
+</script>
+
+</body>
+</html>

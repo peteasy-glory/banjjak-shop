@@ -1,0 +1,396 @@
+<!-- //header -->
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "SHOP 대문 사진 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$shop_sql = "select * from tb_shop where customer_id = '" . $user_id . "'";
+$shop_result = mysqli_query($connection, $shop_sql);
+
+if ($shop_datas = mysqli_fetch_object($shop_result)) {
+    $front_image = $shop_datas->front_image;
+    $name = $shop_datas->name;
+    $working_years = $shop_datas->working_years;
+    $self_introduction = $shop_datas->self_introduction;
+    $professional_field = $shop_datas->professional_field;
+    $career = $shop_datas->career;
+    $license_indexs = $shop_datas->license_indexs;
+    $region_and_cost = $shop_datas->region_and_cost;
+    $enable_flag = $shop_datas->enable_flag;
+    $update_time = $shop_datas->update_time;
+
+
+}
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- page-contents -->  
+		<div class="page-contents">
+			<div class="shop-gate-picture-wrap">
+				<div class="shop-gate-picture-view">					
+					<?if($shop_result->num_rows){?>
+					<!-- 이미지 있을 때 -->
+					<img src="<?="https://image.banjjakpet.com".img_link_change($front_image)?>" alt=""/>
+					<?}else{?>
+					<!-- 이미지 없을 때 -->
+					<div class="common-none-data">
+						<div class="none-inner">
+							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"/></div>
+							<div class="item-info">등록된 이미지가 없습니다.</div>
+						</div>
+					</div>
+
+					<?}?>
+				</div>
+				<div class="shop-gate-info-title">Shop 대문 사진함</div>
+				<div class="shop-gate-info-desc">아래 사진 중 원하시는 사진을 SHOP 대문사진으로 설정해 주세요. 보관함에 있는 사진들도 언제든지 대문사진 변경 가능합니다.</div>
+				<div class="shop-gate-picture-select">
+					<div class="list-inner">
+						<?php
+				        $shop_fi_sql = "select * from tb_shop_frontimage where customer_id = '" . $user_id . "'";
+				        $shop_fi_result = mysqli_query($connection, $shop_fi_sql);
+
+				        while ($shop_fi_datas = mysqli_fetch_object($shop_fi_result)) {
+				            $image_value = $shop_fi_datas->image;
+				            ?>
+						<div class="list-cell">
+							<div class="picture-thumb-view">
+								<div class="picture-obj"><img src="<?= "https://image.banjjakpet.com".img_link_change($image_value) ?>" alt=""/></div>
+								<div class="picture-ui">
+									<button type="button" class="btn-picture-ui"></button>									
+								</div>
+								<div class="picture-ui-list">
+									<div class="picture-ui-list-inner">
+										<a href="#" onclick="selectImage('<?=$image_value ?>')" class="btn-picture-ui-nav">대표 사진 등록</a>
+										<a href="javascript:deleteImage('<?=$image_value ?>');" class="btn-picture-ui-nav">삭제</a>
+									</div>
+								</div>
+								<?if($front_image==$image_value){?>
+								<!-- 대표사진 일 경우 -->
+								<div class="check-point"></div>
+								<?}?>
+							</div>
+						</div>
+						<?}?>
+						<div class="list-cell"><a href="#" onclick="javascript:MemofocusNcursor();" class="btn-gate-picture-register"><span><em>이미지 추가</em></span></a></div>
+						<div style="display:block;position:absolute;top:-50px"><input type="file" accept="image/*" name=imgupfile id=addimgfile></div>
+					</div>				
+				</div>
+				<div class="picture-add-info">이미지는 최대 25개까지 등록할 수 있습니다.<br>gif, png, jpg, jpeg 형식의 절차 이미지만 등록됩니다.</div>
+			</div>
+		</div>
+		<!-- //page-contents -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<script language="javascript">
+    $('#addimgfile').bind('change', function(e) {
+        $("#fileuparea").hide();
+        $("#fileuplodingarea").show();
+        var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+            alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+            $("#fileuparea").show();
+            $("#fileuplodingarea").hide();
+            return;
+        }
+
+        var filename = $("input[name=imgupfile]")[0].files[0].name;
+
+        var newfilename = GetPhotoFilename('artist_front_image', '<?= $user_id ?>', filename);
+
+        var formData = new FormData();
+        formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+        formData.append("filepath", newfilename);
+        $.ajax({
+            url: 'data/upload_shop_front_image.php',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data) {
+
+                $("#fileuparea").show();
+                $("#fileuplodingarea").hide();
+                if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+                    // ie 일때 input[type=file] init.
+                    $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+                } else {
+                    // other browser 일때 input[type=file] init.
+                    $("#addimgfile").val("");
+                }
+
+                addwidth = " style='width:30%' ";
+                mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
+                location.reload();
+
+            },
+            error: function(xhr, status, error) {
+                alert(error + "에러발생");
+            }
+        });
+
+
+    });
+
+    //안드로이드 앱일경우애만 ... 실행..
+    $(document).ready(function() {
+        //dvck=getDeviceCheck();
+        if ('<?= $is_android ?>' == 1) {
+            $("#fileuparea").hide();
+            $("#fileuparea2").show();
+        }
+    });
+
+    function galleryup() {
+        //alert("갤러리")
+        window.Android.openGallery();
+    }
+
+    function cameraup() {
+        //alert("카메라")
+        window.Android.openCamera();
+    }
+<?php
+    function getFileFromCustomerSrv($fileName){
+        $url = 'https://customer.banjjakpet.com/upload/appupload/'.$fileName;
+        $outFileName  = "upload/appupload/down_file.jpg";
+        if(!file_exists("upload/appupload/".$fileName)) {
+            $options = array(
+                CURLOPT_FILE    => fopen($outFileName, 'w'),
+                CURLOPT_TIMEOUT =>  28800, // set  8 hours
+                CURLOPT_URL     => $url
+            );
+
+            $ch = curl_init();
+            curl_setopt_array($ch, $options);
+            curl_exec($ch);
+            curl_close($ch);
+        }
+    }
+
+    $downResult = getFileFromCustomerSrv("down_file1.jpg");
+?>
+
+    //안드에서 업로드가 끝나면 무조건 호출..
+    function uploadEnd(fileName) {
+
+        var post_file = 'filename=' + fileName;
+        $.ajax({
+            url: 'data/customerFileBridge.php',
+            data: post_data,
+            type: 'POST',
+            success: function(data){
+
+            },
+            error: function (xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+
+        //$("#fileuparea2").hide();
+        //$("#fileuplodingarea").show();
+        //
+        //var down_result = "<?//=getFileFromCustomerSrv()?>//"
+        //
+        //var newfilename = GetPhotoFilename('artist_front_image', '<?//= $user_id ?>//', fileName);
+        //var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+        //var formData = new FormData();
+        //
+        //formData.append("filepath", fileName);
+        //formData.append("newfilepath", newfilename);
+        //
+        //$.ajax({
+        //    url: 'data/upload_shop_front_image_byapp.php',
+        //    data: post_data,
+        //    type: 'POST',
+        //    success: function(data) {
+        //        $("#fileuparea2").show();
+        //        $("#fileuplodingarea").hide();
+        //        if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+        //            // ie 일때 input[type=file] init.
+        //            $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+        //        } else {
+        //            // other browser 일때 input[type=file] init.
+        //            $("#addimgfile").val("");
+        //        }
+        //        addwidth = " style='width:30%' ";
+        //        mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
+        //        //location.reload();
+        //        location.href = location.pathname;
+        //    },
+        //    error: function(xhr, status, error) {
+        //        //alert(error + "네트워크에러");
+		//		if(xhr.status != 0){
+		//			alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+		//		}
+        //    }
+        //});
+    }
+
+    function bridgeUploadEnd(fileName){
+        $("#fileuparea2").hide();
+        $("#fileuplodingarea").show();
+
+        var newfilename = GetPhotoFilename('artist_front_image', '<?= $user_id ?>', fileName);
+        var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+        var formData = new FormData();
+
+        formData.append("filepath", fileName);
+        formData.append("newfilepath", newfilename);
+
+        $.ajax({
+            url: 'data/upload_shop_front_image_byapp.php',
+            data: post_data,
+            type: 'POST',
+            success: function(data) {
+                $("#fileuparea2").show();
+                $("#fileuplodingarea").hide();
+                if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+                    // ie 일때 input[type=file] init.
+                    $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+                } else {
+                    // other browser 일때 input[type=file] init.
+                    $("#addimgfile").val("");
+                }
+                addwidth = " style='width:30%' ";
+                mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
+                //location.reload();
+                location.href = location.pathname;
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    function MemofocusNcursor() {
+        html = "<div id='upimgarea'></div>";
+        //document.getElementById('dmemo').focus();
+        var sel, range;
+        if (window.getSelection) {
+            // IE9 and non-IE
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+
+                // Range.createContextualFragment() would be useful here but is
+                // non-standard and not supported in all browsers (IE9, for one)
+                var el = document.createElement("div");
+                el.innerHTML = html;
+                var frag = document.createDocumentFragment(),
+                    node, lastNode;
+                while ((node = el.firstChild)) {
+                    lastNode = frag.appendChild(node);
+                }
+                range.insertNode(frag);
+
+                // Preserve the selection
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+        } else if (document.selection && document.selection.type != "Control") {
+            // IE < 9
+            document.selection.createRange().pasteHTML(html);
+        }
+
+        if(checkMobile()  == true){
+            galleryup();
+        } else {
+            $("#addimgfile").trigger("click");
+
+        }
+    }
+
+    function checkMobile(){
+        var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+        if ( varUA.indexOf('android') > -1) {
+            //안드로이드
+            return true;
+        } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+            //IOS
+            return 'ios';
+        } else {
+            //아이폰, 안드로이드 외
+            return 'other';
+        }
+    }
+</script>
+
+<script>
+function deleteImage(path) {
+    var post_data = 'path=' + path;
+    $.ajax({
+        url: 'data/delete_front_image.php',
+        data: post_data,
+        type: 'POST',
+        success: function(data) {
+            location.reload();
+        },
+        error: function(xhr, status, error) {
+            popalert.open('firstRequestMsg1', '적용실패');
+        }
+    });
+}
+
+function selectImage(path) {
+    var post_data = 'path=' + path;
+    $.ajax({
+        url: 'data/change_front_image.php',
+        data: post_data,
+        type: 'POST',
+        success: function(data) {
+           	//location.reload();
+            location.href = location.pathname;
+        },
+        error: function(xhr, status, error) {
+            popalert.open('firstRequestMsg1', '적용실패');
+        }
+    });
+}
+</script>
+
+
+	
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

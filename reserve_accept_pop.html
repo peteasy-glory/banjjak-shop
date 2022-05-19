@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="page-title">예약 접수</div>
+	<div class="header-right">
+		<a href="#" class="btn-page-ui btn-page-close"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></a>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<button type="button" class="btn btn-purple" onclick="pop.open('reserveAcceptMsg1');"><em>이미등록되어 있음</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reserveAcceptMsg2');"><em>알림없이 등록</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reserveAcceptMsg3');"><em>필수사항 입력</em></button>
+	</div>
+	<!-- //page-body -->	
+	
+	<!--  이미등록되어 있음 -->
+	<article id="reserveAcceptMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">이 번호의 고객이 이미 반짝에 등록되어 있어 펫정보를 불러올 수 있습니다.<br><br>반짝의 다른 입점샵 이용이력이 있는 고객으로 펫 정보만 불러옵니다<br>(다른샵 미용이력/메모제외)</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //이미등록되어 있음 -->
+	
+	<!--  알림없이 등록 -->
+	<article id="reserveAcceptMsg2" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-title">알림없이 등록</div>
+						<div class="msg-txt">미용 예약 하루전 알림은 발송 하시겠습니까?</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">발송</button>
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">미발송</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //알림없이 등록 -->
+
+	<!--  필수사항 입력 -->
+	<article id="reserveAcceptMsg3" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">[필수사항]을 입력해주세요.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //필수사항 입력 -->
+
+</section>
+<!-- //container -->
+
+</body>
+</html>

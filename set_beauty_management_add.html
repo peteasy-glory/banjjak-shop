@@ -1,0 +1,526 @@
+<?php
+$shop_title	= "미용 추가옵션 등록/수정";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$backurl = $_GET['backurl'];
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$professional_name = $_GET['first_type'];
+$second_type = $_GET['second_type'];
+if (!$second_type) {
+    $second_type = '소형견미용';
+}
+
+$dog_product_title = array();
+$dog_product_arr = array(
+    "무게",
+    "목욕",
+    "부분미용",
+    "부분+목욕",
+    "위생",
+    "위생+목욕",
+    "전체미용",
+    "스포팅",
+    "가위컷",
+    "썸머컷"
+);
+$dog_product_seq = array(
+    "목욕"         =>'bath',
+    "부분미용"      =>'part',
+    "부분+목욕"     =>'bath_part',
+    "위생"         =>'sanitation',
+    "위생+목욕"    =>'sanitation_bath',
+    "전체미용"     =>'all',
+    "스포팅"      =>'spoting',
+    "가위컷"      =>'scissors',
+    "썸머컷"       =>'summercut'
+);
+$option_name = array('bath_price','part_price','bath_part_price','sanitation_price','sanitation_bath_price','all_price','spoting_price','scissors_price','summercut_price');
+$option_chk_name = array('is_consult_bath','is_consult_part','is_consult_bath_part','is_consult_sanitation','is_consult_sanitation_bath','is_consult_all',
+    'is_consult_spoting','is_consult_scissors','is_consult_summercut','is_consult_beauty1','is_consult_beauty2','is_consult_beauty3','is_consult_beauty4','is_consult_beauty5');
+$cnt = 10;
+$beauty = 1;
+$que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}'";
+$res = mysqli_query($connection, $que);
+$row = mysqli_fetch_assoc($res);
+for($i=1;$i<=14;$i++){
+    if(!empty($row['worktime'.$i.'_disp_yn'] == 'y')){
+        if($i<10){
+            array_push($dog_product_title, $dog_product_arr[$i]);
+        } else {
+            $dog_product_seq[$row['worktime'.$i.'_title']] = 'beauty'.$beauty;
+            $option_name[] = 'beauty'.$beauty."_price";
+            array_push($dog_product_title, $row['worktime'.$i.'_title']);
+            $beauty++;
+        }
+    }
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+//echo $sql;
+$result = mysqli_query($connection,$sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+$crypto = new Crypto();
+$enc_artist_id = $crypto->encode(trim($user_id), $access_key, $secret_key);
+$sql = "
+	SELECT * 
+	FROM tb_request_artist 
+	WHERE customer_id = '" . $enc_artist_id . "'
+";
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)) {
+    $data['request_artist'] = $row;
+    $is_offline = ($row['is_got_offline_shop'] == NULL) ? 0 : $row['is_got_offline_shop'];
+}
+$dog_type = "'소형견미용','중형견미용','대형견미용','특수견미용','추가공통옵션','직접입력'";
+
+
+// 기본 요금제 호출 - 강아지
+$sql = "
+	SELECT * 
+	FROM tb_product_dog_static 
+	WHERE customer_id = '".$user_id."' AND second_type = '{$_GET['second_type']}'
+	";
+if(isset($_GET['direct_title'])){
+    $sql .= " AND direct_title = '{$_GET['direct_title']}'";
+}
+//echo $sql;
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)){
+    $data["product_dog_static"][] = $row;
+}
+
+//print_r($data["product_dog_static"]);
+
+if(!isset($data['product_dog_static'])){
+    $total_option_cnt = 3;
+} else {
+    //등록된 옵션의 갯수를 구한다.
+    $total_option_cnt = count(get_explode_data($data['product_dog_static'][0]['kgs']));
+    $tmp_kgs = get_explode_data($data['product_dog_static'][0]['kgs']);
+}
+
+//무게 이외에 추가된 미용구분에 대한 금액을 가져온다
+for($j=0;$j<count($option_name);$j++){
+    if(isset($data['product_dog_static'][0][$option_name[$j]])){
+        ${'tmp_'.$option_name[$j]} = get_explode_data($data['product_dog_static'][0][$option_name[$j]]);
+    }
+}
+
+
+//상담 체크박스 불러오기
+for($j=0;$j<count($option_chk_name);$j++){
+    if(isset($data['product_dog_static'][0][$option_chk_name[$j]])){
+        $chk = get_explode_data($data['product_dog_static'][0][$option_chk_name[$j]]);
+        ${$option_chk_name[$j]} = $chk;
+    }
+}
+
+?>
+
+
+<!-- container -->
+<section id="container">
+
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- set-beauty-add -->
+        <form name="frm" method="post" action="./data/save_beauty_managerment_add">
+            <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
+            <input type="hidden" name="type" value="dog_service_type">
+            <div class="set-beauty-add">
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">상품분류</h4>
+                    </div>
+                    <div class="basic-data-group vvsmall2">
+                        <div class="wide-tab">
+                            <div class="wide-tab-inner">
+                                <!-- 활성화시 actived클래스 추가 -->
+                                <div class="tab-cell actived"><a href="#" class="btn-tab-item">강아지</a></div>
+                                <div class="tab-cell"><a href="./set_beauty_management_add2?backurl=<?php echo $backurl;?>" class="btn-tab-item">고양이</a></div>
+                            </div>
+                        </div>
+                        <div class="basic-data-group vmiddle">
+                            <div class="form-group">
+                                <div class="form-group-cell middle">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">제공방식</div>
+                                        <div class="form-item-data type-2">
+                                            <div class="grid-layout toggle-button-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell grid-3">
+                                                        <label class="form-toggle-box middle">
+                                                            <input type="radio" name="offer" value="01" <?php echo (($data['product_dog_static'][0]['in_shop_product']=='0' && $data['product_dog_static'][0]['out_shop_product']=='1') || !isset($data['product_dog_static'][0]['in_shop_product']) )?'checked':''; ?>><em>매장상품</em>
+                                                        </label>
+                                                    </div>
+                                                    <div class="grid-layout-cell grid-3">
+                                                        <label class="form-toggle-box middle">
+                                                            <input type="radio" name="offer" value="10" <?php echo ($data['product_dog_static'][0]['in_shop_product']=='1' && $data['product_dog_static'][0]['out_shop_product']=='0')?'checked':''; ?>><em>출장상품</em>
+                                                        </label>
+                                                    </div>
+                                                    <div class="grid-layout-cell grid-3">
+                                                        <label class="form-toggle-box middle">
+                                                            <input type="radio" name="offer" value="11" <?php echo ($data['product_dog_static'][0]['in_shop_product']=='1' && $data['product_dog_static'][0]['out_shop_product']=='1')?'checked':''; ?>><em>출장/매장</em>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group-cell middle">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">상품명</div>
+                                        <div class="form-item-data type-2">
+                                            <select name="product_second_type" id="product_second_type" onchange="location.href='./set_beauty_management_add?second_type='+this.value" >
+                                                
+                                                <option value="소형견미용" <?php echo ('소형견미용'==$second_type)?'selected':'';?>>소형견미용</option>
+                                                <option value="중형견미용" <?php echo ('중형견미용'==$second_type)?'selected':'';?>>중형견미용</option>
+                                                <option value="대형견미용" <?php echo ('대형견미용'==$second_type)?'selected':'';?>>대형견미용</option>
+                                                <option value="특수견미용" <?php echo ('특수견미용'==$second_type)?'selected':'';?>>특수견미용</option>
+                                                <option value="추가공통옵션" <?php echo ('추가공통옵션'==$second_type)?'selected':'';?>>추가공통옵션</option>
+                                                <option value="직접입력" <?php echo ($_GET['second_type']=='직접입력')?'selected':'';?>>직접입력</option>
+                                            </select>
+                                            <input type="text" name="product_second_type2" id="product_second_type2" value="<?php echo (isset($_GET['direct_title']))?$_GET['direct_title']:$data["product_dog_static"][0]['direct_title'];?>" style="display:<?php echo (trim($_GET['second_type'])=='직접입력')?'block':'none';?>; margin-top:5px;" maxlength="20" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">미용구분(옵션1)</h4>
+                    </div>
+                    <div class="basic-info" style="display:block;">
+                        <?php
+                        $dpt_cnt = count($dog_product_title);
+                        for($j=0;$j<$dpt_cnt;$j++){
+                            echo $dog_product_title[$j];
+                            if($j < $dpt_cnt-1) echo " · ";
+                        }
+                        ?>
+                    </div>
+                    <div class="basic-data-group vsmall">
+                        <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='set_beauty_management_division'">미용구분 선택</button>
+                    </div>
+                    <!-- 옵션목록이 없을 경우 -->
+                    <?php
+                    $total_count = count($dog_product_title);
+                    if(empty($total_count)){
+                        ?>
+                        <div class="basic-data-group vmiddle" style="display:block;">
+                            <div class="form-group">
+                                <div class="form-group-cell middle">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">옵션목록</div>
+                                        <div class="form-item-data type-3">
+                                            <div class="basic-info font-color-black">미용구분이 선택되지 않았습니다.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <!-- //옵션목록이 없을 경우 -->
+                    <!-- 옵션목록이 있을 경우 -->
+                    <div class="basic-data-group vmiddle" style="display:block;">
+                        <div class="form-group">
+                            <div class="form-group-cell middle">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">옵션목록</div>
+                                    <div class="form-item-data type-9">
+                                        <div class="horizontal-swiper-scoller">
+                                            <div class="scroller-inner">
+                                                <div class="read-table scroller-table">
+                                                    <table>
+                                                        <colgroup>
+                                                            <?php
+
+                                                            $column_width = floor(250/($total_count+1));
+                                                            for($i=0;$i<=$total_count;$i++){
+                                                                ?>
+                                                                <col style="width:100px;">
+                                                            <?php } ?>
+
+                                                        </colgroup>
+                                                        <thead>
+                                                        <tr>
+                                                            <th>무게</th>
+                                                            <?php
+                                                            for($j=0;$j<count($dog_product_title);$j++){
+                                                                ?>
+                                                                <th><?php echo $dog_product_title[$j];?></th>
+                                                            <?php } ?>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="areaBeauty">
+                                                        <?php
+
+                                                        for($option_val=1;$option_val<=$total_option_cnt;$option_val++){
+                                                            ?>
+                                                            <tr class="beauty-tr">
+                                                                <td class="no-padding">
+                                                                    <div class="form-table-select">
+                                                                        <select name="kgs[]">
+                                                                            <option value="">선택안함</option>
+                                                                            <?php for($i=1;$i<6;$i+=0.1){ ?>
+                                                                                <option value="<?php echo $i;?>"
+                                                                                    <?php
+                                                                                    echo ( trim($i) == $tmp_kgs[($option_val-1)])?'selected':'';
+                                                                                    ?>
+                                                                                >~<?php echo $i;?>kg</option>
+                                                                            <?php } ?>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <?php
+                                                                for($j=0;$j<count($dog_product_title);$j++){
+                                                                    ?>
+                                                                    <td class="no-padding">
+                                                                        <div class="form-table-select">
+                                                                            <select name="<?php echo $dog_product_seq[$dog_product_title[$j]];?>_price[]">
+                                                                                <option value="">선택안함</option>
+                                                                                <?php for($i=1000;$i<=10000;$i+=500){ ?>
+                                                                                    <option value="<?php echo $i;?>"
+                                                                                        <?php
+                                                                                        echo (trim($i) == ${tmp.'_'.$dog_product_seq[$dog_product_title[$j]].'_price'}[($option_val-1)])?'selected':'';
+                                                                                        ?>
+                                                                                    ><?php echo number_format($i);?></option>
+                                                                                <?php } ?>
+                                                                            </select>
+                                                                            <label class="form-checkbox">
+                                                                                <input type="checkbox"
+                                                                                       name="<?php echo $dog_product_seq[$dog_product_title[$j]];?>_chk[]"
+                                                                                       data-name="<?php echo $dog_product_seq[$dog_product_title[$j]];?>"
+                                                                                       class=" ckbx <?php echo $dog_product_seq[$dog_product_title[$j]];?>"
+                                                                                       value="1"
+                                                                                       data-cnt="<?php echo ($option_val-1);?>"
+                                                                                    <?php echo (${'is_consult_'.$dog_product_seq[$dog_product_title[$j]]}[($option_val-1)]==1)?'checked':''; ?>
+                                                                                >
+                                                                                <span class="form-check-icon"><em>상담</em></span>
+                                                                            </label>
+                                                                            <input type="hidden" name="<?php echo $dog_product_seq[$dog_product_title[$j]];?>_chk[]" <?php echo (${'is_consult_'.$dog_product_seq[$dog_product_title[$j]]}[($option_val-1)]==1)?'disabled':''; ?> value="0">
+                                                                        </div>
+                                                                    </td>
+                                                                    <?php
+                                                                }
+                                                                ?>
+                                                            </tr>
+                                                        <?php } ?>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="btn-basic-action">
+                                            <div class="grid-layout btn-grid-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round beauty-area-add">구간추가</a></div>
+                                                    <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round beauty-area-del">구간삭제</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell middle">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">Kg당 추가요금설정(추가옵션1)</div>
+                                    <div class="form-item-data type-2">
+                                        <div class="form-check-group">
+                                            <div class="form-check-inner">
+                                                <div class="check-cell"><label class="form-radiobox"><input type="radio" name="add_weight" <?php echo ($data['product_dog_static'][0]['is_over_kgs']==1)?'checked':''?> class="add-weight-chk" value="1"><span class="form-check-icon"><em>설정</em></span></label></div>
+                                                <div class="check-cell"><label class="form-radiobox"><input type="radio" name="add_weight" <?php echo ($data['product_dog_static'][0]['is_over_kgs']!=1)?'checked':''?> class="add-weight-chk" value="0"><span class="form-check-icon"><em>설정안함</em></span></label></div>
+                                            </div>
+                                        </div>
+                                        <div class="form-bottom-info type-2 font-color-black">*위 가격표에 표시된 무게가 넘는 아이를 위한 kg당 추가요금이 있을 경우</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 설정일 경우 -->
+                            <div class="form-group-cell middle" id="add_weight_div" style="display:<?php echo ($data['product_dog_static'][0]['is_over_kgs']==1)?'block':'none'?>;">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">무게입력</div>
+                                    <div class="form-item-data">
+                                        <div class="form-char">
+                                            <input type="text" name="set_weight" value="<?php echo $data['product_dog_static'][0]['what_over_kgs']; ?>" class="form-control" placeholder="숫자 및 '.'만 입력가능" onKeyup="this.value=this.value.replace(/[^.0-9]/g,'');"  maxlength="8">
+                                            <div class="char">Kg 이상</div>
+                                        </div>
+                                        <div class="form-input-info">최대 8자까지 입력가능합니다.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell middle" id="add_price_div" style="display:<?php echo ($data['product_dog_static'][0]['is_over_kgs']==1)?'block':'none'?>;">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">금액입력</div>
+                                    <div class="form-item-data">
+                                        <div class="form-char">
+                                            <div class="char">Kg 당</div>
+                                            <div class="char-input">
+
+                                                <input type="text" name="set_price" value="<?php echo $data['product_dog_static'][0]['over_kgs_price']; ?>" class="form-control" onKeyup="this.value=this.value.replace(/[^0-9]/g,'');" placeholder="숫자만 입력가능" maxlength="8">
+                                                <div class="form-input-info">최대 8자까지 입력가능합니다.</div>
+                                            </div>
+                                            <div class="char">원 추가</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- //설정일 경우 -->
+                        </div>
+                    </div>
+                    <!-- //옵션목록이 있을 경우 -->
+                </div>
+                <div class="basic-data-group">
+                    <div class="form-group-cell">
+                        <div class="form-group-item">
+                            <div class="form-item-label">추가설명</div>
+                            <div class="form-item-data">
+                                <textarea name="add_comment" id="add_comment" class="form-control"><?php echo $data['product_dog_static'][0]['add_comment']; ?></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <!--<div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-label">추가설명</div>
+                                <div class="form-item-data">
+                                    <textarea name="add_comment" id="add_comment" cols="30" rows="10"><?php /*echo nl2br($data['product_dog_static'][0]['add_comment']); */?></textarea>
+                                    <input type="text" name="add_comment" value="" class="form-control" placeholder="입력" maxlength="1000">
+                                    <div class="form-input-info">0/1000</div>
+                                    <div class="form-bottom-info">*작성 내용을 정확히 확인하고 저장버튼을 눌러주세요. 잘못 설정된 가격에 대한 책임은 펫샵회원에게 있습니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+                </div>
+            </div>
+            <!-- //set-beauty-add -->
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="javascript:;" class="btn-page-bottom btn-save">저장하기</a>
+    </div>
+    <!-- //page-bottom -->
+    </form>
+
+</section>
+<script>
+    //구간추가
+    $(document).on('click','.beauty-area-add',function(){
+        var bt_div = $('.beauty-tr:last-child').clone();
+        $('#areaBeauty').append(bt_div);
+    });
+
+    //구간 삭제
+    $(document).on('click','.beauty-area-del',function(){
+        var total_cnt = $('.beauty-tr').length;
+        if(total_cnt > 1) {
+            var bt_div = $('.beauty-tr:last-child').remove();
+        }
+    });
+
+    //상품명 직접입력 선택시 텍스트 박스 나오게하기. 2020-02-21 james
+    function chk_select(val){
+        if($.trim(val) == '직접입력'){
+            $('#product_second_type2').css('display','block');
+        } else {
+            $('#product_second_type2').css('display','none');
+        }
+    }
+
+    //체크박스 선택시 히든 체크박스 disabled 시키기
+    $(document).on('click','.ckbx', function(){
+        if($(this).is(':checked')==true){
+            $(this).parent().parent().children('input').prop('disabled',true);
+        } else {
+            $(this).parent().parent().children('input').prop('disabled',false);
+        }
+    });
+
+    //상품저장 클릭시
+    $(document).on('click','.btn-save',function(){
+
+        var select_type = $.trim($('#product_second_type option:selected').val());
+        if(select_type == '직접입력' && $('#product_second_type2').val() == '' ){
+            alert('상품명을 입력해주세요.');
+            return false;
+        }
+
+        var add_weight_chk = $('input[name="add_weight"]:checked').val();
+        if(add_weight_chk == 'y' && $('input[name="set_weight"]').val() == ''){
+            alert('최대 8자까지 입력가능, 초과시 alert: 최대 8자까지 입력 가능합니다.');
+            return false;
+        }
+
+
+        document.frm.submit();
+
+    });
+
+    $(document).on('click','.add-weight-chk',function(){
+        var add_weight_chk = $('input[name="add_weight"]:checked').val();
+        if(add_weight_chk == '1'){
+            $('#add_weight_div, #add_price_div').css('display','block');
+        } else {
+            $('#add_weight_div, #add_price_div').css('display','none');
+        }
+    });
+
+    // 제공방식 선택
+    var is_offline = <?= $is_offline ?>;
+    function save_service_type(is_in, is_out) {
+        if (is_in) {
+            if (!is_offline) {
+                $.MessageBox({
+                    buttonDone: "확인",
+                    message: "매장상품을 등록하려면 오프라인매장이 등록되어 있어야합니다. 고객센터나 1대1문의를 통해 등록신청할 수 있습니다."
+                }).done(function() {
+                    document.getElementById('radio_btn1').checked = true;
+                });
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+</script>
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

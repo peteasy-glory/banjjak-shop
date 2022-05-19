@@ -1,0 +1,316 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "매장결제방식 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+?>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-save-money -->  
+		<div class="set-save-money"  id="shop_reserve">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">기본 적립율 설정</h4>
+				</div>
+				<div class="form-group vmiddle">
+					<div class="form-group-cell middle">
+						<div class="form-group-item">
+							<div class="form-item-label">결제액의</div>
+							<div class="form-item-data type-2">
+								<select name="percent">
+									<option value="0">0%</option>
+									<option value="0.1">0.1%</option>
+									<option value="0.2">0.2%</option>
+									<option value="0.3">0.3%</option>
+									<option value="0.4">0.4%</option>
+									<option value="0.5">0.5%</option>
+									<option value="0.6">0.6%</option>
+									<option value="0.7">0.7%</option>
+									<option value="0.8">0.8%</option>
+									<option value="0.9">0.9%</option>
+									<option value="1">1%</option>
+									<option value="1.1">1.1%</option>
+									<option value="1.2">1.2%</option>
+									<option value="1.3">1.3%</option>
+									<option value="1.4">1.4%</option>
+									<option value="1.5">1.5%</option>
+									<option value="1.6">1.6%</option>
+									<option value="1.7">1.7%</option>
+									<option value="1.8">1.8%</option>
+									<option value="1.9">1.9%</option>
+									<option value="2">2%</option>
+									<option value="2.1">2.1%</option>
+									<option value="2.2">2.2%</option>
+									<option value="2.3">2.3%</option>
+									<option value="2.4">2.4%</option>
+									<option value="2.5">2.5%</option>
+									<option value="2.6">2.6%</option>
+									<option value="2.7">2.7%</option>
+									<option value="2.8">2.8%</option>
+									<option value="2.9">2.9%</option>
+									<option value="3">3%</option>
+									<option value="3.1">3.1%</option>
+									<option value="3.2">3.2%</option>
+									<option value="3.3">3.3%</option>
+									<option value="3.4">3.4%</option>
+									<option value="3.5">3.5%</option>
+									<option value="3.6">3.6%</option>
+									<option value="3.7">3.7%</option>
+									<option value="3.8">3.8%</option>
+									<option value="3.9">3.9%</option>
+									<option value="4">4%</option>
+									<option value="4.1">4.1%</option>
+									<option value="4.2">4.2%</option>
+									<option value="4.3">4.3%</option>
+									<option value="4.4">4.4%</option>
+									<option value="4.5">4.5%</option>
+									<option value="4.6">4.6%</option>
+									<option value="4.7">4.7%</option>
+									<option value="4.8">4.8%</option>
+									<option value="4.9">4.9%</option>
+									<option value="5">5%</option>
+									<option value="5.1">5.1%</option>
+									<option value="5.2">5.2%</option>
+									<option value="5.3">5.3%</option>
+									<option value="5.4">5.4%</option>
+									<option value="5.5">5.5%</option>
+									<option value="5.6">5.6%</option>
+									<option value="5.7">5.7%</option>
+									<option value="5.8">5.8%</option>
+									<option value="5.9">5.9%</option>
+									<option value="6">6%</option>
+									<option value="6.1">6.1%</option>
+									<option value="6.2">6.2%</option>
+									<option value="6.3">6.3%</option>
+									<option value="6.4">6.4%</option>
+									<option value="6.5">6.5%</option>
+									<option value="6.6">6.6%</option>
+									<option value="6.7">6.7%</option>
+									<option value="6.8">6.8%</option>
+									<option value="6.9">6.9%</option>
+									<option value="7">7%</option>
+									<option value="7.1">7.1%</option>
+									<option value="7.2">7.2%</option>
+									<option value="7.3">7.3%</option>
+									<option value="7.4">7.4%</option>
+									<option value="7.5">7.5%</option>
+									<option value="7.6">7.6%</option>
+									<option value="7.7">7.7%</option>
+									<option value="7.8">7.8%</option>
+									<option value="7.9">7.9%</option>
+									<option value="8">8%</option>
+									<option value="8.1">8.1%</option>
+									<option value="8.2">8.2%</option>
+									<option value="8.3">8.3%</option>
+									<option value="8.4">8.4%</option>
+									<option value="8.5">8.5%</option>
+									<option value="8.6">8.6%</option>
+									<option value="8.7">8.7%</option>
+									<option value="8.8">8.8%</option>
+									<option value="8.9">8.9%</option>
+									<option value="9">9%</option>
+									<option value="9.1">9.1%</option>
+									<option value="9.2">9.2%</option>
+									<option value="9.3">9.3%</option>
+									<option value="9.4">9.4%</option>
+									<option value="9.5">9.5%</option>
+									<option value="9.6">9.6%</option>
+									<option value="9.7">9.7%</option>
+									<option value="9.8">9.8%</option>
+									<option value="9.9">9.9%</option>
+									<option value="10">10%</option>
+													<option value="10">10%</option>
+									<option value="10.5">10.5%</option>
+									<option value="11">11%</option>
+									<option value="11.5">11.5%</option>
+									<option value="12">12%</option>
+									<option value="12.5">12.5%</option>
+									<option value="13">13%</option>
+									<option value="13.5">13.5%</option>
+									<option value="14">14%</option>
+									<option value="14.5">14.5%</option>
+									<option value="15">15%</option>
+									<option value="15.5">15.5%</option>
+									<option value="16">16%</option>
+									<option value="16.5">16.5%</option>
+									<option value="17">17%</option>
+									<option value="17.5">17.5%</option>
+									<option value="18">18%</option>
+									<option value="18.5">18.5%</option>
+									<option value="19">19%</option>
+									<option value="19.5">19.5%</option>
+									<option value="20">20%</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">최소 사용금액 설정</h4>
+				</div>
+				<div class="basic-data-group vvsmall2">
+					<div class="form-mulity-input">
+						<div class="input-txt font-weight-400">누적된 적립금</div>
+						<select name="min_reserve">
+							<option value="0">0</option>
+							<option value="500">500</option>
+							<option value="1000">1,000</option>
+							<option value="1500">1,500</option>
+							<option value="2000">2,000</option>
+							<option value="2500">2,500</option>
+							<option value="3000">3,000</option>
+							<option value="3500">3,500</option>
+							<option value="4000">4,000</option>
+							<option value="4500">4,500</option>
+							<option value="5000">5,000</option>
+						</select>
+						<div class="input-txt font-weight-400">원 이하라면</div>
+					</div>
+					<div class="form-bottom-info">사용할 수 없도록 설정합니다.</div>
+				</div>
+			</div>
+		</div>
+		<!-- //set-save-money -->  
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom set_update_reserve_btn">저장하기</a>
+	</div>
+	<!-- //page-bottom -->	
+</section>
+<!-- //container -->
+
+
+
+
+<script>
+var $shop_reserve = $("#shop_reserve");
+var artist_id = "<?=$artist_id ?>";
+var shop_reserve_data = [];
+$(function(){
+	get_reserve();
+    $('#btn_page_prev').prop('href','set_main');
+});
+
+$(".set_update_reserve_btn").click(function(){
+	set_update_reserve();
+	return false;
+});
+
+function get_reserve(){
+	$.ajax({
+		url: 'data/reserve_ajax',
+		data: {
+			mode : "get_reserve",
+			artist_id : artist_id
+		},
+		type: 'POST',
+		dataType: 'json',
+		success: function(data) {
+			if(data.code == "000000"){ // success
+				console.log(data.data);
+				shop_reserve_data = data.data;
+				$shop_reserve.find("select[name='percent']").val(data.data.percent);
+				$shop_reserve.find("select[name='min_reserve']").val(data.data.min_reserve);
+
+			}else if(data.code == "000002"){
+				console.log("신규생성");
+				set_insert_reserve(); // 신규생성
+
+			}else{
+				popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+			}
+		},
+		error: function(xhr, status, error) {
+			console.log(xhr, status, error);
+		}
+	});
+}
+
+function set_insert_reserve(){
+	$.ajax({
+		url: 'data/reserve_ajax',
+		data: {
+			mode : "set_insert_reserve",
+			artist_id : artist_id
+		},
+		type: 'POST',
+		dataType: 'json',
+		success: function(data) {
+			if(data.code == "000000"){ // success
+				console.log(data.data);
+				shop_reserve_data = data.data;
+			}else{
+				popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+			}
+		},
+		error: function(xhr, status, error) {
+			console.log(xhr, status, error);
+		}
+	});
+}
+
+function set_update_reserve(){
+	var is_use = ($shop_reserve.find("select[name='percent'] option:selected").val() == "0")? "2" : "1";
+
+	$.ajax({
+		url: 'data/reserve_ajax',
+		data: {
+			mode : "set_update_reserve",
+			artist_id : artist_id,
+			percent : $shop_reserve.find("select[name='percent'] option:selected").val(),
+			min_reserve : $shop_reserve.find("select[name='min_reserve'] option:selected").val(),
+			sr_seq : shop_reserve_data.sr_seq,
+			is_use : is_use
+		},
+		type: 'POST',
+		dataType: 'json',
+		success: function(data) {
+			if(data.code == "000000"){ // success
+				console.log(data.data);
+				popalert.open('firstRequestMsg1', '적용되었습니다.');
+			}else{
+				popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+			}
+		},
+		error: function(xhr, status, error) {
+			console.log(xhr, status, error);
+		}
+	});
+}
+</script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

@@ -1,0 +1,519 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
+
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "샵 정보관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$emoji = new TEmoji();
+
+$shop_sql = "SELECT *, shop.photo AS photo2
+FROM tb_shop shop, tb_customer customer
+WHERE shop.customer_id = '" . $user_id . "'
+AND customer.id = '" . $user_id . "'";
+
+$shop_result = mysqli_query($connection, $shop_sql);
+
+if ($shop_datas = mysqli_fetch_object($shop_result)) {
+
+    $front_image = $shop_datas->front_image;
+    $name = $shop_datas->name;
+    $working_years = $shop_datas->working_years;
+    $self_introduction = $emoji->emojiDBToStr($shop_datas->self_introduction);
+    $professional_field = $shop_datas->professional_field;
+    $career = $emoji->emojiDBToStr($shop_datas->career);
+    $license_indexs = $shop_datas->license_indexs;
+    $region_and_cost = $shop_datas->region_and_cost;
+    $enable_flag = $shop_datas->enable_flag;
+    $update_time = $shop_datas->update_time;
+    $photo = $shop_datas->photo;
+    $photo2 = $shop_datas->photo2;
+    $award_indexs = $shop_datas->award_indexs;
+    $offline_flag = $shop_datas->offline_flag;
+    $offline_address = $shop_datas->offline_address;
+
+    // sns 정보 가져오기
+    $sns_sql = "
+				SELECT *, kakao_channel,
+					   SUBSTRING_INDEX(instagram, '/', -1) AS instagram_id,
+					   kakao_id
+				FROM tb_shop_sns
+				WHERE artist_id = '".$user_id."'
+				";
+    $sns_result = mysqli_query($connection, $sns_sql);
+    $sns_datas = mysqli_fetch_object($sns_result);
+
+    //print_r($sns_datas);
+
+    $sns_cnt = mysqli_num_rows($sns_result); // 1이면 테이블 정보가 있음(insert 인지 update 인지 구분하는데 사용)
+
+    //echo  $sns_cnt;
+    //exit;
+    $sns_kakao_channel = $sns_datas->kakao_channel;
+    $sns_instagram = $sns_datas->instagram_id;
+    $sns_kakao_id = $sns_datas->kakao_id;
+}
+?>
+
+    <!-- container -->
+    <section id="container">
+        <!-- page-body -->
+        <div class="page-body">
+            <!-- page-contents -->
+            <div class="page-contents">
+                <form action="data/save_artist_info.php" id="shop_form" method="POST">
+                    <input type="hidden" name="sns_cnt" value="<?=$sns_cnt ?>">
+                    <div class="shop-management">
+                        <div class="shop-picture-modify">
+                            <div class="picture-add-group">
+                                <div class="picture-add-data">
+
+                                    <!-- 사진 있을 때 -->
+                                    <?php
+                                    if ($photo2 == NULL && $photo2 == "") {
+                                        ?>
+                                        <!-- 사진 없을 때 -->
+                                        <div style="display:none">
+                                            <a href="#" class="btn-picture-add">
+                                                <div>
+                                                    <div class="icon icon-size-24 icon-camera-gray"></div>
+                                                    <div class="add-label">사진첨부</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    <?}else{?>
+                                        <div style="display:block">
+                                            <div class="picture-view">
+                                                <img src="<?="http://image.banjjakpet.com".img_link_change($photo2);?>" alt=""/>
+                                                <div class="add-label">사진첨부</div>
+                                            </div>
+                                        </div>
+
+                                    <?}?>
+                                </div>
+                            </div>
+                            <div class="shop-picture-info">
+                                <div class="shop-name">샵 이름</div>
+                                <div class="shop-info"><?= $name ?></div>
+                                <!-- 사진 첨부 완료 시 활성화 -->
+                                <?php
+                                if ($photo2 != NULL || $photo2 != "") {
+                                    ?>
+                                    <div style="display:block;">
+                                        <a href="#" onclick="javascript:MemofocusNcursor();" class="btn-modify"><div class="icon icon-size-24 icon-camera-gray"></div>사진 수정</a>
+                                    </div>
+                                    <div style="display:block;position:absolute;top:-50px">
+                                        <input type="file" accept="image/*" name=imgupfile id=addimgfile>
+                                    </div>
+                                <?}?>
+                            </div>
+                        </div>
+                        <div class="form-group">
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">경력</div>
+                                    <div class="form-item-data">
+                                        <div class="form-year">
+                                            <input type="text" name="artist_working_years" value="<?= $working_years ?>" class="form-control" maxLength="2">
+                                            <div class="unit">년</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">영업지역<a href="shop_bussiness_trip" class="btn-form-more">출장지 관리</a></div>
+                                    <div class="form-item-data">
+
+                                        <div class="area-group-list">
+                                            <?php
+                                            $now_sql = "select distinct tr.middle, tr.top from tb_working_region twr, tb_region tr where twr.customer_id = '" . $user_id . "' and twr.region_id = tr.id;";
+                                            $now_result = mysqli_query($connection, $now_sql);
+                                            while ($now_datas = mysqli_fetch_object($now_result)) {
+                                                $now_top = $now_datas->top;
+                                                $now_middle = $now_datas->middle;
+                                                ?>
+
+                                                <div class="area-group-item">
+                                                    <div class="area-title">
+                                                        <?= $now_top ?>
+                                                        <?= $now_middle ?>
+                                                    </div>
+                                                    <div class="area-item-list">
+                                                        <div class="list-inner">
+                                                            <?php
+                                                            $select_bottom_sql = "select distinct tr.bottom, tr.id from tb_working_region twr, tb_region tr where twr.customer_id = '" . $user_id . "' and twr.region_id = tr.id and tr.top = '" . $now_top . "' and tr.middle = '" . $now_middle . "';";
+                                                            $sb_result = mysqli_query($connection, $select_bottom_sql);
+                                                            while ($sb_datas = mysqli_fetch_object($sb_result)) {
+                                                                ?>
+                                                                <div class="list-cell"><div class="area-word-item"><?= $sb_datas->bottom ?></div></div>
+                                                                <?php
+                                                            }
+                                                            ?>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">간단소개<span>(최대 500자)</span></div>
+                                    <div class="form-item-data">
+                                        <textarea class="form-control small" name="artist_self_intro"><?= $self_introduction ?></textarea>
+                                        <!--<input type="text" name="artist_self_intro" value="<?/*= $self_introduction */?>" class="form-control">-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">주요경력<span>(최대 500자)</span></div>
+                                    <div class="form-item-data">
+                                        <textarea class="form-control small" name="artist_career"><?= $career ?></textarea>
+                                        <!--<input type="text" name="artist_career" value="<?/*= $career */?>" class="form-control">-->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="">
+                                    <h6 class="con-title">SNS</h6>
+                                    <div class="form-group-item">
+                                        <div class="form-item-label"><div class="icon icon-size-24 icon-kakao-channel"></div>카카오채널 링크</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="kakao_channel" id="kakao_channel" value="<?= $sns_kakao_channel ?>" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group-item">
+                                        <div class="form-item-label"><div class="icon icon-size-24 icon-kakao-talk"></div>카카오 아이디</div>
+                                        <div class="form-item-data">
+                                            <input type="text" name="kakao_id" id="kakao_id" value="<?= $sns_kakao_id ?>" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="form-group-item">
+                                        <!-- 20211223 수정 -->
+                                        <div class="form-item-label"><div class="icon icon-size-24 icon-kakao-instargram"></div>인스타 계정</div>
+                                        <!-- //20211223 수정 -->
+                                        <div class="form-item-data">
+                                            <input type="text" name="instagram" id="instagram" value="<?= $sns_instagram ?>" class="form-control">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">보유자격증 <a href="shop_license2" class="btn-form-add">추가하기</a></div>
+                                    <div class="form-item-data type-3">
+                                        <div>
+                                            <!-- 리스트 있을 때 -->
+                                            <div class="vertical-list-wrap line license-list">
+                                                <div class="list-inner">
+
+                                                    <?php
+                                                    $license_sql = "select * from tb_license where customer_id = '" . $user_id . "' and enable_flag = true;";
+                                                    $license_result = mysqli_query($connection, $license_sql);
+
+                                                    $count_number = 0;
+                                                    while ($license_datas = mysqli_fetch_object($license_result)) {
+                                                        $license_photo = $license_datas->photo;
+                                                        $license_name = $emoji->emojiDBToStr($license_datas->name);
+                                                        $license_issue_date = $license_datas->issue_date;
+                                                        $license_issue_place = $emoji->emojiDBToStr($license_datas->issue_place);
+                                                        ?>
+                                                        <div class="list-cell">
+                                                            <div class="basic-list-item license">
+                                                                <div class="thumb">
+                                                                    <img src="<?= "https://image.banjjakpet.com".img_link_change($license_photo) ?>" alt="">
+                                                                </div>
+                                                                <div class="info-wrap">
+                                                                    <div class="item-name"><?= $license_name ?></div>
+                                                                    <div class="item-info"><?= $license_issue_place ?></div>
+                                                                    <div class="item-date"><?= date_format(date_create($license_issue_date), "Y/m/d") ?> 발급</div>
+                                                                </div>
+                                                                <button type="button" onclick="check_delete('<?= urlencode($license_photo) ?>');" class="btn-item-del"><span class="icon icon-size-36 icon-trash"></span></button>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                        $count_number++;
+                                                    }
+                                                    if ($count_number == 0) {
+                                                        echo "<div>데이터가 없습니다.</div>";
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <!-- //리스트 있을 때 -->
+                                            <!-- 리스트 없을 때 -->
+                                            <div style="display: none;" class="none-license">등록된 보유자격증이 없습니다.</div>
+                                            <!-- //리스트 없을 때 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group-cell">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">수상경력 <a href="shop_license1" class="btn-form-add">추가하기</a></div>
+                                    <div class="form-item-data type-3">
+                                        <div>
+                                            <!-- 리스트 있을 때 -->
+                                            <div class="vertical-list-wrap line license-list">
+                                                <div class="list-inner">
+                                                    <?php
+                                                    $license_sql = "select * from tb_award where customer_id = '" . $user_id . "' and enable_flag = true;";
+                                                    $license_result = mysqli_query($connection, $license_sql);
+
+                                                    $count_number = 0;
+                                                    while ($license_datas = mysqli_fetch_object($license_result)) {
+                                                        $license_photo = $license_datas->photo;
+                                                        $license_name = $emoji->emojiDBToStr($license_datas->name);
+                                                        $license_issue_date = $license_datas->issue_date;
+                                                        $license_issue_place = $emoji->emojiDBToStr($license_datas->issue_place);
+                                                        ?>
+                                                        <div class="list-cell">
+                                                            <div class="basic-list-item license">
+                                                                <div class="thumb">
+                                                                    <img src="<?= "https://image.banjjakpet.com".$license_photo ?>" alt="">
+                                                                </div>
+                                                                <div class="info-wrap">
+                                                                    <div class="item-name"><?= $license_name ?></div>
+                                                                    <div class="item-info"><?= $license_issue_place ?></div>
+                                                                    <div class="item-date"><?= date_format(date_create($license_issue_date), "Y/m/d") ?></div>
+                                                                </div>
+                                                                <button type="button" onclick="check_delete_award('<?= urlencode($license_photo) ?>');" class="btn-item-del"><span class="icon icon-size-36 icon-trash"></span></button>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                        $count_number++;
+                                                    }
+                                                    if ($count_number == 0) {
+                                                        echo "<div><div>데이터가 없습니다.</div></div>";
+                                                    }
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <!-- //리스트 있을 때 -->
+                                            <!-- 리스트 없을 때 -->
+                                            <div style="display: none;" class="none-license">등록된 보유자격증이 없습니다.</div>
+                                            <!-- //리스트 없을 때 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <!-- //page-contents -->
+        </div>
+        <!-- //page-body -->
+        <!-- page-bottom -->
+        <div class="page-bottom">
+            <!--
+            //	비활성화시
+            // - a태그는 disabled 클래스 추가
+            // - button 태그는 disabled 속성 추가
+            -->
+            <a href="#" class="btn-page-bottom" onclick="document.getElementById('shop_form').submit();">저장하기</a>
+        </div>
+        <!-- //page-bottom -->
+    </section>
+    <!-- //container -->
+
+    <script language="javascript">
+        $('#addimgfile').bind('change', function(e) {
+            $("#fileuparea").hide();
+            $("#fileuplodingarea").show();
+            var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+                $("#fileuparea").show();
+                $("#fileuplodingarea").hide();
+                return;
+            }
+
+            var filename = $("input[name=imgupfile]")[0].files[0].name;
+
+            var newfilename = GetPhotoFilename('artist_photo', '<?= $user_id ?>', filename);
+
+            var formData = new FormData();
+            formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+            formData.append("filepath", newfilename);
+
+            /*               var formData = new FormData();
+                              formData.append("toronclass", $("input[name=toronclass]").val());
+                              formData.append("imgupfile", $("input[name=imgupfile]")[0].files[0]);*/
+            $.ajax({
+                url: 'data/upload_artist_photo.php',
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function(data) {
+                    //console.log(data);
+                    location.reload();
+                    //alert('1');
+
+                },
+                error: function(xhr, status, error) {
+                    // alert(error+"에러발생");
+                }
+            });
+
+
+        });
+        //안드로이드 앱일경우애만 ... 실행..
+        $(document).ready(function() {
+            $('#btn_page_prev').prop('href','shop_main');
+            //dvck=getDeviceCheck();
+            if ('<?= $is_android ?>' == 1) {
+                $("#fileuparea").hide();
+                $("#fileuparea2").show();
+            }
+        });
+
+        function galleryup() {
+            //alert("갤러리")
+            window.Android.openGallery();
+        }
+
+        function cameraup() {
+            //alert("카메라")
+            window.Android.openCamera();
+        }
+
+        //안드에서 업로드가 끝나면 무조건 호출..
+        function uploadEnd(fileName) {
+            //              alert(fileName);
+            $("#fileuparea2").hide();
+            $("#fileuplodingarea").show();
+
+            var newfilename = GetPhotoFilename('artist_photo', '<?= $user_id ?>', fileName);
+            var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+            $.ajax({
+                url: 'data/upload_artist_photo_byapp.php',
+                data: post_data,
+                type: 'POST',
+                success: function(data) {
+                    location.href = location.pathname;
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function MemofocusNcursor() {
+            html = "<div id='upimgarea'></div>";
+            //document.getElementById('dmemo').focus();
+            var sel, range;
+            if (window.getSelection) {
+                // IE9 and non-IE
+                sel = window.getSelection();
+                if (sel.getRangeAt && sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    range.deleteContents();
+
+                    // Range.createContextualFragment() would be useful here but is
+                    // non-standard and not supported in all browsers (IE9, for one)
+                    var el = document.createElement("div");
+                    el.innerHTML = html;
+                    var frag = document.createDocumentFragment(),
+                        node, lastNode;
+                    while ((node = el.firstChild)) {
+                        lastNode = frag.appendChild(node);
+                    }
+                    range.insertNode(frag);
+
+                    // Preserve the selection
+                    if (lastNode) {
+                        range = range.cloneRange();
+                        range.setStartAfter(lastNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                }
+            } else if (document.selection && document.selection.type != "Control") {
+                // IE < 9
+                document.selection.createRange().pasteHTML(html);
+            }
+            if(checkMobile()  == true){
+                galleryup();
+            } else {
+                $("#addimgfile").trigger("click");
+
+            }
+
+
+        }
+
+        function checkMobile(){
+            var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+            if ( varUA.indexOf('android') > -1) {
+                //안드로이드
+                return true;
+            } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+                //IOS
+                return 'ios';
+            } else {
+                //아이폰, 안드로이드 외
+                return 'other';
+            }
+        }
+
+
+        function check_delete_award(photo) {
+            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_award.php?photo=' + photo);
+
+
+        }
+
+        function check_delete(photo) {
+
+            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_license.php?photo=' + photo);
+
+        }
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','shop_main')
+        })
+    </script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

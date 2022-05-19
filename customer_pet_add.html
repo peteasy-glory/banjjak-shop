@@ -1,0 +1,385 @@
+<?php
+$shop_title	= "펫 수정";
+include($_SERVER['DOCUMENT_ROOT'] . "/include/global.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/include/check_login_shop.php");
+
+$pet_seq = $_GET['pet_seq'];
+$payment_log_seq = $_GET['payment_seq'];
+$que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$_GET['pet_seq']}'";
+$res = sql_query($que);
+$data['pet'] = sql_fetch($res);
+//print_r($data['pet']);
+//강아지 종류
+$sql = " SELECT 
+            pet.*
+        FROM 
+            tb_pet_type pet
+        WHERE 
+            pet.type = 'dog'
+            AND pet.enable_flag=1 ORDER BY type_seq ASC, name ASC
+    ";
+
+$pk = sql_fetch_array($sql);
+
+
+$sql = " SELECT 
+            pet.*
+        FROM 
+            tb_pet_type pet
+        WHERE 
+            pet.type = 'cat'
+            AND pet.enable_flag=1 ORDER BY type_seq ASC, name ASC
+    ";
+$cat = sql_fetch_array($sql);
+
+
+//결제 정보 구하기
+$que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}";
+$res = sql_query($que);
+$pay = sql_fetch($res);
+
+$que = "SELECT COUNT(*) AS cnt FROM tb_payment_log WHERE customer_id = '{$pay['customer_id']}' AND artist_id = '{$pay['artist_id']}' AND pet_seq = {$pet_seq} AND is_cancel = 0 AND is_no_show = 0 AND data_delete = 0 AND is_confirm = 1";
+//echo $que;
+$res = sql_query($que);
+$payc = sql_fetch($res);
+
+
+?>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->
+    <form action="./data/get_book_data_ajax" method="post" name="petFrm">
+        <input type="hidden" name="pet_seq" id="pet_seq" value="<?php echo $pet_seq;?>">
+        <input type="hidden" name="payment_seq" id="pet_seq" value="<?php echo $_GET['payment_seq'];?>">
+        <input type="hidden" name="backurl" value="<?php echo $_GET['backurl'];?>">
+        <input type="hidden" name="mode" value="petModify">
+	<div class="page-body">
+		
+		<div class="user-pet-add">
+			<div class="form-group">
+
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">펫 이름</div>
+						<div class="form-item-data">
+							<input type="text" name="pet_name" id="pet_name" value="<?php echo $data['pet']['name'];?>" class="form-control" placeholder="펫 이름 입력">
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">품종</div>
+						<div class="form-item-data type-2">
+							<div class="pet-breed-select">
+								<div class="breed-select">
+									<label class="form-toggle-box" for="breed1"><input type="radio" name="type" value="dog" <?php echo ($data['pet']['type']=='dog')?'checked':'';?> id="breed1" onclick="$('#dog_div').css('display','block');$('#cat_div').css('display','none');"><em><span>강아지</span></em></label>
+									<label class="form-toggle-box" for="breed2"><input type="radio" name="type" value="cat" <?php echo ($data['pet']['type']=='cat')?'checked':'';?> id="breed2" onclick="$('#cat_div').css('display','block');$('#dog_div').css('display','none');"><em><span>고양이</span></em></label>
+								</div>
+								<!-- 강아지 -->
+								<div id="dog_div" style="display:<?php echo ($data['pet']['type']=='dog')?'block':'none';?>">
+                                    <select id="pet_type" name="pet_type" onchange="etc_toggle()" >
+                                        <option value="">선택</option>
+                                        <?php
+                                        if(count($pk)>0){
+                                            foreach($pk as $pk){
+                                        ?>
+                                                <option value="<?php echo $pk['name'];?>" <?php echo ($data['pet']['pet_type']==$pk['name'])?'selected':'';?>><?php echo $pk['name'];?></option>
+                                        <?php }} ?>
+                                    </select>
+                                    <div>
+                                        <input id="pet_type2" type="text" name="pet_type2" class="input input_full" style="display:none"/>
+                                    </div>
+								</div>
+								<!-- //강아지 -->
+								<!-- 고양이 -->
+								<div id="cat_div"  style="display:<?php echo ($data['pet']['type']=='cat')?'block':'none';?>">
+                                    <select name="pet_type_cat">
+                                        <option value="">선택</option>
+                                        <?php
+                                        if(count($cat)>0){
+                                            foreach($cat as $cat){
+                                                ?>
+                                                <option value="<?php echo $cat['name'];?>" <?php echo ($data['pet']['pet_type']==$cat['name'])?'selected':'';?>><?php echo $cat['name'];?></option>
+                                            <?php }} ?>
+                                    </select>
+								</div>
+								<!-- //고양이 -->
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- 강아지 -->
+				<div class="form-group-cell pup" style="display:block;">
+					<div class="form-group-item">
+						<div class="form-item-label">생일</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout margin-12">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-3">
+                                        <select name="pet_year">
+                                            <?php for ($y = 2000; $y <= (int) date('Y'); $y++) { ?>
+                                                <option value="<?= $y ?>" <?= ($data["pet"]["year"] == $y) ? "selected" : ""; ?>><?= $y ?> 년</option>
+                                            <?php } ?>
+                                        </select>
+									</div>
+									<div class="grid-layout-cell grid-3">
+                                        <select name="pet_month">
+                                            <?php for ($m = 1; $m <= 12; $m++) { ?>
+                                                <option value="<?= $m ?>" <?= ($data["pet"]["month"] == $m) ? "selected" : ""; ?>><?= $m ?> 월</option>
+                                            <?php } ?>
+                                        </select>
+									</div>
+									<div class="grid-layout-cell grid-3">
+                                        <select name="pet_day">
+                                            <?php for ($d = 1; $d <= 31; $d++) { ?>
+                                                <option value="<?= $d ?>" <?= ($data["pet"]["day"] == $d) ? "selected" : ""; ?>><?= $d ?> 일</option>
+                                            <?php } ?>
+                                        </select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group-cell pup" style="display:block;">
+					<div class="form-group-item">
+						<div class="form-item-label">성별 선택</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+                                    <div class="grid-layout-cell grid-2">
+                                        <label class="form-toggle-box middle" for="gender1">
+                                            <input type="radio" name="pet_gender_m" id="gender1" value="남아" <?= ($data["pet"]["gender"] == "남아") ? "checked" : ""; ?>><em>남아</em>
+                                        </label>
+                                    </div>
+                                    <div class="grid-layout-cell grid-2">
+                                        <label class="form-toggle-box middle" for="gender2">
+                                            <input type="radio" name="pet_gender_m" id="gender2" value="여아" <?= ($data["pet"]["gender"] == "여아") ? "checked" : ""; ?>><em>여아</em>
+                                        </label>
+                                    </div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group-cell pup" style="display:block;">
+					<div class="form-group-item">
+						<div class="form-item-label">중성화</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+                                    <div class="grid-layout-cell grid-2">
+                                        <label class="form-toggle-box middle" for="neutralize1">
+                                            <input type="radio" name="neutral" id="neutralize1" value="0" <?= ($data["pet"]["neutral"] != "1") ? "checked" : ""; ?>><em>X</em>
+                                        </label>
+                                    </div>
+                                    <div class="grid-layout-cell grid-2">
+                                        <label class="form-toggle-box middle" for="neutralize2">
+                                            <input type="radio" name="neutral" id="neutralize2" value="1" <?= ($data["pet"]["neutral"] == "1") ? "checked" : ""; ?>><em>O</em>
+                                        </label>
+                                    </div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-group-cell pup" style="display:block;">
+					<div class="form-group-item">
+						<div class="form-item-label">몸무게</div>
+						<div class="form-item-data type-2">
+							<div class="form-flex">
+                                <select name="pet_weight1" id="pet_weight1" class="inline-block">
+                                    <?
+                                    $weight = explode(".", $data["pet"]["weight"]);
+                                    for ($i = 0; $i <= 50; $i++) {
+                                        ?>
+                                        <option value="<?= $i ?>" <?= ($weight[0] == $i) ? "selected" : "" ?>><?= $i ?></option>
+                                        <?
+                                    }
+                                    ?>
+                                </select>
+                                <div class="form-unit-point">.</div>
+                                <select name="pet_weight2" id="pet_weight2" class="inline-block">
+                                    <?
+                                    for ($i = 0; $i <= 9; $i++) {
+                                        ?>
+                                        <option value="<?= $i ?>" <?= ($weight[1] == $i) ? "selected" : "" ?>><?= $i ?></option>
+                                        <?
+                                    }
+                                    ?>
+                                </select>
+								<div class="form-unit-label">kg</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- //강아지 -->
+				<!-- 고양이 -->
+                <div class="form-group-cell middle">
+                    <div class="form-group-item">
+                        <div class="form-item-label">미용 경험</div>
+                        <div class="form-item-data type-2">
+                            <select name="beauty_cnt">
+                                <?php for($i=0;$i<20;$i++){ ?>
+                                <option value="<?php echo $i;?>" <?php echo ($data['pet']['beauty_exp']==$i)?'selected':'';?>><?php echo $i;?>회</option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group-cell middle">
+                    <div class="form-group-item">
+                        <div class="form-item-label">예방 접종</div>
+                        <div class="form-item-data type-2">
+                            <select name="vaccination">
+                                <?php for($i=0;$i<20;$i++){ ?>
+                                    <option value="<?php echo $i;?>" <?php echo ($data['pet']['vaccination']==$i)?'selected':'';?>><?php echo $i;?>회</option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group-cell middle">
+                    <div class="form-group-item">
+                        <div class="form-item-label">입질</div>
+                        <div class="form-item-data type-2">
+                            <select name="bite">
+                                <option value="0" <?php echo ($data['pet']['bite']==1)?'selected':'';?>>해요</option>
+                                <option value="1" <?php echo ($data['pet']['bite']!=1)?'selected':'';?>>안해요</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group-cell middle">
+                    <div class="form-group-item">
+                        <div class="form-item-label">슬개골 탈구</div>
+                        <div class="form-item-data type-2">
+                            <select name="luxation">
+                                <option value="0">없음</option>
+                                <?php for($i=1;$i<=4;$i++){ ?>
+                                    <option value="<?php echo $i;?>" <?php echo ($data['pet']['luxation']==$i)?'selected':'';?>><?php echo $i;?>기</option>
+                                <?php } ?>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group-cell middle">
+                    <div class="form-group-item">
+                        <div class="form-item-label">특이사항</div>
+                        <div class="form-item-data type-2">
+                            <div class="grid-layout toggle-button-group">
+                                <div class="grid-layout-inner">
+                                    <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="special1"><input type="checkbox" value="1" name="dermatosis" id="special1" <?php echo ($data['pet']['dermatosis']==1)?'checked':'';?>><em>피부병</em></label></div>
+                                    <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="special2"><input type="checkbox" value="1" name="heart_trouble" id="special2" <?php echo ($data['pet']['heart_trouble']==1)?'checked':'';?>><em>심장질환</em></label></div>
+                                    <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="special3"><input type="checkbox" value="1" name="marking" id="special3" <?php echo ($data['pet']['marking']==1)?'checked':'';?>><em>마킹</em></label></div>
+                                    <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="special3"><input type="checkbox" value="1" name="mounting" id="special3" <?php echo ($data['pet']['mounting']==1)?'checked':'';?>><em>마운팅</em></label></div>
+                                    <div class="grid-layout-cell grid-1">
+                                        <input type="text" name="memo" value="<?php echo $data['pet']['etc'];?>" class="form-control" placeholder="메모를 입력해주세요">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<!-- //고양이 -->
+			</div>
+		</div>
+
+
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" onclick="document.petFrm.submit();" class="btn-page-bottom">마이 펫 프로필 저장</a>
+	</div>
+    </form>
+	<!-- //page-bottom -->	
+</section>
+<!-- //container -->
+
+<script>
+    $(document).ready(function(){
+        get_pet_info(<?php echo $pet_seq;?>);
+        var petType = '<?php echo $data['pet']['type'];?>';
+        $.ajax({
+            type: 'get',
+            url: 'data/data_get_json_petkind_list',
+            data: 'type=' + pet_type,
+            dataType: 'json',
+            error: function() {
+                alert('Error');
+            },
+            success: function(res) {
+                $.each(res.row,function(i, v) {
+                    var obj_option = $('<option></option>');
+                    obj_option.val(v['name']).text(v['name']);
+                    if (thisVale != null && v['name'] == thisVale) obj_option.prop('selected', true);
+                    petType.append(obj_option);
+                });
+            }
+        });
+
+    });
+
+
+    function get_pet_info(no){
+        $.ajax({
+            type : 'post',
+            url : './data/get_pet_info',
+            data : {'mode':'petInfo','no':no},
+            dataType : 'json',
+            success : function(json){
+
+                if(json.result['flag'] == true){
+                    var kg = json.data['weight'].split('.');
+                    $('#pet_name').val(json.data['name']);
+                    $('#pet_type').val(json.data['pet_type']);
+                    if(json.data['type']=='dog'){
+                        $('#breed1').prop('checked',true);
+                    } else {
+                        $('#breed2').prop('checked',true);
+                    }
+
+                    $('#pet_year').val(json.data['year']);
+                    $('#pet_month').val(json.data['month']);
+                    $('#pet_day').val(json.data['day']);
+
+
+
+                    $('#pet_weight1').val(kg[0]);
+                    $('#pet_weight2').val(kg[1]);
+
+
+                    if(json.beauty != ''){
+                        $('#prev_beauty_info').empty().append(json.beauty).css('display','block');
+                    } else {
+                        $('#prev_beauty_info').empty().css('display','none');
+                    }
+
+                    $('#customer_id').val(json.data['customer_id']);
+
+
+
+                }
+            }, error : function(xhr, error){
+                console.log('error'+xhr)
+            }
+        });
+    }
+    $(document).ready(function(){
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').attr('href','<?php echo $_SESSION['backurl2'];?>');
+    });
+</script>
+</body>
+</html>

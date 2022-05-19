@@ -1,0 +1,902 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "미용사관리";
+$header_right	= '
+	
+';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = 'set_teacher';
+?>
+
+
+
+    <!-- container -->
+    <section id="container">
+        <!-- page-body -->
+        <div class="page-body">
+            <!-- set-teacher-wrap -->
+            <div class="set-teacher-wrap">
+                <button type="button" class="btn btn-outline-purple btn-middle-size btn-round btn_add_teachter">미용사 추가</button>
+                <div class="basic-data-group vvsmall2">
+                    <div class="con-title-info type-2">미용사 이름을 드래그하여 순서 변경 가능합니다.</div>
+                </div>
+                <div class="basic-data-group vvsmall3" id="manage_artist_list">
+                    <ul class="accordion-list card drag-sort-wrap" id="artist_list_wrap">
+                        <!--
+                        // 숨김 및 퇴사시 accordion-cell클래스에 hide클래스 추가
+                        -->
+
+                    </ul>
+                </div>
+            </div>
+            <!-- //set-teacher-wrap -->
+        </div>
+        <!-- //page-body -->
+        <!--  예약거부 -->
+        <article id="goout" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">퇴사자로 처리되면 예약접수를 할수 없습니다.<br/><br/>해당 미용사를 퇴사처리하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-ok" onclick="confirm_out();">확인</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- //예약거부 -->
+
+        <!--  예약거부 -->
+        <article id="gooutcancel" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">해당 미용사를 퇴사취소처리 하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-ok" onclick="confirm_out_cancel();">확인</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- //예약거부 -->
+
+        <article id="confirmOnlyOkNoLink" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+        <article id="confirmOnlyOkReload" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+
+        <article id="confirmOnlyOkLink" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">예약이 취소되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();location.href='./set_teacher';">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+
+        <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">
+                                <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+    </section>
+    <!-- //container -->
+
+    <script src="/static/pub/js/Sortable.min.js"></script>
+    <script>
+        $(function(){
+            //https://github.com/SortableJS/Sortable
+            var idArray = [];
+            var indexArray = [];
+            $('.drag-sort-wrap').each(function(index){
+                var sortable = Sortable.create($(this)[0] , {
+                    delay : 300,
+                    ghostClass: 'guide',
+                    draggable : '.accordion-cell',
+                    handle : '.item-info-wrap',
+                    onStart : function(evt){
+                        //드래그 시작
+                        console.log('drag start');
+                    },
+                    onEnd : function(evt){
+                        //드래그 끝
+                        console.log('drag end');
+                        //evt.to;    // 현재 아이템
+                        //evt.from;  // 이전 아이템
+                        //evt.oldIndex;  // 이전 인덱스값
+                        //evt.newIndex;  // 새로운 인덱스값
+                    },
+                    onUpdate : function(evt){
+                        var grade = new Array();
+                        var artist = new Array();
+                        var name = new Array();
+
+
+                        $('.accordion-cell').each(function(){
+                            grade.push($(this).data('idx'));
+                            artist.push($(this).data('artist'));
+                            name.push($(this).data('name'));
+                        });
+
+                        $.ajax({
+                           type : 'post',
+                           url : './data/get_book_data_ajax',
+                            data : {'mode':'setBeautyChangeGrade','grade':grade,'name':name,'artist_id':artist},
+                            dataType : 'json',
+                            success : function(json){
+                                console.log(json)
+                            }
+                        });
+                    },
+                    onRemove: function (/**Event*/evt) {
+                        console.log('remove');
+                    }
+
+                });
+            });
+        });
+    </script>
+
+
+    <script>
+        var $manage_artist_list = $("#manage_artist_list");
+        var $manage_artist_list_popup = $("#manage_artist_list_popup");
+        var artist_id = "<?=$artist_id ?>";
+        var week_name_arr = ['일', '월', '화', '수', '목', '금', '토'];
+        var week_list = [0, 1, 2, 3, 4, 5, 6];
+        var artist_list = [];
+        var working_schedule = [];
+        var regular_holiday = [];
+
+        $(function(){
+            get_artist_list();
+            get_working_schedule();
+            get_regular_holiday();
+        });
+
+        $manage_artist_list.on("click", ".set_artist_btn", function(){
+            var _this = $(this);
+            var tmp_title = "";
+            if(_this.data('action') == "update"){
+                var flag = 0;
+                $.each(artist_list, function(i, v){
+                    if(v.name == _this.data('name')){
+                        flag = i;
+                    }
+                });
+                tmp_title = "미용사 수정";
+            }else if(_this.data('action') == "insert"){
+                tmp_title = "미용사 입력";
+            }
+
+            $manage_artist_list_popup.dialog({
+                modal: true,
+                title: tmp_title,
+                autoOpen: true,
+                width: "350",
+                height: $(window).height() - 40,
+                autoSize: true,
+                resizable: false,
+                draggable: false,
+                buttons: {
+                    "저장": function() {
+                        var tmp_chk = 0;
+                        $("#artist_list_form input[type='checkbox']").each(function(i, v){
+                            if($(this).is(":checked") == true){
+                                tmp_chk++;
+                            }
+                        });
+                        if(tmp_chk == 0){ // 업무요일 예외처리
+                            $.MessageBox("업무요일은 최소 1개 이상 선택해야 합니다.");
+                            return false;
+                        }
+
+                        var post_data = $manage_artist_list_popup.find("#artist_list_form").serialize();
+                        post_data += "&mode=set_insert_artist_list";
+                        //console.log(post_data);
+                        $.ajax({
+                            url: '/data/manage_artist_ajax.php',
+                            data: post_data,
+                            type: 'POST',
+                            dataType: 'JSON',
+                            success: function(data) {
+                                if(data.code == "000000"){
+                                    //console.log(data.data);
+                                    var tmp_message = (_this.data('action') == "update")? "변경 되었습니다." : "추가 되었습니다.";
+                                    $.MessageBox({
+                                        buttonDone: "확인",
+                                        message: tmp_message
+                                    }).done(function(){
+                                        $manage_artist_list_popup.dialog("close");
+                                        get_artist_list();
+                                    });
+                                }else{
+                                    alert(data.data+"("+data.code+")");
+                                    console.log(data.data);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                //alert(error + "네트워크에러");
+                                if(xhr.status != 0){
+                                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                }
+                            }
+                        });
+                    }
+                },
+                open: function(event, ui) {
+                    var html = '';
+                    if(_this.data('action') == "insert"){
+                        var week_arr = [];
+                        for(var _i = 0; _i < 7; _i++){
+                            if(regular_holiday[_i] != "1"){
+                                week_arr.push(_i+"");
+                            }
+                        }
+                        var time_start_arr = [];
+                        var time_end_arr = [];
+                        for(var _i = 0; _i < 7; _i++){
+                            if($.inArray(_i+"", week_arr) != -1){
+                                time_start_arr[_i] = working_schedule.working_start+":00";
+                                time_end_arr[_i] = working_schedule.working_end+":00";
+                            }
+                        }
+                        var is_main = "0";
+                        var name = "";
+                        var nicname = "";
+                        var is_readonly = "";
+                    }else if(_this.data('action') == "update"){
+                        var week_arr = artist_list[flag].week_list.split(',');
+                        var time_start_arr = [];
+                        var time_end_arr = [];
+                        var tmp_flag = 0;
+                        for(var _i = 0; _i < 7; _i++){
+                            if($.inArray(_i+"", week_arr) != -1){
+                                time_start_arr[_i] = artist_list[flag].time_start_list.split(',')[tmp_flag];
+                                time_end_arr[_i] = artist_list[flag].time_end_list.split(',')[tmp_flag];
+                                tmp_flag++;
+                            }
+                        }
+                        var is_main = artist_list[flag].is_main;
+                        var name = artist_list[flag].name;
+                        var nicname = artist_list[flag].nicname;
+                        var is_readonly = " readonly ";
+                    }
+
+                    html += '<div>';
+                    html += '	<form id="artist_list_form" method="POST">';
+                    html += '		<input type="hidden" name="artist_id" value="'+artist_id+'" />';
+                    html += '		<input type="hidden" name="is_main" value="'+is_main+'" />';
+                    html += '		<div>';
+                    html += '			<div class="title">미용사 이름 / 닉네임</div>';
+                    html += '			<ul>';
+                    html += '				<li>';
+                    html += '					<span>이름</span>';
+                    html += '					<input type="text" name="name" value="'+name+'" '+is_readonly+' />';
+                    html += '				</li>';
+                    html += '				<li>';
+                    html += '					<span>닉네임</span>';
+                    html += '					<input type="text" name="nicname" value="'+nicname+'" />';
+                    html += '				</li>';
+                    html += '			</ul>';
+                    html += '		</div>';
+                    html += '		<div>';
+                    html += '			<div class="title">업무요일 / 업무시간</div>';
+                    html += '			<table>';
+                    for(var _i = 0; _i < 7; _i++){
+                        var is_week = $.inArray(_i+"", week_arr); // 활성화 데이터 호출
+                        var is_disabled = (is_week == '-1')? '' : ' checked ';
+                        is_disabled = (regular_holiday[_i] == "1")? ' disabled ' : is_disabled;
+                        html += '				<tr>';
+                        html += '					<th>';
+                        html += '						<input type="checkbox" id="checkbox_time_'+_i+'" name="checkbox_time[]" data-week="'+is_week+'" value="'+_i+'" '+is_disabled+' />';
+                        html += '						<label for="checkbox_time_'+_i+'">'+week_name_arr[_i]+'</label>';
+                        html += '					</th>';
+                        html += '					<td>';
+                        if(regular_holiday[_i] == "1"){
+                            html += '<div>정기휴일</div>';
+                        }else{
+                            var tmp_is_disabled = (is_disabled == "")? ' disabled ' : '';
+                            html += '						<select name="select_time_from[]" '+tmp_is_disabled+'>';
+                            for(var _j = parseInt(working_schedule.working_start); _j < parseInt(working_schedule.working_end); _j++){
+                                for(var _k = 0; _k < 60; _k+=30){
+                                    var value = _j+':'+fillZero(2, _k);
+                                    var is_selected = (value == time_start_arr[_i])? ' selected ' : '';
+                                    html += '							<option value="'+value+'" '+is_selected+'>'+value+'</option>';
+                                }
+                            }
+                            html += '						</select>&nbsp;&nbsp;~&nbsp;&nbsp;';
+                            html += '						<select name="select_time_to[]" '+tmp_is_disabled+'>';
+                            for(var _j = parseInt(working_schedule.working_start); _j < parseInt(working_schedule.working_end); _j++){
+                                for(var _k = 0; _k < 60; _k+=30){
+                                    var tmp_end_time = '1970-01-01 '+fillZero(2, _j)+':'+fillZero(2, _k)+':00';
+                                    tmp_end_time = new Date(tmp_end_time.replace(/-/g, '/')); // ios cross browsing
+                                    tmp_end_time.setMinutes(tmp_end_time.getMinutes() + 30);
+                                    var value = tmp_end_time.getHours()+':'+fillZero(2, tmp_end_time.getMinutes());
+                                    var is_selected = (value == time_end_arr[_i])? ' selected ' : '';
+                                    html += '							<option value="'+value+'" '+is_selected+'>'+value+'</option>';
+                                }
+                            }
+                            html += '						</select>';
+                        }
+                        html += '					</td>';
+                        html += '				</tr>';
+                    }
+                    html += '			</table>';
+                    html += '		</div>';
+                    html += '	</form>';
+                    html += '</div>';
+
+                    $(this).html(html);
+                },
+                close: function() {
+                    $(this).html('');
+                }
+            });
+        });
+
+        $manage_artist_list.on("click", ".set_out_artist_btn", function(){
+            var name = $(this).data("name");
+            var is_main = $(this).data("is_main");
+            var is_out = $(this).data("is_out");
+
+            if(is_out == "1"){
+                //console.log(artist_id+':'+name+':'+is_main+':'+is_out)
+                $('#gooutcancel').data('artist_id',artist_id);
+                $('#gooutcancel').data('name',name);
+                $('#gooutcancel').data('is_main',is_main);
+                $('#gooutcancel').data('is_out',is_out);
+                popalert.open('gooutcancel');
+            }else{
+                console.log('1->'+artist_id+':'+name+':'+is_main+':'+is_out)
+                $('#goout').data('aid',artist_id);
+                $('#goout').data('name',name);
+                $('#goout').data('main',is_main);
+                $('#goout').data('out',is_out);
+
+                popalert.open('goout');
+            }
+        });
+
+        function confirm_out(){
+            var artist_id = $('#goout').data('aid');
+            var name = $('#goout').data('name');
+            var is_main = $('#goout').data('main');
+            var is_out = $('#goout').data('out');
+            popalert.close();
+            $.ajax({
+                url: 'data/manage_artist_ajax.php',
+                data: {
+                    mode: "set_update_artist_list",
+                    artist_id: artist_id,
+                    name: name,
+                    is_main: is_main,
+                    is_out: (is_out == '1')? '2' : '1'
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        //console.log(data.data);
+                        /*$.MessageBox({
+                            buttonDone: "확인",
+                            message: "퇴사취소처리 되었습니다."
+                        }).done(function(){*/
+                        popalert.open('confirmOnlyOkReload','퇴사처리 되었습니다.');
+                        //});
+                    }else{
+
+                        popalert.open('confirmOnlyOkReload',data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function confirm_out_cancel(){
+            var artist_id = $('#gooutcancel').data('artist_id');
+            var name = $('#gooutcancel').data('name');
+            var is_main = $('#gooutcancel').data('is_main');
+            var is_out = $('#gooutcancel').data('is_out');
+            popalert.close();
+            $.ajax({
+                url: 'data/manage_artist_ajax.php',
+                data: {
+                    mode: "set_update_artist_list",
+                    artist_id: artist_id,
+                    name: name,
+                    is_main: is_main,
+                    is_out: (is_out == '1') ? '2' : '1'
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.code == "000000") {
+                        //console.log(data.data);
+                        /*$.MessageBox({
+                            buttonDone: "확인",
+                            message: "퇴사처리 되었습니다."
+                        }).done(function () {*/
+                        popalert.open('confirmOnlyOkReload','퇴사취소처리 되었습니다.');
+                        //});
+                    } else {
+                        console.log(data.code)
+                        //popalert.open('confirmOnlyOkReload',data.code);
+                    }
+                },
+                error: function (xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if (xhr.status != 0) {
+                        alert("code = " + xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+
+
+        $manage_artist_list.on("click", ".set_view_artist_btn", function(){
+            var name = $(this).data("name");
+            var is_main = $(this).data("is_main");
+            var is_view = $(this).data("is_view");
+            if(is_view == "1"){
+                /*$.MessageBox({
+                    buttonDone: "노출",
+                    buttonFail: "취소",
+                    message: "해당 미용사를 노출처리 하시겠습니까?"
+                }).done(function(){*/
+                if(confirm("해당 미용사를 노출처리 하시겠습니까?")) {
+                    $.ajax({
+                        url: 'data/manage_artist_ajax.php',
+                        data: {
+                            mode: "set_update_artist_list",
+                            artist_id: artist_id,
+                            name: name,
+                            is_view: (is_view == '1') ? '2' : '1'
+                        },
+                        type: 'POST',
+                        dataType: 'JSON',
+                        success: function (data) {
+                            if (data.code == "000000") {
+                                //console.log(data.data);
+                                /*$.MessageBox({
+                                    buttonDone: "확인",
+                                    message: "노출처리 되었습니다."
+                                }).done(function(){*/
+                                //get_artist_list();
+                                //});
+                                popalert.open('confirmOnlyOkReload','노출처리 되었습니다.');
+                            } else {
+                                alert(data.data + "(" + data.code + ")");
+                                console.log(data.data);
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            //alert(error + "네트워크에러");
+                            if (xhr.status != 0) {
+                                alert("code = " + xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                            }
+                        }
+                    });
+                }
+
+            }else{
+                /*$.MessageBox({
+                    buttonDone: "숨김",
+                    buttonFail: "취소",
+                    message: "숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.<br/><br/>해당 미용사를 숨김처리 하시겠습니까?"
+                }).done(function(){*/
+                if(confirm("숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.\n해당 미용사를 숨김처리 하시겠습니까?")) {
+                    $.ajax({
+                        url: 'data/manage_artist_ajax.php',
+                        data: {
+                            mode: "set_update_artist_list",
+                            artist_id: artist_id,
+                            name: name,
+                            is_view: (is_view == '1') ? '2' : '1'
+                        },
+                        type: 'POST',
+                        dataType: 'JSON',
+                        success: function (data) {
+                            if (data.code == "000000") {
+                                //console.log(data.data);
+                                /*$.MessageBox({
+                                    buttonDone: "확인",
+                                    message: "숨김처리 되었습니다."
+                                }).done(function () {*/
+                                popalert.open('confirmOnlyOkReload','숨김처리 되었습니다.');
+
+                                    //get_artist_list();
+                                //});
+                            } else {
+                                popalert.open('confirmOnlyOkReload',data.code);
+
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            //alert(error + "네트워크에러");
+                            if (xhr.status != 0) {
+                                alert("code = " + xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                            }
+                        }
+                    });
+                    //});
+                }
+            }
+        });
+
+        /*
+        $manage_artist_list.on("click", ".set_delete_artist_btn", function(){
+            var name = $(this).data("name");
+            var is_main = $(this).data("is_main");
+            $.MessageBox({
+                buttonDone: "삭제",
+                buttonFail: "취소",
+                message: "해당 미용사를 삭제 하시겠습니까?"
+            }).done(function(){
+                $.ajax({
+                    url: 'data/manage_artist_ajax',
+                    data: {
+                        mode: "set_delete_artist_list",
+                        artist_id: artist_id,
+                        name: name,
+                        is_main: is_main
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        if(data.code == "000000"){
+                            //console.log(data.data);
+                            $.MessageBox({
+                                buttonDone: "확인",
+                                message: "삭제되었습니다."
+                            }).done(function(){
+                                get_artist_list();
+                            });
+                        }else{
+                            alert(data.data+"("+data.code+")");
+                            console.log(data.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        //alert(error + "네트워크에러");
+                        if(xhr.status != 0){
+                            alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                        }
+                    }
+                });
+            });
+        });
+        */
+
+        $manage_artist_list_popup.on("click", "input[name='checkbox_time[]']", function(){
+            //console.log($(this).parent().siblings('td').children("select[name='select_time_from[]']").html());
+            if($(this).is(":checked") == true){
+                $(this).parent().siblings('td').children("select[name='select_time_from[]']").prop("disabled", false);
+                $(this).parent().siblings('td').children("select[name='select_time_to[]']").prop("disabled", false);
+            }else{
+                $(this).parent().siblings('td').children("select[name='select_time_from[]']").prop("disabled", true);
+                $(this).parent().siblings('td').children("select[name='select_time_to[]']").prop("disabled", true);
+            }
+        });
+
+        function get_artist_list(){
+            $.ajax({
+                url: 'data/manage_artist_ajax.php',
+                data: {
+                    mode: "get_artist_list",
+                    artist_id: artist_id
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        //console.log(data.data);
+                        artist_list = data.data;
+
+                        var html = '';
+                        $.each(data.data, function(i, v){
+                            var week_arr = v.week_list.split(',');
+                            var time_start_arr = v.time_start_list.split(',');
+                            var time_end_arr = v.time_end_list.split(',');
+                            var _is_out = (v.is_out == '1')? 'is_out' : '';
+                            var _is_out_txt = (v.is_out == '1')? '퇴사취소' : '퇴사';
+                            var _is_view = (v.is_view == '1')? 'hide' : '';
+                            var _is_view_txt = (v.is_view == '1')? '(숨김)' : '';
+
+                            var __is_main = (v.is_main == '1')? '대표미용사' : '';
+                            var __is_out = (v.is_out == '1')? ' (퇴사)' : '';
+                            var __is_hide = (v.is_out == '1' || v.is_view == 1)? 'hide' : '';
+                            var __is_txt = (v.is_out == '1' || v.is_view == 1)? 'txt' : '';
+                            var __is_txt = (v.is_main == '1')? 'label label-outline-purple middle' : __is_txt;
+                            var time_html	= "";
+
+
+
+                            for (var _i = 0; _i < week_arr.length; _i++) {
+                                time_html += '				<div class="schedule-day-item">';
+                                time_html += '					<div class="item-title"><div class="schedule-day-state">'+week_name_arr[week_arr[_i]]+'</div></div>';
+                                time_html += '					<div class="item-value">'+time_start_arr[_i]+' ~ '+time_end_arr[_i]+'</div>';
+                                time_html += '				</div>';
+                            }
+
+
+                            console.log(_is_view)
+                            html2	= `
+							<li class="accordion-cell ${__is_hide}" class="artist_list ${_is_view}" lst_seq="${v.seq_list}" data-idx="${v.seq}" data-artist="${v.artist_id}"  data-name="${v.name}">
+								<div class="card-teacher-item">
+									<div class="card-teacher-header">
+										<div class="item-info-wrap">
+										<div class="item-info-inner">
+												<div class="item-name">${v.name} ${__is_out}</div>
+												<div class="item-info">닉네임 : ${v.nicname}</div>
+											</div>
+										</div>`;
+                        if(v.artist_id == v.name) {
+                                html2 += `<div class="item-state">
+                                                <div class="label label-outline-purple middle">대표미용사</div>
+                                        </div>`;
+                                        }
+								html2 += `		<div class="item-state"><div class="${__is_txt}">${__is_main}${__is_out}${_is_view_txt}</div></div>
+										<button type="button" class="btn-accordion-menu"></button>
+									</div>
+									<div class="accordion-content">
+										<div class="card-teacher-body">
+											<div class="schedule-day-list">
+												${time_html}
+											</div>
+											<div class="btn-basic-action">
+												<div class="grid-layout basic btn-grid-group">
+													<div class="grid-layout-inner">
+														<div class="grid-layout-cell flex-1"><a href="set_teacher_add?seq=${v.seq}" class="btn btn-outline-gray btn-middle-size btn-round">수정</a></div>
+                            `;
+                            if(v.is_out == 1) {
+                                html2 += `
+														<div class="grid-layout-cell flex-1"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round cancel-out set_out_artist_btn" data-is_main="${v.is_main}" data-name="${v.name}"  data-is_out="${v.is_out}">퇴사취소</a></div>`;
+                            } else {
+                                html2 += `
+														<div class="grid-layout-cell flex-1"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round go-out set_out_artist_btn"  data-is_main="${v.is_main}" data-name="${v.name}"  data-is_out="${v.is_out}">퇴사</a></div>`;
+                                if(v.is_view == 1) {
+                                    html2 += `
+                                                        <div class="grid-layout-cell flex-1"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round go-hide set_view_artist_btn " data-is_main="${v.is_main}" data-name="${v.name}"  data-is_view="${v.is_view}">숨김해제</a></div>`;
+                                } else {
+                                    html2 += `
+                                                        <div class="grid-layout-cell flex-1"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round go-hide set_view_artist_btn " data-is_main="${v.is_main}" data-name="${v.name}"  data-is_view="${v.is_view}">숨김</a></div>`;
+                                }
+                            }
+                            
+                            html2 +=`
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</li>
+						`;
+                            $manage_artist_list.find("#artist_list_wrap").append(html2);
+
+                            html += '<div class="artist_list '+_is_view+'" lst_seq="'+ v.seq_list +'">';
+                            html += '	<div class="title">';
+                            html += '		<span>';
+                            html += (v.is_main == '1')? '대표미용사' : v.name;
+                            html += (v.is_out == '1')? ' (퇴사)' : '';
+                            html += '		</span>';
+                            html += '		<div class="right">';
+                            html += '			<button type="button" class="set_artist_btn" data-name="'+v.name+'" data-action="update">수정</button>';
+                            //html += (v.is_main != '1')? '<button type="button" class="set_delete_artist_btn" data-name="'+v.name+'" data-is_main="'+v.is_main+'">삭제</button>' : '';
+                            html += (v.is_main != '1')? '<button type="button" class="set_out_artist_btn" data-name="'+v.name+'" data-is_main="'+v.is_main+'" data-is_out="'+v.is_out+'">'+_is_out_txt+'</button>' : '';
+                            html += '<button type="button" class="set_view_artist_btn" data-name="'+v.name+'" data-is_view="'+v.is_view+'">'+_is_view_txt+'</button>';
+                            html += '		</div>';
+                            html += '	</div>';
+                            html += '	<div class="container">';
+                            html += '		<div>고객에 보여지는 이름 : '+v.nicname+'</div>';
+                            html += '		<div class="timetable">';
+                            html += '			<table>';
+                            html += '				<caption>';
+                            html += '					업무요일 및 업무시간';
+                            html += '				</caption>';
+                            html += '				<colgroup>';
+                            html += '					<col width="60px" />';
+                            html += '					<col width="*" />';
+                            html += '				</colgroup>';
+                            for (var _i = 0; _i < week_arr.length; _i++) {
+                                html += '				<tr>';
+                                html += '					<th><span class="box_circle">'+week_name_arr[week_arr[_i]]+'</span></th>';
+                                html += '					<td>'+time_start_arr[_i]+' ~ '+time_end_arr[_i]+'</td>';
+                                html += '				</tr>';
+                            }
+                            html += '			</table>';
+                            html += '		</div>';
+                            html += '	</div>';
+                            html += '</div>';
+
+
+
+                        });
+                        //$manage_artist_list.find("#artist_list_wrap").html(html);
+                        //console.log(html2);
+
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        //console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function get_working_schedule(){
+            $.ajax({
+                url: 'data/manage_artist_ajax.php',
+                data: {
+                    mode: "get_working_schedule",
+                    artist_id: artist_id
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        //console.log(data.data);
+                        working_schedule = data.data;
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function get_regular_holiday(){
+            $.ajax({
+                url: 'data/manage_artist_ajax.php',
+                data: {
+                    mode: "get_regular_holiday",
+                    artist_id: artist_id
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        //console.log(data.data);
+                        regular_holiday[0] = data.data.is_sunday;
+                        regular_holiday[1] = data.data.is_monday;
+                        regular_holiday[2] = data.data.is_tuesday;
+                        regular_holiday[3] = data.data.is_wednesday;
+                        regular_holiday[4] = data.data.is_thursday;
+                        regular_holiday[5] = data.data.is_friday;
+                        regular_holiday[6] = data.data.is_saturday;
+                        //console.log(regular_holiday);
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        //남는 길이만큼 0으로 채움
+        function fillZero(width, str){
+            var str = String(str);//문자열 변환
+            return str.length >= width ? str:new Array(width-str.length+1).join('0')+str;
+        }
+
+        $(document).ready(function(){
+            $(".btn_add_teachter").click(function(){
+                location.href='set_teacher_add';
+            })
+
+            $(".btn-accordion-menu").click(function(){
+                $(this).parents(".card-teacher-header").next().show();
+            })
+            $('#header_bell').css('display','none');
+            $('#btn_page_prev').prop('href','set_main')
+        })
+    </script>
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

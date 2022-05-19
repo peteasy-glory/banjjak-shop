@@ -1,0 +1,257 @@
+<?php include "../include/top.php"; ?>
+<?php
+//로그인 된 상태 일땐 메인으로 보내기(2019-06-21 hue)
+if ($_SESSION[gobeauty_user_id] != "") {
+    echo "
+			<script>
+				location.href = '../mainpage/index.php';
+			</script>
+		";
+    exit;
+}
+?>
+
+<link rel="stylesheet" href="<?= $css_directory ?>/m_new.css?<?= filemtime($upload_static_directory . $css_directory . '/m_new.css') ?>">
+
+<script>
+    //	function onLogin (id) {
+    //	}
+    function on_login() {
+        var id = document.getElementById('gobeauty_user_name').value;
+        return window.Android.onLogin(id);
+    }
+</script>
+<script src="<?= $js_directory ?>/fontawesome.min.js"></script>
+<script type="text/javascript" src="https://static.nid.naver.com/js/naveridlogin_js_sdk_2.0.0.js" charset="utf-8"></script>
+<form action="login_process.php" method="POST" id="cs_login_all">
+    <div class="imgcontainer">
+        <label for="uname"><a href="<?= $mainpage_directory ?>/"><img src="<?= $image_directory ?>/logo_02.png" width="30%"></a></label>
+    </div>
+
+    <table width="100%">
+        <tr>
+            <td align="center">
+                <table class="container" style="width:90%;">
+                    <tr>
+                        <td>
+                            <input type="text" placeholder="이메일 아이디입력" name="gobeauty_user_name" id="gobeauty_user_name" required>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div style="height:2px;width:100%;"></div>
+                        </td>
+					</tr>
+            </td>
+        <tr>
+            <td>
+                <input type="password" placeholder="비밀번호" name="gobeauty_user_password" id="gobeauty_user_password" required>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <div style="height:7px;width:100%;"></div>
+            </td>
+            </td>
+        <tr>
+            <td>
+                <input type="checkbox" checked="checked" name="remember">
+                <font style="font-size:12px;color:Gray;font-family: 'NanumGothic';vertical-align: top;">로그인 상태유지</font>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <button class="go_login" type="submit">로그인</button>
+            </td>
+        </tr>
+        <tr>
+            <td align="center">
+                <table width="90%">
+                    <tr>
+                        <td align="left">
+                            <a href="find_id_password.php" class="find_password" style="color:#000000;font-family: 'NanumGothic';font-weight:bold;">아이디/비밀번호 찾기</a>
+                        </td>
+                        <td style="font-size:14px;color:#999999;">|</td>
+                        <td align="right">
+                            <a href="registration_agree.php" class="find_password" style="color:#000000;font-family: 'NanumGothic';font-weight:bold;">회원가입</a>
+                        </td>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <br>
+            </td>
+        </tr>
+        <tr>
+            <td style="padding-top: 10px;">
+                <?php
+                // 네이버 로그인 접근토큰 요청 예제
+                $client_id = "UJ2SBwYTjhQSTvsZF8TO";
+                $redirectURI = urlencode("https://www.gopet.kr/pet/login/naver.php");
+                $state = "RAMDOM_STATE";
+                $apiURL = "https://nid.naver.com/oauth2.0/authorize?response_type=code&client_id=" . $client_id . "&redirect_uri=" . $redirectURI . "&state=" . $state;
+                ?>
+
+                <a href="<?php echo $apiURL ?>" class="ngo_login">
+                    <table width="100%" height="40px">
+                        <tr>
+                            <td align="right">
+                                <font style="font-size:25px;">N</font>
+                            </td>
+                            <td align="center" style="font-family: 'BMJUA';font-weight:normal;"> 네이버 아이디로 로그인</td>
+                        </tr>
+                    </table>
+                </a>
+            </td>
+        </tr>
+		<tr>
+			<td style="padding-top: 10px;">
+				<!-- div id="appleid-signin" data-color="black" data-border="true" data-type="sign in">
+					<div style="text-align: center; background-color: #000; border-radius: 5px;">
+						<a href="<?=$authorize_url ?>" style="display:block; width:100%;">
+							<img src="<?=$image_directory ?>/apple_login_btn.png" style="height: 44px;"/>
+						</a>
+					</div>
+				</div -->
+				<?php
+					$client_id = 'com.gopet.banjjak';
+					$client_secret = 'eyJraWQiOiIzVlpLVTNTNDJVIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjAzMzMzNjY0LCJleHAiOjE2MTg4ODU2NjQsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uZ29wZXQuYmFuamphayJ9.UaY4hkWwh9tliHhlLp2pbPHT5EU1gss-3skjUAG7SOi-tJT6j4KuPhXB_XP0yhuzq_0xm7CXp-_dt9lSDJD1Cw';
+					$redirect_uri = 'https://www.gopet.kr/pet/mainpage/apple_callback.php';
+					
+					$_SESSION['state'] = RandomToken(5);
+
+					$authorize_url = 'https://appleid.apple.com/auth/authorize'.'?'.http_build_query([
+						'response_type' => 'code',
+						'response_mode' => 'form_post',
+						'client_id' => $client_id,
+						'redirect_uri' => $redirect_uri,
+						'state' => $_SESSION['state'],
+						'scope' => 'name email',
+					]);
+
+					function RandomToken($length = 32){
+						if(!isset($length) || intval($length) <= 8 ){
+						  $length = 32;
+						}
+						if (function_exists('random_bytes')) {
+							return bin2hex(random_bytes($length));
+						}
+						if (function_exists('mcrypt_create_iv')) {
+							return bin2hex(mcrypt_create_iv($length, MCRYPT_DEV_URANDOM));
+						}
+						if (function_exists('openssl_random_pseudo_bytes')) {
+							return bin2hex(openssl_random_pseudo_bytes($length));
+						}
+					}
+				?>
+
+				<div>
+					<a href="<?=$authorize_url ?>" style="width: 100%;">
+						<div style="position: relative; width: 100%; height: 44px; line-height: 44px; background-color: #000; border-radius: 5px; color: #fff; font-family: auto;">
+							<span style="position: absolute; left: 28px; top: 10px; font-size: 25px;"><i class="fab fa-apple"></i></span>
+							<span style="display: inline-block; margin-left: 20px; width: 100%; font-size: 19px; text-align: center;">Sign in with Apple</span>
+						</div>
+					</a>
+				</div>
+			</td>
+		</tr>
+		<tr class="item_order" style="display: none;">
+            <td>
+                <button type="button" class="guest_buy">비회원 조회하기</button>
+            </td>
+        </tr>
+</table>
+</form>
+
+<script>
+// 상품결제 데이터
+var order_step = getCookie("order_step");
+var order_num = getCookie("order_num");
+
+$(function(){
+	if(order_step != ""){
+		//$(".item_order").show(); 비회원 구매 불가 처리
+
+		if(order_step == "1"){ // 구매
+			$(".guest_buy").text("비회원 구매하기");
+		}else if(order_step == "2"){ // 조회
+			$(".guest_buy").text("비회원 조회하기");
+		}else if(order_step == "3"){ // 장바구니
+			$(".guest_buy").text("비회원 구매하기");
+		}
+	}
+});
+
+$(document).on("click", ".guest_buy", function(){
+	if(order_num != ""){
+		if(order_step == "1"){ // 구매
+			location.href = "<?=$item_directory ?>/item_payment.php?no="+order_num;
+		}else if(order_step == "2"){ // 조회
+			location.href = "../chkodr/?no="+order_num;
+		}else if(order_step == "3"){ // 장바구니
+			location.href = "<?=$item_directory ?>/item_cart.php?no="+order_num;
+		}
+	}else{
+		location.href = "../chkodr/";
+	}
+});
+
+// 기기 체크
+function checkMobile2(){
+	var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+	if ( varUA.indexOf("app_gobeauty_and") > -1 ) {
+		//APP
+		return "in_app_and";
+	} else if (varUA.indexOf("app_gobeauty_ios") > -1 ) {
+		//안드로이드
+		return "in_app_ios";
+	} else if ( varUA.indexOf('android') > -1 ) {
+		//안드로이드
+		return "android";
+	} else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+		//IOS
+		return "ios";
+	} else {
+		//아이폰, 안드로이드 외
+		return "other";
+	}
+}
+
+// 쿠키 생성
+function setCookie(cName, cValue, cDay){
+	var expire = new Date();
+	expire.setDate(expire.getDate() + cDay);
+	cookies = cName + '=' + escape(cValue) + '; path=/ '; // 한글 깨짐을 막기위해 escape(cValue)를 합니다.
+	if(typeof cDay != 'undefined') cookies += ';expires=' + expire.toGMTString() + '; SameSite=None; Secure ';
+	cookies += ' SameSite=None; Secure '; // Chrome 80 issue
+	document.cookie = cookies;
+}
+
+// 쿠키 생성
+function setCookie_ios(cName, cValue, cDay){ // IOS bug - SameSite=None; Secure를 SameSite=static으로 인식하는 문제
+	var expire = new Date();
+	expire.setDate(expire.getDate() + cDay);
+	cookies = cName + '=' + escape(cValue) + '; path=/ '; // 한글 깨짐을 막기위해 escape(cValue)를 합니다.
+	if(typeof cDay != 'undefined') cookies += ';expires=' + expire.toGMTString() + ';';
+	cookies += ' SameSite=None; Secure '; // Chrome 80 issue
+	document.cookie = cookies;
+}
+
+// 쿠키 가져오기
+function getCookie(cName) {
+	cName = cName + '=';
+	var cookieData = document.cookie;
+	var start = cookieData.indexOf(cName);
+	var cValue = '';
+	if(start != -1){
+		start += cName.length;
+		var end = cookieData.indexOf(';', start);
+		if(end == -1)end = cookieData.length;
+		cValue = cookieData.substring(start, end);
+	}
+	return unescape(cValue);
+}
+</script>
+
+<?php include "../include/bottom.php"; ?>

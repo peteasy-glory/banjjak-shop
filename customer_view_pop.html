@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">010-1234-1234</div>
+	<div class="header-right">
+		<a href="#" class="btn btn-middle-size btn-outline-gray btn-round">삭제</a>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="page-contents">
+			<button type="button" class="btn btn-purple" onclick="pop.open('numberAddPop');"><em>번호추가</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('memberGradeAddPop');"><em>회원등급부여</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('memberGradeComPop');"><em>회원등급부여 완료</em></button>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	
+	<!-- 번호추가 -->
+	<article id="numberAddPop" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-header">
+						<h4 class="con-title">전화번호 추가</h4>
+					</div>
+					<div class="pop-body phone-add-wrap">
+						<div class="phone-add-list">
+							<!--
+							//	- phone-add-item 클래스에 new 클래스 추가시 새이름 입력필드
+							//	- phone-add-item 클래스에 actived클래스 추가시 활성화
+							-->
+							<div class="phone-add-item actived">
+								<div class="item-check"><label for="phone1" class="form-radiobox"><input type="radio" id="phone1" name="phone"><span class="form-check-icon"><em>대표</em></span></label></div>
+								<div class="item-data">
+									<div class="phone-add-item-value">
+										<div class="phone-add-name"><div class="ellipsis">고객고객고객고객고객고객고객고객고객고객고객고객</div></div>
+										<div class="phone-add-num"><div class="ellipsis">010-1234-1234</div></div>
+										<div class="phone-state-icon"><div class="icon icon-phone-add-tel"></div></div>
+									</div>
+								</div>
+								<div class="item-ui">
+									<button type="button" class="btn-phone-del"><span class="icon icon-phone-add-del"></span></button>
+								</div>
+							</div>
+							<div class="phone-add-item">
+								<div class="item-check"><label for="phone2" class="form-radiobox"><input type="radio" id="phone2" name="phone"><span class="form-check-icon"><em>대표</em></span></label></div>
+								<div class="item-data">
+									<div class="phone-add-item-value">
+										<div class="phone-add-name"><div class="ellipsis">고객</div></div>
+										<div class="phone-add-num"><div class="ellipsis">010-1234-1234</div></div>
+										<div class="phone-state-icon"><div class="icon icon-phone-add-tel"></div></div>
+									</div>
+								</div>
+								<div class="item-ui">
+									<button type="button" class="btn-phone-del"><span class="icon icon-phone-add-del"></span></button>
+								</div>
+							</div>
+							<div class="phone-add-item">
+								<div class="item-check"><label for="phone3" class="form-radiobox"><input type="radio" id="phone3" name="phone"><span class="form-check-icon"><em>대표</em></span></label></div>
+								<div class="item-data">
+									<div class="phone-add-item-value">
+										<div class="phone-add-name"><div class="ellipsis">고객</div></div>
+										<div class="phone-add-num"><div class="ellipsis">010-1234-1234</div></div>
+										<div class="phone-state-icon"><div class="icon icon-phone-add-tel"></div></div>
+									</div>
+								</div>
+								<div class="item-ui">
+									<button type="button" class="btn-phone-del"><span class="icon icon-phone-add-del"></span></button>
+								</div>
+							</div>
+							<div class="phone-add-item new">
+								<div class="item-check"><label for="phone4" class="form-radiobox"><input type="radio" id="phone4" name="phone" disabled><span class="form-check-icon"><em>대표</em></span></label></div>
+								<div class="item-data">
+									<div class="phone-add-item-value">
+										<div class="phone-add-name"><div class="ellipsis">새 이름</div></div>
+										<div class="phone-add-num"><div class="ellipsis">새 번호</div></div>
+										<div class="phone-state-icon"><div class="icon icon-phone-add-tel"></div></div>
+									</div>
+								</div>
+								<div class="item-ui">
+									<button type="button" class="btn-phone-del"><span class="icon icon-phone-add-del"></span></button>
+								</div>
+							</div>
+						</div>
+						<!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
+						<div class="phone-add-input disabled">
+							<div class="form-group">
+								<div class="form-group-cell">
+									<div class="form-group-item">
+										<div class="form-item-label">등록이름</div>
+										<div class="form-item-data type-6">
+											<input type="text" class="" placeholder="입력" disabled/>										
+										</div>
+									</div>
+								</div>
+								<div class="form-group-cell">
+									<div class="form-group-item">
+										<div class="form-item-label">전화번호</div>
+										<div class="form-item-data type-6">
+											<input type="text" class="" placeholder="'-' 제외하고 입력" disabled/>										
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="form-input-info">*보조연락처는 3개까지 등록 가능합니다.</div>
+						</div>
+						<button type="button" class="btn btn-purple btn-smiddle-size btn-round">등록</button>
+					</div>
+					<button type="button" class="btn-pop-close" onclick="pop.close();">닫기</button>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //번호추가 -->
+	
+	<!-- 회원등급부여 -->
+	<article id="memberGradeAddPop" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-header">
+						<h4 class="con-title">회원등급 부여</h4>
+					</div>
+					<div class="pop-body">
+						<div class="msg-txt">현재 까미 (010-6481-5987)고객님의 등급은 VIP 입니다.</div>
+						<div class="form-group">
+							<div class="form-group-item">
+								<select>
+									<option value="">VIP</option>
+									<option value="">Normal</option>
+									<option value="">Normal_B</option>
+								</select>
+								<div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
+							</div>
+						</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">저장</button>
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">취소</button>
+					</div>
+					<button type="button" class="btn-pop-close" onclick="pop.close();">닫기</button>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //회원등급부여 -->
+	
+	<!-- 회원등급부여 완료 -->
+	<article id="memberGradeComPop" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">등급이 부여되었습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //회원등급부여 완료 -->
+	
+</section>
+<!-- //container -->
+
+</body>
+</html>

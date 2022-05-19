@@ -1,0 +1,234 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+print_r($_POST);
+
+
+?>
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <div class="reserve-sale-wrap">
+            <div class="con-title-group">
+                <h4 class="con-title">2. 판매할 고객을 선택하세요</h4>
+            </div>
+            <div>
+                <div class="con-title-group">
+                    <h5 class="con-title">정렬방식</h5>
+                    <form action="./reserve_time_sale_step2_1" method="get" name="searchFrm" onchange="document.searchFrm.submit();">
+                        <select name="order_by" class="arrow">
+                            <option value="confirm_dt">최신순</option>
+                            <option value="name">가나다순</option>
+                            <!--<option value="">이용회수별</option>-->
+                            <option value="pet_type">견종별</option>
+                            <!--<option value="">등급별</option>-->
+                        </select>
+                    </form>
+                </div>
+                <div class="reserve-data-all-select">
+                    <label class="form-radiobox large"><input type="checkbox" name="allChk" id="allChk" value="y"><span class="form-check-icon"><em>전체선택</em></span></label>
+                </div>
+                <div>
+                    <div class="customer-all-inquiry-list">
+                        <table class="customer-table">
+                            <colgroup>
+                                <!-- 20220211 수정 -->
+                                <col style="width:25%">
+                                <col style="width:25%">
+                                <col style="width:20%">
+                                <col style="width:20%">
+                                <!-- //20220211 수정 -->
+                            </colgroup>
+                            <thead>
+                            <!-- 20220211 수정 -->
+                            <tr>
+                                <th>펫이름/등급</th>
+                                <th>견종</th>
+                                <th>전화번호</th>
+                                <th>펫 보유 수</th>
+                            </tr>
+                            <!-- //20220211 수정 -->
+                            </thead>
+                            <tbody>
+                            <!-- 20220211 수정 -->
+                            <?php
+                                if(!isset($_GET['order_by']))   $order_by = 'confirm_dt DESC';
+                                if(!empty($_GET['order_by'])){
+                                    if($_GET['order_by'] == 'confirm_dt'){
+
+                                    } else if($_GET['order_by'] == 'confirm_dt'){
+                                        $order_by = 'confirm_dt DESC';
+                                    } else if($_GET['order_by'] == 'name'){
+                                        $order_by = 'name ASC';
+                                    } else if($_GET['order_by'] == 'pet_type'){
+                                        $order_by = 'pet_type ASC';
+                                    }
+                                }
+                                $que = "SELECT * FROM tb_payment_log WHERE artist_id = '{$artist_id}' AND is_confirm = 1 AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 GROUP BY customer_id ORDER BY {$order_by}  ";
+                                //echo $que;
+                                $pay = sql_fetch_array($que);
+                                if(count($pay)>0){
+                                    foreach($pay as $pay){
+                                        if(!empty($pay['customer_id'])) {
+                                            $sql = "SELECT * FROM tb_mypet WHERE customer_id = '{$pay['customer_id']}' ";
+                                        } else {
+                                            $sql1 = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$pay['cellphone']}'";
+                                            //echo $sql1."<p>";
+                                            $tu = sql_fetch_array($sql1);
+                                            $sql = "SELECT * FROM tb_mypet WHERE tmp_seq = '{$tu[0]['tmp_seq']}' ";
+                                        }
+                                        //echo $sql;
+                                        $pet = sql_fetch_array($sql);
+                                        if(count($pet)>0){
+                                            foreach($pet as $mypet){
+                                                $mp[$pay['cellphone']]['name'][] = $mypet['name'];
+                                                $mp[$pay['cellphone']]['pet_type'][] = $mypet['pet_type'];
+                                                $mp[$pay['cellphone']]['type'][] = $mypet['type'];
+                                                //$data[$pay['cellphone']] = $mp;
+                                            }
+                                        }
+
+                                        $que = "SELECT * FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$pay['customer_id']}'";
+                                        //echo $que;
+                                        $grade = sql_fetch_array($que);
+                                        if(empty($grade[0]['grade_ord'])){
+                                            $gr = 'vip';
+                                        } else {
+                                            if($grade[0]['grade_ord']==1){
+                                                $gr = 'vip';
+                                            } else if($grade[0]['grade_ord']==1){
+                                                $gr = 'normal';
+                                            } else if($grade[0]['grade_ord']==1){
+                                                $gr = 'normalb';
+                                            }
+                                        }
+
+
+                            ?>
+                            <tr class="customer-table-cell">
+                                <td>
+                                    <div class="customer-table-toggle">
+                                        <span class="toggle-title"><span class="ellipsis"><?php echo $mp[$pay['cellphone']]['name'][0];?></span></span>
+                                        <span class="toggle-grade">
+                                            <label class="form-radiobox large"><input type="checkbox" name="person" class="person" onclick="fn_time_sale();"><span class="form-check-icon"><em></em></span></label>
+                                            <span class="icon icon-grade-<?php echo $gr;?>"></span>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="customer-table-txt"><strong><?php echo ($mp[$pay['cellphone']]['type'][0]=='dog')?'개':'고양이';?></strong></div>
+                                    <div class="customer-table-txt"><?php echo $mp[$pay['cellphone']]['pet_type'][0];?></div>
+                                </td>
+                                <td>
+                                    <div class="customer-table-txt"><?php echo $mp[$pay['cellphone']]['pet_type'][0];?></div>
+                                </td>
+                                <td>
+                                    <div class="customer-table-txt"><?php echo count($mp[$pay['cellphone']]['pet_type'][0]);?></div>
+                                    <div class="customer-table-txt">
+                                        <?php
+                                            for($i=1;$i<4;$i++){
+                                                if(!empty($mp[$pay['cellphone']]['name'][$i])) {
+                                                    $dog_name[$pay['cellphone']][] = $mp[$pay['cellphone']]['name'][$i];
+                                                }
+                                            }
+                                            echo $dn = implode("/",$dog_name[$pay['cellphone']]).'이 외';
+                                        ?>
+                                        </div>
+                                </td>
+                            </tr>
+                           <?php }} ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="javascript;;" class="btn-page-bottom" id="select_person_cnt">0명 선택</a>
+    </div>
+    <!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+<script>
+    $(document).on('click','#allChk',function(){
+        var cnt = 0;
+        if($(this).is(':checked')==true){
+            $('.person').each(function(){
+                $(this).prop('checked',true);
+                cnt++;
+            });
+        } else {
+            $('.person').each(function(){
+                $(this).prop('checked',false);
+            });
+            cnt = 0;
+        }
+
+        $("#select_person_cnt").text(cnt+'명 선택');
+    });
+    function fn_time_sale() {
+        var count = 0;
+
+        $('.person').each(function () {
+            if ($(this).is(':checked') == true) {
+                count++;
+            }
+        });
+
+        $("#select_person_cnt").text(count+'명 선택');
+    }
+    //선택완료
+    $(document).on('click','.selected-done',function(){
+        var cnt = 0;
+        var date_text = '';
+        $('.person').each(function () {
+            if ($(this).is(':checked') == true) {                
+                cnt++;
+            }
+        });
+        $('#select_person_cnt').val(cnt+'명 선택');
+        /*$('#choose_date').val(date_text);
+        if(!cnt){
+            popalert.open('reserveCalendarPop99','최소한 한개 이상 타임을 선택해주세요.');
+            return false;
+        }
+
+        if(!date_text){
+            popalert.open('reserveCalendarPop99','데이터 선택에 오류가 있습니다. 새로고침 후 다시 선택해주세요.');
+            return false;
+        }
+        document.frm.submit();*/
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">차트</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph doughnut-graph">
+				<div class="graph-inner">
+					<canvas id="doughnut"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph">
+			<div class="customer-state-graph doughnut-graph">
+				<div class="graph-inner">
+					<canvas id="doughnut2"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph">
+				<canvas id="horizontalBar"></canvas>
+			</div>
+		</div>
+
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph">
+				<canvas id="horizontalBar2"></canvas>
+			</div>
+		</div>
+
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph treemap-graph">
+				<canvas id="treemap"></canvas>
+			</div>
+		</div>
+
+		<div class="basic-data-group middle">
+			<div class="customer-state-graph line-graph">
+				<canvas id="line"></canvas>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+<!--
+<script src="/static/pub/js/chart3/chart.js"></script>
+<script src="/static/pub/js/chart3/chartjs-plugin-datalabels.js"></script>
+-->
+<script src="/static/pub/js/chart2/Chart.bundle.min.js"></script>
+<script src="/static/pub/js/chart2/chartjs-plugin-labels.js"></script>
+<script src="/static/pub/js/chart2/chartjs-chart-treemap@0.2.3.js"></script>
+<script>
+var  doughnutData = {
+  labels: [
+    '미용',
+    '호텔',
+    '유치원'
+  ],
+  datasets: [{
+    data: [300, 50, 100],
+    backgroundColor: [
+      'rgb(253, 217, 78)',
+      'rgb(255, 72, 72)',
+      'rgb(104, 64, 177)'
+    ],
+    hoverBackgroundColor : [
+      'rgb(253, 217, 78)',
+      'rgb(255, 72, 72)',
+      'rgb(104, 64, 177)'
+    ],
+	borderWidth:0,
+    hoverOffset: 0,
+	datalabels : {
+		anchor : 'center'
+	}
+  }]
+};
+
+var doughnutConfig = {
+	//plugins:[ChartDataLabels],
+	type: 'doughnut',
+	data: doughnutData,
+	options:{
+		reponsive : true,
+		maintainAspectRatio : false,
+		cutoutPercentage :50,
+		title : {
+			display:false
+		},
+		legend : {
+			display:true
+		},
+		animation : false,
+		plugins:{
+			labels : {
+				render : 'value',
+				fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+				fontSize : 14,
+				fontColor : '#fff'
+			}
+		}
+	}	
+};
+
+var doughnutCtx = document.getElementById('doughnut');
+var doughnut = new Chart(doughnutCtx , doughnutConfig);
+
+var doughnutData2 = {
+  labels: [
+    '미용',
+    '호텔',
+    '유치원'
+  ],
+  datasets: [{
+    data: [300, 50, 100],
+    backgroundColor: [
+      'rgb(253, 217, 78)',
+      'rgb(255, 72, 72)',
+      'rgb(104, 64, 177)'
+    ],
+    hoverBackgroundColor : [
+      'rgb(253, 217, 78)',
+      'rgb(255, 72, 72)',
+      'rgb(104, 64, 177)'
+    ],
+	borderWidth:0,
+    hoverOffset: 0,
+	datalabels : {
+		anchor : 'center'
+	}
+  }]
+};
+
+var doughnutConfig2 = {
+	//plugins:[ChartDataLabels],
+	type: 'doughnut',
+	data: doughnutData,
+	options:{
+		reponsive : true,
+		maintainAspectRatio : false,
+		cutoutPercentage :50,
+        rotation: 1 * Math.PI,
+        circumference: 1 * Math.PI,
+		title : {
+			display:false
+		},
+		legend : {
+			display:true
+		},
+		animation : false,
+		plugins:{
+			labels : {
+				render : 'value',
+				fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+				fontSize : 14,
+				fontColor : '#202020'
+			}
+		}
+	}	
+};
+
+var doughnutCtx2 = document.getElementById('doughnut2');
+var doughnut2 = new Chart(doughnutCtx2 , doughnutConfig2);
+
+var horizontalBarData = {
+  labels : ['미용' , '호텔' , '유치원'], //x축 라벨 명
+	datasets : [{
+		borderWidth:0,
+		barPercentage: 0.5,
+		backgroundColor: ['rgb(253, 217, 78)' , 'rgb(255, 72, 72)', 'rgb(104, 64, 177)' ],
+		hoverBackgroundColor: ['rgb(253, 217, 78)' , 'rgb(255, 72, 72)', 'rgb(104, 64, 177)' ],
+		data : [ 50 , 100 , 150], //x축 라벨 데이타값
+	}]
+};
+var horizontalBarConfig = {
+  type: 'horizontalBar',
+  data: horizontalBarData,
+  options:{
+	reponsive : true,
+	maintainAspectRatio : false,
+	title : {
+		display:false
+	},
+	legend : {
+		display:false
+	},		
+	tooltip : {
+		enabled: false
+	},	
+	animation : false,
+	scales: {
+		xAxes: [{	                  
+			scaleLabel : {
+				display:false
+			},		
+			gridLines: {
+				display:true,
+				tickLength:10,
+				color:'#ebebeb',
+				drawBorder:false,
+				zeroLineColor:'rgba(0,0,0,0)'
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666',
+			  min : 0,
+			  max : 200
+			}
+		}],
+		yAxes: [{	
+			scaleLabel : {
+				display:false					
+			},
+			gridLines: {
+				display:false,
+				drawBorder:false
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666',
+			  padding : 0
+			}
+		}]
+	  },          
+	  layout : {
+		padding : {
+		   left :0,
+		   right :0,
+		   top :0,
+		   bottom :0
+		}
+	  }	
+}	
+};
+
+var horizontalBarCtx = document.getElementById('horizontalBar');
+var horizontalBar = new Chart(horizontalBarCtx , horizontalBarConfig);
+
+
+var horizontalBarData2 = {
+  labels : ['미용' , '호텔' , '유치원'], //x축 라벨 명
+	datasets : [{
+		borderWidth:0,
+		barPercentage: 0.5,
+		fill:false,
+		backgroundColor: ['rgb(253, 217, 78)' , 'rgb(255, 72, 72)', 'rgb(104, 64, 177)' ],
+		hoverBackgroundColor: ['rgb(253, 217, 78)' , 'rgb(255, 72, 72)', 'rgb(104, 64, 177)' ],
+		data : [ 50 , 100 , 150], //x축 라벨 데이타값
+	}]
+};
+var horizontalBarConfig2 = {
+  type: 'horizontalBar',
+  data: horizontalBarData2,
+  options:{
+	reponsive : true,
+	maintainAspectRatio : false,
+	title : {
+		display:false
+	},
+	legend : {
+		display:false
+	},		
+	tooltip : {
+		enabled: false
+	},	
+	animation : false,
+	plugins : {
+		labels : {
+			render : 'image',
+			images :  [
+				{
+					src : '9EMtU.png',
+					width : 20,
+					height: 20
+				},
+				{
+					src : '9EMtU.png',
+					width : 20,
+					height: 20
+				},
+				{
+					src : '9EMtU.png',
+					width : 20,
+					height: 20
+				}
+			]
+		}	
+	},	
+	scales: {
+		xAxes: [{	                  
+			scaleLabel : {
+				display:false
+			},		
+			gridLines: {
+				display:true,
+				tickLength:10,
+				color:'#ebebeb',
+				drawBorder:false,
+				zeroLineColor:'rgba(0,0,0,0)'
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666',
+			  min : 0,
+			  max : 200
+			}
+		}],
+		yAxes: [{	
+			scaleLabel : {
+				display:false					
+			},
+			gridLines: {
+				display:false,
+				drawBorder:false
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666',
+			  padding : 0
+			}
+		}]
+	  },          
+	  layout : {
+		padding : {
+		   left :0,
+		   right :0,
+		   top :0,
+		   bottom :0
+		}
+	  }	
+}	
+};
+
+var horizontalBarCtx2 = document.getElementById('horizontalBar2');
+var horizontalBar2 = new Chart(horizontalBarCtx2 , horizontalBarConfig2);
+
+
+var topTags = [
+  {tag:'python',num:133269},{tag:'javascript',num:109742},{tag:'java',num:65490},{tag:'c#',num:45445},{tag:'html',num:43767},{tag:'android',num:42657},{tag:'reactjs',num:38844},{tag:'php',num:34381},{tag:'sql',num:29996},{tag:'python',num:29942},{tag:'css',num:29654},{tag:'r',num:28319},{tag:'c++',num:27389},{tag:'node.js',num:25415},{tag:'angular',num:24093},{tag:'pandas',num:23826},{tag:'arrays',num:23075},{tag:'jquery',num:18968},{tag:'mysql',num:18863},{tag:'swift',num:17971},{tag:'ios',num:17600},{tag:'json',num:15589},{tag:'laravel',num:15537},{tag:'flutter',num:15201},{tag:'c',num:15195},{tag:'django',num:14748},{tag:'sql',num:12752},{tag:'reactjs',num:10974},{tag:'excel',num:10962},{tag:'list',num:10726},{tag:'regex',num:10676}
+];
+
+var treemap = document.getElementById("treemap");
+var treemapCtx = treemap.getContext("2d");
+var chart = window.chart = new Chart(treemapCtx, {
+  type: "treemap",
+  data: {
+    datasets: [{
+      tree: [
+		{
+			tag : 'tag1',
+			num : 100
+		},
+		{
+			tag : 'tag2',
+			num : 200
+		},
+		{
+			tag : 'tag3',
+			num : 300
+		},
+		{
+			tag : 'tag4',
+			num : 400
+		},
+		{
+			tag : 'tag5',
+			num : 500
+		}
+	  ],
+      key: "num",
+      groups: ['tag'],
+      spacing: 1,
+      borderWidth: 0,
+      fontColor: ['#fff' , '#fff' , '#fff' , '#fff' , '#fff'],
+      backgroundColor: ['rgb(253, 217, 78)' , 'rgb(255, 72, 72)', 'rgb(104, 64, 177)' , 'rgb(253, 217, 78)' , 'rgb(255, 72, 72)'],
+    }]
+  },
+  options: {
+	reponsive : true,
+    maintainAspectRatio: false,
+    legend: { display: false },
+    tooltips: { enabled: false },
+	animation : false
+  }
+});
+
+
+var lineData = {
+	labels : ['1' , '2' , '3' , '4'], //x축 라벨 명
+	datasets : [{
+		label : '미용', //라벨명
+		borderWidth:2,
+		borderColor: 'rgb(253, 217, 78)',
+		backgroundColor: 'rgb(253, 217, 78)',
+		pointBorderColor: 'rgb(253, 217, 78)',
+		pointBackgroundColor: 'rgb(255, 255, 255)',
+		pointBorderWidth:2,
+		pointRadius:2,
+		pointHoverRadius:2,
+		pointHoverBackgroundColor: '#fff',
+		lineTension : 0,
+		fill:false,
+		data : [350 , 200 , 300 , 400], //x축 라벨 데이타값
+	} , {
+	label : '호텔', //라벨명
+		borderWidth:2,
+		borderColor: 'rgb(255, 72, 72)',
+		backgroundColor: 'rgb(255, 72, 72)',
+		pointBorderColor: 'rgb(255, 72, 72)',
+		pointBackgroundColor: 'rgb(255, 255, 255)',
+		pointBorderWidth:2,
+		pointRadius:2,
+		pointHoverRadius:2,
+		pointHoverBackgroundColor: '#fff',
+		lineTension : 0,
+		fill:false,
+		data : [50 , 180 , 320 , 70], //x축 라벨 데이타값
+	} , {
+	label : '유치원', //라벨명
+		borderWidth:2,
+		borderColor: 'rgb(104, 64, 177)',
+		backgroundColor: 'rgb(104, 64, 177)',
+		pointBorderColor: 'rgb(104, 64, 177)',
+		pointBackgroundColor: 'rgb(255, 255, 255)',
+		pointBorderWidth:2,
+		pointRadius:2,
+		pointHoverRadius:2,
+		pointHoverBackgroundColor: '#fff',
+		lineTension : 0,
+		fill:false,
+		data : [90 , 260 , 370 , 140], //x축 라벨 데이타값
+	}]
+};
+var lineConfig = {
+  type: 'line',
+  data: lineData,
+  options:{
+	reponsive : true,
+	maintainAspectRatio : false,
+	title : {
+		display:false
+	},
+	legend : {
+		display:false
+	},		
+	tooltip : {
+		enabled: false
+	},	
+	animation : false,
+	scales: {
+		xAxes: [{	                  
+			scaleLabel : {
+				display:false
+			},		
+			gridLines: {
+				display:true,
+				tickLength:10,
+				color:'#ebebeb',
+				drawBorder:false,
+				zeroLineColor:'rgba(0,0,0,0)'
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666'
+			}
+		}],
+		yAxes: [{	
+			scaleLabel : {
+				display:false					
+			},
+			gridLines: {
+				display:false,
+				drawBorder:false,
+				zeroLineColor:'transparent'
+			},
+			ticks : {
+			  fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+			  fontSize : 14,
+			  lineHeight : 1.5,
+			  fontColor : '#666'
+			}
+		}]
+	  },          
+	  layout : {
+		padding : {
+		   left :0,
+		   right :0,
+		   top :0,
+		   bottom :0
+		}
+	  }	
+}	
+};
+
+var lineCtx = document.getElementById('line');
+var lineChart = new Chart(lineCtx , lineConfig);
+
+
+
+</script>
+</body>
+</html>

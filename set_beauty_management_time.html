@@ -1,0 +1,140 @@
+<?php
+$shop_title	= "미용 소요시간 설정";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$backurl = $_GET['backurl'];
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$first_type = $_REQUEST['first_type'];
+$second_type = $_REQUEST['second_type'];
+if (!$second_type) {
+    $second_type = '추가공통옵션';
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+$result = mysqli_query($connection, $sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+
+
+$que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}' ";
+$res = mysqli_query($connection, $que);
+$rs = mysqli_fetch_assoc($res);
+
+$productWorkTimeTitle = array("목욕", "부분미용", "부분+목욕", "위생", "위생+목욕","전체미용", "스포팅", "가위컷", "썸머컷");
+$productWorkTimeOption = array("30","60","90","120","150","180","210","240","270");
+?>
+
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <form action="./data/save_beauty_managerment_time" method="post" name="f">
+        <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
+    <div class="page-body">
+        <!-- set-beauty-take -->
+        <div class="set-beauty-take">
+            <div class="form-vertical-group">
+                <div class="form-vertical-header">
+                    <div class="grid-layout margin-12">
+                        <div class="grid-layout-inner flex-nowrap">
+                            <div class="grid-layout-cell grid-60"><div class="form-item-label">미용구분</div></div>
+                            <div class="grid-layout-cell grid-40"><div class="form-item-label">미용시간</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-vertical-body">
+                    <?php
+                        for($i=0;$i<count($productWorkTimeTitle);$i++){
+                            if($rs['worktime'.($i+1).'_disp_yn'] == 'y'){
+                    ?>
+                    <div class="form-vertical-cell">
+                        <div class="grid-layout margin-12">
+                            <div class="grid-layout-inner">
+                                <div class="grid-layout-cell grid-60"><div class="custom-input-item readonly"><?php echo $productWorkTimeTitle[$i];?></div></div>
+                                <div class="grid-layout-cell grid-40">
+                                    <select name="worktime<?php echo ($i+1);?>">
+                                        <?php for($a=30;$a<=240;$a+=30){ ?>
+                                            <option value="<?php echo $a;?>" <?php echo ($rs['worktime'.($i+1)]==$a)?'selected':'';?>><?php echo $a;?>분</option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <?php }} ?>
+                    <?php
+                    for($i=10;$i<=14;$i++){
+                        if($rs['worktime'.$i.'_title'] != '' && $rs['worktime'.$i] != ''){
+                            ?>
+                            <div class="form-vertical-cell">
+                                <div class="grid-layout margin-12">
+                                    <div class="grid-layout-inner">
+                                        <div class="grid-layout-cell grid-60"><div class="custom-input-item readonly"><?php echo $rs['worktime'.$i.'_title'];?></div></div>
+                                        <div class="grid-layout-cell grid-40">
+                                            <select name="worktime<?php echo $i;?>">
+                                                <?php for($a=30;$a<=240;$a+=30){ ?>
+                                                    <option value="<?php echo $a;?>" <?php echo ($rs['worktime'.$i]==$a)?'selected':'';?>><?php echo $a;?>분</option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php }} ?>
+                </div>
+            </div>
+            <div class="form-bottom-info">*미용항목은 상품 관리 &gt; 미용상품 등록/수정 &gt; 미용구분 메뉴에서 추가할 수 있습니다.</div>
+        </div>
+        <!-- //set-beauty-take -->
+    </div>
+    <!-- //page-body -->
+    </form>
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="javascript:;" class="btn-page-bottom btn-save">저장하기</a>
+    </div>
+    <!-- //page-bottom -->
+</section>
+    <iframe name="hiddenframe" src="" style="display:none;" frameborder="0"></iframe>
+<!-- //container -->
+    <script>
+        $(document).on('click','.btn-save',function(){
+            document.f.target = 'hiddenframe';
+            document.f.submit();
+        });
+    </script>
+
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

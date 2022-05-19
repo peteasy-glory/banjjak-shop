@@ -1,0 +1,158 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "매장결제방식 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+
+$shop_sql = "select * from tb_shop where customer_id = '".$user_id."'";
+$shop_result = mysqli_query($connection, $shop_sql);
+if ($shop_datas = mysqli_fetch_object($shop_result)) {
+	$front_image = $shop_datas->front_image;
+	$name = $shop_datas->name;
+	$working_years = $shop_datas->working_years;
+	$self_introduction = $shop_datas->self_introduction;
+	$professional_field = $shop_datas->professional_field;
+	$career = $shop_datas->career;
+	$license_indexs = $shop_datas->license_indexs;
+	$region_and_cost = $shop_datas->region_and_cost;
+	$enable_flag = $shop_datas->enable_flag;
+	$update_time = $shop_datas->update_time;
+	$is_setting_pay_in_shop = $shop_datas->is_setting_pay_in_shop;
+}
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-pay-type -->  
+		<div class="set-pay-type">
+			<div class="set-pay-type-item">
+				<div class="item-info-wrap">
+					<div class="item-title">매장결제</div>
+					<div class="item-info">매장결제방식을 원치 않으시면, OFF로 변경해주세요.</div>
+				</div>
+				<div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_pay_in_shop"><span class="bar"></span></label></div>
+			</div>		
+			<div class="set-pay-type-item">
+				<div class="item-info-wrap">
+					<div class="item-title">지금결제</div>
+					<div class="item-info">지금결제방식을 원치 않으시면, OFF로 변경해주세요.</div>
+					<div class="item-info font-color-red">*지금결제를 비활성화하면 견주 대상 이벤트 진행 시 참여가 불가할 수 있습니다.</div>
+				</div>
+				<div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_pay_in_now"><span class="bar"></span></label></div>
+			</div>		
+		</div>
+		<!-- //set-pay-type -->  
+	</div>
+	<!-- //page-body -->
+</section>
+<!-- //container -->
+
+
+<script>
+        function change_push(setting_paytype) {
+                $.ajax({
+                        url: 'data/change_setting_paytype',
+                        type: 'POST',
+                        data: {
+                                'setting_paytype': setting_paytype
+                        },
+                        success: function(data) {
+                                console.log('---------------sssssss-------------');
+                                location.reload();
+                        },
+                        error: function(xhr, status, error) {}
+                });
+        }
+        /*
+        var check = $("input[type='checkbox']");
+        check.click(function() {
+                $(".my_menu_img2 p").toggle();
+                change_push();
+        });
+        var is_push = <?= $is_setting_pay_in_shop ?>;
+        if (is_push == 1) {
+                $(".my_menu_img2 p").toggle();
+        }
+        */
+
+        
+        /*
+        [is_push 값의 의미]
+        1(default) : '매장결제'와 '지금결제' 둘 다 활성화
+        2 : '지금결제'만 활성화
+        0 : '매장결제'만 활성화
+        */
+        var is_push = <?= $is_setting_pay_in_shop ?>;
+        var in_shop = $("input:checkbox[id='setting_pay_in_shop']");
+        var in_now = $("input:checkbox[id='setting_pay_in_now']");
+        
+        if (is_push == 1) {
+                in_shop.prop("checked", true);
+                in_now.prop("checked", true);
+        }else if(is_push == 0){
+                in_shop.prop("checked", false);
+                in_now.prop("checked", true);
+        }else if(is_push == 2){
+                in_shop.prop("checked", true);
+                in_now.prop("checked", false);
+        }
+
+        in_shop.click(function() {
+                if(in_shop.is(":checked")==false && in_now.is(":checked")==false){
+                        alert("매장결제 또는 지금결제 중 한 가지는 필수적으로 선택해야 합니다.");
+                        in_shop.prop("checked", true);
+                        return;
+                }else{
+                        $(".my_menu_img2 p").toggle();
+                        if(in_shop.is(":checked")==true && in_now.is(":checked")==true){
+                                change_push(1);
+                        }else{
+                                change_push(0);
+                        }
+                }
+        });
+
+        in_now.click(function() {
+                if(in_shop.is(":checked")==false && in_now.is(":checked")==false){
+                        alert("매장결제 또는 지금결제 중 한 가지는 필수적으로 선택해야 합니다.");
+                        in_now.prop("checked", true);
+                }else{
+                        $(".my_menu_img2_now p").toggle();
+                        if(in_shop.is(":checked")==true && in_now.is(":checked")==true){
+                                change_push(1);
+                        }else{
+                                change_push(2);
+                        }
+
+                }
+        });
+</script>
+
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>
