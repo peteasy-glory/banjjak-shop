@@ -174,7 +174,7 @@ class Allimtalk{
 
     public function sendBeautyAgree_new($customerNumber, $petName, $shopName, $date, $btnLink){
         $templateNo = "14516";
-        $btnName = "미용동의서";
+        $btnName = "미용동의서 자세히 보기";
         $message = "반려생활의 단짝, 반짝에서 ".$customerNumber."님이 작성해주신 미용동의서를 공유해 드립니다."
 		."\n\n - 이용샵 : ".addslashes($shopName)
 		."\n - 펫 이름 : ".addslashes($petName)

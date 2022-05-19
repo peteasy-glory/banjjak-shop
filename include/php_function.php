@@ -16,7 +16,7 @@ function make_password_hash($pass){
 function make_user_directory($static_directory,$user_id){
 	$mkdir = $static_directory."/".$user_id."/";
 	if (!is_dir($mkdir)) {
-		$old = umask(0);
+        $old = umask(0);
 		mkdir($mkdir);
 		chmod($mkdir,0777);
 		umask($old);
@@ -50,63 +50,71 @@ function check_bad_word($word) {
 }
 function app_push($arr_userapikey,$title,$memo,$path,$image){
 		$result =[];
-// 		global $connection;
-//         $API_ACCESS_KEY= 'AAAAKR8K-yk:APA91bFGTYpY4e0uOZw1IfOmyMc9dQQlDfsXCWKUAkoJBMPudzEdXYuXJVHgkZrmXp8ikj0qKrtb8rV63-jcgCMsEiZaCdwc1bCUyiSrCsayIdcEkFhS29Ok5zK559Bh8c9rYrA-T5cY';
+ 		global $connection;
+        //$API_ACCESS_KEY= 'AAAAKR8K-yk:APA91bFGTYpY4e0uOZw1IfOmyMc9dQQlDfsXCWKUAkoJBMPudzEdXYuXJVHgkZrmXp8ikj0qKrtb8rV63-jcgCMsEiZaCdwc1bCUyiSrCsayIdcEkFhS29Ok5zK559Bh8c9rYrA-T5cY'; // 기존 키값
+
+        $user_agent = $_SERVER['HTTP_USER_AGENT'];
+        if(strpos($user_agent, "app_gopet_partner_and_one_store") > 0){
+            $API_ACCESS_KEY= 'AAAAk71B8O8:APA91bG73bS1yk41VOeiOMmPdRCnPXA6Ar3dcfSYm0dDpbq6XB6TiTgAbht9dne6WtLzCBwZifKwsJ4JCMbs5XkShuyuEKGoGY_MqfW4OEXznrRbHElyzt59e74lwjQQqhpDVwxqMoqK';
+        }else{
+            $API_ACCESS_KEY= 'AAAAexOuErg:APA91bGIHbSkZlt46HZaPelJtBMNPskBVkJ0w9z944k-UkppzuasuiWhpeexSkgnsM3TC7XVExCmkKgbQSk_48-CX54rZmSgtzeLWOjgPbVSdTFJ13No_Hm2kQnH7LxW37fLiS6-_VUE';
+        }
+
 		
-// 		$path = str_replace("http://" , "https://" , $path);
+ 		$path = str_replace("http://" , "https://" , $path);
 
-// 		// https://firebase.google.com/docs/cloud-messaging/http-server-ref		
-//          $postJSONData = array(
-// //                'registration_ids' => $arr_userapikey,
-//                  'content_available' => true,
-//                 'priority' =>'high',
-//                 'notification' => array(
-//                         'title' => $title,
-//                         'body' =>$memo,
-//                         'count' =>'0',
-//                         'sound' =>'default',
-//                         'image' => $image,
-//                         'path' => $path
-//                 ),
-//                  'data'  => array(
-//                         'title' =>$title,
-//                          'msg' =>$memo,
-//                          'count' =>'0',
-//                          'path' =>$path,
-//                         'image' => $image
-//                  )
-//          );
+ 		// https://firebase.google.com/docs/cloud-messaging/http-server-ref		
+          $postJSONData = array(
+ //                'registration_ids' => $arr_userapikey,
+                  'content_available' => true,
+                 'priority' =>'high',
+                 'notification' => array(
+                         'title' => $title,
+                         'body' =>$memo,
+                         'count' =>'0',
+                         'sound' =>'default',
+                         'image' => $image,
+                         'path' => $path
+                 ),
+                  'data'  => array(
+                         'title' =>$title,
+                          'msg' =>$memo,
+                          'count' =>'0',
+                          'path' =>$path,
+                         'image' => $image
+                  )
+          );
 
-// 		$_lst_to_user_token = "";	// 수신자 구분 저장용
-//         if ($arr_userapikey != null && $arr_userapikey != "") {
-//                 if(is_array($arr_userapikey)) {
-//                         $postJSONData['registration_ids'] = $arr_userapikey;	//  멀티캐스트 메시지(둘 이상의 등록 토큰으로 전송된 메시지)의 수신자를 지정
-// 						$_lst_to_user_token = json_encode( $arr_userapikey );
-//                 } else {
-//                         $postJSONData['to'] = $arr_userapikey;	// 수신자 지정
-// 						$_lst_to_user_token = $arr_userapikey;
-//                 }
-//         }
+ 		$_lst_to_user_token = "";	// 수신자 구분 저장용
+         if ($arr_userapikey != null && $arr_userapikey != "") {
+                 if(is_array($arr_userapikey)) {
+                         $postJSONData['registration_ids'] = $arr_userapikey;	//  멀티캐스트 메시지(둘 이상의 등록 토큰으로 전송된 메시지)의 수신자를 지정
+ 						$_lst_to_user_token = json_encode( $arr_userapikey );
+                 } else {
+                         $postJSONData['to'] = $arr_userapikey;	// 수신자 지정
+ 						$_lst_to_user_token = $arr_userapikey;
+                 }
+         }
 
-//          $headers = array
-//          (
-//                 'Authorization: key=' .$API_ACCESS_KEY,
-//                 'Content-Type: application/json'
-//          );
+          $headers = array
+          (
+                 'Authorization: key=' .$API_ACCESS_KEY,
+                 'Content-Type: application/json'
+          );
 
-//         $request_msg =  json_encode( $postJSONData );
-//         //echo $request_msg."<br>";
-//          $ch = curl_init();
-//          curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
-//          curl_setopt( $ch,CURLOPT_POST, true );
-//          curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
-//          curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
-//          curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
-//          curl_setopt( $ch,CURLOPT_POSTFIELDS, $request_msg );
-//          $result = curl_exec($ch );
-//          curl_close( $ch );
+         $request_msg =  json_encode( $postJSONData );
+         //echo $request_msg."<br>";
+          $ch = curl_init();
+          curl_setopt( $ch,CURLOPT_URL, 'https://fcm.googleapis.com/fcm/send' );
+          curl_setopt( $ch,CURLOPT_POST, true );
+          curl_setopt( $ch,CURLOPT_HTTPHEADER, $headers );
+          curl_setopt( $ch,CURLOPT_RETURNTRANSFER, true );
+          curl_setopt( $ch,CURLOPT_SSL_VERIFYPEER, false );
+          curl_setopt( $ch,CURLOPT_POSTFIELDS, $request_msg );
+          $result = curl_exec($ch );
+          curl_close( $ch );
 
-// 		 mysqli_query($connection, "INSERT INTO tb_cron_log (`data`, `result`, `reg_dt`, `lst_to_user_token`) VALUES ('".addslashes($request_msg)."', '".addslashes($result)."', NOW(), '". $_lst_to_user_token ."')");
+ 		 mysqli_query($connection, "INSERT INTO tb_cron_log (`data`, `result`, `reg_dt`, `lst_to_user_token`) VALUES ('".addslashes($request_msg)."', '".addslashes($result)."', NOW(), '". $_lst_to_user_token ."')");
 
          return $result;
 }
@@ -386,9 +394,9 @@ function get_explode_data($data){
 
 //컬럼 형싱 : 으로 분리하기
 function split_text($data){
-	if($data == "")
+    if($data == "") //eaden
 		return null;
-	$data_tmp = explode(",",$data);
+    $data_tmp = explode(",",$data);
 	for($i=0;$i<count($data_tmp);$i++) {
 		$data_new = explode(":", $data_tmp[$i]);
 		$res['name'][] = $data_new[0];

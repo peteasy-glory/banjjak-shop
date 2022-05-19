@@ -198,6 +198,8 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
         alert("준비중입니다.");
     });
 
+    var double_chk = true;
+
     function submit_test(){
         var post_data = decodeURIComponent($("#form_data").serialize());
         if($("input[name=name]").val() == ''){
@@ -240,6 +242,8 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
         }
 
         console.log(post_data);
+    if(double_chk == true){
+        double_chk = false;
         $.ajax({
             type: "POST",
             url: 'data/save_regist',
@@ -247,12 +251,14 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
             // dataType: "JSON",
             success: function(data) {
                  console.log(data);
-                 if (data == "ok"){
+                 const result = $.trim(data);
+                 if(result == "success"){
                     location.href = "home_import_request_4";
-                 } else {
-                     alert("입점신청에 실패했습니다.");
-                     // location.href = "home_import_request_1";
-                     console.log(data);
+                    //alert("성공이다");
+                 }else{
+                     alert("이미 입점신청이 완료되었습니다.");
+                     location.href = "home_import_request_1";
+                     console.log(result);
                  }
             },
             error: function(xhr, status, error) {
@@ -261,6 +267,7 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
                 }
             }
         });
+    }
     }
 
 

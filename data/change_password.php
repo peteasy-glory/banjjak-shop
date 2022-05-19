@@ -1,7 +1,7 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
-$user_id = $_SESSION['gobeauty_user_id'];
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id'] : $_POST['customer_id'] ;
 $user_name = $_SESSION['gobeauty_user_nickname'];
 $find_passwd = isset($_GET['find_passwd']) ? $_GET['find_passwd'] : "";
 

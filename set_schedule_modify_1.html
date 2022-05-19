@@ -89,7 +89,7 @@ if($row["is_sunday"]==1){
 <!-- container -->
 <section id="container">
 	<!-- page-body -->
-    <form action="./data/set_schedule_ajax.php" method="post" name="f" target="hiddenFrame">
+    <form action="./data/set_schedule_ajax" method="post" name="f" target="hiddenFrame">
 	<div class="page-body">
 		<!-- set-schedule-wrap -->
 		<div class="set-schedule-wrap">
@@ -108,7 +108,7 @@ if($row["is_sunday"]==1){
                                             <?php
                                                 for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
                                             ?>
-											<option value="<?php echo date('G',$i);?>" <?php echo ($data["day_start"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+											<option value="<?php echo date('G',$i);?>" <?php echo ($data["day_start"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=12)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
                                             <?php } ?>
 										</select>
 									</div>
@@ -118,7 +118,7 @@ if($row["is_sunday"]==1){
                                             <?php
                                             for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
                                             ?>
-                                                <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_end"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+                                                <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_end"]==date('G',$i))?'selected':'';?>><?php echo (date('H',$i)>=12)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
                                             <?php } ?>
 										</select>
 									</div>
@@ -143,7 +143,7 @@ if($row["is_sunday"]==1){
                                                 <input type="checkbox" name="rest_public_holiday" value="<?=$data["is_rest_holiday"]?>"
                                                        id="switch-toggle" <?php echo ($data["is_rest_holiday"]==0)?'checked':'';?> >
                                                 <span class="bar"></span></label></div>
-									</div>
+                                    </div>
 								</div>
 							</div>
 						</div>
@@ -156,7 +156,7 @@ if($row["is_sunday"]==1){
 									<div class="grid-layout-inner">
                                         <?php
                                             for($i=strtotime($data["day_start"].':00');$i<=strtotime($data["day_end"].':00');$i+=1800){
-                                                $break_value = date('g:i',$i).'~'.date('g:i',$i+1800);
+                                                $break_value = date('H:i',$i).'~'.date('H:i',$i+1800);
                                                 if(in_array($break_value,$break_time)){
                                                     $selected = 'checked';
                                                 } else {
@@ -165,7 +165,7 @@ if($row["is_sunday"]==1){
                                         ?>
 										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle">
                                                 <input type="checkbox" name="break_time[]" value="<?php echo $break_value;?>" <?php echo $selected;?>>
-                                                <em><?php echo (date('H:i',$i)>'12:00')?'오후':'오전';?> <?php echo date('g:i',$i);?></em></label>
+                                                <em><?php echo (date('H:i',$i)>'11:59')?'오후':'오전';?> <?php echo date('g:i',$i);?></em></label>
                                         </div>
                                         <?php } ?>
 									</div>
@@ -234,7 +234,7 @@ if($row["is_sunday"]==1){
                                         }
                                         ?>
                                         <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle">
-                                                <input type="checkbox" name="artist_break_time_<?php echo $artist_cnt;?>[]" class="artist-schedule"  value="<?php echo $break_value;?>" <?php echo $selected;?>>
+                                                <input type="checkbox" name="artist_break_time_<?php echo $artist_cnt;?>[]" class="artist-schedule artist_time_cnt_<?php echo $artist_cnt;?>"  value="<?php echo $break_value;?>" <?php echo $selected;?>>
                                                 <em><?php echo (date('H:i',$i)>'12:00')?'오후':'오전';?> <?php echo date('g:i',$i);?></em></label>
                                         </div>
                                     <?php } ?>
@@ -439,7 +439,7 @@ if($row["is_sunday"]==1){
         var seq = $(this).data('seq');
         $.ajax({
             type: 'post',
-            url: './data/get_book_data_ajax.php',
+            url: './data/get_book_data_ajax',
             data: {'mode':'privateDel', 'seq':seq},
             dataType: 'json',
             error: function(request,status,error) {
@@ -475,17 +475,19 @@ if($row["is_sunday"]==1){
     });
 
     function chk_frm(){
-        var cnt = 0;
-        $('.artist-schedule').each(function(){
-            if($(this).is(':checked')==true){
-                cnt++;
-            }
-        });
 
-        if(cnt < 3){
-            popalert.open('talkExam','최소 2개의 타임을 선택해주세요.');
-            return false;
+        var artist_cnt = <?=$artist_cnt?>;
+        // console.log($('input[name="time2"]:checked').val());
+        if($('input[name="time2"]:checked').val() == 2){
+            for(var i=0; i<artist_cnt; i++){
+                console.log($('.artist_time_cnt_'+i+':checked').length);
+                if($('.artist_time_cnt_'+i+':checked').length < 2){
+                    popalert.open('talkExam1','최소 2개의 타임을 선택해주세요.');
+                    return false;
+                }
+            }
         }
+
 
         document.f.submit();
     }

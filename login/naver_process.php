@@ -2,9 +2,9 @@
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
 	$gender=$_REQUEST["gender"];
-//	$email=$_REQUEST["email"];
+	$email=$_REQUEST["email"];
     //naver
-    $email="pettester@peteasy.kr";
+//    $email="pettester@peteasy.kr";
 	$age=$_REQUEST["age"];
 	$pc=$_REQUEST["pc"];
 
@@ -42,10 +42,10 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 		$artist_flag = $rows->artist_flag;
 		$my_shop_flag = $rows->my_shop_flag;
 
-//		$_SESSION['gobeauty_user_id'] = $rows->id;
+		$_SESSION['gobeauty_user_id'] = $rows->id;
         //naver
-        $_SESSION['gobeauty_user_id'] = "pettester@peteasy.kr";
-        $_SESSION['my_shop_flag']='1';
+        //$_SESSION['gobeauty_user_id'] = "pettester@peteasy.kr";
+        $_SESSION['my_shop_flag'] = $my_shop_flag;
 
 		$_SESSION['gobeauty_user_nickname'] = $rows->nickname;
 
@@ -72,7 +72,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 		if ($user_agent) {
-			$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+			$token_index = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
 			if ($token_index > 0) {
 ?>
 		<script>
@@ -83,7 +83,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 		}
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 		if ($user_agent) {
-			$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+			$token_index = strpos($user_agent, "APP_GOPET_PARTNER_AND");
 			if ($token_index > 0) {
 ?>
 		<script>
@@ -113,11 +113,14 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 			}
 
 			if(getCookie("order_step") == "1"){ // 결제
-				location.href="<?=$item_directory ?>/item_payment.php?no="+getCookie("order_num");
+				//location.href="<?=$item_directory ?>/item_payment.php?no="+getCookie("order_num");
+                location.href="../home_main";
 			}else if(getCookie("order_step") == "2"){ // 조회
-				location.href="../chkodr/?no="+getCookie("order_num");
+				//location.href="../chkodr/?no="+getCookie("order_num");
+                location.href="../home_main";
 			}else if(getCookie("order_step") == "3"){ // 장바구니
-				location.href="<?=$item_directory ?>/item_cart.php?no="+getCookie("order_num");
+				//location.href="<?=$item_directory ?>/item_cart.php?no="+getCookie("order_num");
+                location.href="../home_main";
 			}else{
 				<?php if($my_shop_flag == "1"){ ?>
 					<?php if($pc == "1"){ ?>
@@ -147,11 +150,15 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 		if ($result_login) {
 			$_SESSION['gobeauty_user_id'] = $email;
 			$_SESSION['gobeauty_user_nickname'] = $nickname;
+            //naver
+            //$_SESSION['gobeauty_user_id'] = "pettester@peteasy.kr";
+            //$_SESSION['my_shop_flag']='1';
+
 		}
 
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 		if ($user_agent) {
-			$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+			$token_index = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
 			if ($token_index > 0) {
 ?>
 		<script>
@@ -162,7 +169,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 		}
 		$user_agent = $_SERVER['HTTP_USER_AGENT'];
 		if ($user_agent) {
-			$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+			$token_index = strpos($user_agent, "APP_GOPET_PARTNER_AND");
 			if ($token_index > 0) {
 ?>
 		<script>
@@ -174,7 +181,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
         cookie_save($email,$master_key_name);
 ?>i
 		<script>
-			location.href="../home_main";
+			location.href="naver_cellphone";
 		</script>
 <?php
 	}

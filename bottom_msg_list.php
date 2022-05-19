@@ -21,11 +21,12 @@
         <div class="layer-pop-children">
             <div class="pop-data alert-pop-data">
                 <div class="pop-body type-3">
-                    <div class="msg-txt">승인대기중인 예약이 <span id="a_cnt">0</span>건 </div>
+                    <div class="msg-txt">승인대기중인 예약 <span id="a_cnt">0</span>건 </div>
+                    <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 </div>
                 <div class="pop-footer">
                     <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>
-                    <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_waiting';">승인대기 이동</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_waiting';">지금확인</button> 
                 </div>
             </div>
         </div>
@@ -36,10 +37,11 @@
     <div class="layer-pop-parent">
         <div class="layer-pop-children">
             <div class="pop-data alert-pop-data">
-                <div class="msg-txt">상담대기중인 예약이 <span id="c_cnt">0</span>건 </div>
+                <div class="msg-txt">상담대기중인 예약 <span id="c_cnt">0</span>건 </div>
+                <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 <div class="pop-footer">
-                    <button type="button" class="btn btn-confirm btn-reserv-block" onclick="pop.close();">닫기</button>
-                    <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_advice_list_1';">상담신청 이동</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_advice_list_1';">지금확인</button>
                 </div>
             </div>
         </div>
@@ -53,8 +55,9 @@
             <div class="pop-data alert-pop-data">
 
                 <div class="pop-body type-3">
-                    <div class="msg-txt">승인대기중인 예약이 <span id="a1_cnt">0</span>건 </div>
-                    <div class="msg-txt">상담대기중인 예약이 <span id="c1_cnt">0</span>건 </div>
+                    <div class="msg-txt">승인대기중인 예약 <span id="a1_cnt">0</span>건 </div>
+                    <div class="msg-txt">상담대기중인 예약 <span id="c1_cnt">0</span>건 </div>
+                    <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 </div>
                 <div class="pop-footer">
                     <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>

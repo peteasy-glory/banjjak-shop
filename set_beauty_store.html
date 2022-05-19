@@ -67,7 +67,8 @@ foreach($arr as $list){
 					</div>
 				</div>
 				<!-- actived클래스 추가시 활성화 -->
-				<button type="button" class="btn btn-outline-gray btn-round btn-inline btn-surtax-set actived"><div class="icon"></div>부가세 설정</button>
+				<!--<button type="button" class="btn btn-outline-gray btn-round btn-inline btn-surtax-set actived"><div class="icon"></div>부가세 설정</button>-->
+                <button type="button" class="btn btn-outline-gray btn-round btn-inline btn-surtax-set <?php echo ($data['shop']['is_vat']==1)?'actived':'';?>"><div class="icon"></div>부가세 설정</button>
 			</div>
 			<div class="basic-data-group vsmall">
 				<div class="con-title-group">
@@ -77,7 +78,7 @@ foreach($arr as $list){
 					<div class="wide-tab-inner">
 						<!-- 활성화시 actived클래스 추가 -->
                         <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_management';">미용상품</button></div>
-                        <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_option';">미용 추가옵션</button></div>
+                        <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_option';">추가옵션</button></div>
                         <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_coupon';">쿠폰상품</button></div>
                         <div class="tab-cell actived"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_store';">매장상품</button></div>
 					</div>
@@ -90,7 +91,6 @@ foreach($arr as $list){
 					</div>
                     <?php
                     if(!count($data['product_shop'])){ ?>
-                        ?>
 					<div class="common-none-data">
 						<div class="none-inner">
 							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
@@ -114,6 +114,7 @@ foreach($arr as $list){
 											<span class="accordion-menu-subject">용품</span>
 										</button>
 										<div class="accordion-content">
+                                        <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
 											<div class="read-table">
 												<table>
 													<colgroup>
@@ -148,6 +149,7 @@ foreach($arr as $list){
 											<span class="accordion-menu-subject">간식</span>
 										</button>
 										<div class="accordion-content">
+                                        <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
 											<div class="read-table">
 												<table>
 													<colgroup>
@@ -182,6 +184,7 @@ foreach($arr as $list){
 											<span class="accordion-menu-subject">사료</span>
 										</button>
 										<div class="accordion-content">
+                                        <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
 											<div class="read-table">
 												<table>
 													<colgroup>
@@ -216,6 +219,7 @@ foreach($arr as $list){
 											<span class="accordion-menu-subject">기타</span>
 										</button>
 										<div class="accordion-content">
+                                        <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
 											<div class="read-table">
 												<table>
 													<colgroup>
@@ -281,10 +285,83 @@ foreach($arr as $list){
 		<!-- //set-beauty-management -->  
 	</div>
 	<!-- //page-body -->	
+    <article id="surtaxSet" class="layer-pop-wrap" style="z-index: 100000;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-header">
+                        <h4 class="con-title">부가세 설정</h4>
+                    </div>
+                    <div class="pop-body type-3">
+                        <div class="msg-txt text-align-left font-color-gray">*고객에게 보여지는 가격에 부가세10%를 추가로 받으시는 분은 하단에 있는[부가세 10%추가]버튼을 눌러주세요.<br>(예: 전체미용 가격표 표기 10,000원, 고객이 실제 지불하는 금액 11,000원)</div>
+                        <div class="basic-data-group vvsmall3">
+                            <div class="memo-item type-2">
+                                <div class="flex align-items-center justify-content-space-between">
+                                    <div>부가세 10% 추가</div>
+                                    <div><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" id="is_vat" value="1" <?php echo ($data['shop']['is_vat']==1)?'checked':'';?>><span class="bar"></span></label></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <article id="confirmReload" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            <img src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
 </section>
 <!-- //container -->
+<script>
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_main');
+        });
 
+        //부가세 설정 팝업
+        $(document).on('click','.btn-surtax-set',function(){
+            popalert.open('surtaxSet');
+        });
+
+        //부가세 설정
+        $(document).on('click','#is_vat',function(){
+            var type = '0';
+            var artist_id = '<?php echo $user_id;?>';
+            if($(this).is(':checked')==true){
+                type = '1';
+            }
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'vat','type':type,'artist_id':artist_id},
+                dataType : 'json',
+                success : function(res){
+                    popalert.open('confirmReload',res.error);
+                }, error : function (errors){
+
+                }
+            });
+        });
+
+</script>
 
 <?php
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

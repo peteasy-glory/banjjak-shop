@@ -39,17 +39,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 			$r_time_start = ($_POST["select_time_from"] && $_POST["select_time_from"] != "")? $_POST["select_time_from"] : "";
 			$r_time_end = ($_POST["select_time_to"] && $_POST["select_time_to"] != "")? $_POST["select_time_to"] : "";
             $r_old_name = $_POST["old_name"];
-//            $r_time_start = [];
-//            $r_time_end = [];
-//            $r_time_start = [];
-//            for($i=0; $i<7; $i++) {
-//                $r_time_start[i] = "09:00";
-//                $r_time_end[i] = "09:00";
-//            }
-//            for($i=0; $i<count($r_week); $i++){
-//                $r_time_start[(int)$r_week[$i]] = $tmp_r_time_start[$i];
-//                $r_time_end[(int)$r_week[$i]] = $tmp_r_time_end[$i];
-//            }
 
 			//print_r($r_time_end);
 			if($r_artist_id != "" && $r_name != "" && $r_nicname != ""){
@@ -75,7 +64,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							for($_i = 0; $_i < count($r_time_end); $_i++){
 							    if($r_week[$_i] != '') {
                                     //echo $r_week[$_i]." : ".$r_time_end[$r_week[$_i]];
-                                    $insert_qy .= "('" . $r_artist_id . "', '" . $r_name . "', '" . $r_nicname . "', '" . $r_is_main . "', '" . $r_week[$_i] . "', '" . $r_time_start[$r_week[$_i]] . "', '" . $r_time_end[$r_week[$_i]] . "','" . $_POST['grade'] . "'),";
+                                    $insert_qy .= "('" . $r_artist_id . "', '" . $r_name . "', '" . $r_nicname . "', '" . $r_is_main . "', '" . $r_week[$_i] . "', '" . $r_time_start[$r_week[$_i]] . "', '" . $r_time_end[$r_week[$_i]] . "',NULLIF('" . $_POST['grade'] . "','')),";
                                 }
 							}
 							$insert_qy = substr($insert_qy, 0, -1);
@@ -106,46 +95,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 			}else{
 				$return_data = array("code" => "000001", "data" => "중요 데이터가 누락 되었습니다.");
 			}
-//		}else if($r_mode == "set_update_artist_list_simple"){
-//                if(count($r_week) > 0){
-//                    $sql2 = "
-//							DELETE FROM tb_artist_list
-//							WHERE artist_id = '".$r_artist_id."' AND name = '".$r_name."'
-//						";
-//                    $result = mysqli_query($connection, $sql2);
-//                    //$result = true;
-//                    if($result){
-//                        $insert_qy = "";
-//                        for($_i = 0; $_i < count($r_time_end); $_i++){
-//                            if($r_week[$_i] != '') {
-//                                //echo $r_week[$_i]." : ".$r_time_end[$r_week[$_i]];
-//                                $insert_qy .= "('" . $r_artist_id . "', '" . $r_name . "', '" . $r_nicname . "', '" . $r_is_main . "', '" . $r_week[$_i] . "', '" . $r_time_start[$r_week[$_i]] . "', '" . $r_time_end[$r_week[$_i]] . "','" . $_POST['grade'] . "'),";
-//                            }
-//                        }
-//                        $insert_qy = substr($insert_qy, 0, -1);
-//
-//                        $sql = "
-//								INSERT INTO tb_artist_list (
-//									`artist_id`, `name`, `nicname`, `is_main`, `week`,
-//									`time_start`, `time_end`, `sequ_prnt`
-//								) VALUES ".$insert_qy."
-//							";
-//                        //echo $sql;
-//                        $result = mysqli_query($connection, $sql);
-//                        //$result = true;
-//                        if($result){
-//                            $return_data = array("code" => "000000", "data" => $sql);
-//                        }else{
-//                            $return_data = array("code" => "000002", "data" => "미용사 추가에 실패했습니다.");
-//                        }
-//                    }else{
-//                        $return_data = array("code" => "000002", "data" => "미용사 초기화에 실패했습니다.");
-//                    }
-//                }else{
-//                    $return_data = array("code" => "000003", "data" => "최소 하루는 선택하여 주시기 바랍니다.");
-//                }
-//            }
-        }else if($r_mode == "set_update_artist_list"){
+		}else if($r_mode == "set_update_artist_list"){
 			$r_artist_id = ($_POST["artist_id"] && $_POST["artist_id"] != "")? $_POST["artist_id"] : "";
 			$r_name = ($_POST["name"] && $_POST["name"] != "")? $_POST["name"] : "";
 			$r_is_main = ($_POST["is_main"] != "")? $_POST["is_main"] : "";

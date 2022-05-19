@@ -4,7 +4,9 @@ $shop_title	= "상품관리";
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
 
+$emoji = new TEmoji();
 
 $backurl = $_GET['backurl'];
 $user_id = $_SESSION['gobeauty_user_id'];
@@ -92,18 +94,18 @@ while($row = mysqli_fetch_assoc($result)){
     $data["product_cat"][] = $row;
 }
 
-if($data['product_dog_common'][0]['in_shop_product'] == '0' && $data['product_dog_common'][0]['out_shop_product'] == '1'){
+if($data['product_dog_common'][0]['in_shop_product'] == '1' && $data['product_dog_common'][0]['out_shop_product'] == '0'){
     $sale_type = '매장상품';
-} else if($data['product_dog_common'][0]['in_shop_product'] == '1' && $data['product_dog_common'][0]['out_shop_product'] == '0'){
+} else if($data['product_dog_common'][0]['in_shop_product'] == '0' && $data['product_dog_common'][0]['out_shop_product'] == '1'){
     $sale_type = '출장상품';
 } else if($data['product_dog_common'][0]['in_shop_product'] == '1' && $data['product_dog_common'][0]['out_shop_product'] == '1'){
     $sale_type = '출장/매장';
 }
 
 
-if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0]['out_shop_product'] == '1'){
+if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0]['out_shop_product'] == '0'){
     $sale_type_cat = '매장상품';
-} else if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0]['out_shop_product'] == '0'){
+} else if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0]['out_shop_product'] == '1'){
     $sale_type_cat = '출장상품';
 } else if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0]['out_shop_product'] == '1'){
     $sale_type_cat = '출장/매장';
@@ -137,7 +139,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                     <div class="wide-tab-inner">
                         <!-- 활성화시 actived클래스 추가 -->
                         <div class="tab-cell actived"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_management';">미용상품</button></div>
-                        <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_option';">미용 추가옵션</button></div>
+                        <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_option';">추가옵션</button></div>
                         <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_coupon';">쿠폰상품</button></div>
                         <div class="tab-cell"><button type="button" class="btn-tab-item" onclick="location.href='./set_beauty_store';">매장상품</button></div>
                     </div>
@@ -169,6 +171,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                     <span class="accordion-menu-subject">미용별 소요시간</span>
                                 </button>
                                 <div class="accordion-content">
+                                <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
                                     <!-- 6개 이하 칼람일 경우 -->
                                     <?php
                                         $cnt = $disp_cnt = 0;
@@ -222,7 +225,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                         </table>
                                     </div>
 
-                                    <div class="read-table-info">(단위:분)</div>
+                                    <!--<div class="read-table-info">(단위:분)</div>-->
                                     <?php } else {?>
                                     <!-- //6개 이하 칼람일 경우 -->
                                     <!-- 7개 이상 칼람일 경우 -->
@@ -336,9 +339,9 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                         //무게
                                         $kgs = explode(",",$rs['kgs']);
 
-                                        if($rs['in_shop_product'] == '0' && $rs['out_shop_product'] == '1'){
+                                        if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '0'){
                                             $sale_type = '매장상품';
-                                        } else if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '0'){
+                                        } else if($rs['in_shop_product'] == '0' && $rs['out_shop_product'] == '1'){
                                             $sale_type = '출장상품';
                                         } else if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '1'){
                                             $sale_type = '출장/매장';
@@ -349,24 +352,36 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                     <span class="accordion-menu-subject"><?php echo ($rs['direct_title']!='')?$rs['direct_title']:$rs['second_type'];?><div class="label label-outline-black middle"><?php echo $sale_type;?></div></span>
                                 </button>
                                 <div class="accordion-content">
+                                <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
                                     <div class="read-table">
                                         <table>
                                             <colgroup>
                                                 <?php
+                                                $real_cnt = 0;
                                                 for($i=0;$i<count($dog_product_title);$i++){
+                                                    $is_beauty_price = $rs[$dog_product_seq[$dog_product_title[$i]].'_price'];
+                                                    if($is_beauty_price && $is_beauty_price != ''){
+                                                        $real_cnt = $real_cnt+1;
                                                 ?>
                                                 <col style="width:auto;">
-                                                <?php } ?>
+                                                <?php 
+                                                    }
+                                                }
+                                                    ?>
                                             </colgroup>
                                             <thead>
                                             <tr>
                                                 <th>무게</th>
                                                 <?php
                                                 for($i=0;$i<count($dog_product_title);$i++){
-
+                                                    $is_beauty_price = $rs[$dog_product_seq[$dog_product_title[$i]].'_price'];
+                                                    if($is_beauty_price && $is_beauty_price != ''){
                                                 ?>
                                                     <th><?php echo $dog_product_title[$i];?></th>
-                                                <?php } ?>
+                                                <?php 
+                                                    }
+                                                }
+                                                ?>
                                             </tr>
                                             </thead>
                                             <tbody>
@@ -380,11 +395,22 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                                 <?php
                                                 $total_cnt = count($dog_product_title);
                                                 for($j=0;$j<count($dog_product_title);$j++){
+                                                    $is_beauty_price = $rs[$dog_product_seq[$dog_product_title[$j]].'_price'];
                                                     $beauty_price = explode(",",$rs[$dog_product_seq[$dog_product_title[$j]].'_price']);
                                                     $consult = explode(",",$rs['is_consult_'.$dog_product_seq[$dog_product_title[$j]]]);
+                                                    if($beauty_price[$i] && $beauty_price[$i] != ''){
                                                 ?>
                                                 <td><?php echo ($consult[$i]==1)?'상담':number_format($beauty_price[$i]);?></td>
-                                                <?php } ?>
+                                                <?php 
+                                                    }else if($is_beauty_price == ''){
+
+                                                    }else{
+                                                        ?>
+                                                        <td></td>
+                                                        <?php
+                                                    }
+                                                } 
+                                                ?>
                                             </tr>
                                                 <?php } ?>
                                             <!--<tr>
@@ -395,7 +421,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                             <?php if($rs['is_over_kgs']==1){ ?>
                                             <tr>
                                                 <th><?php echo $rs['what_over_kgs'];?>kg~</th>
-                                                <td colspan="<?php echo $total_cnt;?>">kg당 <?php echo number_format($rs['over_kgs_price']);?>원 추가</td>
+                                                <td colspan="<?php echo $real_cnt;?>">kg당 <?php echo number_format($rs['over_kgs_price']);?>원 추가</td>
                                             </tr>
                                             <?php } ?>
                                             </tbody>
@@ -405,13 +431,13 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                     <div class="basic-data-group vsmall">
                                         <div class="memo-item large">
                                             <div class="memo-item-title">상품별 안내사항</div>
-                                            <div class="memo-item-txt"><?php echo $rs['add_comment'];?></div>
+                                            <div class="memo-item-txt"><?php echo nl2br($emoji->emojiDBToStr($rs['add_comment']));?></div>
                                         </div>
                                     </div>
                                     <div class="basic-data-group vvsmall3">
                                         <div class="grid-layout btn-grid-group">
                                             <div class="grid-layout-inner">
-                                                <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='./set_beauty_management_add?second_type=<?php echo ($rs['direct_title']!='')?'직접입력':$rs['second_type'];?>&direct_title=<?php echo ($rs['direct_title']!='')?$rs['direct_title']:'';?>&backurl=set_beauty_management'">수정</a></div>
+                                                <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='./set_beauty_management_add?direct_title=<?php echo ($rs['direct_title']!='')?$rs['direct_title']:'';?>&backurl=set_beauty_management&second_type=<?php echo ($rs['direct_title']!='')?'직접입력':$rs['second_type'];?>'">수정</a></div>
                                                 <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round btn-del-beauty" data-type="<?php echo '개|'.$rs['second_type'];?>">삭제</a></div>
                                             </div>
                                         </div>
@@ -427,9 +453,9 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                 $rs = sql_fetch($res);
                                 if($rs['customer_id']){
                                 $n_section = get_explode_data($rs['section']);
-                                    if($rs['in_shop_product'] == '0' && $rs['out_shop_product'] == '1'){
+                                    if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '0'){
                                         $sale_type = '매장상품';
-                                    } else if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '0'){
+                                    } else if($rs['in_shop_product'] == '0' && $rs['out_shop_product'] == '1'){
                                         $sale_type = '출장상품';
                                     } else if($rs['in_shop_product'] == '1' && $rs['out_shop_product'] == '1'){
                                         $sale_type = '출장/매장';
@@ -444,6 +470,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                     <span class="accordion-menu-subject">고양이 미용<div class="label label-outline-pink middle"><?php echo $sale_type;?></div></span>
                                 </button>
                                 <div class="accordion-content">
+                                <?php echo ($data['shop']['is_vat']==1)?'* 부가세 10% 별도':'';?>
                                     <div>
                                         <div class="basic-data-group vmiddle">
                                             <div class="read-table">
@@ -616,7 +643,7 @@ if($data['product_cat'][0]['in_shop_product'] == '0' && $data['product_cat'][0][
                                     <div class="basic-data-group vsmall">
                                         <div class="memo-item large">
                                             <div class="memo-item-title">상품별 안내사항</div>
-                                            <div class="memo-item-txt">프론트 샵페이지 상품하단에 위치하는 안내입니다.</div>
+                                            <div class="memo-item-txt"><?php echo nl2br($rs['add_comment']);?></div>
                                         </div>
                                     </div>
                                     <div class="btn-basic-action">

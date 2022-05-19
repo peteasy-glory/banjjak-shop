@@ -27,7 +27,6 @@ $header_right	= '';
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
-
 $payment_log_seq = $_GET['payment_log_seq'];
 $artist_id = $_GET['artist_id'];
 
@@ -56,7 +55,7 @@ if ($rows = mysqli_fetch_object($result)) {
 		
 		<div class="master-review-wrap">
 			<div class="review-write-form">
-				<form name="regFrm" method="post" action="data/insert_usage_review_reply_pc.php">
+				<form name="regFrm" method="post" action="data/insert_usage_review_reply_pc">  
 					<input type="hidden" name="payment_log_seq" value="<?= $payment_log_seq ?>">
 					<input type="hidden" name="artist_id" value="<?= $artist_id ?>">
 				<div class="form-group">					
@@ -64,10 +63,7 @@ if ($rows = mysqli_fetch_object($result)) {
 						<div class="form-group-item">
 							<div class="form-item-label">내용</div>
 							<div class="form-item-data">
-								<!-- 20211223 수정 -->
-                                <textarea name="memo" id="memo" cols="30" rows="10"><?= $memo ?></textarea>
-								<!--<input type="text" name="memo" value="<?/*= $memo */?>" class="form-control" placeholder="내용을 입력해 주세요">-->
-								<!-- //20211223 수정 -->
+                            <textarea name="memo" id="memo" cols="30" rows="10"><?= $memo ?></textarea>
 							</div>
 						</div>
 					</div>
@@ -85,9 +81,9 @@ if ($rows = mysqli_fetch_object($result)) {
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="javascript:;" class="btn-page-bottom disabled btn-submit">저장하기</a>
-	</div>
-	<!-- //page-bottom -->
+<a href="javascript:;" class="btn-page-bottom disabled btn-submit">저장하기</a>
+        </div>
+        <!-- //page-bottom -->
     <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
         <div class="layer-pop-parent">
             <div class="layer-pop-children">
@@ -128,7 +124,7 @@ if ($rows = mysqli_fetch_object($result)) {
 </section>
 <!-- //container -->
 <script>
-	$(document).ready(function(){
+        $(document).ready(function(){
         $('.btn-submit').on('click',function(){
             if($('#memo').val() == ''){
                 popalert.open('talkExam');
@@ -137,13 +133,13 @@ if ($rows = mysqli_fetch_object($result)) {
             popalert.open('talkExam1');
 
         });
-	})
+        })
     $(document).ready(function(){
         $('#header_bell').css('display','none');
         $('#btn_page_prev').prop('href','shop_review_list')
     });
 </script>
-		
+
 <?
 //include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

@@ -15,6 +15,7 @@ echo $que;
 $res = sql_query($que);
 $row = sql_fetch($res);
 $rs = explode("|",$row['product']);
+$is_vat = $row['is_vat'];
 
 $option_name = array('bath_price'=>'목욕',
     'part_price'=>'부분미용',
@@ -56,9 +57,24 @@ if($pet[0]['type']=='dog') {
     $w3 = explode(":", $_POST['hair_length']);
     $total_price += $w3[1];
 
+    /*
     $product .= $_POST['hair_type'] . '|';
     $w4 = explode(":", $_POST['hair_type']);
     $total_price += $w4[1];
+    */
+    // 털특징별 중복선택 가능
+    $hair_type_cnt = count($_POST['hair_type']);
+    if ($hair_type_cnt == 0) {
+        $product .= '|';
+    } else {
+
+        for ($i = 0; $i < count($_POST['hair_type']); $i++) {
+            $hair_type_price = explode(':', $_POST['hair_type'][$i]);
+            $total_price += $hair_type_price[1];
+            $product .= $_POST['hair_type'][$i] . ',';
+        }
+        $product = substr($product , 0, -1).'|';
+    }
 
 
     $leg_other_cnt = count($_POST['leg']);
@@ -148,7 +164,7 @@ if($pet[0]['type']=='dog') {
     }
 
     $etc_total_cnt = count($_POST['etc']);
-    if ($spa_total_cnt == 0) {
+    if ($etc_total_cnt == 0) {
         $product .= '0|';
     } else {
         $product .= $etc_total_cnt . '|';
@@ -179,6 +195,7 @@ if($pet[0]['type']=='dog') {
     }
     //미용 단모/장모
     $product .= $_POST['hair'].'|';
+    $total_price += explode(':',$_POST['hair'])[1];
     //발톱
     if(!empty($_POST['cat_toenail'])){
         $product .= $_POST['cat_toenail'].'|';
@@ -194,11 +211,13 @@ if($pet[0]['type']=='dog') {
     } else {
         $product .= '|';
     }
+    $total_price += $bath[1];
     //추가 서비스
     $etc_cnt = count($_POST['cat_etc']);
     $product .= $etc_cnt.'|';
     for($i=0;$i<count($_POST['cat_etc']);$i++){
         $product .= $_POST['cat_etc'][$i].'|';
+        $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
 
 }
@@ -244,7 +263,7 @@ if($pet[0]['type']=='dog') {
 
         if($result) {
             $sql3 = "INSERT INTO tb_coupon_history SET ";
-            $sql3 .= "coupon_seq            = '{$_POST['customer_id']}', ";
+            $sql3 .= "coupon_seq            = '{$_POST['cp'][$b]}', ";
             $sql3 .= "user_coupon_seq       = '{$id}', ";
             $sql3 .= "payment_log_seq       = '{$_POST['seq']}', ";
             $sql3 .= "amount                = '{$tbc[0]['given']}', ";
@@ -338,11 +357,14 @@ if ($goods_cnt > 0) {
 
     //echo $product."<p>";
 
-
-
+    // 최종가격 업데이트(현금결제로 하더라도 일단 카드로 바꾼 후 가격 적용)
+    if($is_vat == '1'){
+        $total_price = $total_price*1.1;
+    }
 
     $que = "UPDATE tb_payment_log SET ";
-    $que .= "local_price        = '{$_POST['total']}', ";
+    $que .= "local_price        = '{$total_price}', ";
+    $que .= "local_price_cash        = '0', ";
     if ($_POST['coupon_use_yn'] == 'y') {
         $que .= "is_coupon          = 'Y', ";
     }

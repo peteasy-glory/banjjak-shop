@@ -16,7 +16,7 @@
 
 <?php
 		exit;
-	}elseif(isset($_SESSION['gobeauty_user_id']) && $_SESSION['my_shop_flag']!='1') {
+	}elseif(isset($_SESSION['gobeauty_user_id']) && $_SESSION['my_shop_flag']!='1' && $_SESSION['artist_flag']!=true) {
 		?>
 		<script>
 		location.href="/join5";

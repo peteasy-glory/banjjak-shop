@@ -104,9 +104,9 @@ $dog_type = "'소형견미용','중형견미용','대형견미용','특수견미
 $sql = "
 	SELECT * 
 	FROM tb_product_dog_static 
-	WHERE customer_id = '".$user_id."' AND second_type = '{$_GET['second_type']}'
+	WHERE customer_id = '".$user_id."' AND second_type = '{$second_type}'
 	";
-if(isset($_GET['direct_title'])){
+if(isset($_GET['direct_title']) && $_GET['direct_title'] != ''){
     $sql .= " AND direct_title = '{$_GET['direct_title']}'";
 }
 //echo $sql;
@@ -176,12 +176,12 @@ for($j=0;$j<count($option_chk_name);$j++){
                                                 <div class="grid-layout-inner">
                                                     <div class="grid-layout-cell grid-3">
                                                         <label class="form-toggle-box middle">
-                                                            <input type="radio" name="offer" value="01" <?php echo (($data['product_dog_static'][0]['in_shop_product']=='0' && $data['product_dog_static'][0]['out_shop_product']=='1') || !isset($data['product_dog_static'][0]['in_shop_product']) )?'checked':''; ?>><em>매장상품</em>
+                                                            <input type="radio" name="offer" value="10" <?php echo (($data['product_dog_static'][0]['in_shop_product']=='1' && $data['product_dog_static'][0]['out_shop_product']=='0') || !isset($data['product_dog_static'][0]['in_shop_product']) )?'checked':''; ?>><em>매장상품</em>
                                                         </label>
                                                     </div>
                                                     <div class="grid-layout-cell grid-3">
                                                         <label class="form-toggle-box middle">
-                                                            <input type="radio" name="offer" value="10" <?php echo ($data['product_dog_static'][0]['in_shop_product']=='1' && $data['product_dog_static'][0]['out_shop_product']=='0')?'checked':''; ?>><em>출장상품</em>
+                                                            <input type="radio" name="offer" value="01" <?php echo ($data['product_dog_static'][0]['in_shop_product']=='0' && $data['product_dog_static'][0]['out_shop_product']=='1')?'checked':''; ?>><em>출장상품</em>
                                                         </label>
                                                     </div>
                                                     <div class="grid-layout-cell grid-3">
@@ -291,12 +291,14 @@ for($j=0;$j<count($option_chk_name);$j++){
                                                                     <div class="form-table-select">
                                                                         <select name="kgs[]">
                                                                             <option value="">선택안함</option>
-                                                                            <?php for($i=1;$i<6;$i+=0.1){ ?>
-                                                                                <option value="<?php echo $i;?>"
+                                                                            <?php for($i=1;$i<60;$i+=0.1){ 
+                                                                                $_i = round($i,1);
+                                                                                ?>
+                                                                                <option value="<?php echo $_i;?>"
                                                                                     <?php
-                                                                                    echo ( trim($i) == $tmp_kgs[($option_val-1)])?'selected':'';
+                                                                                    echo ( trim($_i) == $tmp_kgs[($option_val-1)])?'selected':'';
                                                                                     ?>
-                                                                                >~<?php echo $i;?>kg</option>
+                                                                                >~<?php echo $_i;?>kg</option>
                                                                             <?php } ?>
                                                                         </select>
                                                                     </div>
@@ -308,7 +310,7 @@ for($j=0;$j<count($option_chk_name);$j++){
                                                                         <div class="form-table-select">
                                                                             <select name="<?php echo $dog_product_seq[$dog_product_title[$j]];?>_price[]">
                                                                                 <option value="">선택안함</option>
-                                                                                <?php for($i=1000;$i<=10000;$i+=500){ ?>
+                                                                                <?php for($i=1000;$i<=400000;$i+=500){ ?>
                                                                                     <option value="<?php echo $i;?>"
                                                                                         <?php
                                                                                         echo (trim($i) == ${tmp.'_'.$dog_product_seq[$dog_product_title[$j]].'_price'}[($option_val-1)])?'selected':'';
@@ -518,6 +520,10 @@ for($j=0;$j<count($option_chk_name);$j++){
         }
         return true;
     }
+
+    $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_beauty_management')
+        });
 
 
 </script>

@@ -7,8 +7,8 @@ class App {
 		$this->app = 0;
 		if (user_agent) {
 			$and_idx = strpos(strtolower($user_agent), "app_gopet_partner_and");
-			//$and_one_idx = strpos(strtolower($user_agent), "app_gopet_partner_and_one_store");
-			$ios_idx = strpos(strtolower($user_agent), "app_gopet_partner_ios");
+            //$and_one_idx = strpos(strtolower($user_agent), "app_gopet_partner_and_one_store");
+            $ios_idx = strpos(strtolower($user_agent), "app_gopet_partner_ios");
 
 		        if ($and_idx > -1) {
         		        $this->app = 1;

@@ -13,7 +13,7 @@ $check_delete_db = "false";
 
 if(@unlink($old_image_path)){
     $check_delete_old_image = "true";
-    $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
+        $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
     $s3->deleteFileToS3(substr($path, 1));
 }
 

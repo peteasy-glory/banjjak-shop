@@ -92,7 +92,7 @@ switch($clear['mode']){
 
 
 
-        echo "<script>location.href = '../set_beauty_store_add';</script>";
+        echo "<script>location.href = '../set_beauty_store';</script>";
     break;
 
     //데이터 한개 삭제

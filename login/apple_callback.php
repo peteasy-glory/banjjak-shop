@@ -58,8 +58,8 @@
 
 		//print_r($claims);
 
-//		header("LOCATION: https://partner.banjjakpet.com/login/apple_cellphone?status=success&email={$claims->email}&sub={$claims->sub}");
-        header("LOCATION: https://partner.banjjakpet.com/login/apple_cellphone?status=success&email=pettester@peteasy.kr&sub={$claims->sub}");
+		header("LOCATION: https://partner.banjjakpet.com/login/apple_cellphone?status=success&email={$claims->email}&sub={$claims->sub}");
+//        header("LOCATION: https://partner.banjjakpet.com/login/apple_cellphone?status=success&email=pettester@peteasy.kr&sub={$claims->sub}");
 
 
 	}else{

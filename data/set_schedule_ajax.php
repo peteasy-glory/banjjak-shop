@@ -16,7 +16,6 @@ if($row[0]['cnt']>0) {
     $que = "UPDATE tb_working_schedule SET ";
     $que .= "working_start = '{$_POST['day_start']}', ";
     $que .= "working_end = '{$_POST['day_end']}', ";
-
     if(!isset($_POST['rest_public_holiday'])) {
         $que .= "rest_public_holiday = '1', ";
     } else {
@@ -83,7 +82,8 @@ foreach($rs as $rs){
         $sql = "
 						SELECT COUNT(*) AS cnt
 						FROM tb_time_schedule
-						WHERE artist_id = '" . $rs['name'] . "'
+                        WHERE artist_id = '".$user_id."'
+						AND artist_name = '" . $rs['name'] . "';
 					"; // 타임제 스케줄
         //echo $sql."<p>";
         $row = sql_fetch_array($sql);
@@ -118,32 +118,43 @@ $sql = "
         ";
 //echo $sql;
 $row = sql_fetch_array($sql);
+
+$btime = ($btime)? $btime : 0;
+$is_monday = ($_POST['is_monday'])? $_POST['is_monday'] : 0;
+$is_tuesday = ($_POST['is_tuesday'])? $_POST['is_tuesday'] : 0;
+$is_wednesday = ($_POST['is_wednesday'])? $_POST['is_wednesday'] : 0;
+$is_thursday = ($_POST['is_thursday'])? $_POST['is_thursday'] : 0;
+$is_friday = ($_POST['is_friday'])? $_POST['is_friday'] : 0;
+$is_saturday = ($_POST['is_saturday'])? $_POST['is_saturday'] : 0;
+$is_sunday = ($_POST['is_sunday'])? $_POST['is_sunday'] : 0;
+
+
 if($row[0]['cnt']>0) {
     $que = "UPDATE tb_regular_holiday SET ";
     $que .= "is_sunday          = '{$btime}', ";
-    $que .= "is_monday          = '{$_POST['is_monday']}', ";
-    $que .= "is_tuesday         = '{$_POST['is_tuesday']}', ";
-    $que .= "is_wednesday       = '{$_POST['is_wednesday']}', ";
-    $que .= "is_thursday        = '{$_POST['is_thursday']}', ";
-    $que .= "is_friday          = '{$_POST['is_friday']}', ";
-    $que .= "is_saturday        = '{$_POST['is_saturday']}', ";
-    $que .= "is_sunday          = '{$_POST['is_sunday']}', ";
+    $que .= "is_monday          = '{$is_monday}', ";
+    $que .= "is_tuesday         = '{$is_tuesday}', ";
+    $que .= "is_wednesday       = '{$is_wednesday}', ";
+    $que .= "is_thursday        = '{$is_thursday}', ";
+    $que .= "is_friday          = '{$is_friday}', ";
+    $que .= "is_saturday        = '{$is_saturday}', ";
+    $que .= "is_sunday          = '{$is_sunday}', ";
     $que .= "week_type          = '{$_POST['time4']}', ";
-    $que .= "update_time        = NOW()";
+    $que .= "update_time        = NOW() ";
     $que .= "WHERE customer_id  = '{$user_id}'";
 } else {
     $que = "INSERT INTO tb_regular_holiday SET ";
     $que .= "customer_id        = '{$user_id}', ";
     $que .= "is_sunday          = '{$btime}', ";
-    $que .= "is_monday          = '{$_POST['is_monday']}', ";
-    $que .= "is_tuesday         = '{$_POST['is_tuesday']}', ";
-    $que .= "is_wednesday       = '{$_POST['is_wednesday']}', ";
-    $que .= "is_thursday        = '{$_POST['is_thursday']}', ";
-    $que .= "is_friday          = '{$_POST['is_friday']}', ";
-    $que .= "is_saturday        = '{$_POST['is_saturday']}', ";
-    $que .= "is_sunday          = '{$_POST['is_sunday']}', ";
+    $que .= "is_monday          = '{$is_monday}', ";
+    $que .= "is_tuesday         = '{$is_tuesday}', ";
+    $que .= "is_wednesday       = '{$is_wednesday}', ";
+    $que .= "is_thursday        = '{$is_thursday}', ";
+    $que .= "is_friday          = '{$is_friday}', ";
+    $que .= "is_saturday        = '{$is_saturday}', ";
+    $que .= "is_sunday          = '{$is_sunday}', ";
     $que .= "week_type          = '{$_POST['time4']}', ";
-    $que .= "update_time        = NOW()";
+    $que .= "update_time        = NOW() ";
 }
 //echo $que;
 sql_query($que);

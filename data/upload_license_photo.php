@@ -10,7 +10,7 @@ make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
 
 // 설정
 $allowed_ext = array('jpg','jpeg','png','gif');
-
+ 
 // 변수 정리
 $error = $_FILES['myfile']['error'];
 $name = $_FILES['myfile']['name'];
@@ -33,13 +33,13 @@ if( $error != UPLOAD_ERR_OK ) {
 	}
 	exit;
 }
-
+ 
 // 확장자 확인
 if( !in_array(strtolower($ext), $allowed_ext) ) {
 	echo "허용되지 않는 확장자입니다.";
 	exit;
 }
-
+ 
 // 파일 이동
 $upload_direcoty_full_path = $upload_directory2."/".$new_filename;
 move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory2.$upload_direcoty_full_path);
@@ -47,6 +47,7 @@ move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory2.$up
 $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
 $s3->resizeImage($upload_static_directory2.$upload_direcoty_full_path, $upload_static_directory2.$upload_direcoty_full_path);
 $s3->fileToS3($upload_static_directory2.$upload_direcoty_full_path, $upload_directory."/".$new_filename);
+
 
 ?>
 {"upfilename": "<?=$upload_direcoty_full_path?>","allpath": "<?="https://image.banjjakpet.com".$upload_direcoty_full_path?>","msg": ""}

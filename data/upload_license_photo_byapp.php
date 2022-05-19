@@ -15,7 +15,6 @@ $allowed_ext = array('jpg','jpeg','png','gif');
 
 $filename = $_REQUEST['filepath'];
 $filename = trim($filename);
-
 $new_filename = $_REQUEST['newfilepath'];
 $new_filename = trim($new_filename);
 $ext = array_pop(explode('.', $filename));
@@ -43,6 +42,7 @@ if( !in_array(strtolower($ext), $allowed_ext) ) {
 }
  
 $upload_direcoty_full_path = $upload_directory2."/".$new_filename;
+//move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory2.$upload_direcoty_full_path);
 
 $oldfile = $upload_static_directory2."/upload/appupload/".$filename;
 $newfile = $upload_static_directory2.$upload_direcoty_full_path;
@@ -106,7 +106,6 @@ $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+
 $s3->resizeImage($target, $target);
 $s3->fileToS3($target, $upload_directory."/".$new_filename);
 @unlink($imgpath);
-
 ?>
-
 {"upfilename": "<?=$upload_direcoty_full_path?>","allpath": "<?="https://image.banjjakpet.com".$upload_direcoty_full_path?>","msg": "","imagewidth": "300"}
+

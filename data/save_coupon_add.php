@@ -106,7 +106,7 @@ switch($clear['mode']){
         }
         //echo $sql."<br>";
         sql_query($sql);
-        echo "<script>location.href = '../set_beauty_coupon_add';</script>";
+        echo "<script>location.href = '../set_beauty_coupon';</script>";
     break;
 
     //데이터 한개 삭제

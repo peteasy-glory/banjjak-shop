@@ -6,6 +6,10 @@ function img_link_change_header($url){
 	return $url;
 }
 
+if($_SESSION['artist_flag'] === true){
+    $footer_menu = false;
+}
+
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
 if ($artist_flag === true) {
@@ -68,7 +72,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 	}
 
     //----- 본인 정보 가져오기
-    $customer_sql = "select * from tb_customer where id = '" . $user_id . "'";
+    $customer_sql = "select * from tb_customer where id = '" . $_SESSION['gobeauty_user_id'] . "'";
     $customer_result = mysqli_query($connection, $customer_sql);
     $customer_datas = mysqli_fetch_object($customer_result);
     $nickname = $customer_datas->nickname;
@@ -85,6 +89,8 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 	<meta charset="utf-8">
 	<!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0 , maximum-scale=1.0, user-scalable=no" />
+    <link rel="shortcut icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.ico">
+    <link rel="icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.png">
     <!--<meta name="viewport" content="user-scalable=no" />-->
 	<title>반짝</title>
 	<meta name="format-detection" content="telephone=no">
@@ -101,8 +107,34 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
     <script type="text/javascript" src="https://ssl.daumcdn.net/dmaps/map_js_init/postcode.v2.js"></script>
     <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f2cf1f3b7e2ca88cb298196078ef550f&libraries=services"></script>
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-D73FL6EC4X"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'G-D73FL6EC4X');
+    </script>
+
 </head>
 <body>        
+
+<!-- 로딩화면 -->
+<div id="loading" class="actived">
+    <div class="loading-wrap">
+        <div class="loading-bar">
+            <div class="loading-obj">
+                <svg xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="50%" cy="50%" r="24"  class="background" stroke-linecap="butt"></circle>
+                    <circle cx="50%" cy="50%" r="24"  class="yellow" stroke-linecap="butt" ></circle>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- [필수사항]을(를) 입력해주세요.  -->
 <article id="firstRequestMsg1" class="layer-pop-wrap">
 	<div class="layer-pop-parent">
@@ -175,7 +207,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 			<div class="user-main-info">
 				<div class="info-item-wrap">
 					<div class="thumb-data">
-						<div class="content-thumb small"><img src="<?= img_link_change_header($front_image) ?>" alt=""></div>
+						<div class="content-thumb small"><img src="https://image.banjjakpet.com<?= img_link_change_header($front_image) ?>" alt=""></div>
 					</div>
 					<div class="txt-data align-self-start">
 						<div class="txt-data-inner">
@@ -204,7 +236,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 						<!-- list-cell 클래스에 actived클래스 추가시 활성화 -->
 						<div id="hiddenReserve" style="display:none;"></div>
 						<div class="list-cell" id="reserve_advice_list_1"  ><a href="reserve_advice_list_1" class="btn-single-item arrow"><div class="txt">상담 대기</div></a></div>
-						<div class="list-cell" id="reserve_accept"><a href="reserve_accept" class="btn-single-item arrow"><div class="txt">예약 접수하기<div class="tag-item"></div></div></a></div>
+						<div class="list-cell" id="reserve_accept"><a href="reserve_main_week" class="btn-single-item arrow"><div class="txt">예약 접수하기<div class="tag-item"></div></div></a></div>
 					</div>
 				</div>
 				<div class="basic-data-group">
@@ -217,9 +249,10 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 						<div id="hiddenCustomer" style="display:none;"></div>
 						<div class="list-cell" id="customer_all_inquiry1"><a href="customer_all_inquiry1" class="btn-single-item arrow"><div class="txt">전체 고객 조회</div></a></div>
 						<div class="list-cell" id="customer_pet_new" ><a href="customer_pet_new" class="btn-single-item arrow"><div class="txt">신규 등록</div></a></div>
-						<div class="list-cell" id="customer_grade"><a href="customer_grade" class="btn-single-item arrow"><div class="txt">회원 등급 설정</div></a></div>
+						<!--<div class="list-cell" id="customer_grade"><a href="customer_grade" class="btn-single-item arrow"><div class="txt">회원 등급 설정</div></a></div>-->
 					</div>
 				</div>
+                <?php if($_SESSION['artist_flag'] !== true){ ?>
 				<div class="basic-data-group">
 					<div class="con-title-group">
 						<button type="button" class="btn-gnb-toggle-menu" onClick="location.href='shop_main';"><span class="icons"><span class="icon icon-size-24 icon-shop-black off"></span><span class="icon icon-size-24 icon-shop-black-fill on"></span></span>샵 관리</button>
@@ -252,10 +285,11 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 						<button type="button" class="btn-gnb-toggle-menu"><span class="icons"><span class="icon icon-size-24 icon-money-black off"></span><span class="icon icon-size-24 icon-money-black-fill on"></span></span>판매 실적</button>
 					</div>
 					<div class="single-btns-list">
-<!--						<div class="list-cell" id="stats_sale" ><a href="stats_sale" class="btn-single-item arrow"><div class="txt">판매실적 조회</div></a></div> -->
-                        <div class="list-cell" id="stats_sale" ><a href="javascript:popalert.confirm('firstRequestMsg1','준비중입니다.','home_main');" class="btn-single-item arrow"><div class="txt">판매실적 조회</div></a></div>
+						<div class="list-cell" id="stats_sale" ><a href="stats_sale" class="btn-single-item arrow"><div class="txt">판매실적 조회</div></a></div>
+                        <!--<div class="list-cell" id="stats_sale" ><a href="javascript:popalert.confirm('firstRequestMsg1','준비중입니다.','home_main');" class="btn-single-item arrow"><div class="txt">판매실적 조회</div></a></div>-->
 					</div>
 				</div>
+                <?php } ?>
                 <div class="basic-data-group">
                     <div class="con-title-group">
                         <button type="button" class="btn-gnb-toggle-menu"><span class="icons"><span class="icon icon-size-24 icon-other off"></span><span class="icon icon-size-24 icon-other-fill on"></span></span>기타</button>
@@ -326,3 +360,8 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 	<?php }	?>
 </header>
 <?php } ?>
+<script>
+    window.onload = function(){
+        $('#loading').removeClass("actived");
+    }
+</script>

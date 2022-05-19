@@ -18,8 +18,6 @@ $memo = $emoji->emojiStrToDB($memo);
 //echo $memo;
 $key = ($_GET["key"]) ? $_GET["key"] : $_POST["key"];
 
-
-//echo $key;
 if ($key == "delete") {
     //echo "delete";
     $update_sql = "UPDATE tb_usage_reviews set artist_reply = '' 

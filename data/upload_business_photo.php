@@ -2,9 +2,12 @@
 ini_set('memory_limit', -1);
 
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
-include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
 
 // 여기서 비율적으로 계산(함수 실행전에 사이즈 체크 후 비율 계산하기)
+/*
 function correctImageOrientation($filename){
     $w = 0;
     $h = 0;
@@ -53,12 +56,12 @@ function correctImageOrientation($filename){
 
     imagejpeg($dst, $filename); // 리사이징 및 회전이 완려된 파일 붙여넣기
 }
-
+*/
 
 $user_id = $_SESSION['gobeauty_user_id'];
 
 
-make_user_directory($upload_static_directory.$upload_directory, $user_id);
+make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
 
 // 설정
 $allowed_ext = array('jpg','jpeg','png','gif');
@@ -114,14 +117,19 @@ if(file_exists($filepath_appuploaded)) {    // android용
         echo '파일복사실패';
     } else {
         //echo '파일복사성공';
+        $s3->resizeImage($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_static_directory.'/'.$upload_direcoty_full_path);
+        $s3->fileToS3($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_direcoty_full_path);
+        @unlink($filepath_appuploaded);
     }
 } else {    // pc / iphone용
 //	imagejpeg($_FILES['myfile']['tmp_name'], $upload_static_directory.$upload_direcoty_full_path, 50);
     move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory.'/'.$upload_direcoty_full_path);
+    $s3->resizeImage($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_static_directory.'/'.$upload_direcoty_full_path);
+    $s3->fileToS3($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_direcoty_full_path);
 }
 
 // 이미지 ori 조정
-correctImageOrientation($upload_static_directory.$upload_direcoty_full_path);
+//correctImageOrientation($upload_static_directory.$upload_direcoty_full_path);
 
 
     echo $upload_direcoty_full_path;

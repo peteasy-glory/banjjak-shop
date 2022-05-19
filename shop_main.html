@@ -28,14 +28,13 @@ $sql = "select * from tb_shop where customer_id = '".$user_id."';";
 $qry	= mysqli_query($connection, $sql);
 $shop_data	= mysqli_fetch_assoc($qry);
 
-$_SESSION['backurl1'] = 'shop_main';
 ?>
 
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->    
 	<div class="page-body">
-		
+		<div class="board-more" style="margin:8px 0 8px 0;"><a href="https://partner.banjjakpet.com/stats_sale"><button type="button" class="btn btn-middle-size btn-round btn-outline-purple"><img src="../static/pub/images/icon/10-ic-24-admin-all-menu-money@2x_purple.png" style="width:20px;height:20px;">&nbsp;판매실적 조회</button></a></div>
 		<div class="master-shop-main">
 			<div class="master-shop-main-inner">
 				<div class="master-shop-main-cell">
@@ -55,7 +54,7 @@ $_SESSION['backurl1'] = 'shop_main';
 					</div>
 				</div>
 				<div class="master-shop-main-cell">
-                    <a href="reserve_view?type=beauty&artist_id=<?= $user_id ?>" class="btn btn-yellow btn-middle-size border-radius-5"><strong>마이샵 방문하기</strong></a>
+					<!--<a href="reserve_view?type=beauty&artist_id=<?= $user_id ?>" class="btn btn-yellow btn-middle-size border-radius-5"><strong>마이샵 노출상태 확인하기</strong></a>-->
 				</div>
 			</div>
 		</div>
@@ -64,12 +63,7 @@ $_SESSION['backurl1'] = 'shop_main';
 	<!-- //page-body -->	
 </section>
 <!-- //container -->
-    <script>
-        $(document).ready(function(){
-            $('#header_bell').css('display','none');
-            $('#btn_page_prev').prop('href','home_main')
-        });
-    </script>
+
 <?
-//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

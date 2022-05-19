@@ -4,7 +4,7 @@
 <?php
     $app = new App();
     $is_android = $app->is_app();
-
+    
     if ($is_android == 1) {
         $login_insert_sql = "update tb_customer set token = '' where id = '".$_SESSION['gobeauty_user_id']."';";
         $result = mysqli_query($connection, $login_insert_sql);

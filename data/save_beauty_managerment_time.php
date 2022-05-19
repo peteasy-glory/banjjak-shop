@@ -21,8 +21,8 @@ $sql .= "update_dt = NOW() ";
 $sql .= " WHERE artist_id = '{$user_id}' ";
 //echo $sql."<br>";
 $set_res = sql_query($sql);
-$returl_url = 'set_beauty_management_time';
-if($_POST['backurl'])   $returl_url = $_POST['backurl'];
+$returl_url = 'set_beauty_management';
+//if($_POST['backurl'])   $returl_url = $_POST['backurl'];
 
 
 ?>

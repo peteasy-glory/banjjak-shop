@@ -25,22 +25,12 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 
+$sql = "select * from tb_customer where id = '".$user_id."'";
+$result = mysqli_query($connection, $sql);
+$datas = mysqli_fetch_object($result);
+$push_option = $datas->push_option;
 
-$shop_sql = "select * from tb_shop where customer_id = '".$user_id."'";
-$shop_result = mysqli_query($connection, $shop_sql);
-if ($shop_datas = mysqli_fetch_object($shop_result)) {
-    $front_image = $shop_datas->front_image;
-    $name = $shop_datas->name;
-    $working_years = $shop_datas->working_years;
-    $self_introduction = $shop_datas->self_introduction;
-    $professional_field = $shop_datas->professional_field;
-    $career = $shop_datas->career;
-    $license_indexs = $shop_datas->license_indexs;
-    $region_and_cost = $shop_datas->region_and_cost;
-    $enable_flag = $shop_datas->enable_flag;
-    $update_time = $shop_datas->update_time;
-    $is_setting_pay_in_shop = $shop_datas->is_setting_pay_in_shop;
-}
+$push_checked = ($push_option == 1)? "checked" : "";
 ?>
 
     <!-- container -->
@@ -54,7 +44,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                         <div class="item-title">알림 수신</div>
                         <div class="item-info">알림수신을 원치 않으시면, OFF로 변경해주세요.</div>
                     </div>
-                    <div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_pay_in_shop"><span class="bar"></span></label></div>
+                    <div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_push" <?=$push_checked?>><span class="bar"></span></label></div>
                 </div>
                 <div class="set-notice-type-item sentCell" style="display:none;">
                     <div class="item-info-wrap">
@@ -62,17 +52,17 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                         <div class="item-info">발신 견주정보 표시를 원치 않으시면, OFF로 변경해주세요.<br>( <span>안드로이드폰만</span> 제공 / 애플의 정책상 애플폰은 미제공 )</div>
                         <a href="#" class="about_notice"><div class="txt">발신 견주정보 표시기능이란  </div><div class="question"></div></a>
                     </div>
-                    <div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_sentCell" checked><span class="bar"></span></label></div>
+                    <div class="item-check"><label class="form-switch-toggle"><input type="checkbox" id="setting_sentCell"><span class="bar"></span></label></div>
                 </div>
                 <!-- 발신표시 신청 -->
-                <div class="set-notice-type-item requestSentCell" style="display: none;">
+                <div class="set-notice-type-item requestSentCell">
                     <div class="item-info-wrap">
                         <div class="item-title">발신 견주정보 표시 서비스 신청</div>
                         <div class="item-info">( <span>안드로이드폰만</span> 제공 / 애플의 정책상 애플폰은 미제공 )</div>
 <!--                        <a href="javascript:request_service();" class="about_notice"><div class="txt">신청하기  </div></a>-->
                     </div>
                 </div>
-                <button type="button" onclick="request_service()" class="btn btn-outline-purple btn-small-size btn-round btn-enter">신청하기</button>
+                <button type="button" onclick="request_service()" class="btn btn-outline-purple btn-small-size btn-round btn-enter request_btn">신청하기</button>
             </div>
             <!-- //set-pay-type -->
         </div>
@@ -110,6 +100,20 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
             </div>
         </div>
     </article>
+    <article id="ios_pop" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">안드로이드폰만 신청이 가능합니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
 
 
     <script>
@@ -117,8 +121,8 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
             var tmp_val = checkMobile2();
                 if(tmp_val == 'in_app_one_store'){
                     $(".sentCell").css("display","flex");
-                }else if(tmp_val == 'in_app_and'){
-                    $(".requestSentCell").css("display","flex");
+                    $(".requestSentCell").css("display","none");
+                    $(".request_btn").css("display","none");
                 }
 
             $('#btn_page_prev').prop('href','set_main');
@@ -136,6 +140,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                 androidBridgeOnappCellId(0);
                 console.log("none");
             }
+            */
         });
 
         // 기기 체크
@@ -155,7 +160,12 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
         // 발신정보표시 신청
         function request_service(){
-            popalert.open('requestSentCell_pop');
+            var tmp_val = checkMobile2();
+            if(tmp_val == 'in_app_and'){
+                popalert.open('requestSentCell_pop');
+            }else{
+                popalert.open('ios_pop');
+            }
         }
 
         function request_confirm(){
@@ -184,22 +194,52 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         var double_chk = true; // 따닥 방지
 
         $("#setting_sentCell").click(function(){
-            if($("input:checkbox[id='setting_sentCell']").is(":checked") == true){
-                androidBridgeOnappCellId(1);
-                console.log("checked");
-            }else{
-                androidBridgeOnappCellId(0);
-                console.log("none");
+            if(double_chk){
+                double_chk = false;
+                if($("input:checkbox[id='setting_sentCell']").is(":checked") == true){
+                    androidBridgeOnappCellId(1);
+                    console.log("checked");
+                }else{
+                    androidBridgeOnappCellId(0);
+                    console.log("none");
+                }
             }
         });
 
         function androidBridgeOnappCellId(chk){
+
             ret = Android.onAppCellId(chk);
-            alert(ret);
+            double_chk = true;
+            // alert(ret);
+        }
+
+        function androidBridgeOnappSentCellStatus(){
+            ret = Android.onAppSentCellStatus();
+            return ret;
+        }
+
+         // 알림 수신 여부 변경
+        $("#setting_push").click(function(){
+            if(double_chk){
+                double_chk = false;
+                change_push()
+            }
+        });
+
+        function change_push() {
+            $.ajax({
+                url: 'data/change_user_push',
+                type: 'POST',
+                success: function(data) {
+                    console.log("## ", data);
+                    double_chk = true;
+                },
+                error: function(xhr, status, error) {}
+            });
         }
     </script>
 
 
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

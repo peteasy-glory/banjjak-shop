@@ -48,15 +48,15 @@ $pc_url = ($r_pc != "")? "?pc=".$r_pc : "";
 //			echo $response;
 			$json_info = json_decode($response);
 			$age= $json_info->response->age;
-//			$email= $json_info->response->email;
+			$email= $json_info->response->email;
             //naver
-            $email = "pettester@peteasy.kr";
+//            $email = "pettester@peteasy.kr";
 			$gender= $json_info->response->gender;
 ?>
 			<script>
-//  			location.href='naver_process.php?email=<?=$email?>&age=<?=$age?>&gender=<?=$gender?>&pc=<?=$r_pc?>';
+      			location.href='naver_process.php?email=<?=$email?>&age=<?=$age?>&gender=<?=$gender?>&pc=<?=$r_pc?>';
                 // naver
-                location.href='naver_process.php?email=pettester@peteasy.kr&age=<?=$age?>&gender=<?=$gender?>&pc=<?=$r_pc?>';
+                //location.href='naver_process.php?email=pettester@peteasy.kr&age=<?=$age?>&gender=<?=$gender?>&pc=<?=$r_pc?>';
 
 			</script>
 <?php

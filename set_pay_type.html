@@ -150,9 +150,13 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
                 }
         });
+
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_main');
+        });
 </script>
 
 
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

@@ -1,8 +1,17 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include ($_SERVER['DOCUMENT_ROOT']."/include/Allimtalk.class.php");
 /*print_r($_SESSION);
 print_r($_POST);*/
+
+if($_SESSION['artist_flag'] === true){
+    $shop_id = $_SESSION['shop_user_id'];
+    $user_name = $_SESSION['shop_user_nickname'];
+}else{
+    $shop_id = $_SESSION['gobeauty_user_id'];
+    $user_name = $_SESSION['gobeauty_user_nickname'];
+}
 
 $total_price = 0;
 
@@ -18,28 +27,57 @@ $option_name = array('bath_price'=>'목욕',
 
 $product = '';
 $phone = $_GET['cellphone'];
+$customer_id = $_POST['customer_id'];
 
+if($_SESSION['reserve_go'] == 1) {
+    unset($_SESSION['reserve_go']); // 예약 프로세스 시작하면 세션 삭제(중복예약 방지)
 
 //유저등록
 if($_POST['id_use_yn']=='n' && empty($_POST['pet_seq'])) {
-    $que = "INSERT INTO tb_tmp_user SET ";
-    $que .= "cellphone = '{$_POST['cellphone']}' ";
-//echo $que;
-    $res = sql_query($que);
-    $tmp_seq = mysqli_insert_id($connection);
+    // 정회원 여부
+        if($_POST['customer_id']!=''){
+            $customer_id = $_POST['customer_id'];
+        }else{
+            $select_c_q = "SELECT * FROM tb_customer WHERE cellphone = '".$_POST['cellphone']."' and nickname not like 'cellp_%' ORDER BY last_login_time DESC LIMIT 1";
+            $select_c_r = mysqli_query($connection, $select_c_q);
+            $select_c_cnt = mysqli_num_rows($select_c_r);
+            //echo $select_c_q."<br>";
+
+            // 가회원 여부
+            $select_q = "SELECT * FROM tb_tmp_user WHERE cellphone = '".$_POST['cellphone']."'";
+            $select_r = mysqli_query($connection, $select_q);
+            $select_cnt = mysqli_num_rows($select_r);
+            //echo $select_q."<br>";
+            if($select_c_cnt>0){
+                $select_c_data['data'] = mysqli_fetch_assoc($select_c_r);
+                $customer_id = $select_c_data['data']['id'];
+                //echo $customer_id."<br>";
+            }else if($select_cnt>0){
+                $select_data['data'] = mysqli_fetch_assoc($select_r);
+                $tmp_seq = $select_data['data']['tmp_seq'];
+                //echo $tmp_seq."<br>";
+            }else{
+                $que = "INSERT INTO tb_tmp_user SET ";
+                $que .= "cellphone = '{$_POST['cellphone']}' ";
+                //echo $que;
+                $res = sql_query($que);
+                $tmp_seq = mysqli_insert_id($connection);
+            }
+        }
 
     $dermatosis     = ($_POST['dermatosis']=='')?0:$_POST['dermatosis'];
     $heart_trouble  = ($_POST['heart_trouble']=='')?0:$_POST['heart_trouble'];
     $marking        = ($_POST['marking']=='')?0:$_POST['marking'];
     $mounting       = ($_POST['mounting']=='')?0:$_POST['mounting'];
 
+    $pet_type = ($_POST['pet_kind'] == 'cat')? $_POST['pet_type_cat'] : $_POST['pet_type'];
 
     //펫 기본 정보 업데이트
     $sql  = "INSERT INTO tb_mypet SET ";
-    $sql .= "tmp_seq        = '{$tmp_seq}', ";
-    $sql .= "customer_id    = '{$data["customer"]["id"]}', ";
+    $sql .= "tmp_seq        = nullif('{$tmp_seq}',''), ";
+    $sql .= "customer_id    = nullif('{$customer_id}',''), ";
     $sql .= "type           = '{$_POST['pet_kind']}', ";
-    $sql .= "pet_type       = '{$_POST['pet_type']}', ";
+    $sql .= "pet_type       = '{$pet_type}', ";
     $sql .= "name           = '{$_POST['pet_name']}', ";
     $sql .= "year           = '{$_POST['pet_year']}', ";
     $sql .= "month          = '{$_POST['pet_month']}', ";
@@ -103,8 +141,8 @@ if($_POST['id_use_yn']=='n' && empty($_POST['pet_seq'])) {
 
     //펫 기본 정보 업데이트
     $sql  = "UPDATE tb_mypet SET ";
-    $sql .= "tmp_seq        = '{$tmp_seq}', ";
-    $sql .= "customer_id    = '{$data["customer"]["id"]}', ";
+    $sql .= "tmp_seq        = nullif('{$tmp_seq}',''), ";
+    $sql .= "customer_id    = nullif('{$data["customer"]["id"]}',''), ";
     $sql .= "type           = '{$_POST['pet_kind']}', ";
     $sql .= "pet_type       = '{$_POST['pet_type']}', ";
     $sql .= "name           = '{$_POST['pet_name']}', ";
@@ -145,10 +183,22 @@ if($_POST['pet_kind']=='dog') {
     $w3 = explode(":", $_POST['hair_length']);
     $total_price += $w3[1];
 
-    $product .= $_POST['hair_type'] . '|';
-    $w4 = explode(":", $_POST['hair_type']);
-    $total_price += $w4[1];
+    //$product .= $_POST['hair_type'] . '|';
+    //$w4 = explode(":", $_POST['hair_type']);
+    //$total_price += $w4[1];
 
+    $hair_type_cnt = count($_POST['hair_type']);
+        if ($hair_type_cnt == 0) {
+            $product .= '|';
+        } else {
+
+            for ($i = 0; $i < count($_POST['hair_type']); $i++) {
+                $hair_type_price = explode(':', $_POST['hair_type'][$i]);
+                $total_price += $hair_type_price[1];
+                $product .= $_POST['hair_type'][$i] . ',';
+            }
+            $product = substr($product , 0, -1).'|';
+        }
 
     $leg_other_cnt = count($_POST['leg']);
     $is_leg1 = $is_leg2 = $is_leg3 = false;
@@ -258,6 +308,7 @@ if($_POST['pet_kind']=='dog') {
     }
     //미용 단모/장모
     $product .= $_POST['hair'].'|';
+    $total_price += explode(':',$_POST['hair'])[1];
     //발톱
     if(!empty($_POST['cat_toenail'])){
         $product .= $_POST['cat_toenail'].'|';
@@ -273,62 +324,95 @@ if($_POST['pet_kind']=='dog') {
     } else {
         $product .= '|';
     }
+    $total_price += $bath[1];
     //추가 서비스
     $etc_cnt = count($_POST['cat_etc']);
     $product .= $etc_cnt.'|';
     for($i=0;$i<count($_POST['cat_etc']);$i++){
         $product .= $_POST['cat_etc'][$i].'|';
+        $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
 }
 
 
-$product .= '0|'; //제품구매수
-$product .= '0|'; //쿠폰구매수
+    $product .= '0|'; //제품구매수
+    $product .= '0|'; //쿠폰구매수
 
 
+$chk_sql = "
+            SELECT * FROM tb_payment_log WHERE artist_id = '{$shop_id}' AND worker = '{$_POST['worker']}'
+            AND YEAR = '{$_POST['year']}' AND MONTH = '{$_POST['month']}' AND DAY = '{$_POST['day']}' AND HOUR = '".date('H', $_POST['from_time'])."' AND MINUTE = '".date('i', $_POST['from_time'])."' and is_cancel = 0
+        ";
+$chk_result = mysqli_query($connection,$chk_sql);
+$chk_cnt = mysqli_num_rows($chk_result);
+if($chk_cnt < 1) {
 
+    $pay_data = json_encode($_POST, JSON_UNESCAPED_UNICODE);
 
+    $que = "INSERT INTO tb_payment_log SET ";
+    $que .= "pet_seq            = '{$pet_seq}', ";
+    $que .= "session_id         = '" . session_id() . "', ";
+    $que .= "customer_id        = '{$customer_id}', ";
+    $que .= "artist_id          = '{$shop_id}', ";
+    $que .= "order_id           = '" . str2hex($_POST['customer_id'] . "_" . rand_id()) . "', ";
+    $que .= "local_price        = '{$total_price}', ";
+    $que .= "cellphone          = '{$_POST['cellphone']}', ";
+    $que .= "worker             = '{$_POST['worker']}', ";
+    $que .= "year               = '{$_POST['year']}', ";
+    $que .= "month              = '{$_POST['month']}', ";
+    $que .= "day                = '{$_POST['day']}', ";
+    $que .= "pay_type           = 'pos-card', ";
+    $from_hour = date('H', $_POST['from_time']);
+    $from_min = date('i', $_POST['from_time']);
+    $que .= "hour               = '{$from_hour}', ";
+    $que .= "minute             = '{$from_min}', ";
 
+    $que .= "pay_data           = '{$pay_data}',";
 
-$que = "INSERT INTO tb_payment_log SET ";
-$que .= "pet_seq            = '{$pet_seq}', ";
-$que .= "session_id         = '" . session_id() . "', ";
-$que .= "customer_id        = '{$_POST['customer_id']}', ";
-$que .= "artist_id          = '{$_SESSION['gobeauty_user_id']}', ";
-$que .= "order_id           = '" . str2hex($_POST['customer_id'] . "_" . rand_id()) . "', ";
-$que .= "local_price        = '{$total_price}', ";
-$que .= "cellphone          = '{$_POST['cellphone']}', ";
-$que .= "worker             = '{$_POST['worker']}', ";
-$que .= "year               = '{$_POST['year']}', ";
-$que .= "month              = '{$_POST['month']}', ";
-$que .= "day                = '{$_POST['day']}', ";
-$que .= "pay_type           = 'pos-card', ";
-$from_hour = date('H', $_POST['from_time']);
-$from_min = date('i', $_POST['from_time']);
-$que .= "hour               = '{$from_hour}', ";
-$que .= "minute             = '{$from_min}', ";
+    $to_hour = date('H', $_POST['to_time']);
+    $to_min = date('i', $_POST['to_time']);
+    $que .= "to_hour            = '{$to_hour}', ";
+    $que .= "to_minute          = '{$to_min}', ";
+    $que .= "product_type       = 'B', ";
+    $que .= "approval           = '1', ";
+    if ($_POST['coupon_use_yn'] == 'y') {
+        $que .= "is_coupon          = 'Y', ";
+    }
+    $sql = "SELECT is_vat FROM tb_shop WHERE customer_id = '{$shop_id}'";
+    $r = sql_query($sql);
+    $rw = sql_fetch($r);
+    $que .= "is_vat             = '{$rw['is_vat']}', ";
+    $que .= "product            = '{$product}', ";
+    $que .= "reserve_yn         = '{$_POST['alarm_yn']}', ";
+    $que .= "a_day_ago_yn       = '{$_POST['befor_day_alarm_yn']}', ";
+    $que .= "buy_time           = NOW() ";
+    //echo $que . "<br>";
+    $product_res = sql_query($que);
+    $id = mysqli_insert_id($connection);
 
-$to_hour = date('H', $_POST['to_time']);
-$to_min = date('i', $_POST['to_time']);
-$que .= "to_hour            = '{$to_hour}', ";
-$que .= "to_minute          = '{$to_min}', ";
-$que .= "product_type       = 'B', ";
-$que .= "approval           = '1', ";
-if ($_POST['coupon_use_yn'] == 'y') {
-    $que .= "is_coupon          = 'Y', ";
+    // 알림톡발송
+    $now = time();
+    $year = $_POST['year'];
+    $month = $_POST['month'];
+    $day = $_POST['day'];
+    //$reservationTime = strtotime($_POST['year'].'-'.$_POST['month'].'-'.$_POST['day'].' '.$from_hour.':'.$from_min);
+    $reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
+
+    if ($reservationTime > $now && $_POST['alarm_yn'] == "Y") {
+        $talk = new Allimtalk();
+
+        $talk->cellphone = $_POST['cellphone'];
+
+        $week_arr = ['일', '월', '화', '수', '목', '금', '토'];
+        $talkCustomerName = substr($_POST['cellphone'], -4);
+        //$talkDate = date("Y년 m월 d일 H시 i분", $reservationTime);
+        $talkDate = date("Y년 m월 d일", $reservationTime);
+        $talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
+        $talkDate .= date("H시 i분", $reservationTime);
+        $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$id;
+        $talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
+    }
 }
-$sql = "SELECT is_vat FROM tb_shop WHERE customer_id = '{$_SESSION['gobeauty_user_id']}'";
-$r = sql_query($sql);
-$rw = sql_fetch($r);
-$que .= "is_vat             = '{$rw['is_vat']}', ";
-$que .= "product            = '{$product}', ";
-$que .= "reserve_yn         = '{$_POST['alarm_yn']}', ";
-$que .= "a_day_ago_yn       = '{$_POST['befor_day_alarm_yn']}', ";
-$que .= "buy_time           = NOW() ";
-//echo $que . "<br>";
-$product_res = sql_query($que);
-
-
-
+}
 ?>
 <script>location.href = '../<?php echo $_SESSION['backurl1'];?>';</script>

@@ -1,4 +1,5 @@
 <?php
+
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
@@ -10,16 +11,19 @@ function debug_to_console($data) {
     echo "<script>alert('Debug Objects: " . $output . "' );</script>";
 }
 
+
 $user_id = $_SESSION['gobeauty_user_id'];
+
 make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
+
 
 // 설정
 $allowed_ext = array('jpg','jpeg','png','gif');
 
-$filename = $_REQUEST['filepath'];
+$filename = $_POST['filepath'];
 $filename = trim($filename);
 
-$new_filename = $_REQUEST['newfilepath'];
+$new_filename = $_POST['newfilepath'];
 $new_filename = trim($new_filename);
 
 $ext = array_pop(explode('.', $filename));
@@ -49,10 +53,12 @@ if( !in_array(strtolower($ext), $allowed_ext) ) {
 $upload_direcoty_full_path = $upload_directory2."/".$new_filename;
 //move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory2.$upload_direcoty_full_path);
 
+
 $oldfile = $upload_static_directory2."/upload/appupload/".$filename;
 $newfile = $upload_static_directory2.$upload_direcoty_full_path;
 $imgpath = $oldfile;
 $target = $newfile;
+
 
 			//모바일 세로 이미지 로테이션...
 $mklotaion=false;
@@ -114,9 +120,21 @@ $s3->fileToS3($target, $upload_directory."/".$new_filename);
 
 
 $sql = "insert into tb_shop_frontimage (customer_id, image) value ('".$user_id."','".$upload_direcoty_full_path."');";
+//echo $sql;
+$result = mysqli_query($connection,$sql);
+
+
+/*
+$filename = $_POST['filepath'];
+$new_filename = $_POST['newfilepath'];
+$filepath_appuploaded = $upload_static_directory . "/upload/appupload/" . $filename;
+$upload_direcoty_full_path = $upload_directory."/".$new_filename;
+copy($filepath_appuploaded, $upload_static_directory.'/'.$upload_direcoty_full_path);
+$user_id = $_SESSION['gobeauty_user_id'];
+$sql = "insert into tb_shop_frontimage (customer_id, image) value ('".$user_id."','".$upload_direcoty_full_path."');";
+//echo $sql;
 $result = mysqli_query($connection, $sql);
-
-
+*/
 ?>
-
 {"upfilename": "<?=$upload_direcoty_full_path?>","allpath": "<?=$upload_static_directory2.$upload_direcoty_full_path?>","msg": "","imagewidth": "300"}
+

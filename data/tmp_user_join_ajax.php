@@ -181,7 +181,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						//$temp .= $sql."<br/>";
 
 						$result2 = mysqli_query($connection, $sql);
-                        $pay_seq = mysqli_insert_id($connection);
 						if($result2){
 							$pet_seq = mysqli_insert_id($connection);
 
@@ -197,7 +196,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							//$temp .= $sql."<br/>";
 
 							$result3 = mysqli_query($connection, $sql);
-							$pay_seq = mysqli_insert_id($connection);
 							if($result3){
 								$sql = "
 									SELECT *
@@ -218,7 +216,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 									$result4 = mysqli_query($connection, $sql);
 									if($result4){
-										$return_data = array("code" => "000000", "data" => $r_pet_name, "pay_seq"=>$pay_seq); // OK
+										$return_data = array("code" => "000000", "data" => $r_pet_name); // OK
 									}else{
 										$return_data = array("code" => "000105", "data" => "펫이름 입력에 실패했습니다.");
 									}
@@ -279,13 +277,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								)
 							";
 							//$temp .= $sql."<br/>";
-<<<<<<< HEAD
 
-=======
-						    //echo $sql;
->>>>>>> d9eeb70938c4a6807528f6e5fc17be88ec5a06e3
 							$result3 = mysqli_query($connection, $sql);
-							$pay_seq = mysqli_insert_id($connection);
 							if($result3){
 								$sql = "
 									SELECT *
@@ -306,7 +299,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 									$result4 = mysqli_query($connection, $sql);
 									if($result4){
-										$return_data = array("code" => "000000", "data" => $r_pet_name, "pay_seq"=>$pay_seq); // OK
+										$return_data = array("code" => "000000", "data" => $r_pet_name); // OK
 									}else{
 										$return_data = array("code" => "000105", "data" => "펫이름 입력에 실패했습니다.");
 									}
@@ -321,7 +314,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 									$result4 = mysqli_query($connection, $sql);
 									if($result4){
-										$return_data = array("code" => "000000", "data" => $r_pet_name, "pay_seq"=>$pay_seq); // OK
+										$return_data = array("code" => "000000", "data" => $r_pet_name); // OK
 									}else{
 										$return_data = array("code" => "000104", "data" => "펫이름 입력에 실패했습니다.");
 									}
@@ -363,20 +356,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 									'" . $r_cellphone . "', '" . $r_memo . "', NOW(), '0', '" . $r_pet_name . "', 'A'
 								)
 							";
-<<<<<<< HEAD
                             //$temp .= $sql."<br/>";
 
                             $result3 = mysqli_query($connection, $sql);
                             if ($result3) {
                                 $sql = "
-=======
-							//$temp .= $sql."<br/>";
-                            //echo $sql;
-							$result3 = mysqli_query($connection, $sql);
-                            $pay_seq = mysqli_insert_id($connection);
-							if($result3){
-								$sql = "
->>>>>>> d9eeb70938c4a6807528f6e5fc17be88ec5a06e3
 									SELECT *
 									FROM tb_artist_customer_list
 									WHERE artist_id = '" . $r_artist_id . "'
@@ -393,7 +377,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 									";
                                     //$temp .= $sql."<br/>";
 
-<<<<<<< HEAD
                                     $result4 = mysqli_query($connection, $sql);
                                     if ($result4) {
                                         $return_data = array("code" => "000000", "data" => $r_pet_name); // OK
@@ -402,17 +385,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                     }
                                 } else { // update
                                     $sql = "
-=======
-									$result4 = mysqli_query($connection, $sql);
-
-									if($result4){
-										$return_data = array("code" => "000000", "data" => $r_pet_name, "pay_seq"=>$pay_seq); // OK
-									}else{
-										$return_data = array("code" => "000105", "data" => "펫이름 입력에 실패했습니다.");
-									}
-								}else{ // update
-									$sql = "
->>>>>>> d9eeb70938c4a6807528f6e5fc17be88ec5a06e3
 										UPDATE tb_artist_customer_list SET
 											pet_name = '" . $r_pet_name . "'
 										WHERE artist_id = '" . $r_artist_id . "'

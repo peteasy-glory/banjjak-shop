@@ -1,6 +1,6 @@
 <?
-
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
 
 //로그인 유지 기능 (2019-06-21 hue)
 if (isset($_SESSION['gobeauty_user_id']) && $_SESSION['gobeauty_user_id'] != "") {
@@ -65,7 +65,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 
 <!-- container -->
 <section id="container" class="login-view-wrap">
-	<form action="/data/login_process.php" method="POST" id="cs_login_all">
+	<form action="/data/login_process" method="POST" id="cs_login_all">
 		<input type="hidden" name="is_pc" value="true" />
 		<!--<input type="hidden"  name="remember" id="remember" value=""/>-->
 	<!-- page-body -->    

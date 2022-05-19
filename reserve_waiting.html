@@ -48,11 +48,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                         <?php
                         if($cnt == 0){
                             $artist_same[0] = $rs['worker'];
-                            $worker = $rs['worker'];
+                            $worker = ($rs['worker']!=$rs['artist_id'])? $rs['worker'] : "실장";
                             echo '<div class="con-title-group"><h5 class="con-title">'.$worker.'</h5></div>';
                         } else if($cnt > 0){
                             if($artist_same[$cnt-1] != $rs['worker'] || $date_same[$cnt-1] != date('ymd',strtotime($rs['reg_date']))) {
-                                $worker = $rs['worker'];
+                                $worker = ($rs['worker']!=$rs['artist_id'])? $rs['worker'] : "실장";
                                 echo '<div class="con-title-group"><h5 class="con-title">'.$worker.'</h5></div>';
                             }
                             $artist_same[$cnt] = $rs['worker'];
@@ -97,7 +97,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
         $('#header_bell').css('display','none');
         $('#btn_page_prev').prop('href','javascript:;');
         $('#btn_page_prev').on('click',function(){
-            location.href = './<?php echo $_SESSION['backurl'];?>';
+            location.href = 'reserve_main_month';
         });
     });
 </script>

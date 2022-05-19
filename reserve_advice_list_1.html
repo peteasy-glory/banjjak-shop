@@ -206,7 +206,6 @@ for ($count_pet_datas2 = 0; $pet_datas = mysqlI_fetch_object($pet_result2); $cou
 
 
 					<?}?>
-					</div>
 				</div>
 				<!-- //내용 있을 때 -->
 				<?if($processing_list_count==0){?>
@@ -237,7 +236,8 @@ for ($count_pet_datas2 = 0; $pet_datas = mysqlI_fetch_object($pet_result2); $cou
 			$(".tab-data-cell").hide();
 			$(".tab-data-cell:eq("+idx+")").show();
 
-		})
+		});
+        $(".pc-header-menu-cell4").addClass("actived");
 
 	})
 </script>

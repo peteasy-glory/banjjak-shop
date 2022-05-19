@@ -1,0 +1,1187 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "판매실적/정산조회";
+$header_right	= '
+	
+';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+unset($_SESSION['backurl']);
+$_SESSION['backurl'] = 'set_main';
+
+$startDate = ($_GET['startDate'] && $_GET['startDate'] != "")? $_GET['startDate'] : DATE('Y-m-01');
+$endDate = ($_GET['endDate'] && $_GET['endDate'] != "")? $_GET['endDate'] : DATE('Y-m-d');
+$orderType = (!empty($_GET['orderType']))?$_GET['orderType']:'date';
+$orderDetail = $_GET['orderDetail'];
+$quk = $_GET['quk'];
+
+$sum = 0;
+$sum_c = 0; // 카드
+$sum_m = 0; // 현금
+$count = 0;
+$searchList = null;
+$summaryCount = null;
+$summaryCard = null;
+$summaryMoney = null;
+$data = array();
+
+
+$dog_product_title = array();
+$dog_product_arr = array(
+    "무게",
+    "목욕",
+    "부분미용",
+    "부분+목욕",
+    "위생",
+    "위생+목욕",
+    "전체미용",
+    "스포팅",
+    "가위컷",
+    "썸머컷"
+);
+$dog_product_seq = array(
+    "목욕"         =>'bath',
+    "부분미용"      =>'part',
+    "부분+목욕"     =>'bath_part',
+    "위생"         =>'sanitation',
+    "위생+목욕"    =>'sanitation_bath',
+    "전체미용"     =>'all',
+    "스포팅"      =>'spoting',
+    "가위컷"      =>'scissors',
+    "썸머컷"       =>'summercut'
+);
+$option_name = array('bath_price','part_price','bath_part_price','sanitation_price','sanitation_bath_price','all_price','spoting_price','scissors_price','summercut_price');
+$option_chk_name = array('is_consult_bath','is_consult_part','is_consult_bath_part','is_consult_sanitation','is_consult_sanitation_bath','is_consult_all',
+    'is_consult_spoting','is_consult_scissors','is_consult_summercut','is_consult_beauty1','is_consult_beauty2','is_consult_beauty3','is_consult_beauty4','is_consult_beauty5');
+$cnt = 10;
+$beauty = 1;
+$que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}'";
+
+$res = mysqli_query($connection, $que);
+$row = mysqli_fetch_assoc($res);
+for($i=1;$i<=14;$i++){
+    if(!empty($row['worktime'.$i.'_disp_yn'] == 'y')){
+        if($i<10){
+            array_push($dog_product_title, $dog_product_arr[$i]);
+        } else {
+            $dog_product_seq[$row['worktime'.$i.'_title']] = 'beauty'.$beauty;
+            $option_name[] = 'beauty'.$beauty."_price";
+            if($row['worktime'.$i.'_title']!='') {
+                array_push($dog_product_title, $row['worktime' . $i . '_title']);
+                $beauty++;
+            }
+        }
+    }
+}
+$service_title = implode("','",$dog_product_title);
+
+
+
+// 상점 정보(?왜 가져오는거지?)
+$sql = "select * from tb_shop where customer_id = '".$user_id."' ";
+//echo $sql;
+$result = mysqli_query($connection,$sql);
+while($row = mysqli_fetch_array($result)){
+    $data["shop"]["front_image"] = $row["front_image"];
+    $data["shop"]["name"] = $row["name"];
+    $data["shop"]["working_years"] = $row["working_years"];
+    $data["shop"]["self_introduction"] = $row["self_introduction"];
+    $data["shop"]["professional_field"] = $row["professional_field"];
+    $data["shop"]["career"] = $row["career"];
+    $data["shop"]["license_indexs"] = $row["license_indexs"];
+    $data["shop"]["region_and_cost"] = $row["region_and_cost"];
+    $data["shop"]["enable_flag"] = $row["enable_flag"];
+    $data["shop"]["update_time"] = $row["update_time"];
+}
+
+// 결제액 합계
+if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != null)) {
+    $orderBy = "";
+    $where = "";
+    switch ($orderType) {
+        case "date":
+            $orderBy = "ORDER BY A.payment_type ASC, A.reservationDate DESC";
+            $where = ($orderDetail != "")? " AND A.payment_type = '".$orderDetail."' " : "";
+            break;
+        case "service":
+            $orderBy = "ORDER BY A.service DESC";
+            $where = " AND A.payment_type = '미용' ";
+            $where .= ($orderDetail != "")? " AND A.service = '".$orderDetail."' " : "";
+            break;
+        case "artist":
+            $orderDetail_1 = ($orderDetail == $user_id)? "대표" : $orderDetail;
+            $orderBy = "ORDER BY A.worker DESC";
+            $where = " AND A.payment_type = '미용' ";
+            $where .= ($orderDetail_1 != "")? " AND A.worker = '".$orderDetail_1."' " : "";
+            break;
+        case "payment":
+            $orderBy = "ORDER BY A.pay_type DESC";
+            $where = ($orderDetail != "")? " AND (A.pay_type = '".$orderDetail."' OR A.pay_type = '매장접수(카)') " : "";
+            break;
+        case "hotel":
+            $orderBy = "ORDER BY A.room_name DESC";
+            $where = " AND A.payment_type = '호텔' ";
+            $where .= ($orderDetail != "")? " AND A.room_name = '".$orderDetail."' " : "";
+            break;
+        case "playroom":
+            $orderBy = "ORDER BY A.room_name DESC, A.reservation_dt ASC";
+            $where = " AND A.payment_type = '유치원' ";
+            $where .= ($orderDetail != "")? " AND A.room_name = '".$orderDetail."' " : "";
+            break;
+        default:
+            $orderBy = "ORDER BY A.payment_type ASC, A.reservationDate DESC";
+    }
+
+    // 상세내역
+    $query = "
+		SELECT *
+		FROM (
+			SELECT 
+				  SUBSTRING_INDEX(product,'|',1) AS name			    
+				, DATE_FORMAT(buy_time, '%Y-%m-%d %H:%i' ) AS reservation_dt
+				, DATE_FORMAT( CONCAT( year,'-',month,'-',day,' ',hour,':',IFNULL(minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) AS reservationDate
+				, DATE_FORMAT(cancel_time, '%Y-%m-%d %H:%i' ) AS cancel_dt
+				, SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(product,'|',5),'|',-1), ':', 1) AS service
+				, product AS extra_service
+			    , payment_log_seq AS pls
+			    , pl.pet_seq AS b_pet_seq
+				, if(worker = '".$user_id."', '대표', worker) AS worker
+				, (
+					case
+						when pay_type = 'card' then '앱-선결제'
+						when pay_type = 'bank' then '앱-선결제'
+						when pay_type = 'offline-card' then '앱-매장결제'
+						when pay_type = 'offline-cash' then '앱-매장결제'
+						when pay_type = 'pos-card' then '매장접수'
+						when pay_type = 'pos-cash' then '매장접수'
+						ELSE '매장접수(카)'
+					end
+				) AS pay_type
+                , IF(pay_type = 'card' or pay_type = 'bank', IFNULL(total_price, 0) - IFNULL(spend_point, 0) + IFNULL(add_price, 0), IFNULL(local_price, 0)) AS card
+				, IFNULL(local_price_cash, 0) AS cash
+                #, IFNULL(IF(pay_type = 'card' or pay_type = 'bank', IFNULL(total_price, 0) - IFNULL(spend_point, 0) + IFNULL(add_price, 0), if(local_price_cash>0 OR add_price_cash>0,if(add_price='',0,IFNULL(add_price, 0)),IFNULL(local_price, 0))), 0) AS card
+                #, IFNULL(if(local_price_cash > 0, local_price_cash, add_price_cash), 0) AS cash
+				, '미용' AS payment_type 
+				, '' AS room_name
+				, IFNULL(reserve_point, '0') AS reserve_point
+				, (
+					SELECT IFNULL(SUM(add_reserve), '0')
+					FROM tb_user_reserve_log
+					WHERE is_delete = '2'
+						AND artist_id = pl.artist_id
+						AND payment_log_seq = pl.payment_log_seq
+						AND service_type = 'B'
+						AND type = 'R'
+				) AS use_reserve				
+			FROM tb_payment_log AS pl
+			WHERE is_cancel = 0
+				AND is_no_show = 0
+				AND data_delete = 0
+				AND artist_id = '".$user_id."'
+				AND DATE_FORMAT( CONCAT( year,'-',month,'-',day,' ',hour,':',IFNULL(minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) 
+					BETWEEN DATE_FORMAT(CONCAT('".$startDate."', ' 00:00'), '%Y-%m-%d %H:%i') 
+						 AND DATE_FORMAT(CONCAT('".$endDate."', ' 23:59'), '%Y-%m-%d %H:%i') 
+			
+			UNION all
+						
+			SELECT
+				  mp.name
+				, DATE_FORMAT(hpl.reg_dt, '%Y-%m-%d %H:%i') AS reservation_dt
+				, DATE_FORMAT(CONCAT(hr.check_in_date,' ',hr.check_in_time), '%Y-%m-%d %H:%i') AS reservationDate
+				, DATE_FORMAT(hpl.delete_dt, '%Y-%m-%d %H:%i') AS cancel_dt
+				, CONCAT(hr.room_name,'/',TIMESTAMPDIFF(DAY,hr.check_in_date,hr.check_out_date),'박/~',hr.weight,'Kg') AS service
+				, etc_product_data AS extra_service
+				, '-' AS worker
+				, (
+					case
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 1 then '앱-선결제' 
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 2 then '앱-선결제' 
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 0 then '앱-매장결제' 
+						when receipt_type = 3 then '매장접수' 
+						ELSE '매장접수'
+					end
+				) AS pay_type
+				, add_price_card AS card
+				, add_price_cash AS cash
+				, '호텔' AS payment_type 
+				, hr.room_name AS room_name
+				, '0' AS reserve_point
+				, '0' AS use_reserve
+				, hp_log_seq
+				, hpl.pet_seq AS h_pet_seq
+			FROM tb_hotel_payment_log AS hpl
+				INNER JOIN tb_hotel_reservation AS hr ON hpl.order_num = hr.order_num
+				INNER JOIN tb_mypet AS mp ON hpl.pet_seq = mp.pet_seq
+			WHERE hpl.is_delete = '2'
+				AND hpl.is_no_show = '2'
+				AND hpl.data_delete = '0'
+				AND hpl.artist_id = '".$user_id."'
+				AND DATE_FORMAT(CONCAT(hr.check_in_date,' ',hr.check_in_time), '%Y-%m-%d %H:%i') 
+					BETWEEN DATE_FORMAT(CONCAT('".$startDate."', ' 00:00'), '%Y-%m-%d %H:%i') 
+						 AND DATE_FORMAT(CONCAT('".$endDate."', ' 00:00'), '%Y-%m-%d %H:%i')
+
+			UNION all
+						
+			SELECT
+				  mp.name
+				, DATE_FORMAT(ppl.reg_dt, '%Y-%m-%d %H:%i') AS reservation_dt
+				, DATE_FORMAT(CONCAT(pr.check_in_date,' ',pr.check_in_time), '%Y-%m-%d %H:%i') AS reservationDate
+				, DATE_FORMAT(ppl.delete_dt, '%Y-%m-%d %H:%i') AS cancel_dt
+				, IF(pr.service_type = 1, pr.allday_pass_name, CONCAT('[',pr.room_name,'h/~',pr.weight,'Kg] X ',pr.count)) AS service
+				, pr.etc_product_data AS extra_service
+				, '-' AS worker
+				, (
+					case
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 1 then '앱-선결제' 
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 2 then '앱-선결제' 
+						when (receipt_type = 1 or receipt_type = 2) AND pay_type = 0 then '앱-매장결제' 
+						when receipt_type = 3 then '매장접수' 
+						ELSE '매장접수'
+					end
+				) AS pay_type
+				, ppl.add_price_card AS card
+				, ppl.add_price_cash AS cash
+				, '유치원' AS payment_type 
+				, pr.service_type AS room_name
+				, '0' AS reserve_point
+				, '0' AS use_reserve
+				, pp_log_seq
+				, ppl.pet_seq AS p_pet_seq
+			FROM tb_playroom_payment_log AS ppl
+				INNER JOIN tb_playroom_reservation AS pr ON ppl.order_num = pr.order_num
+				INNER JOIN tb_mypet AS mp ON ppl.pet_seq = mp.pet_seq
+			WHERE ppl.is_delete = '2'
+				AND ppl.is_no_show = '2'
+				AND ppl.data_delete = '0'
+				AND ppl.artist_id = '".$user_id."'
+				AND DATE_FORMAT(CONCAT(pr.check_in_date,' ',pr.check_in_time), '%Y-%m-%d %H:%i') 
+					BETWEEN DATE_FORMAT(CONCAT('".$startDate."', ' 00:00'), '%Y-%m-%d %H:%i') 
+						 AND DATE_FORMAT(CONCAT('".$endDate."', ' 00:00'), '%Y-%m-%d %H:%i')
+		) AS A WHERE 1=1 ".$where." ".$orderBy."
+	";
+    //echo $query;
+    $result = mysqli_query($connection,$query);
+
+    while ($data = mysqli_fetch_array($result)) {
+        $searchList[] = $data;
+        $sum += $data["sum"];
+        $count++;
+        $sum_c += $data["card"];
+        $sum_m += $data["cash"];
+
+        $nowType = "";
+
+        switch ($orderType) {
+            case "date":
+                $nowType = $data["reservationDate"];
+                break;
+            case "service":
+                $nowType = $data["service"];
+                break;
+            case "artist":
+                $nowType = $data["worker"];
+                break;
+            case "payment":
+                $nowType = $data["pay_type"];
+                break;
+            case "hotel":
+                $nowType = $data["room_name"];
+                break;
+            case "playroom":
+                $nowType = $data["room_name"];
+                break;
+            default:
+                $nowType = $data["reservationDate"];
+        }
+
+        if ($orderType == "payment") {
+            switch ($nowType) {
+                case "앱-선결제":
+                    $nowType = "앱-선결제";
+                    break;
+                case "앱-매장결제":
+                    $nowType = "앱-매장결제";
+                    break;
+                case "매장접수":
+                    $nowType = "매장접수";
+                    break;
+                default:
+                    $nowType = "매장접수";
+            }
+        }
+
+        if ($orderType == "date") {
+            switch ($nowType) {
+                case "미용":
+                    $nowType = "미용";
+                    break;
+                case "호텔":
+                    $nowType = "호텔";
+                    break;
+                case "유치원":
+                    $nowType = "유치원";
+                    break;
+                default:
+                    $nowType = "미용";
+            }
+        }
+
+        if($orderType == "playroom"){
+            switch ($nowType) {
+                case "1":
+                    $nowType = "종일권";
+                    break;
+                case "2":
+                    $nowType = "몇시간만";
+                    break;
+                default:
+                    $nowType = "종일권";
+            }
+        }
+
+
+
+        $summaryCount[$nowType]++;
+        $summaryCard[$nowType] += $data["card"];
+        $summaryMoney[$nowType] += $data["cash"];
+    }
+}
+
+// 제품목록 가져오기
+$query = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '".$user_id."'";
+$result = mysqli_query($connection,$query);
+while ($row = mysqli_fetch_object($result)) {
+    $data['dog_etc_list'][] = $row;
+}
+?>
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- stats-sale-wrap -->
+        <div class="stats-sale-wrap">
+            <div class="wide-tab">
+                <div class="wide-tab-inner">
+                    <!-- 활성화시 actived클래스 추가 -->
+                    <div class="tab-cell actived"><a href="stats_sale" class="btn-tab-item">판매실적</a></div>
+                    <div class="tab-cell"><a href="javascript:layerPop.alert('준비중입니다.');" class="btn-tab-item">정산조회</a></div>
+                </div>
+            </div>
+            <form id="searchForm" method="get" autocomplete="off">
+                <div class="form-bottom-info type-2">취소된 예약과 NoShow예약은 제외되며 매장에서 접수한 예약은 매장에서 입력한 결제 금액을 그대로 표시하여 입력하지 않은 경우 0원으로 표시됩니다.</div>
+                <div class="basic-data-group vmiddle">
+                    <div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-label">검색기간 선택</div>
+                                <div class="form-item-data type-2">
+                                    <div class="grid-layout toggle-button-group">
+                                        <div class="grid-layout-inner">
+                                            <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle"><input type="radio" name="quk" value="<?php echo date('Y-m-d');?>" data-select="<?php echo date('Y-m-d');?>" data-end="<?php echo date('Y-m-d');?>"                               class="quk_date d_today" <?=($quk == date('Y-m-d'))? "checked" : ""; ?>><em>금일</em></label></div>
+                                            <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle"><input type="radio" name="quk" value="<?php echo date('Y-m-d',strtotime('-1 week'));?>" data-end="<?php echo date('Y-m-d');?>" data-select="<?php echo date('Y-m-d',strtotime('-1 week'));?>"  class="quk_date d_today" <?=($quk == date('Y-m-d',strtotime('-1 week')))? "checked" : ""; ?>><em>1주</em></label></div>
+                                            <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle"><input type="radio" name="quk" value="<?php echo date('Y-m-d',strtotime('-1 month'));?>" data-end="<?php echo date('Y-m-d');?>" data-select="<?php echo date('Y-m-d',strtotime('-1 month'));?>" class="quk_date d_today" <?=($quk == date('Y-m-d',strtotime('-1 month')))? "checked" : ""; ?>><em>1달</em></label></div>
+                                            <div class="grid-layout-cell grid-4"><label class="form-toggle-box middle"><input type="radio" name="quk" value="<?php echo date('Y-m-d',strtotime('-3 month'));?>" data-end="<?php echo date('Y-m-d');?>" data-select="<?php echo date('Y-m-d',strtotime('-3 month'));?>" class="quk_date d_today" <?=($quk == date('Y-m-d',strtotime('-3 month')))? "checked" : ""; ?>><em>3달</em></label></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-label">검색일자 선택</div>
+                                <div class="form-item-data type-2">
+                                     <!-- 20220415 수정 -->
+                                    <div class="form-datepicker-group">
+                                        <div class="form-datepicker"><input type="text" id="startDate" name="startDate" class="datepicker-start" value="<?=$startDate?>"/></div>
+                                        <div class="form-unit">~</div>
+                                        <div class="form-datepicker"><input type="text" id="endDate" name="endDate" class="datepicker-end" value="<?=$endDate?>"/></div>
+                                    </div>
+                                    <!-- //20220415 수정 -->
+
+                                    <!--<div class="form-datepicker-group">
+                                        <div class="form-datepicker">
+                                            <select id="startDate" name="startDate" class="datePicker">
+                                                <?php
+                                                for($i=strtotime(date('Y-m-d'));$i>=strtotime('2020-01-01');$i-=86400){
+                                                    ?>
+                                                    <option value="<?php echo date('Y-m-d',$i); ?>" <?php echo ($startDate==date('Y-m-d',$i))?'selected':'';?>><?php echo date('Y-m-d',$i); ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                        <div class="form-unit">~</div>
+                                        <div class="form-datepicker">
+                                            <select id="endDate" name="endDate" class="datePicker">
+                                                <?php
+                                                for($i=strtotime(date('Y-m-d'));$i>=strtotime('2020-01-01');$i-=86400){
+                                                    ?>
+                                                    <option value="<?php echo date('Y-m-d',$i); ?>" <?php echo ($endDate==date('Y-m-d',$i))?'selected':'';?>><?php echo date('Y-m-d',$i); ?></option>
+                                                <?php } ?>
+                                            </select>
+                                        </div>
+                                    </div>-->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-label">검색조건</div>
+                                <div class="form-item-data type-2">
+                                    <div class="grid-layout basic">
+                                        <div class="grid-layout-inner">
+                                            <div class="grid-layout-cell grid-2">
+                                                <select id="orderType" name="orderType">
+                                                    <option value="date" <?= ($orderType == "date") ? "selected" : "" ?>>최신순</option>
+                                                    <option value="payment" <?= ($orderType == "payment") ? "selected" : "" ?>>예약/결제방식별</option>
+                                                    <option value="service" <?= ($orderType == "service") ? "selected" : "" ?>>미용-미용별</option>
+                                                    <option value="artist" <?= ($orderType == "artist") ? "selected" : "" ?>>미용-미용사별</option>
+                                                    <!--<option value="hotel" <?/*= ($orderType == "hotel") ? "selected" : "" */?>>호텔-객실별</option>
+                                                <option value="playroom" <?/*= ($orderType == "playroom") ? "selected" : "" */?>>유치원-서비스별</option>-->
+                                                </select>
+                                            </div>
+                                            <div class="grid-layout-cell grid-2">
+                                                <select id="orderDetail" name="orderDetail">
+                                                    <option value="">전체</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="btn-basic-action">
+                        <div class="grid-layout btn-grid-group">
+                            <div class="grid-layout-inner">
+                                <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round" id="resetBtn">초기화</button></div>
+                                <div class="grid-layout-cell grid-2"><button type="submit" onclick="$('#loading').addClass('actived');" class="btn btn-outline-purple btn-middle-size btn-round" id="searchBtn">조회</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="basic-data-group middle" style="dispilay:block;">
+                <!-- 그래프영역 -->
+<!--                <div class="stats-result-graph" id="graph1" >-->
+<!--                    <div class="customer-state-graph doughnut-graph" >-->
+<!--                        <div class="graph-inner">-->
+<!--                            <canvas id="doughnut"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="customer-state-graph horizontal-bar-graph" >-->
+<!--                        <canvas id="horizontalBar"></canvas>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="stats-result-graph" id="graph2" style="display:none;" >-->
+<!--                    <div class="customer-state-graph doughnut-graph" >-->
+<!--                        <div class="graph-inner">-->
+<!--                            <canvas id="doughnut2"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="stats-result-graph" id="graph3" style="display:none;" >-->
+<!--                    <div class="customer-state-graph horizontal-bar-graph" >-->
+<!--                        <canvas id="horizontalBar2"></canvas>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="stats-result-graph" id="graph4" style="display:none;" >-->
+<!--                    <div class="customer-state-graph horizontal-bar-graph" >-->
+<!--                        <canvas id="treemap"></canvas>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <!-- //그래프영역 -->
+                <!-- 조회 데이타 영역-->
+                <div class="stats-result-data">
+                    <div class="stats-result-sort">
+                        <div class="sort-tab big">
+                            <div class="sort-tab-inner">
+                                <!-- 활성화시 actived클래스 추가 -->
+                                <div class="tab-cell actived"><a href="#" class="btn-tab-item"><strong>고객</strong> (<span class="customer_count"></span>)</a></div>
+                                <div class="tab-cell"><a href="#" class="btn-tab-item"><strong>동물</strong> (<span id="pet_count"></span>)</a></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- tab-data-cell 클래스에 actived클래스 추가시 활성화 -->
+                    <div class="tab-data-group">
+                        <!-- 고객 -->
+                        <div class="tab-data-cell actived">
+                            <div>
+                                <div class="customer-all-inquiry-list">
+                                    <div class="table_header">
+                                        <table class="customer-table">
+                                            <colgroup>
+                                                <col style="width:26%">
+                                                <col style="width:20%">
+                                                <col style="width:20%">
+                                                <col style="width:17%">
+                                                <col style="width:17%">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th rowspan="2">펫이름</th>
+                                                <th rowspan="2">이용 일시</th>
+                                                <th rowspan="2">내역</th>
+                                                <th colspan="2">금액(단위:원)</th>
+                                            </tr>
+                                            <tr>
+                                                <th>카드</th>
+                                                <th>현금</th>
+                                            </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                    <table class="customer-table">
+                                        <colgroup>
+                                            <col style="width:26%">
+                                            <col style="width:20%">
+                                            <col style="width:20%">
+                                            <col style="width:17%">
+                                            <col style="width:17%">
+                                        </colgroup>
+                                            <tbody>
+
+                                        <?php
+                                        if(count($searchList) > 0){
+                                            $beforeType = "";
+                                            foreach($searchList AS $key => $value){
+                                                if($value["payment_type"] == "미용"){
+                                                    // 펫 이름
+                                                    $product = explode("|", $value["extra_service"]);
+                                                    $pet_name = $product[0];
+
+                                                    // 미용일시
+                                                    $working_dt = $value["year"]."-".$value["month"]."-".$value["day"]." ".$value["hour"].":".$value["minute"].":00";
+                                                    $working_dt = DATE("Y-m-d", STRTOTIME($working_dt))."<br/>".DATE("H:i", STRTOTIME($working_dt));
+
+                                                    // 내역
+                                                    $pet_type = $product[1];
+                                                    $etc_product_list = array();
+                                                    if($pet_type == "개"){
+                                                        //미용 내역
+                                                        $product_name = explode(":", $product[4])[0];
+                                                        //추가 내역
+                                                        $add_product = explode(":", $product[6])[0];
+                                                        //털 길이
+                                                        $hair = explode(":", $product[7])[0];
+
+                                                        //추가 옵션
+                                                        $toenail = $product[9];
+                                                        $trumpet = $product[10];
+                                                        $bell = $product[11];
+
+                                                        $addition_count = intval($product[14]);
+                                                        if ($toenail != "" && $toenail != null) {
+                                                            $etc_product_list[] = "발톱";
+                                                        }
+                                                        if ($trumpet != "" && $trumpet != null) {
+                                                            $etc_product_list[] = "장화";
+                                                        }
+                                                        if ($bell != "" && $bell != null) {
+                                                            $etc_product_list[] = "방울";
+                                                        }
+                                                        for ($i = 15; $i < (15 + $addition_count); $i++) {
+                                                            $etc_product_list[] = explode(":", $product[$i])[0];
+                                                        }
+
+                                                        //기타 상품
+                                                        $start = 15 + $addition_count;
+                                                        $etc_count = intval($product[$start]);
+                                                        for ($i = $start + 1; $i < (($start + 1) + $etc_count); $i++) {
+                                                            $etc_product_list[] = explode(":", $product[$i])[0];
+                                                        }
+                                                    }else{
+                                                        //미용 내역
+                                                        $product_name = $product[3];
+                                                        //추가 내역
+                                                        $add_product = explode(":", $product[5])[0];
+
+                                                        //추가 옵션
+                                                        $toenail = $product[6];
+                                                        $bath = $product[7];
+
+                                                        $addition_count = intval($product[8]);
+                                                        if ($toenail != "" && $toenail != null) {
+                                                            $etc_product_list[] = "발톱";
+                                                        }
+                                                        if ($bath != "" && $bath != null) {
+                                                            $etc_product_list[] = "목욕";
+                                                        }
+                                                        for ($i = 9; $i < (9 + $addition_count); $i++) {
+                                                            $etc_product_list[] = explode(":", $product[$i])[0];
+                                                        }
+
+                                                        //기타 상품
+                                                        $start = 9 + $addition_count;
+                                                        $etc_count = intval($product[$start]);
+                                                        for ($i = $start + 1; $i < (($start + 1) + $etc_count); $i++) {
+                                                            $etc_product_list[] = explode(":", $product[$i])[0];
+                                                        }
+                                                    }
+
+                                                    //쿠폰
+                                                    $is_coupon = $value["is_coupon"];
+                                                    $buy_coupon = $value["buy_coupon"];
+                                                    if (($product_name == "" || $product_name == NULL) && $buy_coupon == "Y") {
+                                                        $product_name = "쿠폰";
+                                                    } else if ($product_name == "" || $product_name == NULL) {
+                                                        $product_name = " ";
+                                                    }
+
+                                                    $add_product_str = ""; // 추가
+                                                    if ($is_coupon == "Y") {
+                                                        $add_product_str = number_format($price_c)."/".number_format($price_m);
+                                                        $price_c = "쿠폰";
+                                                        $price_m = "쿠폰";
+                                                    } else {
+                                                        $add_product_str = $add_product . ((($add_product != null & $add_product != "") && ($hair != null & $hair != "")) ? " / " : "") . (($hair != null && $hair != "") ? $hair . "mm" : "");
+                                                        $price_c = number_format($price_c);
+                                                        $price_m = number_format($price_m);
+                                                    }
+
+                                                    if ((trim($product_name) == NULL || trim($product_name) == "") && (trim($add_product_str) == NULL || trim($add_product_str) == "")) {
+                                                        $product_name = array_shift($etc_product_list);
+                                                        $add_product_str = implode(", ", $etc_product_list);
+                                                    }
+
+                                                    // 추가내역에 상품구매 추가
+                                                    // 제품목록에서 구매 이력 있는 사용자 가져오기
+                                                    $merchandise = "";
+                                                    foreach ($data["dog_etc_list"] as $index => $etc) {
+                                                        $etc_seq = $etc->etc_seq; // 제품 목록의 제품seq
+                                                        for($i=0; $i<count($product) ; $i++){
+                                                            $buy_merchandise = explode(":", $product[$i]);
+                                                            if($etc_seq == $buy_merchandise[0]){
+                                                                $merchandise .= $buy_merchandise[1]." ".$buy_merchandise[3]."개, ";
+                                                            }
+                                                        }
+                                                    }
+                                                    $merchandise = ($merchandise != "")? substr($merchandise, 0, -2) : $merchandise; // 마지막에 , 빼기
+
+                                                }else if($value["payment_type"] == "호텔"){
+                                                    $add_product_str = ""; // 추가
+                                                    $product_arr = array();
+                                                    $product_data = json_decode($value["extra_service"], 1);
+                                                    foreach($product_data AS $key2 => $value2){
+                                                        $product_arr[] = $value2["name"];
+                                                    }
+                                                    $add_product_str = implode(", ", $product_arr);
+                                                }else if($value["payment_type"] == "유치원"){
+                                                    $add_product_str = ""; // 추가
+                                                    $product_arr = array();
+                                                    $product_data = json_decode($value["extra_service"], 1);
+                                                    foreach($product_data AS $key2 => $value2){
+                                                        $product_arr[] = $value2["name"];
+                                                    }
+                                                    $add_product_str = implode(", ", $product_arr);
+                                                }
+
+
+
+                                                // 정렬 구분
+                                                $nowType = "";
+
+                                                switch ($orderType) {
+                                                    case "date":
+                                                        $nowType = $value["payment_type"];
+                                                        break;
+                                                    case "service":
+                                                        $nowType = $value["service"];
+                                                        break;
+                                                    case "artist":
+                                                        $nowType = $value["worker"];
+                                                        break;
+                                                    case "payment":
+                                                        $nowType = $value["pay_type"];
+                                                        break;
+                                                    case "hotel":
+                                                        $nowType = $value["room_name"];
+                                                        break;
+                                                    case "playroom":
+                                                        $nowType = $value["room_name"];
+                                                        break;
+                                                    default:
+                                                        $nowType = $value["payment_type"];
+                                                }
+
+                                                if ($orderType == "payment") {
+                                                    switch ($nowType) {
+                                                        case "앱-선결제":
+                                                            $nowType = "앱-선결제";
+                                                            break;
+                                                        case "앱-매장결제":
+                                                            $nowType = "앱-매장결제";
+                                                            break;
+                                                        case "매장접수":
+                                                            $nowType = "매장접수";
+                                                            break;
+                                                        default:
+                                                            $nowType = "매장접수";
+                                                    }
+                                                }
+
+                                                if ($orderType == "date") {
+                                                    switch ($nowType) {
+                                                        case "미용":
+                                                            $nowType = "미용";
+                                                            break;
+                                                        case "호텔":
+                                                            $nowType = "호텔";
+                                                            break;
+                                                        case "유치원":
+                                                            $nowType = "유치원";
+                                                            break;
+                                                        default:
+                                                            $nowType = "미용";
+                                                    }
+                                                }
+
+                                                if($orderType == "playroom"){
+                                                    switch ($nowType) {
+                                                        case "1":
+                                                            $nowType = "종일권";
+                                                            break;
+                                                        case "2":
+                                                            $nowType = "몇시간만";
+                                                            break;
+                                                        default:
+                                                            $nowType = "종일권";
+                                                    }
+                                                }
+
+                                                $pet_data[] = $value['b_pet_seq'];
+
+                                                if (($beforeType != $nowType) && $orderType != "") {
+                                                    if($orderType == 'payment') {
+                                                        $pt[$nowType] = $summaryCard[$nowType] + $summaryMoney[$nowType];
+                                                    } else if($orderType == 'service'){
+                                                        $pt[$nowType] = $summaryCard[$nowType] + $summaryMoney[$nowType];
+                                                    } else if($orderType == 'artist'){
+                                                        $art[] = $nowType;
+                                                        $pt[$nowType] = $summaryCard[$nowType] + $summaryMoney[$nowType];
+                                                    }
+                                                    ?>
+                                                    <!-- 하나의 그룹 -->
+                                                    <tr class="customer-table-total">
+                                                        <td class="text-align-left" colspan="2"><?= ($orderType == "artist" && ($nowType == $shop_id)) ? "대표" : $nowType ?> 소계</td>
+                                                        <td class="no-padding"><?= $summaryCount[$nowType] ?>건</td>
+                                                        <td class="no-padding"><?= number_format($summaryCard[$nowType]) ?></td>
+                                                        <td class="no-padding"><?= number_format($summaryMoney[$nowType]) ?></td>
+                                                    </tr>
+                                                    <?php
+                                                }
+                                                ?>
+                                                <!-- 하나의 아이템 -->
+                                                <tr class="customer-table-cell">
+                                                    <td class="text-align-left">
+                                                        <div class="customer-table-txt"><strong><?=$value["name"] ?></strong></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="customer-table-txt"><?=substr($value["reservationDate"],0,10) ?></div>
+                                                        <div class="customer-table-txt"><?php echo (date('G',strtotime($value["reservationDate"]))>12)?'오후':'오전'; ?> <?=date('g:i',strtotime($value["reservationDate"])) ?></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="customer-table-txt">미용</div>
+                                                        <div class="customer-table-txt"><?=$value["service"] ?></div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="customer-table-txt"><?=number_format($value["card"]) ?>원</div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="customer-table-txt"><?=number_format($value["cash"]) ?>원</div>
+                                                    </td>
+                                                </tr>
+                                                <?php
+                                                $beforeType = $nowType;
+                                            }
+                                        } else {
+                                            ?>
+                                            <!-- 없을 경우 -->
+                                            <tr>
+                                                <td class="none" colspan="5">결제 내역이 없습니다.</td>
+                                            </tr>
+                                        <?php }
+
+                                        $pd = implode(",",$pet_data);
+                                        $que = "SELECT * FROM tb_mypet WHERE pet_seq IN ($pd)";
+                                        $rs = sql_fetch_array($que);
+                                        if(count($rs)>0){
+                                            foreach($rs as $rs){
+                                                if(!empty($rs['customer_id'])){
+                                                    $cus[] =  $rs['customer_id'];
+                                                } else {
+                                                    $cus[] =  $rs['tmp_seq'];
+                                                }
+                                            }
+                                        }
+
+
+                                        $person_cnt = count(array_unique($cus));
+                                        $pet_cnt = count(array_unique($pet_data));
+
+                                        ?>
+                                        <!-- //없을 경우 -->
+                                        <!-- //하나의 그룹 -->
+                                        </tbody>
+                                    </table>
+                                    <div class="basic-data-group bottom_fixed_div">
+                                        <div class="stats-result-total">
+                                            <div class="grid-layout">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell">
+                                                        <div class="stats-result-total-item"><em>건수</em><p><?= $count ?>건</p></div>
+                                                    </div>
+                                                    <div class="grid-layout-cell">
+                                                        <div class="stats-result-total-item"><em>카드</em><p><?= number_format($sum_c) ?>원</p></div>
+                                                    </div>
+                                                    <div class="grid-layout-cell">
+                                                        <div class="stats-result-total-item"><em>현금</em><p><?= number_format($sum_m) ?>원</p></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="stats-result-total">
+                                            <div class="stats-result-total-item total"><em>실적합계</em><p><?= number_format($sum_c + $sum_m) ?>원</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- //고객 -->
+                        <!-- 동물 -->
+                        <div class="tab-data-cell">
+                        </div>
+                        <!-- //동물 -->
+                    </div>
+                </div>
+                <!-- //조회 데이타 영역-->
+            </div>
+        </div>
+        <!-- //stats-sale-wrap -->
+    </div>
+    <!-- //page-body -->
+</section>
+<!-- //container -->
+
+<script src="/static/pub/js/chart2/Chart.bundle.min.js"></script>
+<script src="/static/pub/js/chart2/chartjs-plugin-labels.js"></script>
+<script src="/static/pub/js/chart2/chartjs-chart-treemap@0.2.3.js"></script>
+
+
+
+<script>
+    var orderType = "<?=$orderType?>";
+    var artist_id = "<?=$user_id?>";
+    var select_value = "<?=$orderDetail?>";
+    var person_cnt = '<?php echo $person_cnt;?>';
+    var pet_cnt = '<?php echo $pet_cnt;?>';
+    $(document).ready(function() {
+        if(orderType != ""){
+            orderDetail(orderType, artist_id, select_value);
+        }
+
+        $('.customer_count').text(person_cnt);
+        $('#pet_count').text(pet_cnt);
+
+    });
+
+    // 상세내역 ajax로 호출하여 추가
+    $("#manage_statistics").on("click", ".mobile table.stat_data tr", function(){
+        if($(this).hasClass("on")){
+            $("#manage_statistics .mobile table.stat_data tr.on").removeClass("on");
+            $("#manage_statistics .mobile table.stat_data tr.add_line td ul").animate({height: 0}, 100, function(){
+                $("#manage_statistics .mobile table.stat_data tr.add_line").remove();
+            });
+        }else{
+            if(!$(this).hasClass("add_line") && !$(this).hasClass("title") && !$(this).hasClass("subSummary") && !$(this).hasClass("not_list")){
+                $("#manage_statistics .mobile table.stat_data tr.on").removeClass("on");
+                $("#manage_statistics .mobile table.stat_data tr.add_line").remove();
+
+                var idx = $(this).index();
+                var html = "";
+                var etc1 = $(this).data("etc1");
+                var etc2 = $(this).data("etc2");
+                var etc3 = $(this).data("etc3");
+                var etc3_3 = $(this).data("etc3_3");
+                var etc4 = $(this).data("etc4");
+                var etc5 = $(this).data("etc5");
+                var etc6 = $(this).data("etc6");
+
+                $(this).addClass("on");
+                html += "<tr class='add_line'>";
+                html += "	<td colspan='5'>";
+                html += "		<ul>";
+                html += "			<li><span>예약일시</span>"+etc1+"</li>";
+                html += "			<li><span>미용사</span>"+etc2+"</li>";
+                html += "			<li><span>추가</span>"+etc3+etc3_3+"</li>";
+                html += "			<li><span>취소일시</span>"+etc4+"</li>";
+                html += "			<li><span>적립금</span>"+etc6+"</li>";
+                html += "			<li><span>결제방식</span>"+etc5+"</li>";
+                html += "		</ul>";
+                html += "	</td>";
+                html += "</tr>";
+
+                $("#manage_statistics .mobile table.stat_data tr:eq("+idx+")").after(html);
+            }
+        }
+    });
+
+    // 검색 시 정렬방식 변경하면 하위 선택메뉴 호출
+    $("#searchForm").on("change", "#orderType", function(){
+        orderType = $(this).children("option:selected").val();
+
+        if(orderType != ""){
+            orderDetail(orderType, artist_id, select_value);
+        }
+    });
+
+    // 검색 초기화
+    $("#searchForm").on("click", "#resetBtn", function(){
+        location.replace($(location).attr('protocol')+"//"+$(location).attr('host')+""+$(location).attr('pathname'));
+    });
+
+    // 날짜 퀵 검색(1일, 1주일, 1달, 3달)
+    $("#searchForm").on("click", ".quk_date", function(){
+        var start_date = $(this).data('select');
+        var end_date = $(this).data('end');
+
+        $("#startDate").val(start_date);
+        $("#endDate").val(end_date);
+    });
+
+    function orderDetail(orderType, artist_id, select_value){
+        var html = "<option value=''>전체</option>";
+
+        $.ajax({
+            type: 'post',
+            dataType: 'json',
+            data: {
+                mode : "getSearchDetailList",
+                type : orderType,
+                artist_id : artist_id
+            },
+            url: './data/manage_statistics_ajax.php',
+            error: function() {
+                alert('호출에 실패했습니다.');
+            },
+            success: function(json) {
+                if(json.code == "000000"){
+                    //console.log(json.data);
+                    if(orderType != "playroom"){ // not list
+                        $.each(json.data.list, function(i, e){
+                            var is_select = "";
+                            var option_val = e;
+                            var option_txt = (orderType == "artist" && artist_id == e)? "대표" : e;
+
+                            if(e == select_value){
+                                is_select = " selected ";
+                            }
+
+                            html += "<option value='"+option_val+"' "+is_select+">"+option_txt+"</option>";
+                        });
+                    }
+                    $("#orderDetail").html("").html(html);
+                }else{
+                    alert(json.data+" ("+json.code+")");
+                }
+            }
+        });
+    }
+
+    function get_customer_pet_count(artist_id){
+        $.ajax({
+            url: 'data/manage_customer_allview_ajax.php',
+            data: {
+                mode: "get_customer_pet_count",
+                artist_id: artist_id
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    $("#pet_count").text(data.data);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+    function get_customer_count(artist_id){
+        $.ajax({
+            url: 'data/manage_customer_allview_ajax.php',
+            data: {
+                mode: "get_customer_count",
+                artist_id: artist_id
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    //console.log(data.data);
+                    $("#manage_customer_view_pc #customer_count").text(data.data);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    // 달력
+    /* 20220415 수정 */
+    $(".datepicker-start").datepicker({
+        showOn: "both",
+        buttonImage: "/static/pub/images/icon/icon-datepicker.png",
+        buttonImageOnly: true,
+        dateFormat: 'yy-mm-dd',//포맷 설정
+        prevText: '이전 달',//이전 버튼
+        nextText: '다음 달', //다음달 버튼
+        monthNames: ['1','2','3','4','5','6','7','8','9','10','11','12'],//월 설정
+        monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'], //월 설정
+        dayNames: ['일','월','화','수','목','금','토'],//주 타이틀 설정
+        dayNamesShort: ['일','월','화','수','목','금','토'],//주 타이틀 설정
+        dayNamesMin: ['일','월','화','수','목','금','토'], //주 타이틀 설정
+        showMonthAfterYear: true, // 년도가 앞으로 설정
+        yearSuffix: '.', //년도 뒤 블릿 설정
+        changeMonth: false, //월 선택 불가
+        changeYear: false, //년 선택 불가
+        showOtherMonths:true, //이전 , 다음 달 일수 활성화
+    });
+
+    $(".datepicker-end").datepicker({
+        showOn: "both",
+        buttonImage: "/static/pub/images/icon/icon-datepicker.png",
+        buttonImageOnly: true,
+        dateFormat: 'yy-mm-dd',//포맷 설정
+        prevText: '이전 달',//이전 버튼
+        nextText: '다음 달', //다음달 버튼
+        monthNames: ['1','2','3','4','5','6','7','8','9','10','11','12'],//월 설정
+        monthNamesShort: ['1','2','3','4','5','6','7','8','9','10','11','12'], //월 설정
+        dayNames: ['일','월','화','수','목','금','토'],//주 타이틀 설정
+        dayNamesShort: ['일','월','화','수','목','금','토'],//주 타이틀 설정
+        dayNamesMin: ['일','월','화','수','목','금','토'], //주 타이틀 설정
+        showMonthAfterYear: true, // 년도가 앞으로 설정
+        yearSuffix: '.', //년도 뒤 블릿 설정
+        changeMonth: false, //월 선택 불가
+        changeYear: false, //년 선택 불가
+        showOtherMonths:true, //이전 , 다음 달 일수 활성화
+    });
+    /* //20220415 수정 */
+
+    function getRecentDate(){
+        var dt = new Date();
+
+        var recentYear = dt.getFullYear();
+        var recentMonth = dt.getMonth() + 1;
+        var recentDay = dt.getDate();
+
+        if(recentMonth < 10) recentMonth = "0" + recentMonth;
+        if(recentDay < 10) recentDay = "0" + recentDay;
+
+        return recentYear + "-" + recentMonth + "-" + recentDay;
+    }
+
+    // date - week(Y-m-d)
+    function getWeekDate(period){
+        var dt = new Date();
+
+        dt.setDate(dt.getDate() - (7 * period));
+
+        var year = dt.getFullYear();
+        var month = dt.getMonth() + 1;
+        var day = dt.getDate();
+
+        if(month < 10) month = "0" + month;
+        if(day < 10) day = "0" + day;
+
+        return year + "-" + month + "-" + day;
+    }
+
+    // date - period(Y-m-d)
+    function getPastDate(period){
+        var dt = new Date();
+
+        dt.setMonth((dt.getMonth() + 1) - period);
+
+        var year = dt.getFullYear();
+        var month = dt.getMonth();
+        var day = dt.getDate();
+
+        if(month < 10) month = "0" + month;
+        if(day < 10) day = "0" + day;
+
+        return year + "-" + month + "-" + day;
+    }
+
+    // date - period(Y-m-d)
+    function getStartDate(period){
+        var dt = new Date();
+
+        dt.setMonth(dt.getMonth() - period);
+
+        var year = dt.getFullYear();
+        var month = (dt.getMonth() + 1);
+        var day = 1;
+
+        if(month < 10) month = "0" + month;
+        if(day < 10) day = "0" + day;
+
+        return year + "-" + month + "-" + day;
+    }
+
+    // date - endDay(Y-m-d)
+    function getEndDate(period){
+        var dt = new Date();
+
+        dt.setMonth(dt.getMonth() - period);
+
+        var year = dt.getFullYear();
+        var month = (dt.getMonth() + 1);
+        var day = ( new Date(year, month, 0) ).getDate();
+
+        if(month < 10) month = "0" + month;
+        if(day < 10) day = "0" + day;
+
+        return year + "-" + month + "-" + day;
+    }
+</script>
+<script>
+    $(document).ready(function(){
+        $('#btn_page_prev').prop('href','home_main');
+    });
+</script>
+</body>
+</html>

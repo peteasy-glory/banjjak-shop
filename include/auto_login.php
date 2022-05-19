@@ -27,7 +27,9 @@
 				$_SESSION['gobeauty_user_nickname'] = $row["nickname"];
 				$_SESSION['is_pc'] = $is_pc;
 				$_SESSION['my_shop_flag'] = $my_shop_flag;
-                $_SESSION['is_token'] = "1";
+//                if(!$_SESSION['is_token'] || $_SESSION['is_token'] != "0"){ 
+                    $_SESSION['is_token'] = "1";
+//                }
 //				$_SESSION['my_shop_flag'] = $row[my_shop_flag];
 
 				if($artist_flag == "1"){
@@ -42,6 +44,7 @@
 				}
 
 				cookie_save($id,$master_key_name);
+
 			}
 		}
 ?>

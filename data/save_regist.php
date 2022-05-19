@@ -19,7 +19,7 @@ $name = ($_POST["name"] && $_POST["name"] != "")? $_POST["name"] : "";
 $cellphone = ($_POST["cellphone"] && $_POST["cellphone"] != "")? $_POST["cellphone"] : "";
 $top_region = ($_POST["top_region"] && $_POST["top_region"] != "")? $_POST["top_region"] : "";
 $middle_region = ($_POST["middle_region"] && $_POST["middle_region"] != "")? $_POST["middle_region"] : "";
-$offline = ($_POST["offline"] && $_POST["offline"] != "" && $_POST["offline"] == 1)? $_POST["offline"] : 0;
+$offline = ($_POST["offline"] && $_POST["offline"] != "" && $_POST["offline"] == 1)? $_POST["offline"] : "";
 $zipcode = ($_POST["zipcode"] && $_POST["zipcode"] != "")? $_POST["zipcode"] : "";
 $lat = ($_POST["lat"] && $_POST["lat"] != "")? $_POST["lat"] : "";
 $lng = ($_POST["lng"] && $_POST["lng"] != "")? $_POST["lng"] : "";
@@ -38,7 +38,7 @@ $working_years = 0;
 
 
 $shop_address = $zipcode."|".$business_addr." ".$business_addr_detail;
-//make_user_directory ($upload_static_directory.$upload_directory, $user_id);
+//make_user_directory ($upload_static_directory2.$upload_directory2, $user_id);
 //
 //$license_photo = $_POST["license_photo"];
 //$license_name = $_POST["license_name"];
@@ -58,15 +58,14 @@ $sql = "
         (`customer_id`, `step`, `name`, `cellphone`, `is_personal`, `is_business`, `business_number`, `business_license`, `region`, `professional`, `is_got_offline_shop`, 
          `offline_shop_name`, `offline_shop_phonenumber`, `offline_shop_address`, `update_time`, `working_years`, `lat`, `lng`, `enter_path`, `choice_service`) 
     VALUES 
-        ('".$user_id."', 6, '".$name."', '".$cellphone."', '".$is_personal."', '".$is_business."', '".$business_number."', '".$business_photo."', '".$region."', '', '".$offline."', 
+        ('".$user_id."', 5, '".$name."', '".$cellphone."', '".$is_personal."', '".$is_business."', '".$business_number."', '".$business_photo."', '".$region."', '', '".$offline."', 
          '".$offline_shop_name."', '".$offline_shop_phonenumber."', '".$shop_address."', NOW(), '".$working_years."', '".$lat."', '".$lat."', '', '".$cate."');
 
 ";
 
 $result = mysqli_query($connection, $sql);
 if($result){
-    echo "ok";
-//    echo $sql;
+    echo "success";
 }else{
     echo $sql;
 }
