@@ -50,6 +50,7 @@ while($row = mysqli_fetch_assoc($result)){
     <section id="container">
         <!-- page-body -->
         <div class="page-body">
+
             <div class="customer-all-inquiry">
                 <div class="con-title-group">
                     <h5 class="con-title"><strong>정렬방식</strong></h5>
@@ -61,11 +62,11 @@ while($row = mysqli_fetch_assoc($result)){
                         <!--<option value="">등급별</option>-->
                     </select>
                 </div>
-                <div class="customer-state-graph doughnut-graph">
+                <!--<div class="customer-state-graph doughnut-graph">
                     <div class="graph-inner">
                         <canvas id="doughnut"></canvas>
                     </div>
-                </div>
+                </div>-->
 
                 <div class="customer-all-inquiry-result" id="manage_customer_view_pc">
                     <div class="sort-tab big">
@@ -172,8 +173,8 @@ while($row = mysqli_fetch_assoc($result)){
             })
         })
         $(function(){
-            $("#loading").css("align-items", "center").css("justify-content", "center");
-            $("#loading").html("<span style='color: #fff; max-width: 50%; text-align:center;'><img src='/pet/images/logo_loading0.gif' style='width: 100px; height: 100px;'/><br/>소중한 고객의 정보를 수집중입니다...</span>");
+            //$("#loading").css("align-items", "center").css("justify-content", "center");
+            //$("#loading").html("<span style='color: #fff; max-width: 50%; text-align:center;'><img src='/pet/images/logo_loading0.gif' style='width: 100px; height: 100px;'/><br/>소중한 고객의 정보를 수집중입니다...</span>");
 
             for(var _i = 0; _i < hangul_arr.length; _i++){
                 var tmp_str = hangul_arr[_i];
@@ -198,7 +199,7 @@ while($row = mysqli_fetch_assoc($result)){
         });
 
         function get_customer_list(artist_id, search_btn){
-            $("#loading").css("display", "flex");
+            //$("#loading").css("display", "flex");
 
             console.log(artist_id+':'+search_btn)
             $.ajax({
@@ -211,12 +212,12 @@ while($row = mysqli_fetch_assoc($result)){
                 type: 'POST',
                 dataType: 'JSON',
                 beforeSend: function(){
-                    $("#loading").css("display", "flex");
+                    $("#loading").addClass("actived");
                     $("#manage_customer_view_pc .customer_list_wrap").html("");
                 },
                 success: function(data) {
-                    $("#loading").hide();
                     if(data.code == "000000"){
+                        $("#loading").removeClass("actived");
                         //console.log(data.data);
                         var html = '';
                         var code_cnt = 0;
@@ -322,6 +323,19 @@ while($row = mysqli_fetch_assoc($result)){
                                 pay_type_count3	+= v.cnt.format();
                                 //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_playroom_payment_customer_info_pc.php?order_num='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
                             }
+
+                            var start_txt = '';
+                            var reserve_info = '';
+                            if(v.cnt == '0'){
+                                start_txt = "신규등록일시";
+                                service = "[신규등록]";
+                                service2 = "[신규등록]";
+                            }else{
+                                start_txt = "최근이용일시";
+                                reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a>';
+                            }
+
+                            var type = (pet_type_arr[v.type])? pet_type_arr[v.type] : "알수없음";
                             html2	= `
 							<!-- 하나의 아이템 -->
 							<tr class="customer-table-cell">
@@ -331,7 +345,7 @@ while($row = mysqli_fetch_assoc($result)){
 									</button>
 								</td>
 								<td>
-									<div class="customer-table-txt"><strong>${pet_type_arr[v.type]}</strong></div>
+									<div class="customer-table-txt"><strong>${type}</strong></div>
 									<div class="customer-table-txt">${pet_type}</div>
 								</td>
 								<td>
@@ -352,7 +366,7 @@ while($row = mysqli_fetch_assoc($result)){
 									<div class="flex-table">
 										<div class="flex-table-cell">
 											<div class="flex-table-item">
-												<div class="flex-table-title"><div class="txt">최근이용일시</div></div>
+												<div class="flex-table-title"><div class="txt">${start_txt}</div></div>
 												<div class="flex-table-data">
 													<div class="flex-table-data-inner">
 														<div class="flex align-items-center">
@@ -363,8 +377,8 @@ while($row = mysqli_fetch_assoc($result)){
 															<div class="flex-1">
 																<div class="grid-layout btn-grid-group">
 																	<div class="grid-layout-inner">
-																		<div class="grid-layout-cell grid-2"><a href="reserve_pay_management_2?payment_log_seq=${v.payment_log_seq}" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a></div>
-																		<div class="grid-layout-cell grid-2"><a href="customer_view" class="btn btn-outline-gray btn-small-size btn-round">고객정보</a></div>
+                                                                        <div class="grid-layout-cell grid-2">${reserve_info}</div>
+																		<div class="grid-layout-cell grid-2"><a href="customer_view?customer_cellphone=${v.cellphone}&pet_seq=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round">고객정보</a></div>
 																	</div>
 																</div>
 															</div>
@@ -395,10 +409,10 @@ while($row = mysqli_fetch_assoc($result)){
 										</div>
 										<div class="flex-table-cell">
 											<div class="flex-table-item">
-												<div class="flex-table-title"><div class="txt">최근이용일시</div></div>
+												<div class="flex-table-title"><div class="txt">최근취소일시</div></div>
 												<div class="flex-table-data">
 													<div class="flex-table-data-inner">
-														${v.update_time2}
+														${v.cancel_time}
 													</div>
 												</div>
 											</div>
@@ -484,7 +498,7 @@ while($row = mysqli_fetch_assoc($result)){
 
                         //$("#manage_customer_view_pc .customer_list_wrap").html("").html(html);
                     }else{
-                        $("#loading").hide();
+                        $("#loading").removeClass("actived");
                         alert(data.data+"("+data.code+")");
                         console.log(data.data);
                     }
@@ -492,7 +506,7 @@ while($row = mysqli_fetch_assoc($result)){
                     console.log(pay_type_count1);
                     console.log(pay_type_count2);
                     console.log(pay_type_count3);
-                    var  doughnutData = {
+                    /*var  doughnutData = {
                         labels: [
                             '미용',
                             '호텔',
@@ -546,6 +560,7 @@ while($row = mysqli_fetch_assoc($result)){
 
                     var doughnutCtx = document.getElementById('doughnut');
                     var doughnut = new Chart(doughnutCtx , doughnutConfig);
+                    */
                 },
                 error: function(xhr, status, error) {
                     //alert(error + "네트워크에러");

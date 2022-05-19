@@ -20,7 +20,7 @@ if($result) {
     }else{
         $sql_3 = "
             INSERT INTO `tb_item_rental` (`product_no`, `customer_id`, `name`, `cellphone`, `persnal_info_agree`, `data_give_finish`, `reg_date`) 
-            VALUES ('sent_cell_service', '".$user_id."', '".$row['name']."', '".$row['cellphone']."', '1', '1', NOW());
+            VALUES ('sent_cell_service', '".$user_id."', '".$row['name']."', '".$row['cellphone']."', '1', '0', NOW());
         ";
         $result_3 = mysqli_query($connection, $sql_3);
         if($result_3){

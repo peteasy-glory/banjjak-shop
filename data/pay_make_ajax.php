@@ -74,7 +74,8 @@ switch($clear['mode']){
                     minute = '".intval(substr($start,10,2))."',
                     
                     to_hour = '".intval(substr($end,8,2))."',
-                    to_minute = '".intval(substr($end,10,2))."'
+                    to_minute = '".intval(substr($end,10,2))."',
+                    update_time = NOW()
                 WHERE payment_log_seq ='{$_POST['seq']}' ";
         //echo $sql;
         $res = sql_query($sql);

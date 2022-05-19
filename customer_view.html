@@ -34,7 +34,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 $crypto = new Crypto();
 $phone = $_GET['customer_cellphone'];
 
-$shop_id = $_SESSION["gobeauty_user_id"];
+$shop_id = $artist_id;
 
 
 //최근 결제 정보 구하기
@@ -46,10 +46,14 @@ $beauty_info = explode("|",$pay['product']);
 
 $crypto = new Crypto();
 //회원정보
-if($pay['customer_id']) {
-    $que = "SELECT * FROM tb_customer WHERE id = '{$pay['customer_id']}'";
+$que1 = "SELECT * FROM tb_customer WHERE cellphone = '{$phone}'";
+$res1 = mysqli_query($connection,$que1);
+$cus1 = mysqli_fetch_assoc($res1);
+
+if($cus1['id']) {
+    $que = "SELECT * FROM tb_customer WHERE id = '{$cus1['id']}'";
 } else {
-    $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$pay['cellphone']}'";
+    $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$phone}'";
 }
 //echo $que;
 $res = mysqli_query($connection,$que);
@@ -66,8 +70,7 @@ $sql = "
 		SELECT *
 		FROM tb_shop_customer_memo
 		WHERE artist_id = '" . $shop_id . "'
-			AND customer_id = '" . $cus["id"] . "'
-			AND tmp_seq = '" . $cus["tmp_seq"] . "'
+			AND cellphone = '" . $phone . "'
 			AND is_delete = '2'
 	";
 //echo $sql;
@@ -86,12 +89,9 @@ $cellphone_encode = $crypto->encode($phone, $access_key, $secret_key);
 $sql = "
 		SELECT *
 		FROM tb_customer
-		WHERE cellphone = '" . $cellphone_encode . "'
-			and nickname not like 'cellp_%'
-			order by last_login_time DESC
-			limit 1
+        WHERE id = '".$cus['id']."'
 	";	// 20210705 by migo - cellp 제외 조건
-//echo $sql."<p>";
+    //echo $sql."<p>";
 
 $result = mysqli_query($connection, $sql);
 $member_cnt = mysqli_num_rows($result);
@@ -105,30 +105,30 @@ if ($member_cnt == 0) { // (가회원)
     $result = mysqli_query($connection, $sql);
     $data["customer"] = mysqli_fetch_assoc($result);
     $data["customer"]["tmp_yn"] = "Y";
-    $where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
+    //$where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
     $where_qy .= " AND mp.tmp_seq = '" . $data["customer"]["tmp_seq"] . "' ";
 } else {
     $data["customer"] = mysqli_fetch_assoc($result);
     $data["customer"]["tmp_yn"] = "N";
-    $where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
+    //$where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
     $where_qy .= " AND mp.customer_id = '" . $data["customer"]["id"] . "' ";
     $data["customer"]["cellphone"] = $phone;
 }
 // 펫 리스트 호출
 $sql = "
 		SELECT * FROM (
-			SELECT
+			SELECT 
 				if(sum(pl.data_delete) > 0, NULL, mp.pet_seq) AS pet_seq,
-				if(sum(pl.data_delete) > 0, NULL, mp.name) AS name,
+				if(sum(pl.data_delete) > 0, NULL, mp.name) AS name, 
 				if(sum(pl.data_delete) > 0, NULL, mp.photo) AS photo
 			FROM tb_mypet AS mp
 				LEFT OUTER JOIN (
-					SELECT *
+					SELECT * 
 					FROM tb_payment_log
 					WHERE artist_id = '" . $user_id . "'
 				) AS pl ON mp.pet_seq = pl.pet_seq
-
-			WHERE 1=1
+				
+			WHERE 1=1 
 			AND mp.data_delete = '0'
 			" . $where_qy . "
 			GROUP BY mp.pet_seq
@@ -137,6 +137,7 @@ $sql = "
 	";
 //echo $sql."<p>";
 $result = mysqli_query($connection, $sql);
+$last_delete = ""; // 해당 고객의 펫이 몇마리인지
 while ($row = mysqli_fetch_assoc($result)) {
     if ($row["pet_name"] != "") {
         $row["name"] = $row["pet_name"];
@@ -144,10 +145,11 @@ while ($row = mysqli_fetch_assoc($result)) {
 
     $data["pet_list"][] = $row;
 }
+$last_delete = count($data["pet_list"]);
 
 if($member_cnt == 0){
     $que = "SELECT * FROM tb_tmp_user WHERE tmp_seq = '{$data["customer"]["tmp_seq"]}'";
-    echo $que;
+    //echo $que;
     $ttu = sql_fetch_array($que);
 }
 
@@ -171,7 +173,7 @@ $enc_phone = $crypto->encode($phone, $access_key, $secret_key);
 $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
 $gd = sql_fetch_array($que);
 
-$que = "SELECT
+$que = "SELECT 
             *
         FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$pay['customer_id']}'  ORDER BY b.grade_ord ASC";
 //echo $que;
@@ -183,60 +185,87 @@ if(empty($grade[0]['grade_name'])){
 
 
 //미용동의서
-$que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$pay['artist_id']}' AND pet_id = '{$pay['pet_seq']}'";
+$que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$pay['artist_id']}' AND pet_id = '{$_GET['pet_seq']}'";
 //echo $que;
 $bag = sql_fetch_array($que);
 
 $que = "SELECT COUNT(*) AS noshow_cnt FROM tb_payment_log WHERE artist_id = '{$user_id}' AND pet_seq = '{$pet_seq}' AND is_no_show = 1";
 $tpl = sql_fetch_array($que);
 
+// 펫삭제시 고려
+// hotel, playroom 펫 기록 조회
+$sql = "
+		SELECT beauty.cnt AS beauty_cnt, hotel.cnt AS hotel_cnt, play.cnt AS play_cnt FROM
+			(SELECT COUNT(*) AS cnt FROM tb_payment_log WHERE artist_id = '".$user_id."' AND pet_seq = '".$_GET['pet_seq']."') AS beauty,
+			(SELECT COUNT(*) AS cnt FROM tb_hotel_payment_log WHERE artist_id = '".$user_id."' AND pet_seq = '".$_GET['pet_seq']."') AS hotel,
+			(SELECT COUNT(*) AS cnt FROM tb_playroom_payment_log WHERE artist_id = '".$user_id."' AND pet_seq = '".$_GET['pet_seq']."') AS play
+	";
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$pet_beauty_cnt = $row["beauty_cnt"];
+$pet_hotel_cnt = $row["hotel_cnt"];
+$pet_play_cnt = $row["play_cnt"];
+
+// hotel, playroom 유저 기록 조회
+$sql = "
+		SELECT beauty.cnt AS beauty_cnt, hotel.cnt AS hotel_cnt, play.cnt AS play_cnt FROM
+			(SELECT COUNT(*) AS cnt FROM tb_payment_log WHERE artist_id = '".$user_id."' AND cellphone = '".$phone."') AS beauty,
+			(SELECT COUNT(*) AS cnt FROM tb_hotel_payment_log WHERE artist_id = '".$user_id."' AND cellphone = '".$phone."') AS hotel,
+			(SELECT COUNT(*) AS cnt FROM tb_playroom_payment_log WHERE artist_id = '".$user_id."' AND cellphone = '".$phone."') AS play
+	";
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+$user_beauty_cnt = $row["beauty_cnt"];
+$user_hotel_cnt = $row["hotel_cnt"];
+$user_play_cnt = $row["play_cnt"];
+$another_reserve = 0;
 ?>
 
-    <!-- container -->
-    <section id="container">
-        <!-- page-body -->
-        <div class="page-body">
-            <div class="customer-view-wrap">
-                <!-- 고객정보 -->
-                <div class="basic-data-group customer-view-user">
-                    <?php
+<!-- container -->
+<section id="container">
+	<!-- page-body -->
+	<div class="page-body">
+		<div class="customer-view-wrap">
+			<!-- 고객정보 -->
+			<div class="basic-data-group customer-view-user">
+                <?php
                     if($tpl[0]['noshow_cnt']>0){
-                        ?>
-                        <div class="customer-noshow-data">
-                            <div class="label label-outline-pink vvvlarge ">NO SHOW <?php echo $tpl[0]['noshow_cnt'];?>회</div>
-                            <button type="button" class="btn btn-red btn-round btn-smiddle-size no-show-reset">초기화</button>
-                        </div>
-                    <?php } ?>
-                    <div class="con-title-group">
-                        <h4 class="con-title">고객 정보</h4>
-                    </div>
-                    <div class="flex-table">
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">최근이용내역</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php echo $beauty_info[3]; ?>
-                                    </div>
-                                    <div class="flex-table-data-side"><a href="customer_alarm_inquiry?cellphone=<?php echo $phone;?>" class="font-color-purple font-underline btn-text">알림톡 발송 조회</a></div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php
+                ?>
+				<div class="customer-noshow-data">
+					<div class="label label-outline-pink vvvlarge ">NO SHOW <?php echo $tpl[0]['noshow_cnt'];?>회</div>
+					<button type="button" class="btn btn-red btn-round btn-smiddle-size no-show-reset">초기화</button>
+				</div>
+                <?php } ?>
+				<div class="con-title-group">
+					<h4 class="con-title">고객 정보</h4>
+				</div>
+				<div class="flex-table">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">최근이용내역</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php echo $beauty_info[3]; ?>
+								</div>
+								<div class="flex-table-data-side"><a href="customer_alarm_inquiry?cellphone=<?php echo $phone;?>" class="font-color-purple font-underline btn-text">알림톡 발송 조회</a></div>
+							</div>
+						</div>
+					</div>
+                    <?php
                         if(!empty($pet11['name'])){
-                            ?>
-                            <div class="flex-table-cell">
-                                <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">대표 펫 (수)</div></div>
-                                    <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
-                                            <?php echo $pet11['name'];?> 외 <?php echo count($data["pet_list"])-1;?>마리
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php } ?>
-                        <!--<div class="flex-table-cell">
+                    ?>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">대표 펫 (수)</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php echo $pet11['name'];?> 외 <?php echo count($data["pet_list"])-1;?>마리
+								</div>
+							</div>
+						</div>
+					</div>
+                    <?php } ?>
+					<!--<div class="flex-table-cell">
 						<div class="flex-table-item">
 							<div class="flex-table-title"><div class="txt">등급</div></div>
 							<div class="flex-table-data">
@@ -245,129 +274,130 @@ $tpl = sql_fetch_array($que);
 										<div class="icon icon-grade-vip"></div>
 										<div class="icon-grade-label"><?php //echo $grade[0]['grade_name'];?></div>
 									</div>-->
-                        <!--
-                        <div class="user-grade-item">
-                            <div class="icon icon-grade-normal"></div>
-                            <div class="icon-grade-label">Normal</div>
-                        </div>
-                        <div class="user-grade-item">
-                            <div class="icon icon-grade-normalb"></div>
-                            <div class="icon-grade-label">Normal_B</div>
-                        </div>
-                        -->
-                        <!--</div>
-                        <div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
-                    </div>
-                </div>
-            </div>-->
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">연락처</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php echo add_hyphen($phone);?>
-                                    </div>
-                                    <?php if($member_cnt == 0){ ?>
-                                        <div class="flex-table-data-side"><button type="button" class="btn-data-modify" onclick="popalert.open('numberAddPop1');">편집</button></div>
-                                    <?php } ?>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">보조 연락처</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php
-                                        for($i=0;$i<count($tel['title']);$i++){
-                                            ?>
-                                            <div class="flex-table-txt"><em><?php echo $tel['title'][$i];?></em><?php echo add_hyphen($tel['tel'][$i]);?></div>
-                                        <?php } ?>
-                                    </div>
-                                    <div class="flex-table-data-side"><button type="button" class="btn-data-add" onclick="popalert.open('numberAddPop');">추가</button></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <div class="form-group-cell">
-                            <div class="form-group-item">
-                                <div class="form-item-label">메모</div>
-                                <div class="form-item-data">
-                                    <textarea name="memo" id="memo" cols="30" rows="10"><?=$data["shop_customer_memo"]["memo"]?></textarea>
-                                    <!--<input type="text" class="form-control" placeholder="입력"/>-->
-                                    <div class="form-input-info">*메모는 입력 후 자동 저장됩니다.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- //고객정보 -->
-                <?php if(empty($pet_seq)){ ?>
-                    <div class="basic-data-group customer-view-pet">
-                        <div class="con-title-group">
-                            <h4 class="con-title">펫 정보</h4>
-                        </div>
-                        <div class="grid-layout btn-grid-group">
-                            <div class="grid-layout-inner">
-                                <!-- btn-toggle-button 클래스에 actived클래스 추가시 활성화 -->
-                                <div class="grid-layout-cell flex-auto">
-                                    <button type="radio" name="pet_no" value="" class="btn-toggle-button" <?php echo ($pet_seq=='')?'checked':'';?> onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=';">전체</button></div>
-                                <?php
-                                //print_r($data["pet_list"]);
-                                foreach ($data["pet_list"] as $key => $value) {
-                                    $str_class_on = ($value["pet_seq"] == $pet_seq) ? "checked" : "";
-                                    ?>
-                                    <div class="grid-layout-cell flex-auto">
-                                        <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" <?= $str_class_on ?> value="<?php echo $value['pet_seq'];?>" data-no="<?php echo $value['pet_seq'];?>" onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=<?php echo $value['pet_seq'];?>';"><em><?= $value["name"] ?></em></label>
-                                    </div>
+									<!--
+									<div class="user-grade-item">
+										<div class="icon icon-grade-normal"></div>
+										<div class="icon-grade-label">Normal</div>
+									</div>
+									<div class="user-grade-item">
+										<div class="icon icon-grade-normalb"></div>
+										<div class="icon-grade-label">Normal_B</div>
+									</div>
+									-->
+								<!--</div>
+								<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
+							</div>
+						</div>
+					</div>-->
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?php echo add_hyphen($phone);?>
+								</div>
+                                <?php if($member_cnt == 0){ ?>
+								<div class="flex-table-data-side"><button type="button" class="btn-data-modify" onclick="popalert.open('numberAddPop1');">편집</button></div>
+								<?php } ?>
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">보조 연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
                                     <?php
-                                }
-                                ?>
-                                <div class="grid-layout-cell flex-auto"><button type="button" onclick="location.href='customer_pet_new?cellphone=<?php echo $phone;?>&customer_id=<?php echo $cus['id'];?>&tmp_seq=<?php echo $cus['tmp_seq'];?>'" class="btn-toggle-button btn-toggle-basic"><span class="icon icon-plus-more-small"></span></button></div>
-                            </div>
-                        </div>
-                    </div>
-                <?php } else { ?>
-                <!-- 펫정보 -->
-                <div class="basic-data-group customer-view-pet">
-                    <div class="con-title-group">
-                        <h4 class="con-title">펫 정보</h4>
-                    </div>
-                    <div class="grid-layout btn-grid-group">
-                        <div class="grid-layout-inner">
-                            <!-- btn-toggle-button 클래스에 actived클래스 추가시 활성화 -->
-                            <div class="grid-layout-cell flex-auto">
-                                <button type="radio" name="pet_no" value="" class="btn-toggle-button" <?php echo ($pet_seq=='')?'checked':'';?> onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=';">전체</button></div>
-                            <?php
-                            //print_r($data["pet_list"]);
-                            foreach ($data["pet_list"] as $key => $value) {
-                                $str_class_on = ($value["pet_seq"] == $pet_seq) ? "checked" : "";
-                                ?>
-                                <div class="grid-layout-cell flex-auto">
-                                    <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" <?= $str_class_on ?> value="<?php echo $value['pet_seq'];?>" data-no="<?php echo $value['pet_seq'];?>" onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=<?php echo $value['pet_seq'];?>';"><em><?= $value["name"] ?></em></label>
-                                </div>
-                                <?php
-                            }
+                                        for($i=0;$i<count($tel['title']);$i++){
+                                    ?>
+									<div class="flex-table-txt"><em><?php echo $tel['title'][$i];?></em><?php echo add_hyphen($tel['tel'][$i]);?></div>
+                                    <?php } ?>
+								</div>	
+								<div class="flex-table-data-side"><button type="button" class="btn-data-add" onclick="popalert.open('numberAddPop');">추가</button></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">메모</div>
+							<div class="form-item-data">
+                                <textarea name="memo" id="memo" cols="30" rows="10"><?=$data["shop_customer_memo"]["memo"]?></textarea>
+								<!--<input type="text" class="form-control" placeholder="입력"/>-->
+								<div class="form-input-info">*메모는 입력 후 자동 저장됩니다.</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //고객정보 -->
+            <?php if(empty($pet_seq)){ ?>
+            <div class="basic-data-group customer-view-pet">
+                <div class="con-title-group">
+                    <h4 class="con-title">펫 정보</h4>
+                </div>
+                <div class="grid-layout btn-grid-group">
+                    <div class="grid-layout-inner">
+                        <!-- btn-toggle-button 클래스에 actived클래스 추가시 활성화 -->
+                        <div class="grid-layout-cell flex-auto">
+                            <button type="radio" name="pet_no" value="" class="btn-toggle-button" <?php echo ($pet_seq=='')?'checked':'';?> onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=';">전체</button></div>
+                        <?php
+                        //print_r($data["pet_list"]);
+                        foreach ($data["pet_list"] as $key => $value) {
+                            $str_class_on = ($value["pet_seq"] == $pet_seq) ? "checked" : "";
                             ?>
-                            <div class="grid-layout-cell flex-auto"><button type="button" onclick="location.href='customer_pet_new?cellphone=<?php echo $phone;?>&customer_id=<?php echo $cus['id'];?>&tmp_seq=<?php echo $cus['tmp_seq'];?>'" class="btn-toggle-button btn-toggle-basic"><span class="icon icon-plus-more-small"></span></button></div>
-                        </div>
+                            <div class="grid-layout-cell flex-auto">
+                                <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" <?= $str_class_on ?> value="<?php echo $value['pet_seq'];?>" data-no="<?php echo $value['pet_seq'];?>" onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=<?php echo $value['pet_seq'];?>';"><em><?= $value["name"] ?></em></label>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                        <div class="grid-layout-cell flex-auto"><button type="button" onclick="location.href='customer_pet_new?cellphone=<?php echo $phone;?>&customer_id=<?php echo $cus['id'];?>&tmp_seq=<?php echo $cus['tmp_seq'];?>'" class="btn-toggle-button btn-toggle-basic"><span class="icon icon-plus-more-small"></span></button></div>
                     </div>
-                    <!-- 펫 상세 -->
-                    <div class="">
-                        <!-- 하나의 펫 -->
-                        <div class="customer-view-pet-group">
-                            <div class="customer-view-pet-picture">
-                                <div class="item-thumb">
-                                    <div class="user-thumb large">
-                                        <?php
-                                        $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet_seq}'";
-                                        $res = sql_query($que);
-                                        $pet = sql_fetch($res);
+                </div>
+            </div>
+            <?php } else { ?>
+			<!-- 펫정보 -->
+			<div class="basic-data-group customer-view-pet">
+				<div class="con-title-group">
+					<h4 class="con-title">펫 정보</h4>
+				</div>
+				<div class="grid-layout btn-grid-group">
+					<div class="grid-layout-inner">
+						<!-- btn-toggle-button 클래스에 actived클래스 추가시 활성화 -->
+						<div class="grid-layout-cell flex-auto">
+                            <button type="radio" name="pet_no" value="" class="btn-toggle-button" <?php echo ($pet_seq=='')?'checked':'';?> onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=';">전체</button></div>
+                        <?php
+                        //print_r($data["pet_list"]);
+                        foreach ($data["pet_list"] as $key => $value) {
+                            $str_class_on = ($value["pet_seq"] == $pet_seq) ? "checked" : "";
+                            ?>
+                            <div class="grid-layout-cell flex-auto">
+                                <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" <?= $str_class_on ?> value="<?php echo $value['pet_seq'];?>" data-no="<?php echo $value['pet_seq'];?>" onclick="location.href='customer_view?customer_cellphone=<?php echo $phone;?>&pet_seq=<?php echo $value['pet_seq'];?>';"><em><?= $value["name"] ?></em></label>
+                            </div>
+                            <?php
+                        }
+                        ?>
+						<div class="grid-layout-cell flex-auto"><button type="button" onclick="location.href='customer_pet_new?cellphone=<?php echo $phone;?>&customer_id=<?php echo $cus['id'];?>&tmp_seq=<?php echo $cus['tmp_seq'];?>'" class="btn-toggle-button btn-toggle-basic"><span class="icon icon-plus-more-small"></span></button></div>
+					</div>
+				</div>
+				<!-- 펫 상세 -->
+				<div class="">
+					<!-- 하나의 펫 -->
+					<div class="customer-view-pet-group">
+						<div class="customer-view-pet-picture">
+							<div class="item-thumb">
+								<div class="user-thumb large">
+                                    <?php
+                                    $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet_seq}'";
+                                    //echo $que;
+                                    $res = sql_query($que);
+                                    $pet = sql_fetch($res);
                                         if(!empty($pet['photo'])){
                                             $img = "https://image.banjjakpet.com".img_link_change($pet['photo']);
                                         } else {
-                                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet_seq}' ORDER BY upload_dt DESC LIMIT 1";
+                                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet_seq}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
                                             $rw = sql_fetch_array($sql);
                                             if(!empty($rw[0]['file_path'])){
                                                 $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);
@@ -376,289 +406,292 @@ $tpl = sql_fetch_array($que);
                                                     $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
                                                 } else {
                                                     $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
-                                                }
-                                            }
+                                             }
                                         }
+                                    }
+                                    ?>
+                                    <img src="<?=$img?>" onclick="showImage('<?=$img?>');" alt="">
+                                </div>
+                                <button type="button" class="btn-picture-modify"  onclick="showImage('<?=$img?>');" >사진편집</button>
+							</div>
+							<!-- 20211227 수정 -->
+							<div class="item-action">
+								<div class="grid-layout btn-grid-group">
+									<div class="grid-layout-inner">
+                                        <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./reserve_beauty_gallery?aid=<?php echo $pay['artist_id'];?>&pet=<?php echo $pet_seq;?>';">미용 갤러리</a></div>
+                                        <div class="grid-layout-cell grid-2"><a href="javascript:delete_pet();" class="btn btn-outline-gray btn-middle-size btn-round" >펫 삭제</a></div>
+                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $_GET['pet_seq'];?>&cellphone=<?php echo $phone;?>&backurl=customer_view';">펫 정보 수정</a></div>
+									</div>
+								</div>
+							</div>
+							<!-- //20211227 수정 -->
+						</div>
+						<div class="flex-table">
+							<div class="flex-table-cell">
+								<div class="flex-table-item">
+									<div class="flex-table-title"><div class="txt">펫 이름</div></div>
+									<div class="flex-table-data">
+										<div class="flex-table-data-inner">
+                                            <?php echo $pet['name'];?>
+										</div>																
+									</div>
+								</div>
+							</div>
+							<div class="flex-table-cell">
+								<div class="flex-table-item">
+									<div class="flex-table-title"><div class="txt">품종</div></div>
+									<div class="flex-table-data">
+										<div class="flex-table-data-inner">
+                                            <?php echo $pet['pet_type'];?>
+										</div>																
+									</div>
+								</div>
+							</div>
+							<div class="flex-table-cell">
+								<div class="flex-table-item">
+									<div class="flex-table-title"><div class="txt">성별</div></div>
+									<div class="flex-table-data">
+										<div class="flex-table-data-inner">
+                                            <?php echo $pet['gender'];?>
+										</div>																
+									</div>
+								</div>
+							</div>
+							<div class="flex-table-cell">
+								<div class="flex-table-item">
+									<div class="flex-table-title"><div class="txt">중성화</div></div>
+									<div class="flex-table-data">
+										<div class="flex-table-data-inner">
+                                            <?php echo ($pet['neutral']==1)?'O':'X';?>
+										</div>																
+									</div>
+								</div>
+							</div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">무게</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo $pet['weight'];?>Kg
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">생일</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">나이</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php
+                                            calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
+                                            ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+						</div>
+						<!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
+                        <div class="customer-view-pet-detail">
+                            <button type="button" class="btn-detail-toggle" id="pet-info-view">펫 정보 자세히 보기</button>
+                            <div class="service-selected-wrap" >
+                                <div class="service-selected-group">
+                                    <div class="list-title">미용 경험</div>
+                                    <div class="list-data"><?php echo $pet['beauty_exp'];?>회</div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">예방 접종</div>
+                                    <div class="list-data"><?php echo $pet['vaccination'];?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">입질</div>
+                                    <div class="list-data"><?php echo ($pet['bite']==1)?'있음':'없음';?></div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">싫어하는 부위</div>
+                                    <div class="list-data">
+                                        <?php
+                                        if($pet['nothing']==1){
+                                            $is_hate = '없음';
+                                        } else {
+                                            if ($pet['dt_eye'] == 1) $hate[] = '눈';
+                                            if ($pet['dt_nose'] == 1) $hate[] = '코';
+                                            if ($pet['dt_mouth'] == 1) $hate[] = '입';
+                                            if ($pet['dt_neck'] == 1) $hate[] = '목';
+                                            if ($pet['dt_body'] == 1) $hate[] = '몸';
+                                            if ($pet['dt_leg'] == 1) $hate[] = '다리';
+                                            if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
+                                            if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
+                                            $is_hate = implode(",",$hate);
+                                        }
+                                        echo $is_hate;
                                         ?>
-                                        <img src="<?=$img?>" onclick="showImage('<?=$img?>');" alt="">
-                                    </div>
-                                    <button type="button" class="btn-picture-modify"  onclick="showImage('<?=$img?>');" >사진편집</button>
-                                </div>
-                                <!-- 20211227 수정 -->
-                                <div class="item-action">
-                                    <div class="grid-layout btn-grid-group">
-                                        <div class="grid-layout-inner">
-                                            <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./reserve_beauty_gallery?aid=<?php echo $pay['artist_id'];?>&pet=<?php echo $pet_seq;?>';">미용 갤러리</a></div>
-                                            <?php
-                                            if($bag[0]['is_agree']==1){
-                                                ?>
-                                                <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree_view?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&ba_seq=<?php echo $bag[0]['ba_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 보기</a></div>
-                                            <?php } else { ?>
-                                                <div class="grid-layout-cell grid-2"><a href="javascript:set_beauty_sign();" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 작성</a></div>
-                                            <?php } ?>
-                                        </div>
                                     </div>
                                 </div>
-                                <!-- //20211227 수정 -->
-                            </div>
-                            <div class="flex-table">
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">펫 이름</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo $pet['name'];?>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">슬개골 탈구</div>
+                                    <div class="list-data"><?php echo $pet['luxation'];?>기</div>
                                 </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">품종</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo $pet['pet_type'];?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">성별</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo $pet['gender'];?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">중성화</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo ($pet['neutral']==1)?'O':'X';?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">무게</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo $pet['weight'];?>Kg
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">생일</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex-table-cell">
-                                    <div class="flex-table-item">
-                                        <div class="flex-table-title"><div class="txt">나이</div></div>
-                                        <div class="flex-table-data">
-                                            <div class="flex-table-data-inner">
-                                                <?php
-                                                calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
-                                                ?>
+                                <div class="service-selected-group">
+                                    <div class="list-title">특이사항</div>
+                                    <div class="list-data">
+                                        <?php
 
-                                            </div>
-                                        </div>
+                                        if ($pet['dermatosis'] == 1) $dis[] = '피부병';
+                                        if ($pet['heart_trouble'] == 1) $dis[] = '심장질환';
+                                        if ($pet['marking'] == 1) $dis[] = '마킹';
+                                        if ($pet['mounting'] == 1) $dis[] = '마운팅';
+
+                                        $is_dis = implode(",",$dis);
+
+                                        echo ($is_dis)?$is_dis:'';
+                                        ?>
                                     </div>
+                                </div>
+                                <div class="service-selected-group">
+                                    <div class="list-title">기타</div>
+                                    <div class="list-data"><?php echo $pet['etc'];?></div>
                                 </div>
                             </div>
-                            <!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
-                            <div class="customer-view-pet-detail">
-                                <button type="button" class="btn-detail-toggle" id="pet-info-view">펫 정보 자세히 보기</button>
-                                <div class="service-selected-wrap" >
-                                    <div class="service-selected-group">
-                                        <div class="list-title">미용 경험</div>
-                                        <div class="list-data"><?php echo $pet['beauty_exp'];?>회</div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">예방 접종</div>
-                                        <div class="list-data"><?php echo $pet['vaccination'];?></div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">입질</div>
-                                        <div class="list-data"><?php echo ($pet['bite']==1)?'있음':'없음';?></div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">싫어하는 부위</div>
-                                        <div class="list-data">
-                                            <?php
-                                            if($pet['nothing']==1){
-                                                $is_hate = '없음';
-                                            } else {
-                                                if ($pet['dt_eye'] == 1) $hate[] = '눈';
-                                                if ($pet['dt_nose'] == 1) $hate[] = '코';
-                                                if ($pet['dt_mouth'] == 1) $hate[] = '입';
-                                                if ($pet['dt_neck'] == 1) $hate[] = '목';
-                                                if ($pet['dt_body'] == 1) $hate[] = '몸';
-                                                if ($pet['dt_leg'] == 1) $hate[] = '다리';
-                                                if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
-                                                if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
-                                                $is_hate = implode(",",$hate);
-                                            }
-                                            echo $is_hate;
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">슬개골 탈구</div>
-                                        <div class="list-data"><?php echo $pet['luxation'];?>기</div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">특이사항</div>
-                                        <div class="list-data">
-                                            <?php
-
-                                            if ($pet['dermatosis'] == 1) $dis[] = '피부병';
-                                            if ($pet['heart_trouble'] == 1) $dis[] = '심장질환';
-                                            if ($pet['marking'] == 1) $dis[] = '마킹';
-                                            if ($pet['mounting'] == 1) $dis[] = '마운팅';
-
-                                            $is_dis = implode(",",$dis);
-
-                                            echo ($is_dis)?$is_dis:'';
-                                            ?>
-                                        </div>
-                                    </div>
-                                    <div class="service-selected-group">
-                                        <div class="list-title">기타</div>
-                                        <div class="list-data"><?php echo $pet['etc'];?></div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="special-note">
-                                <div class="note-title">[특이사항]</div>
-                                <?php
-                                $ct = 0;
-                                $sql = "
+                        </div>
+						<div class="special-note">
+							<div class="note-title">[특이사항]</div>
+                            <?php
+                            $ct = 0;
+                            $sql = "
                                     SELECT *
-                                    FROM tb_payment_log
-                                    WHERE artist_id = '" . $user_id . "'
-                                        AND is_no_show = 0
-                                        AND is_cancel = 0
+                                    FROM tb_payment_log 
+                                    WHERE artist_id = '" . $user_id . "' 
+                                        AND is_no_show = 0 
+                                        AND is_cancel = 0 
                                         AND approval = 1
                                         AND etc_memo != ''
-                                        AND pet_seq = '{$_GET['pet_seq']}'
+                                        AND pet_seq = '{$_GET['pet_seq']}'   
                                         AND CONCAT(year,'-',month,'-',day) < DATE_FORMAT(NOW(),'%Y-%c-%e')
                                         ORDER BY  CONCAT(year,'-',month,'-',day) DESC
                                 ";
-                                //echo $sql;
-                                $arr = sql_fetch_array($sql);
-                                if(count($arr)>0){
-                                    foreach($arr as $rs){
-                                        ?>
-                                        <div class="note-desc"><em><?php echo $rs['year'];?>.<?php echo $rs['month'];?>.<?php echo $rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
-                                    <?php }} ?>
-                            </div>
-                            <div class="grid-layout btn-grid-group">
-                                <div class="grid-layout-inner">
+                            //echo $sql;
+                            $arr = sql_fetch_array($sql);
+                            if(count($arr)>0){
+                            foreach($arr as $rs){
+                            ?>
+							<div class="note-desc"><em><?php echo $rs['year'];?>.<?php echo $rs['month'];?>.<?php echo $rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
+                            <?php }} ?>
+						</div>
+						<div class="grid-layout btn-grid-group">
+							<div class="grid-layout-inner">
+                                <?php
+                                if($bag[0]['is_agree']==1){
+                                    ?>
+                                    <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree_view?aid=<?php echo $shop_id;?>&uid=<?php echo $phone;?>&pid=<?php echo $_GET['pet_seq'];?>&ba_seq=<?php echo $bag[0]['ba_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 보기</a></div>
+                                <?php } else { ?>
                                     <div class="grid-layout-cell grid-2"><a href="javascript:set_beauty_sign();" class="btn btn-outline-purple btn-middle-size btn-round">미용동의서 작성</a></div>
-                                    <div class="grid-layout-cell grid-2"><a href="javascript:popalert.open('msgAlert');" class="btn btn-outline-purple btn-middle-size btn-round">호텔동의서 작성</a></div>
-                                    <div class="grid-layout-cell grid-1"><a href="javascript:direct_rev();" class="btn btn-purple btn-middle-size btn-round">즉시 예약</a></div>
-                                </div>
-                            </div>
-                            <div class="bottom-info">*<strong>[즉시예약]</strong>은 주간 스케줄에서만 사용 가능</div>
+                                <?php } ?>
+								<!--<div class="grid-layout-cell grid-2"><a href="javascript:set_beauty_sign();" class="btn btn-outline-purple btn-middle-size btn-round">미용동의서 작성</a></div>-->
+								<div class="grid-layout-cell grid-2"><a href="javascript:popalert.open('msgAlert');" class="btn btn-outline-purple btn-middle-size btn-round">호텔동의서 작성</a></div>
+								<div class="grid-layout-cell grid-1"><a href="javascript:direct_rev();" class="btn btn-purple btn-middle-size btn-round">즉시 예약</a></div>
+							</div>
+						</div>
+						<div class="bottom-info">*<strong>[즉시예약]</strong>은 주간 스케줄에서만 사용 가능</div>
 
 
-                        </div>
-                        <!-- //하나의 펫 -->
-                        <?php } ?>
-                        <!-- 하나의 펫 -->
+					</div>
+					<!-- //하나의 펫 -->
+                    <?php } ?>
+					<!-- 하나의 펫 -->
 
-                        <!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
+						<!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
 
 
 
-                        <div class="customer-view-lastest">
-                            <div class="con-title-group">
-                                <h6 class="con-title">이용내역</h6>
-                            </div>
-                            <div>
-                                <div class="customer-view-lastest-list">
-                                    <table class="customer-table">
-                                        <colgroup>
-                                            <col style="width:26%"/>
-                                            <col style="width:20%"/>
-                                            <col style="width:20%"/>
-                                            <col style="width:19%"/>
-                                            <col style="width:15%"/>
-                                        </colgroup>
-                                        <thead>
-                                        <tr>
-                                            <th rowspan="2">펫이름</th>
-                                            <th rowspan="2">미용 일시</th>
-                                            <th rowspan="2">내역</th>
-                                            <th colspan="2">총 이용내역</th>
-                                        </tr>
-                                        <tr>
-                                            <th>카드</th>
-                                            <th>현금</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        <!-- 하나의 아이템 -->
-                                        <?php
-                                        $que = "SELECT * FROM tb_payment_log  WHERE 1
-                                                    AND is_no_show = 0
+						<div class="customer-view-lastest">
+							<div class="con-title-group">
+								<h6 class="con-title">이용내역</h6>
+							</div>
+							<div>
+								<div class="customer-view-lastest-list">
+									<table class="customer-table">
+										<colgroup>
+											<col style="width:26%"/>
+											<col style="width:20%"/>
+											<col style="width:20%"/>
+											<col style="width:19%"/>
+											<col style="width:15%"/>
+										</colgroup>
+										<thead>
+											<tr>
+												<th rowspan="2">펫이름</th>
+												<th rowspan="2">미용 일시</th>
+												<th rowspan="2">내역</th>
+												<th colspan="2">총 이용내역</th>
+											</tr>
+											<tr>
+												<th>카드</th>
+												<th>현금</th>
+											</tr>
+										</thead>
+										<tbody>
+											<!-- 하나의 아이템 -->
+                                            <?php
+                                            $que = "SELECT * FROM tb_payment_log  WHERE 1
+                                                    AND is_no_show = 0 
                                                     AND is_cancel = 0
-                                                    AND approval = 1
+                                                    AND approval = 1   
                                                     AND artist_id = '{$user_id}'
                                                     AND cellphone = '{$phone}'
                                             ";
 
-                                        if(!empty($pet_seq)) {
-                                            $que .= " AND pet_seq = '{$pet_seq}' ";
-                                            $que .= " ORDER BY year DESC, MONTH DESC, DAY DESC";
-                                        } else {
-                                            $que .= " ORDER BY pet_seq ASC, year DESC, MONTH DESC, DAY DESC ";
-                                            $que .= "  ";
-                                        }
+                                            if(!empty($pet_seq)) {
+                                                $que .= " AND pet_seq = '{$pet_seq}' ";
+                                                $que .= " ORDER BY year DESC, MONTH DESC, DAY DESC";
+                                            } else {
+                                                $que .= " ORDER BY pet_seq ASC, year DESC, MONTH DESC, DAY DESC ";
+                                                $que .= "  ";
+                                            }
 
 
-                                        //echo $que;
-                                        $arr = sql_fetch_array($que);
-                                        if(count($arr)>0){
+                                            //echo $que;
+                                            $arr = sql_fetch_array($que);
+                                            if(count($arr)>0){
                                             foreach($arr as $arr){
+                                                $another_reserve = $another_reserve+1; // 펫삭제시 고려할 변수
                                                 $beauty = explode("|",$arr['product']);
                                                 $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$arr['pet_seq']}'";
                                                 //echo $que;
                                                 $pet = sql_fetch_array($que);
-                                                ?>
-                                                <tr class="customer-table-cell">
-                                                    <td>
-                                                        <div class="flex align-items-center overflow-hidden">
-                                                            <div class="flex-1 grid-1 overflow-hidden text-align-left"><strong class="ellipsis d-block"><?php echo $pet[0]['name'];?></strong></div>
-                                                            <div class="flex-auto icon icon-arrow-up-gray" onclick="show_div(<?php echo $arr['payment_log_seq'];?>);"></div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="customer-table-txt"><?php echo $arr['year'];?>.<?php echo sprintf('%02d',$arr['month']);?>.<?php echo sprintf('%02d',$arr['day']);?></div>
-                                                        <div class="customer-table-txt"><?php echo sprintf('%02d',$arr['hour']);?>:<?php echo sprintf('%02d',$arr['minute']);?></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="customer-table-txt">미용</div>
-                                                        <div class="customer-table-txt"><?php echo $beauty[4];?></div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="customer-table-txt"><?php echo number_format($arr['add_price']);?>원</div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="customer-table-txt"><?php echo number_format($arr['add_price_cash']);?>원</div>
-                                                    </td>
-                                                </tr>
+                                            ?>
+											<tr class="customer-table-cell">
+												<td>
+													<div class="flex align-items-center overflow-hidden">
+														<div class="flex-1 grid-1 overflow-hidden text-align-left"><strong class="ellipsis d-block"><?php echo $pet[0]['name'];?></strong></div>
+														<div class="flex-auto icon icon-arrow-up-gray" onclick="show_div(<?php echo $arr['payment_log_seq'];?>);"></div>
+													</div>
+												</td>
+												<td>
+													<div class="customer-table-txt"><?php echo $arr['year'];?>.<?php echo sprintf('%02d',$arr['month']);?>.<?php echo sprintf('%02d',$arr['day']);?></div>
+													<div class="customer-table-txt"><?php echo sprintf('%02d',$arr['hour']);?>:<?php echo sprintf('%02d',$arr['minute']);?></div>
+												</td>
+												<td>
+													<div class="customer-table-txt">미용</div>
+                                                    <div class="customer-table-txt"><?php echo $beauty[4];?></div>
+												</td>
+												<td>
+													<div class="customer-table-txt"><?php echo number_format($arr['local_price']);?>원</div>
+												</td>
+												<td>
+													<div class="customer-table-txt"><?php echo number_format($arr['local_price_cash']);?>원</div>
+												</td>
+											</tr>
                                                 <tr class="customer-table-view list-more " id="list_<?php echo $arr['payment_log_seq'];?>">
                                                     <td colspan="5">
                                                         <div class="flex-table">
@@ -678,9 +711,9 @@ $tpl = sql_fetch_array($que);
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner">
                                                                             <?php
-                                                                            $que = "SELECT * FROM tb_artist_list WHERE name = '{$arr['worker']}' ORDER BY seq DESC LIMIT 1";
-                                                                            $al = sql_fetch_array($que);
-                                                                            echo $al[0]['nicname'];
+                                                                                $que = "SELECT * FROM tb_artist_list WHERE name = '{$arr['worker']}' ORDER BY seq DESC LIMIT 1";
+                                                                                $al = sql_fetch_array($que);
+                                                                                echo $al[0]['nicname'];
                                                                             ?>
                                                                         </div>
                                                                     </div>
@@ -688,13 +721,16 @@ $tpl = sql_fetch_array($que);
                                                             </div>
                                                             <div class="flex-table-cell">
                                                                 <div class="flex-table-item">
-                                                                    <div class="flex-table-title"><div class="txt">추가</div></div>
+                                                                    <div class="flex-table-title"><div class="txt">서비스</div></div>
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner">
                                                                             <?php
-
-                                                                            $extra = explode(':',$beauty[6]);
-                                                                            echo $extra[0];
+                                                                                $extra1 = ($beauty[3])? explode(':',$beauty[3]):"";
+                                                                                $extra2 = ($beauty[4])? explode(':',$beauty[4]):"";
+                                                                                $extra2_1 = "/".$extra2[0];
+                                                                                $extra3 = ($beauty[6])? explode(':',$beauty[6]):"";
+                                                                                $extra3_1 = "/".$extra3[0];
+                                                                                echo $extra1[0].$extra2_1.$extra3_1;
                                                                             ?>
                                                                         </div>
                                                                     </div>
@@ -716,11 +752,11 @@ $tpl = sql_fetch_array($que);
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner">
                                                                             <?php
-                                                                            $que = "SELECT *, (SELECT use_reserve FROM tb_user_reserve_log WHERE payment_log_seq = '{$arr['payment_log_seq']}' AND service_type = 'B' AND type = 'U' AND customer_id = '{$data["customer"]["id"]}' AND tmp_seq = '{$data["customer"]["tmp_seq"]}') AS use_reserve
+                                                                                $que = "SELECT *, (SELECT use_reserve FROM tb_user_reserve_log WHERE payment_log_seq = '{$arr['payment_log_seq']}' AND service_type = 'B' AND type = 'U' AND customer_id = '{$data["customer"]["id"]}' AND tmp_seq = '{$data["customer"]["tmp_seq"]}') AS use_reserve
 FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp_seq = '{$data["customer"]["tmp_seq"]}' AND cellphone = '{$arr['cellphone']}'";
 
-                                                                            //echo $que;
-                                                                            $row = sql_fetch_array($que);
+                                                                                //echo $que;
+                                                                                $row = sql_fetch_array($que);
                                                                             ?>
                                                                             사용:<?php echo number_format($row[0]['use_reserve']);?> 누적:<?php echo number_format($row[0]['reserve']);?>
                                                                         </div>
@@ -733,8 +769,34 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner">
                                                                             <?php
-                                                                            if($arr['add_price']>0){ echo '카드 '; }
-                                                                            if($arr['add_price_cash']>0){ echo ' 현금'; }
+                                                                                //if($arr['add_price']>0){ echo '카드 '; }
+                                                                                //if($arr['add_price_cash']>0){ echo ' 현금'; }
+                                                                            $pay_type = $arr["pay_type"];
+                                                                            $pay_type_str = "";
+
+                                                                            switch ($pay_type) {
+                                                                                case "card":
+                                                                                    $pay_type_str = "앱-카드";
+                                                                                    break;
+                                                                                case "bank":
+                                                                                    $pay_type_str = "앱-가상계좌";
+                                                                                    break;
+                                                                                case "offline-cash":
+                                                                                    $pay_type_str = "앱-매장(현)";
+                                                                                    break;
+                                                                                case "offline-card":
+                                                                                    $pay_type_str = "앱-매장(카)";
+                                                                                    break;
+                                                                                case "pos-cash":
+                                                                                    $pay_type_str = "매장접수(현)";
+                                                                                    break;
+                                                                                case "pos-card":
+                                                                                    $pay_type_str = "매장접수(카)";
+                                                                                    break;
+                                                                                default:
+                                                                                    $pay_type_str = "매장접수(카)";
+                                                                                }
+                                                                                echo $pay_type_str;
 
                                                                             ?>
                                                                         </div>
@@ -744,317 +806,346 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                                                         </div>
                                                     </td>
                                                 </tr>
-                                                <!-- //하나의 아이템 -->
-                                            <?php }} ?>
-                                        </tbody>
-                                    </table>
+											<!-- //하나의 아이템 -->
+											<?php }} ?>
+										</tbody>
+									</table>
+								</div>
+							</div>
+						</div>
+
+					</div>
+					<!-- //하나의 펫 -->
+				</div>
+				<!-- //펫 상세 -->
+			</div>
+			<!-- //펫정보 -->
+		</div>
+	</div>
+	<!-- //page-body -->
+    <article id="numberAddPop" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-header">
+                        <h4 class="con-title">전화번호 추가</h4>
+                    </div>
+                    <div class="pop-body phone-add-wrap">
+                        <div class="phone-add-list">
+                            <!--
+                            //	- phone-add-item 클래스에 new 클래스 추가시 새이름 입력필드
+                            //	- phone-add-item 클래스에 actived클래스 추가시 활성화
+                            -->
+
+                            <?php
+                            for($i=0;$i<count($tel['title']);$i++){
+                            ?>
+                            <div class="phone-add-item">
+                                <div class="item-check">
+                                    <?php if(empty($data["customer"]["id"])){ ?>
+                                    <label for="<?php echo $tel['tel'][$i];?>" class="form-radiobox">
+                                        <input type="radio" name="phone" id="<?php echo $tel['tel'][$i];?>" value="<?php echo $tel['tel'][$i];?>" data-ctel="<?php echo $tel['tel'][$i];?>" data-mtel="<?php echo $phone;?>" class="change-main-phone">
+                                        <span class="form-check-icon"><em>대표</em></span>
+                                    </label>
+                                    <?php } ?>
+                                </div>
+                                <div class="item-data">
+                                    <div class="phone-add-item-value">
+                                        <div class="phone-add-name"><div class="ellipsis"><?php echo $tel['title'][$i];?></div></div>
+                                        <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel['tel'][$i]);?></div></div>
+                                        <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
+                                    </div>
+                                </div>
+                                <div class="item-ui">
+                                    <button type="button" class="btn-phone-del" data-seq="<?php echo $tel['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
+                                </div>
+                            </div>
+                            <?php } ?>
+                        </div>
+                        <!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
+                        <div class="phone-add-input disabled">
+                            <div class="form-group">
+                                <div class="form-group-cell">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">등록이름</div>
+                                        <div class="form-item-data type-6">
+                                            <input type="text" name="name" id="family_name" class="" placeholder="입력" >
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group-cell">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">전화번호</div>
+                                        <div class="form-item-data type-6">
+                                            <input type="text" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-input-info">*보조연락처는 5개까지 등록 가능합니다.</div>
+                        </div>
+                        <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="add_tel">등록</button>
+                    </div>
+                    <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                </div>
+            </div>
+        </div>
+    </article>
+    <article id="numberAddPop1" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-header">
+                        <h4 class="con-title">전화번호 수정</h4>
+                    </div>
+                    <div class="pop-body phone-add-wrap">
+
+                        <!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
+                        <div class="phone-add-input disabled">
+                            <div class="form-group">
+                                <div class="form-group-cell">
+                                    <div class="form-group-item">
+                                        <div class="form-item-label">전화번호</div>
+                                        <div class="form-item-data type-6">
+                                            <input type="text" name="tel" id="main_tel" class="" value="<?php echo $phone;?>" placeholder="'-' 제외하고 입력" >
+                                            <input type="hidden" name="org_tel" id="org_tel" value="<?php echo $phone;?>">
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-
+                        <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="modify_tel">수정</button>
                     </div>
-                    <!-- //하나의 펫 -->
+                    <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
                 </div>
-                <!-- //펫 상세 -->
             </div>
-            <!-- //펫정보 -->
         </div>
-        </div>
-        <!-- //page-body -->
-        <article id="numberAddPop" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-header">
-                            <h4 class="con-title">전화번호 추가</h4>
-                        </div>
-                        <div class="pop-body phone-add-wrap">
-                            <div class="phone-add-list">
-                                <!--
-                                //	- phone-add-item 클래스에 new 클래스 추가시 새이름 입력필드
-                                //	- phone-add-item 클래스에 actived클래스 추가시 활성화
-                                -->
-
-                                <?php
-                                for($i=0;$i<count($tel['title']);$i++){
+    </article>
+    <article id="memberGradeAddPop" class="layer-pop-wrap " style="z-index: 100000;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-header">
+                        <h4 class="con-title">회원등급 부여</h4>
+                    </div>
+                    <div class="pop-body">
+                        <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                        <div class="form-group">
+                            <div class="form-group-item">
+                                <select name="member_grade" id="member_grade">
+                                    <?php
+                                    $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
+                                    echo $que;
+                                    $tgos = sql_fetch_array($que);
+                                    if(count($tgos)){
+                                        foreach($tgos as $tgos){
+                                            //echo $tgos['grade_name'].':'.$grade[0]['name'];
                                     ?>
-                                    <div class="phone-add-item">
-                                        <div class="item-check">
-                                            <?php if(empty($data["customer"]["id"])){ ?>
-                                                <label for="<?php echo $tel['tel'][$i];?>" class="form-radiobox">
-                                                    <input type="radio" name="phone" id="<?php echo $tel['tel'][$i];?>" value="<?php echo $tel['tel'][$i];?>" data-ctel="<?php echo $tel['tel'][$i];?>" data-mtel="<?php echo $phone;?>" class="change-main-phone">
-                                                    <span class="form-check-icon"><em>대표</em></span>
-                                                </label>
-                                            <?php } ?>
-                                        </div>
-                                        <div class="item-data">
-                                            <div class="phone-add-item-value">
-                                                <div class="phone-add-name"><div class="ellipsis"><?php echo $tel['title'][$i];?></div></div>
-                                                <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel['tel'][$i]);?></div></div>
-                                                <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
-                                            </div>
-                                        </div>
-                                        <div class="item-ui">
-                                            <button type="button" class="btn-phone-del" data-seq="<?php echo $tel['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
-                                        </div>
-                                    </div>
-                                <?php } ?>
+                                    <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                    <?php }}?>
+                                </select>
+                                <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
                             </div>
-                            <!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
-                            <div class="phone-add-input disabled">
-                                <div class="form-group">
-                                    <div class="form-group-cell">
-                                        <div class="form-group-item">
-                                            <div class="form-item-label">등록이름</div>
-                                            <div class="form-item-data type-6">
-                                                <input type="text" name="name" id="family_name" class="" placeholder="입력" >
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="form-group-cell">
-                                        <div class="form-group-item">
-                                            <div class="form-item-label">전화번호</div>
-                                            <div class="form-item-data type-6">
-                                                <input type="text" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-input-info">*보조연락처는 5개까지 등록 가능합니다.</div>
-                            </div>
-                            <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="add_tel">등록</button>
                         </div>
-                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
                     </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="set_grade();">저장</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                    </div>
+                    <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
                 </div>
             </div>
-        </article>
-        <article id="numberAddPop1" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-header">
-                            <h4 class="con-title">전화번호 수정</h4>
-                        </div>
-                        <div class="pop-body phone-add-wrap">
+        </div>
+    </article>
 
-                            <!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
-                            <div class="phone-add-input disabled">
-                                <div class="form-group">
-                                    <div class="form-group-cell">
-                                        <div class="form-group-item">
-                                            <div class="form-item-label">전화번호</div>
-                                            <div class="form-item-data type-6">
-                                                <input type="text" name="tel" id="main_tel" class="" value="<?php echo $phone;?>" placeholder="'-' 제외하고 입력" >
-                                                <input type="hidden" name="org_tel" id="org_tel" value="<?php echo $phone;?>">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="modify_tel">수정</button>
-                        </div>
-                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+    <article id="allMemberGradeAddPop" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-header">
+                        <h4 class="con-title">전체회원 등급부여</h4>
                     </div>
-                </div>
-            </div>
-        </article>
-        <article id="memberGradeAddPop" class="layer-pop-wrap " style="z-index: 100000;">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-header">
-                            <h4 class="con-title">회원등급 부여</h4>
-                        </div>
-                        <div class="pop-body">
-                            <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
-                            <div class="form-group">
-                                <div class="form-group-item">
-                                    <select name="member_grade" id="member_grade">
-                                        <?php
-                                        $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
-                                        echo $que;
-                                        $tgos = sql_fetch_array($que);
-                                        if(count($tgos)){
-                                            foreach($tgos as $tgos){
-                                                //echo $tgos['grade_name'].':'.$grade[0]['name'];
-                                                ?>
-                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
-                                            <?php }}?>
-                                    </select>
-                                    <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
-                                </div>
+                    <div class="pop-body">
+                        <div class="msg-txt">모든 고객님의 등급을<br>하나의 등급으로 반영합니다.</div>
+                        <div class="form-group">
+                            <div class="form-group-item">
+                                <select>
+                                    <option value="">VIP</option>
+                                    <option value="">Normal</option>
+                                    <option value="">Normal_B</option>
+                                </select>
+                                <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
                             </div>
                         </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="set_grade();">저장</button>
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
-                        </div>
-                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
                     </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">저장</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                    </div>
+                    <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
                 </div>
             </div>
-        </article>
+        </div>
+    </article>
 
-        <article id="allMemberGradeAddPop" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-header">
-                            <h4 class="con-title">전체회원 등급부여</h4>
-                        </div>
-                        <div class="pop-body">
-                            <div class="msg-txt">모든 고객님의 등급을<br>하나의 등급으로 반영합니다.</div>
-                            <div class="form-group">
-                                <div class="form-group-item">
-                                    <select>
-                                        <option value="">VIP</option>
-                                        <option value="">Normal</option>
-                                        <option value="">Normal_B</option>
-                                    </select>
-                                    <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">저장</button>
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
-                        </div>
-                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+    <article id="memberGradeComPop" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
-
-        <article id="memberGradeComPop" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">등급이 부여되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="memberGradeComPop1" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="memberGradeComPop1" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">등급이 부여되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="memberGradeComPop11" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" id="del_num" onclick="del_tel(); popalert.close();">확인</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="memberGradeComPop11" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">등급이 부여되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" id="del_num" onclick="del_tel(); popalert.close();">확인</button>
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
-                        </div>
+        </div>
+    </article>
+    <article id="memberGradeComPop4" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="memberGradeComPop4" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">등급이 부여되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="memberGradeComPop2" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" id="chk" onclick="change_main_phone();popalert.close();">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="memberGradeComPop2" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">등급이 부여되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" id="chk" onclick="change_main_phone();popalert.close();">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="phoneConfirm" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">견주에게 핸드폰을 건네주세요.<br>견주가 직접 작성/동의/서명하는 곳입니다.<br><br>(PC의 경우 터치스크린 기능이 있는 화면에서만 가능)</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.href= './customer_beauty_agree?aid=<?php echo $shop_id;?>&uid=<?php echo $phone;?>&pid=<?php echo $pet_seq;?>';">확인</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="phoneConfirm" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">견주에게 핸드폰을 건네주세요.<br>견주가 직접 작성/동의/서명하는 곳입니다.<br><br>(PC의 경우 터치스크린 기능이 있는 화면에서만 가능)</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="location.href= './customer_beauty_agree?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pet_seq;?>';">확인</button>
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
-                        </div>
+        </div>
+    </article>
+    <article id="deleteCustomer" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">이 고객의 모든 펫 정보와 미용이력이 삭제되며, 복구할 수 없습니다.<br>삭제하시겠습니까?</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="delete_customer_confirm()">삭제</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="deleteCustomer" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">이 고객의 모든 펫 정보와 미용이력이 삭제되며,<br>복구할 수 없습니다.<br><br>삭제하시겠습니까?</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="delete_confirm()">삭제</button>
-                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
-                        </div>
+        </div>
+    </article>
+    <article id="deletePet" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt"><?=$pet['name'] ?> 의 정보와 미용이력이 모두 삭제되며,</br>복구할 수 없습니다.</br></br>삭제하시겠습니까?</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="delete_pet_confirm()">삭제</button>
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="deleteAlert" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">삭제되었습니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="location.href='customer_inquiry';">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="deleteAlert" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">삭제되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.href='customer_inquiry';">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
-        <article id="msgAlert" class="layer-pop-wrap">
-            <div class="layer-pop-parent">
-                <div class="layer-pop-children">
-                    <div class="pop-data alert-pop-data">
-                        <div class="pop-body">
-                            <div class="msg-txt">준비중입니다.</div>
-                        </div>
-                        <div class="pop-footer">
-                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
-                        </div>
+        </div>
+    </article>
+    <article id="deletePetAlert" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">삭제되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
                     </div>
                 </div>
             </div>
-        </article>
+        </div>
+    </article>
+    <article id="msgAlert" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">준비중입니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
         <article id="petImgAlert" class="layer-pop-wrap">
             <div class="layer-pop-parent">
                 <div class="layer-pop-children">
@@ -1068,9 +1159,9 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                     </div>
                 </div>
             </div>
-        </article>
-    </section>
-    <!-- //container -->
+        </article>    
+</section>
+<!-- //container -->
     <script>
         $(document).ready(function(){
             //등급수정
@@ -1149,6 +1240,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
             $('#add_tel').on('click',function(){
                 var main_phone = '<?php echo $phone;?>';
                 var phone = $('#family_tel').val().replace('-','');
+                var id = '<?php echo $pay['customer_id'];?>';
                 console.log(phone)
                 if($('#family_name').val()==''){
                     popalert.open('memberGradeComPop','이름을 입력해주세요.');
@@ -1162,7 +1254,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                 }
                 $.ajax({
                     url: './data/get_book_data_ajax',
-                    data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone},
+                    data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone, 'customer_id':id},
                     type: 'POST',
                     dataType: 'json',
                     success: function(json) {
@@ -1289,7 +1381,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
         //즉시예약
         function direct_rev(){
             var pseq = '<?php echo $_GET['pet_seq'];?>';
-            var pet_name = '<?php echo $pet['name'];?>';
+            var pet_name = '<?php echo $pet[0]['name'];?>';
             var phone = '<?php echo $_GET['customer_cellphone'];?>';
             var customer_id = '<?php echo $pay['customer_id'];?>';
             $.ajax({
@@ -1310,34 +1402,168 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
             });
         }
 
-        // 고객 삭제
+        ////////////////////////////// 고객 및 펫 삭제 시작
         function delete_customer(){
             popalert.open('deleteCustomer');
         }
 
-        function delete_confirm(){
-            $.ajax({
-                url: "./data/delete_customer.php",
-                data : {
-                    cellphone : "<?=$phone?>"
-                },
-                type : 'POST',
-                success: function(data){
-                    if(data == "ok"){
-                        popalert.open('deleteAlert');
-                    }else{
-                        alert("데이터를 삭제하지 못했습니다.");
-                        popalert.close();
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.log(xhr, status, error);
-                }
-            });
+        function delete_pet(){
+            popalert.open('deletePet');
         }
 
+
+        function delete_customer_confirm(){
+            // 회원삭제 (해당 회원의 모든 payment_log 삭제)
+            var artist_id = "<?=$user_id ?>";
+            var cellphone = "<?= $phone ?>";
+            var customer_id = "<?=$cus["id"] ?>";
+            var pet_seq = '<?php echo $_GET['pet_seq'];?>';
+            var another_reserve = '<?=$another_reserve ?>'; // 해당샵에 미용이력이 있는지(0이면 없음)
+            var hotel_cnt = '<?=$user_hotel_cnt ?>'; // 회원의 호텔 이용 이력 횟수
+            var play_cnt = '<?=$user_play_cnt ?>'; // 회원의 유치원 이용 이력 횟수
+            console.log(hotel_cnt+' / '+play_cnt);
+            if(another_reserve == "0"){
+                // payment_log 에 data_delete = 1 로 데이터 하나 추가
+                $.ajax({
+                    url: 'data/delete_info_ajax.php',
+                    data: {
+                        mode: "delete_another_payment_all",
+                        pet_seq: pet_seq,
+                        customer_id: customer_id,
+                        artist_id: artist_id,
+                        cellphone: cellphone
+                    },
+                    type: 'POST',
+                    success: function(data){
+                        // payment, hotel_payment, playroom_payment data_delete = 1로 update
+                        $.ajax({
+                            url: 'data/delete_info_ajax.php',
+                            data: {
+                                mode: "delete_payment_all",
+                                artist_id: artist_id,
+                                customer_id: customer_id,
+                                cellphone: cellphone,
+                                hotel_cnt: hotel_cnt,
+                                play_cnt: play_cnt
+                            },
+                            type: 'POST',
+                            success: function(data){
+                                popalert.open('deleteAlert');
+                                // alert("삭제되었습니다.");
+                            },
+                            error: function(data){
+                                alert('error');
+                            }
+                        });
+                    },
+                    error: function(data){
+                        alert('error');
+                    }
+                });
+            }else{
+                // payment, hotel_payment, playroom_payment data_delete = 1로 update
+                $.ajax({
+                    url: 'data/delete_info_ajax.php',
+                    data: {
+                        mode: "delete_payment_all",
+                        artist_id: artist_id,
+                        customer_id: customer_id,
+                        cellphone: cellphone,
+                        hotel_cnt: hotel_cnt,
+                        play_cnt: play_cnt
+                    },
+                    type: 'POST',
+                    success: function(data){
+                        popalert.open('deleteAlert');
+                        // alert("삭제되었습니다.");
+                    },
+                    error: function(data){
+                        alert('error');
+                    }
+                });
+            }
+        }
+
+        function delete_pet_confirm(){
+            var artist_id = "<?=$user_id ?>";
+            var cellphone = "<?= $phone ?>";
+            var customer_id = "<?=$cus["id"] ?>";
+            var pet_seq = '<?php echo $_GET['pet_seq'];?>';
+            var another_reserve = '<?=$another_reserve ?>'; // 해당샵에 미용이력이 있는지(0이면 없음)
+            var hotel_cnt = '<?=$pet_hotel_cnt ?>'; // 회원의 호텔 이용 이력 횟수
+            var play_cnt = '<?=$pet_play_cnt ?>'; // 회원의 유치원 이용 이력 횟수
+            var last_delete = "<?=$last_delete ?>"; // 고객의 펫이 몇마리인지
+            var delete_location = "";
+            if(last_delete == "1"){ // 한마리일때(삭제하면 남는 펫이 없으므로 이전화면으로 이동)
+                delete_location = "deleteAlert";
+            }else{
+                delete_location = "deletePetAlert";
+            }
+            if(another_reserve == "0"){
+                // payment_log 에 data_delete = 1 로 데이터 하나 추가
+                $.ajax({
+                    url: 'data/delete_info_ajax.php',
+                    data: {
+                        mode: "delete_another_payment_pet",
+                        pet_seq: pet_seq,
+                        customer_id: customer_id,
+                        artist_id: artist_id,
+                        cellphone: cellphone
+                    },
+                    type: 'POST',
+                    success: function(data) {
+                        // payment, hotel_payment, playroom_payment data_delete = 1로 update
+                        $.ajax({
+                            url: 'data/delete_info_ajax.php',
+                            data: {
+                                mode: "delete_payment_log",
+                                pet_seq: pet_seq,
+                                artist_id: artist_id,
+                                hotel_cnt: hotel_cnt,
+                                play_cnt: play_cnt
+                            },
+                            type: 'POST',
+                            success: function(data) {
+                                // location.href = delete_location;
+                                popalert.open(delete_location);
+                                // alert("삭제되었습니다.");
+                            },
+                            error: function() {
+                                alert('error');
+                            }
+                        });
+                    },
+                    error: function() {
+                        alert('error');
+                    }
+                });
+            }else{
+                // payment, hotel_payment, playroom_payment data_delete = 1로 update
+                $.ajax({
+                    url: 'data/delete_info_ajax.php',
+                    data: {
+                        mode: "delete_payment_log",
+                        pet_seq: pet_seq,
+                        artist_id: artist_id,
+                        hotel_cnt: hotel_cnt,
+                        play_cnt: play_cnt
+                    },
+                    type: 'POST',
+                    success: function(data) {
+                        // location.href = delete_location;
+                        popalert.open(delete_location);
+                        // alert("삭제되었습니다.");
+                    },
+                    error: function() {
+                        alert('error');
+                    }
+                });
+            }
+        }
+        ////////////////////// 고객 펫 삭제 끝
+
         // 메모 자동 저장
-        $("#memo").focusout(function(){
+        $("#memo").keyup(function(){
             var memo = $("#memo").val();
             $.ajax({
                 url: "./data/save_customer_memo.php",
@@ -1350,11 +1576,12 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                     memo: memo
                 },
                 type : 'POST',
+                dataType : 'JSON',
                 success: function(data){
-                    if(data == "ok"){
+                    if(data.code == "000000"){
                         console.log("메모저장")
                     }else{
-                        console.log("메모저장실패");
+                        console.log(data.data);
                     }
                 },
                 error: function(xhr, status, error) {

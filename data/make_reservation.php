@@ -1,8 +1,15 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include ($_SERVER['DOCUMENT_ROOT']."/include/Allimtalk.class.php");
 //print_r($_SESSION);
 //print_r($_POST);
+
+if($_SESSION['artist_flag'] === true){
+    $user_id = $_SESSION['shop_user_id'];
+}else{
+    $user_id = $_SESSION['gobeauty_user_id'];
+}
 
 $total_price = 0;
 
@@ -17,6 +24,9 @@ $option_name = array('bath_price'=>'목욕',
     'summercut_price'=>'썸머컷');
 
 $product = '';
+
+if($_SESSION['reserve_go'] == 1){
+    unset($_SESSION['reserve_go']); // 예약 프로세스 시작하면 세션 삭제(중복예약 방지)
 
 //강아지 예약접숙
 
@@ -38,10 +48,22 @@ if($_POST['pet_kind']=='dog') {
     $w3 = explode(":", $_POST['hair_length']);
     $total_price += $w3[1];
 
-    $product .= $_POST['hair_type'] . '|';
-    $w4 = explode(":", $_POST['hair_type']);
-    $total_price += $w4[1];
+    //$product .= $_POST['hair_type'] . '|';
+    //$w4 = explode(":", $_POST['hair_type']);
+    //$total_price += $w4[1];
 
+    $hair_type_cnt = count($_POST['hair_type']);
+    if ($hair_type_cnt == 0) {
+        $product .= '|';
+    } else {
+
+        for ($i = 0; $i < count($_POST['hair_type']); $i++) {
+            $hair_type_price = explode(':', $_POST['hair_type'][$i]);
+            $total_price += $hair_type_price[1];
+            $product .= $_POST['hair_type'][$i] . ',';
+        }
+        $product = substr($product , 0, -1).'|';
+    }
 
     //print_r($_POST);
     //펫 기본 정보 업데이트
@@ -53,7 +75,7 @@ if($_POST['pet_kind']=='dog') {
     $sql .= "day        = '{$_POST['pet_day']}', ";
     $sql .= "gender     = '{$_POST['pet_gender_m']}', ";
     $sql .= "weight     = '{$_POST['pet_weight1']}.{$_POST['pet_weight2']}' ";
-    $sql .= " WHERE pet_seq = '{$_POST['송']}' ";
+    $sql .= " WHERE pet_seq = '{$_POST['pet_no']}' ";
     //echo $sql."<br>";
     $res = sql_query($sql);
     if ($res) {
@@ -166,6 +188,10 @@ if($_POST['pet_kind']=='dog') {
     } else {
         $product .= 'all:0|';
     }
+    //미용 단모/장모
+    $product .= $_POST['hair'] . '|';
+    $total_price += explode(':',$_POST['hair'])[1];
+
     if(!empty($_POST['cat_toenail'])){
         $product .= $_POST['cat_toenail'].'|';
     }
@@ -181,11 +207,13 @@ if($_POST['pet_kind']=='dog') {
     } else {
         $product .= '|';
     }
+    $total_price += $bath[1];
 
     $etc_cnt = count($_POST['cat_etc']);
     $product .= $etc_cnt.'|';
     for($i=0;$i<count($_POST['cat_etc']);$i++){
         $product .= $_POST['cat_etc'][$i].'|';
+        $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
 
 
@@ -204,22 +232,34 @@ if($_POST['pet_kind']=='dog') {
     $res = sql_query($sql);
 
 }
+$chk_sql = "
+        SELECT * FROM tb_payment_log WHERE artist_id = '{$user_id}' AND worker = '{$_POST['worker']}'
+        AND YEAR = '{$_POST['year']}' AND MONTH = '{$_POST['month']}' AND DAY = '{$_POST['day']}' AND HOUR = '".date('H', $_POST['from_time'])."' AND MINUTE = '".date('i', $_POST['from_time'])."' and is_cancel = 0
+    ";
+$chk_result = mysqli_query($connection,$chk_sql);
+$chk_cnt = mysqli_num_rows($chk_result);
+if($chk_cnt < 1) {
+    $pay_data = json_encode($_POST, JSON_UNESCAPED_UNICODE);
+
     $que = "INSERT INTO tb_payment_log SET ";
     $que .= "pet_seq            = '{$_POST['pet_no']}', ";
     $que .= "session_id         = '" . session_id() . "', ";
     $que .= "customer_id        = '{$_POST['customer_id']}', ";
-    $que .= "artist_id          = '{$_SESSION['gobeauty_user_id']}', ";
+    $que .= "artist_id          = '{$user_id}', ";
     $que .= "order_id           = '" . str2hex($_POST['customer_id'] . "_" . rand_id()) . "', ";
     $que .= "local_price        = '{$total_price}', ";
     $que .= "worker             = '{$_POST['worker']}', ";
     $que .= "year               = '{$_POST['year']}', ";
     $que .= "month              = '{$_POST['month']}', ";
     $que .= "day                = '{$_POST['day']}', ";
+    $que .= "status             = 'POS',";
     $que .= "pay_type           = 'pos-card', ";
     $from_hour = date('H', $_POST['from_time']);
     $from_min = date('i', $_POST['from_time']);
     $que .= "hour               = '{$from_hour}', ";
     $que .= "minute             = '{$from_min}', ";
+
+    $que .= "pay_data           = '{$pay_data}',";
 
     $to_hour = date('H', $_POST['to_time']);
     $to_min = date('i', $_POST['to_time']);
@@ -231,7 +271,7 @@ if($_POST['pet_kind']=='dog') {
     if ($_POST['coupon_use_yn'] == 'y') {
         $que .= "is_coupon          = 'Y', ";
     }
-    $sql = "SELECT is_vat FROM tb_shop WHERE customer_id = '{$_SESSION['gobeauty_user_id']}'";
+    $sql = "SELECT is_vat FROM tb_shop WHERE customer_id = '{$user_id}'";
     $r = sql_query($sql);
     $rw = sql_fetch($r);
     $que .= "is_vat             = '{$rw['is_vat']}', ";
@@ -246,6 +286,31 @@ if($_POST['pet_kind']=='dog') {
     $que = "UPDATE tb_coupon_history SET payment_log_seq = {$id} WHERE history_seq = '{$_POST['coupon_seq']}' ";
     sql_query($que);
 
+    // 알림톡발송
+    $now = time();
+    $year = $_POST['year'];
+    $month = $_POST['month'];
+    $day = $_POST['day'];
+    //$reservationTime = strtotime($_POST['year'].'-'.$_POST['month'].'-'.$_POST['day'].' '.$from_hour.':'.$from_min);
+    $reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
+
+    if ($reservationTime > $now && $_POST['alarm_yn'] == "Y") {
+        $talk = new Allimtalk();
+
+        $talk->cellphone = $_POST['cellPhone'];
+
+        $week_arr = ['일', '월', '화', '수', '목', '금', '토'];
+        $talkCustomerName = substr($_POST['cellPhone'], -4);
+        //$talkDate = date("Y년 m월 d일 H시 i분", $reservationTime);
+        $talkDate = date("Y년 m월 d일", $reservationTime);
+        $talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
+        $talkDate .= date("H시 i분", $reservationTime);
+        $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$id;
+        $talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
+    }
+}
+
+}
 
 /*펫이름|
 펫 종류(개,고양이)|
@@ -276,4 +341,6 @@ if($_POST['pet_kind']=='dog') {
 쿠폰구매개수|
 쿠폰시퀀스:쿠폰명:가격*/
 ?>
-<script>location.href = '../<?php echo $_SESSION['backurl1'];?>';</script>
+<script>
+    location.href = '../<?php echo $_SESSION['backurl1'];?>';
+</script>

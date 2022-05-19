@@ -424,14 +424,15 @@ if ($pet_datas = mysqli_fetch_object($pet_result)) {
 	img_list = ('<?=$photo_counseling ?>' != "")? JSON.parse('<?=json_encode($photo_counseling) ?>').split(',') : [];
 
 	$(document).ready(function() {
-		get_file_list(img_list); // call photo_counseling image
+		//get_file_list(img_list); // call photo_counseling image
+            $('#btn_page_prev').prop('href','reserve_advice_list_1');
 	});
 
 	function get_file_list(img_lists){
 		
 		if(img_lists != ""){
 			$.ajax({
-				url: '<?=$mainpage_directory?>/fileupload_ajax.php',
+				url: 'data/fileupload_ajax.php',
 				data: {
 					mode: "get_file_list",
 					file_list: img_lists.join(",")
@@ -487,5 +488,5 @@ if ($pet_datas = mysqli_fetch_object($pet_result)) {
 	}
 </script>
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

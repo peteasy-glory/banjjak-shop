@@ -7,8 +7,16 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 
 
-$user_id = $_SESSION['gobeauty_user_id'];
-$user_name = $_SESSION['gobeauty_user_nickname'];
+//$user_id = $_SESSION['gobeauty_user_id'];
+//$user_name = $_SESSION['gobeauty_user_nickname'];
+
+if($_SESSION['artist_flag'] === true){
+    $user_id = $_SESSION['shop_user_id'];
+    $user_name = $_SESSION['shop_user_nickname'];
+}else{
+    $user_id = $_SESSION['gobeauty_user_id'];
+    $user_name = $_SESSION['gobeauty_user_nickname'];
+}
 
 $first_type = $_REQUEST['first_type'];
 $second_type = $_REQUEST['second_type'];
@@ -89,7 +97,7 @@ $is_offline = 0;
         $("#searchList").html('');
 
         $.ajax({
-            url: 'data/get_reserve_accept_ajax.php',
+            url: 'data/get_reserve_accept_ajax',
             data: {
                 mode: 'get_search_all',
                 search: search_word,
@@ -97,7 +105,7 @@ $is_offline = 0;
                 worker : '<?php echo $_GET['worker'];?>',
                 workTime : '<?php echo $_GET['workTime'];?>',
                 workDate : '<?php echo $_GET['workDate'];?>',
-                searchTxt : search_word
+                backurl : '<?php echo $_GET['backurl'];?>'
             },
             dataType: 'html',
             type: 'POST',
@@ -118,7 +126,7 @@ $is_offline = 0;
             $("#searchList").html('');
 
             $.ajax({
-                url: 'data/get_reserve_accept_ajax.php',
+                url: 'data/get_reserve_accept_ajax',
                 data: {
                     mode: 'get_search_all',
                     search: search_word,

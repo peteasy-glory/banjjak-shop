@@ -8,16 +8,17 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
 $pet_seq = $_POST['pet_seq'];
 
-$check_query = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet_seq}'";
-$check_result = mysqli_query($connection, $check_query);
-$check_data = mysqli_fetch_object($check_result);
+//$check_query = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet_seq}'";
+//$check_result = mysqli_query($connection, $check_query);
+//$check_data = mysqli_fetch_object($check_result);
 
-$user_id = "";
-if($check_data->tmp_yn == "Y"){
-	$user_id = "tmp_".$check_data->tmp_seq;
-}else{
-	$user_id = $check_data->customer_id;
-}
+$user_id = $_SESSION['gobeauty_user_id'];
+
+//if($check_data->tmp_yn == "Y"){
+//	$user_id = "tmp_".$check_data->tmp_seq;
+//}else{
+//	$user_id = $check_data->customer_id;
+//}
 
 make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
 
@@ -77,10 +78,7 @@ if(file_exists($filepath_appuploaded)) {    // android용
 		@unlink($filepath_appuploaded);
 	}
 } else {    // pc / iphone용
-	//make_user_directory(upload_static_directory.'/'.$upload_direcoty_full_path, $user_id);
-//	make_user_directory($upload_static_directory2.$upload_directory2, );
-	move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory.'/'.$upload_direcoty_full_path);
-
+    move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory.'/'.$upload_direcoty_full_path);
 	$s3->resizeImage($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_static_directory.'/'.$upload_direcoty_full_path);
 	$s3->fileToS3($upload_static_directory.'/'.$upload_direcoty_full_path, $upload_direcoty_full_path);
 }
@@ -106,3 +104,4 @@ if($pet_seq > 0){   // 이미지 성공 저장
     echo "Fail";
 }
 ?>
+

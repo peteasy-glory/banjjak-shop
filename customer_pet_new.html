@@ -29,16 +29,6 @@ $header_right	= '
 ';
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
-
-$sql = " SELECT 
-            pet.*
-        FROM 
-            tb_pet_type pet
-        WHERE 
-            pet.type = 'cat'
-            AND pet.enable_flag=1 ORDER BY type_seq ASC, name ASC
-    ";
-$cat = sql_fetch_array($sql);
 ?>
 
 <!-- container -->
@@ -83,8 +73,6 @@ $cat = sql_fetch_array($sql);
 						</div>
 					</div>
 				</div>
-
-
 				<div class="form-group-cell">
 					<div class="form-group-item">
 						<div class="form-item-label">품종</div>
@@ -95,24 +83,13 @@ $cat = sql_fetch_array($sql);
 									<label class="form-toggle-box" for="tuj_pet_kind_cat"><input type="radio" id="tuj_pet_kind_cat" name="pet_kind" value="cat"><em><span>고양이</span></em></label>
 								</div>
 								<!-- 강아지 -->
-								<div id="dog_div" style="display:block">
+								<div style="display:block">
 									<select id="tuj_pet_type" name="pet_type" class="select pet_type">
 										<option value="">선택</option>
 									</select>
 								</div>
-                                <div id="cat_div"  style="display:none">
-                                    <select name="pet_type"  id="tuj_pet_type_cat">
-                                        <option value="">선택</option>
-                                        <?php
-                                        if(count($cat)>0){
-                                            foreach($cat as $cat){
-                                                ?>
-                                                <option value="<?php echo $cat['name'];?>" <?php echo ($data['pet']['pet_type']==$cat['name'])?'selected':'';?>><?php echo $cat['name'];?></option>
-                                            <?php }} ?>
-                                    </select>
-                                </div>
 								<!-- //강아지 -->
-								<!--<input type="text" name="pet_type2" placeholder="품종을 적어주세요." style="display: none;" class="input input_full" />-->
+								<input type="text" name="pet_type2" placeholder="품종을 적어주세요." style="display: none;" class="input input_full" />
 							</div>
 						</div>
 					</div>
@@ -174,9 +151,8 @@ $cat = sql_fetch_array($sql);
 				<div class="form-group-cell">
 					<div class="form-group-item">
 						<div class="form-item-label">메모</div>
-						<div class="form-item-data">
-                            <textarea name="memo" id="memo" cols="30" rows="10"></textarea>
-							<!--<textarea type="text" name="memo" class="form-control" placeholder="메모를 입력해주세요"/>-->
+						<div class="form-item-data">							
+							<input type="text" name="memo" class="form-control" placeholder="메모를 입력해주세요"/>	
 							<div class="form-input-info">*필수항목만 입력해도 예약등록 가능</div>
 						</div>
 					</div>
@@ -200,40 +176,9 @@ $cat = sql_fetch_array($sql);
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="javascript:;" class="btn-page-bottom tmp_user_submit_btn">등록</a>
+		<a href="#" class="btn-page-bottom tmp_user_submit_btn">등록</a>
 	</div>
-	<!-- //page-bottom -->
-
-    <article id="reserveCalendarPop23" class="layer-pop-wrap">
-        <div class="layer-pop-parent">
-            <div class="layer-pop-children">
-                <div class="pop-data alert-pop-data">
-                    <div class="pop-body">
-                        <div class="msg-txt">이 번호의 고객이 이미 반짝에 등록되어 있어 펫정보를 불러올 수 있습니다.<p>(반짝의 다른 입점샵 이용이력이 있는 고객으로 펫정보만 불러옵니다_다른샵 미용이력/메모제외)</div>
-                    </div>
-                    <div class="pop-footer">
-                        <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">확인</button>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </article>
-    <article id="reserveCalendarPop53" class="layer-pop-wrap">
-        <div class="layer-pop-parent">
-            <div class="layer-pop-children">
-                <div class="pop-data alert-pop-data">
-                    <div class="pop-body">
-                        <div class="msg-txt">이 번호의 고객이 이미 반짝에 등록되어 있어 펫정보를 불러올 수 있습니다.<p>(반짝의 다른 입점샵 이용이력이 있는 고객으로 펫정보만 불러옵니다_다른샵 미용이력/메모제외)</div>
-                    </div>
-                    <div class="pop-footer">
-                        <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">확인</button>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </article>
+	<!-- //page-bottom -->	
 </section>
 <!-- //container -->
 
@@ -300,12 +245,12 @@ $cat = sql_fetch_array($sql);
 			dataType: 'json',
 			success: function(data) {
 				if(data.code == "000000"){ // success
-					console.log(data.data);
+					//console.log(data.data);
 					if(data.data.result == true){
 						$("#tuj_cellphone").css("background-color", "#cfc");
 						is_vaildate = true;
 
-						//get_mypet(cellphone, '');
+						get_mypet(cellphone, '');
 					}else{
 						popalert.open('firstRequestMsg1', data.data.message);
 						
@@ -348,12 +293,12 @@ $cat = sql_fetch_array($sql);
 	
 	function submit_validate(){
 		var message = "";
-		if($("#tmp_user_join input[name='cellphone']").val() == "") {
-            message = "전화번호를 적어주세요.";
-            is_submit = false;
-        } else if($("#tmp_user_join input[name='pet_name']").val() == ""){
-            message = "펫이름을 적어주세요.";
-            is_submit = false;
+		if($("#tmp_user_join input[name='pet_name']").val() == ""){
+			message = "펫이름을 적어주세요.";
+			is_submit = false;
+		}else if($("#tmp_user_join input[name='cellphone']").val() == ""){
+			message = "전화번호를 적어주세요.";
+			is_submit = false;
 		}else if($("#tmp_user_join input[name='cellphone']").val() != "" && $("#tmp_user_join input[name='cellphone']").val().length < 8){
 			message = "전화번호를 적어주세요.";
 			is_submit = false;
@@ -427,17 +372,19 @@ $cat = sql_fetch_array($sql);
 						var html = '';
 						if(data.data){
 							
-							popalert.open('reserveCalendarPop23');
-							// 다른 샵에서의 미용 이력이 있을 때 end by.glory-20210817
-                            for(var i=0;i<data.data.length;i++){
+							popalert.open('firstRequestMsg1', "해당번호의 고객정보가 이미 반짝에 등록되어, 등록된 펫정보를 불러올수 있습니다.");
+                            $.each(data.data, function(i, v){
                                 html += '<div class="grid-layout-cell flex-auto">';
-                                html += '<label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" value="'+data.data[i]['pet_seq']+'" data-no="'+data.data[i]['pet_seq']+'"><em>'+data.data[i]['name']+'</em></label>';
+                                html += '    <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" value="'+data.data[i]['pet_seq']+'" data-no="'+data.data[i]['pet_seq']+'"><em>'+data.data[i]['name']+'</em></label>';
                                 html += '</div>';
-                            }
+                            });
+							// 다른 샵에서의 미용 이력이 있을 때 end by.glory-20210817
+
 						}
 
-						$("#pet_list").empty().html(html);
-						$('#pet_choose').css('display','block');
+						//$("#tuj_pet_list").html('').html(html);
+                        $("#pet_list").empty().html(html);
+                        $('#pet_choose').css('display','block');
 					}
 
 					submit_validate();
@@ -453,70 +400,18 @@ $cat = sql_fetch_array($sql);
 	}
 
     $(document).on('click','.pet-no',function(){
-        var no = $(this).data('no');
-        if(!no){
-            alert('펫 정보가 없습니다. 새로 고칭 후 이용해주세요.');
-            return false;
-        }
-        get_pet_info(no);
+        var cellphone = $("#tuj_cellphone").val();
+        var pet_seq = $(this).data('no');
+        console.log("test");
+        console.log(cellphone, pet_seq);
+        get_mypet(cellphone, pet_seq);
 
     });
-    function get_pet_info(no){
-        $.ajax({
-            type : 'post',
-            url : './data/get_pet_info',
-            data : {'mode':'petInfo','no':no,'cellphone':'<?php echo $cellPhone;?>'},
-            dataType : 'json',
-            success : function(json){
-
-                console.log(json.data)
-                if(json.result['flag'] == true){
-                    //var kg = json.data['weight'].split('.');
-                    $('#tuj_pet_name').val(json.data['name']);
-                    $('#tuj_pet_type').val(json.data['pet_type']);
-                    if(json.data['type']=='dog'){
-                        $('#dog_div').css('display','block');
-                        $('#cat_div').css('display','none');
-                        $('#tuj_pet_kind_dog').prop('checked',true)
-                        $('#tuj_pet_type').prop('disabled',false);
-                        $('input[name="pet_type_cat"]').prop('disabled',true);
-                        $('#tuj_pet_kind_dog').val(json.data['pet_type']);
-                    } else {
-                        $('#cat_div').css('display','block');
-                        $('#dog_div').css('display','none');
-                        $('#tuj_pet_type').prop('disabled',true);
-                        $('input[name="pet_type_cat"]').prop('disabled',false);
-                        $('#tuj_pet_kind_cat').prop('checked',true);
-                        $('#tuj_pet_type_cat').val(json.data['pet_type']);
-                    }
-
-                    $('#tuj_pet_year').val(json.data['year']);
-                    $('#tuj_pet_month').val(json.data['month']);
-                    $('#tuj_pet_day').val(json.data['day']);
-
-                    if(json.data['gender']=='남아'){
-                        $('#tuj_pet_gender_m').prop('checked',true);
-                    } else {
-                        $('#tuj_pet_gender_w').prop('checked',true);
-                    }
-
-                    if(json.data['neutral']==1){
-                        $('#tuj_neutral_0').prop('checked',true);
-                    } else {
-                        $('#tuj_neutral_1').prop('checked',true);
-                    }
-
-                    /*$('#pet_weight1').val(kg[0]);
-                    $('#pet_weight2').val(kg[1]);*/
-                }
-            }, error : function(xhr, error){
-                console.log('error'+xhr)
-            }
-        });
-    }
-	function go_to_week_reservation(pet_name,pay) {
-
-		location.href	= "./reserve_main_week?direct_pay_seq="+pay+'&pet_name='+pet_name;
+	
+	
+	
+	function go_to_week_reservation(pet_name) {
+		location.href	= "./reserve_main_week";
 		/*
 		var form = document.createElement('form');
 		var objs;
@@ -558,30 +453,19 @@ $cat = sql_fetch_array($sql);
 
 		get_pet_kind(pet_type, '');
 	});
-
-
-	$(document).on('keyup','#tuj_cellphone',function(){
-        $(this).val($(this).val().replace(/[^0-9]/g,"")).css("background-color", "#fff");
-    });
-
+	
 	$(document).on("click", ".cellphone_chk", function(){
+		
 		var artist_id = "<?=$user_id ?>";
 		var cellphone = $("#tuj_cellphone").val();
-
-        if(artist_id != "" && cellphone != ""){
-            if(cellphone.length >= 8 && isPhone(cellphone)){
-                get_cellphone_chk(artist_id, cellphone);
-            }else{
-                popalert.open('firstRequestMsg1','전화번호를 확인해주세요.');
-            }
-        }
-		/*if(artist_id != "" && cellphone != ""){
+		
+		if(artist_id != "" && cellphone != ""){
 			if(cellphone.length >= 8){
 				get_cellphone_chk(artist_id, cellphone);
 			}else{
 				popalert.open('firstRequestMsg1', '전화번호를 확인해주세요.');
 			}
-		}*/
+		}
 	});
 	
 	$(document).ready(function(){
@@ -596,7 +480,6 @@ $cat = sql_fetch_array($sql);
 
 			return false;
 		})
-<<<<<<< HEAD
         if("<?=$cellphone?>" != ""){
             $(".cellphone_chk").css("display","none");
 
@@ -605,8 +488,6 @@ $cat = sql_fetch_array($sql);
         $(".pc-header-menu-cell1").addClass("actived");
         $('#btn_page_prev').prop('href','<?=$_SESSION['backurl2']?>');
         
-=======
->>>>>>> d9eeb70938c4a6807528f6e5fc17be88ec5a06e3
 })
 	
 	
@@ -634,8 +515,8 @@ $cat = sql_fetch_array($sql);
 			dataType: 'json',
 			success: function(data) {
 				if(data.code == "000000"){ // success
-					console.log(data.data);
-					popalert.open('reserveCalendarPop53','등록되었습니다');
+					//console.log(data.data);
+					alert("등록되었습니다.");
 					if($("input[name='submit_and_reserv']").prop("checked") === true){
 						go_to_week_reservation(data.data);
 					}else if("<?=$cellphone?>" != ""){
@@ -643,7 +524,7 @@ $cat = sql_fetch_array($sql);
                     }else{
                         location.href="customer_inquiry";
                     }
-
+					
 				}else{
 					popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
 				}
@@ -653,18 +534,6 @@ $cat = sql_fetch_array($sql);
 			}
 		});
 	}
-
-    $(document).ready(function(){
-        $('#header_bell').css('display','none');
-        $('#btn_page_prev').prop('href','customer_inquiry');
-
-    });
-    function isPhone(val) {
-        val = val.split('-').join('');
-        var regPhone = /^(01[016789]{1}|02|0[3-9]{1}[0-9]{1})[0-9]{3,4}[0-9]{4}$/;
-        return regPhone.test(val);
-    }
-
 </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");

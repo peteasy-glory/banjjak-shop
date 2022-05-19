@@ -132,7 +132,12 @@ $user_id = $_SESSION['gobeauty_user_id'];
             success: function(data) {
 
                 if(data != "Fail") { // 성공
-                    location.reload();
+                    //location.reload();
+                    $("#photo_upload").css("display", "none");
+                    $("#photo_change").css("display", "block");
+                    $("#upload_photo").attr("src", data);
+                    $("input[name=business_photo]").val(data);
+
 
                 } else {
                     alert('미용사진 업로드에 실패하였습니다.');

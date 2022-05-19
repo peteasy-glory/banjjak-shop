@@ -29,7 +29,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 $app = new App();
 $is_app = $app->is_app();
 
-
 $user_id = ($_SESSION['artist_flag'] === true) ? $_SESSION['shop_user_id'] : $_SESSION['gobeauty_user_id'];
 $customer_user_id = $user_id;	// 사진 변경용 정회원번호
 $customer_tmp_seq = "";			// 사진 변경용 가회원번호
@@ -49,13 +48,13 @@ $ts = sql_fetch_array($que);
 				<div class="list-inner">
 					<div class="list-cell"><a href="javascript:;" onclick="file_view();" class="btn-gate-picture-register"><span><em>이미지 추가</em></span></a></div>
                     <?php
-                        $que = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$_GET['pet']}'";
+                        $que = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$_GET['pet']}' AND artist_id = '{$user_id}'";
                         //echo $que;
                         $arr = sql_fetch_array($que);
                         if(count($arr)>0){
                             foreach($arr as $rs){
                     ?>
-					<div class="list-cell">
+                    					<div class="list-cell">
 						<div class="picture-thumb-view">
 							<div class="picture-obj"><img src="<?php echo 'https://image.banjjakpet.com'.img_link_change($rs['file_path']);?>" alt=""></div>
 							<div class="picture-date"><?php echo date('Y.m.d',strtotime($rs['upload_dt']));?></div>
@@ -83,8 +82,6 @@ $ts = sql_fetch_array($que);
 	<!-- //page-body -->
 
         <input type="file" name="imgupfile"            id="addimgfile"     value="" style="display:none">
-
-
 </section>
 <!-- //container -->
 
@@ -125,6 +122,7 @@ $ts = sql_fetch_array($que);
 
     //안드에서 업로드가 끝나면 무조건 호출..
     function uploadEnd(fileName) {
+        // var filename = $("input[name=imgupfile]")[0].files[0].name;
         var newfilename = GetPhotoFilename('pet_gallery', '<?= ($customer_user_id != null && $customer_user_id != "") ? $customer_user_id : "tmp_$customer_tmp_seq" ?>', fileName);
         var formData = new FormData();
         formData.append("myfile", fileName);
@@ -133,7 +131,7 @@ $ts = sql_fetch_array($que);
         formData.append("payment_log_seq", _payment_log_seq);
         formData.append("artist_id", _artist_id);
         $.ajax({
-            url: './data/upload_user_photo_pet_gallery.php',	// 미용사진 갤러리 전용 업로드
+            url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
             data: formData,
             processData: false,
             contentType: false,
@@ -169,7 +167,7 @@ $ts = sql_fetch_array($que);
         if (window.getSelection) {
             sel = window.getSelection();
             if (sel.getRangeAt && sel.rangeCount) {
-                range = sel.getRangeAt(0);
+                rawindow.nge = sel.getRangeAt(0);
                 range.deleteContents();
 
                 var el = document.createElement("div");
@@ -248,10 +246,6 @@ $ts = sql_fetch_array($que);
         var filename = $("input[name=imgupfile]")[0].files[0].name;
         var newfilename = GetPhotoFilename('pet_gallery', '<?= ($customer_user_id != null && $customer_user_id != "") ? $customer_user_id : "tmp_$customer_tmp_seq" ?>', filename);
 
-        console.log(newfilename)
-        //
-        //var _prnt_titl = $.trim( $("#dialog_pet_gallery_form #pet_data_form .prnt_title").val() );
-        //
         var formData = new FormData();
         formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
         formData.append("filepath", newfilename);
@@ -261,7 +255,7 @@ $ts = sql_fetch_array($que);
         //formData.append("prnt_title", _prnt_titl);
         console.log($("input[name=imgupfile]")[0].files[0])
         $.ajax({
-            url: '/data/upload_user_photo_pet_gallery.php',	// 미용사진 갤러리 전용 업로드
+            url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
             data: formData,
             processData: false,
             contentType: false,
@@ -289,21 +283,36 @@ $ts = sql_fetch_array($que);
         //return rv;
     });
 
+    function toBaseEncode(n) {
+        if (n === 0) {
+            return '0';
+        }
+        var digits = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        var result = '';
+        while (n > 0) {
+            result = digits[n % digits.length] + result;
+            n = parseInt(n / digits.length, 10);
+        }
+
+        return result;
+    }
+    
     function SET_SNSShare(shopName, imgPath){
+       
         var is_android = checkMobile();
-        alert(is_android+':'+shopName+':'+imgPath)
+        //alert(is_android+':'+shopName+':'+imgPath)
         if(is_android == true){
-            Banjjak_Android.SET_SNSShare(shopName, imgPath);
+            Android.SET_SNSShare(shopName, "https://image.banjjakpet.com"+imgPath);
         } else if(is_android == 'ios'){
             let messages = {
                 'shop_name': shopName,
-                'img_path': imgPath
+                'img_path': "https://image.banjjakpet.com"+imgPath
             };
-
-            webkit.messageHandlers.SET_SNSShare.postMessage(message);
+            webkit.messageHandlers.SET_SNSShare.postMessage(messages);
         } else {
 
         }
+        
     }
 
     $(document).ready(function(){

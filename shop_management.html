@@ -2,7 +2,6 @@
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
 
-
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
 if ($artist_flag === true) {
@@ -82,7 +81,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         <div class="page-body">
             <!-- page-contents -->
             <div class="page-contents">
-                <form action="data/save_artist_info.php" id="shop_form" method="POST">
+                <form action="data/save_artist_info" id="shop_form" method="POST">
                     <input type="hidden" name="sns_cnt" value="<?=$sns_cnt ?>">
                     <div class="shop-management">
                         <div class="shop-picture-modify">
@@ -377,7 +376,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                               formData.append("toronclass", $("input[name=toronclass]").val());
                               formData.append("imgupfile", $("input[name=imgupfile]")[0].files[0]);*/
             $.ajax({
-                url: 'data/upload_artist_photo.php',
+                url: 'data/upload_artist_photo',
                 data: formData,
                 processData: false,
                 contentType: false,
@@ -417,21 +416,20 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
         //안드에서 업로드가 끝나면 무조건 호출..
         function uploadEnd(fileName) {
-            //              alert(fileName);
             $("#fileuparea2").hide();
             $("#fileuplodingarea").show();
 
             var newfilename = GetPhotoFilename('artist_photo', '<?= $user_id ?>', fileName);
+
             var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
             $.ajax({
-                url: 'data/upload_artist_photo_byapp.php',
+                url: 'data/upload_artist_photo_byapp',
                 data: post_data,
                 type: 'POST',
                 success: function(data) {
                     location.href = location.pathname;
                 },
                 error: function(xhr, status, error) {
-                    //alert(error + "네트워크에러");
                     if(xhr.status != 0){
                         alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
                     }
@@ -500,14 +498,14 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
 
         function check_delete_award(photo) {
-            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_award.php?photo=' + photo);
+            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_award?photo=' + photo);
 
 
         }
 
         function check_delete(photo) {
 
-            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_license.php?photo=' + photo);
+            popalert.confirm('pop2', '삭제하시겠습니까?', 'data/delete_license?photo=' + photo);
 
         }
         $(document).ready(function(){

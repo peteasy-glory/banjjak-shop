@@ -107,3 +107,4 @@ $s3->fileToS3($target, $upload_directory."/".$new_filename);
 $sql = "insert into tb_portfolio (customer_id, image, update_time) value ('" . $user_id . "','" . $upload_direcoty_full_path . "', now());";
 $result = mysqli_query($connection, $sql);
 ?>
+

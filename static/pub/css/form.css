@@ -210,7 +210,7 @@ textarea.form-control:focus{border-bottom-color:#6840b1;}
 .form-datepicker {display:flex; align-items:center;}
 .form-datepicker > input {flex:1; width:100%;}
 .form-datepicker > img,
-.form-datepicker > button {flex:0 0 auto; width:24px; height:24px; margin-left:6px;}
+.form-datepicker > button {flex:0 0 auto; width:24px; height:24px; margin-left:6px; cursor:pointer;}
 .form-datepicker > button {font-size:0;background:url(../images/icon/icon-datepicker.png) center center no-repeat; background-size:24px auto;}
 
 /* 입력박스 그룹 */

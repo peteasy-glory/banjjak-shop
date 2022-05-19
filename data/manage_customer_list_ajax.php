@@ -67,9 +67,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                 SELECT pet_name 
                                 FROM tb_artist_customer_list 
                                 WHERE artist_id = '" . $r_artist_id . "' AND pet_seq = pl.pet_seq
-                            ) AS pet_name
+                            ) AS pet_name,
+                            bp.file_path
                         FROM tb_payment_log AS pl
                             INNER JOIN tb_mypet AS mp ON pl.pet_seq = mp.pet_seq
+                            LEFT JOIN (SELECT * FROM tb_mypet_beauty_photo WHERE artist_id = '" . $r_artist_id . "' ORDER BY idx DESC) AS bp ON bp.pet_seq = pl.pet_seq
                         WHERE pl.artist_id = '" . $r_artist_id . "'
                         AND pl.data_delete = '0'
                         AND mp.data_delete = '0'
@@ -112,7 +114,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						$data[$row["cellphone"]]["noshow"] = $row2["cnt"];
 					}
 				}
-
+                /*
 				$sql = "
 					SELECT pl.*, mp.name, mp.tmp_seq, mp.type, mp.pet_type, mp.pet_type2, mp.photo, mp.tmp_yn
 					FROM tb_hotel_payment_log AS pl
@@ -122,13 +124,13 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					GROUP BY pl.cellphone
 					ORDER BY pl.hp_log_seq DESC
 				";
-				/*
+				*//*
 				AND NOT pl.pet_seq IN (
 				SELECT pet_seq from tb_payment_log 
 				WHERE artist_id = '".$r_artist_id."' 
 				AND data_delete = '1'
 				)
-				*/
+				*//*
 				$arrayHotelValue = ($r_mode == "get_search_all") ? "payment" : "hotel";
 				$result = mysqli_query($connection, $sql);
 				while($row = mysqli_fetch_assoc($result)){
@@ -172,13 +174,13 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					GROUP BY pl.cellphone
 					ORDER BY pl.pp_log_seq DESC
 				";
-				/*
+				*//*
 				AND NOT pl.pet_seq IN (
 				SELECT pet_seq from tb_payment_log 
 				WHERE artist_id = '".$r_artist_id."' 
 				AND data_delete = '1'
 				)
-				*/
+				*//*
 				$arrayPlayroomValue = ($r_mode == "get_search_all") ? "payment" : "playroom";
 				$result = mysqli_query($connection, $sql);
 				while($row = mysqli_fetch_assoc($result)){
@@ -210,7 +212,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					while($row2 = mysqli_fetch_assoc($result2)){
 						$data[$row["cellphone"]]["noshow"] = $row2["cnt"];
 					}
-				}
+				}*/
 			}
 
 			$return_data = array("code" => "000000", "data" => $data);

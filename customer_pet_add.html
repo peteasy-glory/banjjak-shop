@@ -44,6 +44,7 @@ $que = "SELECT COUNT(*) AS cnt FROM tb_payment_log WHERE customer_id = '{$pay['c
 $res = sql_query($que);
 $payc = sql_fetch($res);
 
+$mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
 
 ?>
 <!-- container -->
@@ -54,6 +55,8 @@ $payc = sql_fetch($res);
         <input type="hidden" name="payment_seq" id="pet_seq" value="<?php echo $_GET['payment_seq'];?>">
         <input type="hidden" name="backurl" value="<?php echo $_GET['backurl'];?>">
         <input type="hidden" name="mode" value="petModify">
+        <input type="hidden" name="mode_1" value="<?php echo $mode_1;?>">
+        <input type="hidden" name="cellphone" value="<?php echo $_GET['cellphone'];?>">
 	<div class="page-body">
 		
 		<div class="user-pet-add">
@@ -300,7 +303,7 @@ $payc = sql_fetch($res);
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="javascript:;" onclick="document.petFrm.submit();" class="btn-page-bottom">마이 펫 프로필 저장</a>
+		<a href="javascript:;" onclick="document.petFrm.submit();" class="btn-page-bottom">펫 정보 수정</a>
 	</div>
     </form>
 	<!-- //page-bottom -->	
@@ -309,6 +312,7 @@ $payc = sql_fetch($res);
 
 <script>
     $(document).ready(function(){
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
         get_pet_info(<?php echo $pet_seq;?>);
         var petType = '<?php echo $data['pet']['type'];?>';
         $.ajax({
@@ -328,6 +332,8 @@ $payc = sql_fetch($res);
                 });
             }
         });
+
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
 
     });
 
@@ -376,10 +382,6 @@ $payc = sql_fetch($res);
             }
         });
     }
-    $(document).ready(function(){
-        $('#header_bell').css('display','none');
-        $('#btn_page_prev').attr('href','<?php echo $_SESSION['backurl2'];?>');
-    });
 </script>
 </body>
 </html>

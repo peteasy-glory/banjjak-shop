@@ -34,7 +34,7 @@ $artist_result = mysqli_query($connection, $artist_sql);
 		<!-- set-right-wrap -->  
 		<div class="set-right-wrap">
 			<button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='/set_right_add';">추가하기</button>
-			<div class="form-bottom-info">샵주인이 직원에게 예약접수 기능만을 부여할 수 있습니다.<br>(해당직원이 <strong class="font-color-purple">반짝(펫샵용)</strong> 회원으로 가입된 상태이어야 합니다.)<br>(완료 후 직원이 재로그인을 하면 예약 접수 권한 사용이 가능합니다.)</div>
+			<div class="form-bottom-info">샵주인이 직원에게 예약접수 기능만을 부여할 수 있습니다.<br>(해당직원이 <strong class="font-color-purple">반짝 미용파트너 앱</strong> 회원으로 가입된 상태이어야 합니다.)<br>(완료 후 직원이 재로그인을 하면 예약 접수 권한 사용이 가능합니다.)</div>
 			<div class="basic-data-group">
 				<div class="con-title-group">
 					<h4 class="con-title">권한받은 ID</h4>
@@ -166,5 +166,5 @@ $artist_result = mysqli_query($connection, $artist_sql);
         });
     </script>
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

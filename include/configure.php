@@ -1,5 +1,4 @@
 <?php
-
 	$document_root	= "/var/www/html/subdomain/banjjak_sol/shop";
 	$document_root2	= "/var/www/html";
 	$root_directory = "/user";
@@ -7,7 +6,6 @@
 	$upload_directory2 = "/upload";
 	$upload_static_directory = "/var/www/html/subdomain/banjjak_sol/shop";
 	$upload_static_directory2 = "/var/www/html/subdomain/banjjak_sol/shop";
-
 	$mainpage_directory = $root_directory."/mainpage";
 	$image_directory = $root_directory."/images";
 	$include_directory = $root_directory."/include";

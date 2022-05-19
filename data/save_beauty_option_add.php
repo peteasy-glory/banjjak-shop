@@ -8,7 +8,7 @@ $user_id = $_SESSION['gobeauty_user_id'];
 //print_r($_POST);
 //echo "aaa->".$part_price;
 //이미 등록된 데이터가 있는지 확인한다.
-$que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_common WHERE customer_id = '{$user_id}' AND first_type = '개' AND second_type = '추가공통옵션'";
+$que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_common WHERE customer_id = '{$user_id}' AND first_type = '개' #AND second_type = '추가공통옵션'";
 //echo $que."<p>";
 $res = mysqli_query($connection, $que);
 $row = mysqli_fetch_assoc($res);
@@ -36,14 +36,22 @@ $work = implode(",",$double_array);
 
 
 //털길이
-$addition_hair = array();
-for($i=0;$i<count($_POST['p_beauty_length']);$i++){
-    if(!empty($_POST['p_beauty_length'][$i]) && !empty($_POST['p_beauty_length_price'][$i])) {
-        $hair_array[] = $_POST['p_beauty_length'][$i] . ":" . $_POST['p_beauty_length_price'][$i];
-    }
+$hair_length_array = "";
+for($i=1;$i<=5;$i++){
+//    if(!empty($_POST['p_beauty_length'][$i]) && !empty($_POST['p_beauty_length_price'][$i])) {
+        $hair_length_array .= " beauty_length_".$i." = '".$_POST['p_beauty_length'][$i-1]."', beauty_length_".$i."_price = '". $_POST['p_beauty_length_price'][$i-1]."', ";
+//    }
 }
-$addition_hair = implode(",",$hair_array);
-
+//echo $hair_length_array;
+if(count($_POST['p_beauty_length']) > 5){
+    $addition_hair = array();
+    for($i=0;$i<count($_POST['p_beauty_length'])-5;$i++){
+        if(!empty($_POST['p_beauty_length'][$i+5]) && !empty($_POST['p_beauty_length_price'][$i+5])) {
+            $hair_array[] = $_POST['p_beauty_length'][$i+5] . ":" . $_POST['p_beauty_length_price'][$i+5];
+        }
+    }
+    $addition_hair = implode(",",$hair_array);
+}
 
 //기타 만들기
 $addition_etc = array();
@@ -105,7 +113,7 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "hair_length_product        = '{$addition_hair}', ";
     $sql .= "add_comment                = '{$_POST['add_comment']}', ";
     $sql .= "update_time                = NOW() ";
-    $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '개' AND second_type = '추가공통옵션' ";
+    $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '개' ";
     //echo $sql."<br>";
     mysqli_query($connection,$sql) or die(mysqli_error());
 } else {

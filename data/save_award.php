@@ -9,7 +9,7 @@ function strToImoji($arg){
     return addslashes($arg);
 }
 	$user_id = $_SESSION['gobeauty_user_id'];
-	make_user_directory ($upload_static_directory.$upload_directory, $user_id);
+	make_user_directory ($upload_static_directory2.$upload_directory2, $user_id);
 
 	$license_photo = $_POST["license_photo"];
 	$license_name = strToImoji($_POST["license_name"]);

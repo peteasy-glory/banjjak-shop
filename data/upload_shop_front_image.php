@@ -2,7 +2,6 @@
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
-
 $user_id = $_SESSION['gobeauty_user_id'];
 make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
 
@@ -45,7 +44,6 @@ move_uploaded_file( $_FILES['myfile']['tmp_name'], $upload_static_directory2.$up
 $s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
 $s3->resizeImage($upload_static_directory2.$upload_direcoty_full_path, $upload_static_directory2.$upload_direcoty_full_path);
 $s3->fileToS3($upload_static_directory2.$upload_direcoty_full_path, $upload_directory."/".$new_filename);
-
 
 $sql = "insert into tb_shop_frontimage (customer_id, image) value ('".$user_id."','".$upload_direcoty_full_path."');";
 //echo $sql;

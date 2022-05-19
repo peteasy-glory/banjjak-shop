@@ -66,11 +66,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$url = "";
 				$user_agent = $_SERVER['HTTP_USER_AGENT'];
 				if ($user_agent) {
-					$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
 					if ($token_index > 0) {
 						$url = "APP_GOBEAUTY_iOS";
 					}
-					$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_AND");
 					if ($token_index > 0) {
 						$url = "APP_GOBEAUTY_AND";
 					}
@@ -144,21 +144,25 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 					$_SESSION['gobeauty_user_id'] = $r_customer_id;
 					$_SESSION['gobeauty_user_nickname'] = $nickname;
 
+                    //apple
+                    //$_SESSION['gobeauty_user_id'] = "pettester@peteasy.kr";
+                    //$_SESSION['my_shop_flag'] = "1";
+
 					$url = "";
 					$user_agent = $_SERVER['HTTP_USER_AGENT'];
 					if ($user_agent) {
-						$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
-						if ($token_index > 0) {
+                        $token_index_partner = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
+						if ($token_index > 0 || $token_index_partner > 0) {
 							$url = "APP_GOBEAUTY_iOS";
-						}
-						$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
-						if ($token_index > 0) {
+                        }
+                        $token_index_partner = strpos($user_agent, "APP_GOPET_PARTNER_AND");
+						if ($token_index > 0 || $token_index_partner > 0 ) {
 							$url = "APP_GOBEAUTY_AND";
 						}
 					}
-					if($url == ""){ // empty url
-						$url = $mainpage_directory."/index.php";
-					}
+					//if($url == ""){ // empty url
+						$url = "../home_main";
+					//}
 
 					$return_data = array("code" => "000000", "data" => $url);
 				}else{

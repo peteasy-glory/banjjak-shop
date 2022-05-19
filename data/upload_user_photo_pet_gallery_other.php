@@ -69,7 +69,7 @@ if($check_data->tmp_yn == "Y"){
 	$user_id = $check_data->customer_id;
 }
 
-make_user_directory($upload_static_directory.$upload_directory, $user_id);
+make_user_directory($upload_static_directory2.$upload_directory2, $user_id);
 
 // 설정
 $allowed_ext = array('jpg','jpeg','png','gif');

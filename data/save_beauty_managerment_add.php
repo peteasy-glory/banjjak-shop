@@ -1,7 +1,9 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
 
+$emoji = new TEmoji();
 
 $user_id = $_SESSION['gobeauty_user_id'];
 
@@ -137,7 +139,7 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "is_over_kgs                = '{$_POST['add_weight']}', ";
     $sql .= "what_over_kgs              = '{$_POST['set_weight']}', ";
     $sql .= "over_kgs_price             = '{$_POST['set_price']}', ";
-    $sql .= "add_comment                = '{$_POST['add_comment']}', ";
+    $sql .= "add_comment                = '".$emoji->emojiStrToDB($_POST['add_comment'])."', ";
     $sql .= "update_time                = NOW() ";
     $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}' ";
     //echo $sql."<br>";
@@ -184,13 +186,13 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "is_over_kgs                = '{$_POST['add_weight']}', ";
     $sql .= "what_over_kgs              = '{$_POST['set_weight']}', ";
     $sql .= "over_kgs_price             = '{$_POST['set_price']}', ";
-    $sql .= "add_comment                = '".mysqli_real_escape_string($connection, $_POST['add_comment'])."', ";
+    $sql .= "add_comment                = '".$emoji->emojiStrToDB($_POST['add_comment'])."', ";
     $sql .= "update_time                = NOW() ";
     //echo $sql."<br>";
     mysqli_query($connection,$sql) or die(mysqli_error());
 }
 
-$returl_url = 'set_beauty_management_time';
+$returl_url = 'set_beauty_management';
 if($_POST['backurl'])   $returl_url = $_POST['backurl'];
 
 ?>

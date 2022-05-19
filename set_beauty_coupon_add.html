@@ -91,7 +91,7 @@ $data['product_coupon_cmt'][] = $row;
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->
-    <form action="./data/save_coupon_add.php" name="f" method="post">
+    <form action="./data/save_coupon_add" name="f" method="post">
         <input type="hidden" name="product_type" value="B">
         <input type="hidden" name="mode" value="beautyCouponAdd">
         <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
@@ -352,7 +352,7 @@ $data['product_coupon_cmt'][] = $row;
                                     </div>
                                     <div class="grid-layout-cell grid-40">
                                         <div class="form-group-item card">
-                                            <div class="form-item-label">요금(담위:원)</div>
+                                            <div class="form-item-label">요금(단위:원)</div>
                                             <div class="form-item-data">
                                                 <select name="flat_price[]" class="flat-price" >
                                                     <option value="">선택안함</option>
@@ -400,7 +400,7 @@ $data['product_coupon_cmt'][] = $row;
                                 </div>
                                 <div class="grid-layout-cell grid-40">
                                     <div class="form-group-item card">
-                                        <div class="form-item-label">요금(담위:원)</div>
+                                        <div class="form-item-label">요금(단위:원)</div>
                                         <div class="form-item-data">
                                             <select name="flat_price[]" >
                                                 <option value="">선택안함</option>
@@ -552,6 +552,11 @@ $data['product_coupon_cmt'][] = $row;
             var bt_div = $('#all_add .all-cell').clone();
             $('.all-div').append(bt_div);
         });
+
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_beauty_coupon');
+        });
+
     </script>
 <?php
 //include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");

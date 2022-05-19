@@ -12,4 +12,3 @@ if ($is_push == 1) {
     $push->set_push($user_id);
 }
 ?>
-

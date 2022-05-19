@@ -186,7 +186,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 		$auth_url = $Crypto->encode($customer_id.$s_artist_id.$s_pet_id.DATE("Y-m-d H:i:s"), $access_key, $secret_key);
 
 		// 미용동의서 등록
-		$return_data = beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_customer_name, $r_is_agree, $r_is_customer, $r_doc_type, $auth_url, $r_ba_seq);
+		$return_data = beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_customer_name, $r_cellphone, $r_is_agree, $r_is_customer, $r_doc_type, $auth_url, $r_ba_seq);
 	}else{
 		$return_data = array("code" => "999990", "data" => "Session over");
 	}
@@ -198,7 +198,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 <?php
 ///////// function list /////////
 
-function beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_customer_name, $r_is_agree, $r_is_customer, $r_doc_type, $auth_url, $r_ba_seq){
+function beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_customer_name, $r_cellphone, $r_is_agree, $r_is_customer, $r_doc_type, $auth_url, $r_ba_seq){
 	global $connection;
 	$return_data = array();
 	$ba_cnt = 0;
@@ -225,8 +225,9 @@ function beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_custome
 	}
 
 	if($ba_cnt == 0){
-		$sql = "INSERT INTO tb_beauty_agree (bs_seq, customer_id, artist_id, pet_id, customer_name, is_agree, is_customer, doc_type, auth_url, reg_date) VALUES ('".$bs_seq."', '".$customer_id."', '".$s_artist_id."', '".$s_pet_id."', '".$r_customer_name."', '".$r_is_agree."', '".$r_is_customer."', '".$r_doc_type."', '".$auth_url."', NOW())";
-		
+		$sql = "INSERT INTO tb_beauty_agree (bs_seq, customer_id, artist_id, pet_id, customer_name, cellphone, is_agree, is_customer, doc_type, auth_url, reg_date) 
+				VALUES ('".$bs_seq."', '".$customer_id."', '".$s_artist_id."', '".$s_pet_id."', '".$r_customer_name."','".$r_cellphone."', '".$r_is_agree."', '".$r_is_customer."', '".$r_doc_type."', '".$auth_url."', NOW())";
+		//echo $sql;
 
 		$result = mysqli_query($connection, $sql);
 		
@@ -245,6 +246,7 @@ function beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_custome
 					customer_id = '".$customer_id."',
 					pet_id = '".$s_pet_id."',
 					customer_name = '".$r_customer_name."',
+					cellphone = '".$r_cellphone."',
 					is_agree = '".$r_is_agree."',
 					is_customer = '".$r_is_customer."',
 					doc_type = '".$r_doc_type."'
@@ -265,6 +267,7 @@ function beauty_agree($bs_seq, $customer_id, $s_artist_id, $s_pet_id, $r_custome
 					customer_id = '".$customer_id."',
 					pet_id = '".$s_pet_id."',
 					customer_name = '".$r_customer_name."',
+					cellphone = '".$r_cellphone."',
 					is_agree = '".$r_is_agree."',
 					is_customer = '".$r_is_customer."'
 				WHERE artist_id = '".$s_artist_id."'

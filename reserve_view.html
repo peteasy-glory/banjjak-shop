@@ -204,7 +204,7 @@ if ($artist_datas = mysqli_fetch_object($artist_result)) {
 			</div>
             
 			<div class="item-desc"><?= $emoji->emojiDBToStr($artist_datas->self_introduction) ?></div>
-			<?php /* ?>
+            			<?php /* ?>
             <div class="item-btns">
 				<ul>
                     <?
@@ -227,7 +227,7 @@ if ($artist_datas = mysqli_fetch_object($artist_result)) {
 				</ul>
 			</div>
         <?php // */ ?>
-        </div>
+		</div>
 		<!-- //상품 정보-->
 		<!-- 매장 정보 -->
 		<div class="product-view-group product-view-store">
@@ -678,9 +678,9 @@ if ($artist_datas = mysqli_fetch_object($artist_result)) {
                         $contents = mb_substr(strip_tags($blog->desc), 0, 60);  ?>
                                 <div class="list-cell">
                                     <a href="#" class="basic-list-item blog" onclick="javascript:openView('<?php echo $link; ?>');">
-<!--                                        <div class="thumb">-->
-<!--                                            <img src="--><?php //echo $image; ?><!--" alt="" onerror="src='//usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'">-->
-<!--                                        </div>-->
+                                        <div class="thumb">
+                                            <img src="<?php echo $image; ?>" alt="" onerror="src='//usr.gopet.kr/static/pub/images/icon/icon-none-thumb-large.png'">
+                                        </div>
                                         <div class="info-wrap">
                                             <div class="item-name"><?= $title ?> </div>
                                             <div class="item-desc"><?= $contents ?> </div>

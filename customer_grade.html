@@ -7,7 +7,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 $shop_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
-$shop_id = 'pettster@peteasy.kr';
+//$shop_id = 'pettster@peteasy.kr';
 $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$shop_id}' ORDER BY grade_ord ASC";
 //echo $que;
 $arr = sql_fetch_array($que);

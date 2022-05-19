@@ -37,8 +37,8 @@ class TReserveSql extends TSql{
                                                       LEFT JOIN tb_grade_reserve_approval_mgr C ON A.payment_log_seq = C.payment_log_seq
                                         WHERE A.artist_id = '%s' AND A.is_cancel = 0 AND A.data_delete = 0 AND A.worker = '%s' 
                                                 AND CONCAT(A.year,LPAD(A.month, '2','0'),LPAD(A.day, '2','0'),LPAD(A.hour, '2','0'),LPAD(A.minute, '2','0')) >= '%s'
-                                                AND CONCAT(A.year,LPAD(A.month, '2','0'),LPAD(A.day, '2','0'),LPAD(A.hour, '2','0'),LPAD(A.minute, '2','0')) < '%s'  
-                                        ORDER BY A.year ASC , A.month ASC , A.day ASC, A.hour ASC, A.minute ASC"; //AND A.worker = '%s'
+                                                AND CONCAT(A.year,LPAD(A.month, '2','0'),LPAD(A.day, '2','0'),LPAD(A.hour, '2','0'),LPAD(A.minute, '2','0')) < '%s'                                    
+                                        ORDER BY A.year ASC , A.month ASC , A.day ASC, A.hour ASC, A.minute ASC"; 
 
     private $SQL_GET_RESERVATION_CHK_MEMO =    "SELECT GROUP_CONCAT(A.grpMemo  separator '') AS before_memo
                                                 FROM ( 
@@ -91,11 +91,11 @@ class TReserveSql extends TSql{
         return $this->sql_fetch_array();
     }
 
+
     public function qry_get_reservation_chk_memo($cellphone, $lastDate){
         $this->sql = sprintf($this->SQL_GET_RESERVATION_CHK_MEMO, $cellphone, $lastDate);
         return $this->sql_fetch_array();
     }
-
 
     private function sql_fetch_array(){
         $res = mysqli_query($this->conn, $this->sql);

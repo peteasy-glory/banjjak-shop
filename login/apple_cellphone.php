@@ -8,8 +8,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 	$r_sub = ($_GET["sub"] && $_GET["sub"] != "")? $_GET["sub"] : "";
 	$r_status = ($_GET["status"] && $_GET["status"] != "")? $_GET["status"] : "";
     // apple
-    $_SESSION['gobeauty_user_id'] = 'pettester@peteasy.kr';
-    $_SESSION['my_shop_flag']='1';
+//    $_SESSION['gobeauty_user_id'] = 'pettester@peteasy.kr';
+//    $_SESSION['my_shop_flag']='1';
 ?>
 <style>
 	ul { list-style: none; padding: 0px; margin: 0px; }
@@ -168,13 +168,13 @@ function login_process(){
 		success: function(data) {
 			if(data.code == "000000"){
 				console.log(data.data);
-				if(data.data == "APP_GOBEAUTY_iOS"){
+				if(data.data == "APP_GOPET_PARTNER_iOS"){
 					try {
 					window.webkit.messageHandlers.onAppLogin.postMessage('<?=$r_email ?>');
 					} catch(e) {
 						console.log(e);
 					}
-				}else if(data.data == "APP_GOBEAUTY_AND"){
+				}else if(data.data == "APP_GOPET_PARTNER_AND"){
 					window.Android.onAppLogin('<?=$r_email ?>');
 					location.href = "../home_main";
 				}else{
@@ -216,10 +216,10 @@ $(document).on("click", "#apple_cellphone .send_sms_btn", function(){
 			sendsms(validate_cellphone);
 			//tmp_code();
 		}else{
-			$.MessageBox("연락처를 정확히 입력해주세요.");
+			alert("연락처를 정확히 입력해주세요.");
 		}
 	}else{
-		$.MessageBox("인증받을 연락처를 입력해주세요.");
+		alert("인증받을 연락처를 입력해주세요.");
 	}
 });
 
@@ -230,7 +230,7 @@ $(document).on("click", "#apple_cellphone .confirm_sms_btn", function(){
 	if(checknum != ""){
 		check_sms_number(checknum);
 	}else{
-		$.MessageBox("인증번호를 입력해주세요.");
+		alert("인증번호를 입력해주세요.");
 	}
 });
 
@@ -316,19 +316,19 @@ $(document).on("click", ".set_insert_apple_btn", function(){
 
 function validate(){
 	if(!$("#agree_1").is(":checked")){
-		$.MessageBox("이용약관에 동의 해주세요.");
+		alert("이용약관에 동의 해주세요.");
 		return false;
 	}
 	if(!$("#agree_2").is(":checked")){
-		$.MessageBox("이용약관에 동의 해주세요.");
+		alert("이용약관에 동의 해주세요.");
 		return false;
 	}
 	if(!$("#agree_3").is(":checked")){
-		$.MessageBox("이용약관에 동의 해주세요.");
+		alert("이용약관에 동의 해주세요.");
 		return false;
 	}
 	if(!is_auth){
-		$.MessageBox("휴대폰 인증을 해주세요.");
+		alert("휴대폰 인증을 해주세요.");
 		return false;
 	}
 
@@ -363,13 +363,13 @@ function apple_join(){
 				//	dataType: "JSON",
 				//	success: function(data) {
 				//		if (data.code == "000000"){
-							if(tmp_url == "APP_GOBEAUTY_iOS"){
+							if(tmp_url == "APP_GOPET_PARTNER_iOS"){
 								try {
 								window.webkit.messageHandlers.onAppLogin.postMessage('<?=$r_email ?>');
 								} catch(e) {
 									console.log(e);
 								}
-							}else if(tmp_url == "APP_GOBEAUTY_AND"){
+							}else if(tmp_url == "APP_GOPET_PARTNER_AND"){
 								window.Android.onAppLogin('<?=$r_email ?>');
 								location.href = "/pet/mainpage/index.php";
 							}else{
@@ -396,7 +396,7 @@ function apple_join(){
 
 function innermsglayer(msg, left, top) {
 	clearTimeout(timer);
-	$.MessageBox(msg);
+	alert(msg);
 	var timer = setTimeout(closelayer, 1500);
 }
 

@@ -133,8 +133,11 @@ $productWorkTimeOption = array("30","60","90","120","150","180","210","240","270
             document.f.target = 'hiddenframe';
             document.f.submit();
         });
+        $(document).ready(function(){
+          $('#btn_page_prev').prop('href','set_beauty_management')
+        })
     </script>
 
 <?php
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

@@ -1,9 +1,11 @@
 <?php
-exit;
-include("../user/join2_naver.php");
+//exit;
+//include("../../user/join2_naver.php");
 
-exit;
+//exit;
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
 
 ?>
 

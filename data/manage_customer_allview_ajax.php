@@ -36,7 +36,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						pl.pet_seq, 
 						mp.pet_seq AS mypet_seq,
 					    pl.customer_id,
-						IFNULL(acl.pet_name, IFNULL(mp.name, SUBSTRING_INDEX(SUBSTRING_INDEX(pl.product,'|',1),'|',-1))) AS pet_name,					   
+						IFNULL(mp.name, IFNULL(acl.pet_name, SUBSTRING_INDEX(SUBSTRING_INDEX(pl.product,'|',1),'|',-1))) AS pet_name,					   
 						(
 							SELECT payment_log_seq
 							FROM tb_payment_log
@@ -58,6 +58,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							FROM tb_payment_log
 							WHERE artist_id = '".$r_artist_id."'
 								AND cellphone = pl.cellphone
+                                #AND product LIKE '|'
 							ORDER BY update_time DESC
 							LIMIT 0 , 1
 						) as service,
@@ -66,6 +67,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							FROM tb_payment_log
 							WHERE artist_id = '".$r_artist_id."'
 								AND cellphone = pl.cellphone
+                                #AND product LIKE '|'
 							ORDER BY update_time DESC
 							LIMIT 0 , 1
 						) as service2,
@@ -321,7 +323,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					SELECT pl.cellphone, COUNT(*) AS cnt
 					FROM tb_payment_log AS pl
 					WHERE pl.artist_id = '".$r_artist_id."'
-						AND pl.product_type = 'B'
+                        #AND pl.product_type = 'B'
+                        AND pl.data_delete = 0 
 						AND pl.cellphone != ''
 						AND (pl.pet_seq != '' OR pl.pet_seq != '0')
 					GROUP BY pl.cellphone

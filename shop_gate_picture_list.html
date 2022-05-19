@@ -55,7 +55,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 				<div class="shop-gate-picture-view">					
 					<?if($shop_result->num_rows){?>
 					<!-- 이미지 있을 때 -->
-					<img src="<?="https://image.banjjakpet.com".img_link_change($front_image)?>" alt=""/>
+					<img src="<?="https://image.banjjakpet.com".img_link_change($front_image)?>" alt=""/>					
 					<?}else{?>
 					<!-- 이미지 없을 때 -->
 					<div class="common-none-data">
@@ -86,8 +86,8 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 								</div>
 								<div class="picture-ui-list">
 									<div class="picture-ui-list-inner">
-										<a href="#" onclick="selectImage('<?=$image_value ?>')" class="btn-picture-ui-nav">대표 사진 등록</a>
-										<a href="javascript:deleteImage('<?=$image_value ?>');" class="btn-picture-ui-nav">삭제</a>
+										<a href="#" onclick="selectImage('<?= $image_value ?>')" class="btn-picture-ui-nav">대표 사진 등록</a>
+										<a href="javascript:deleteImage('<?= $image_value ?>');" class="btn-picture-ui-nav">삭제</a>
 									</div>
 								</div>
 								<?if($front_image==$image_value){?>
@@ -111,7 +111,25 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 <!-- //container -->
 
 <script language="javascript">
-    $('#addimgfile').bind('change', function(e) {
+
+    function checkMobile(){
+            var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+        if ( varUA.indexOf('android') > -1) {
+            //안드로이드
+            return true;
+        } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+            //IOS
+            return 'ios';
+        } else {
+            //아이폰, 안드로이드 외
+            return 'other';
+        }
+    }
+
+
+
+ $(document).on("change", "#addimgfile", function(e){
+   // $('#addimgfile').bind('change', function(e) {
         $("#fileuparea").hide();
         $("#fileuplodingarea").show();
         var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
@@ -123,14 +141,14 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         }
 
         var filename = $("input[name=imgupfile]")[0].files[0].name;
-
+        console.log(filename);
         var newfilename = GetPhotoFilename('artist_front_image', '<?= $user_id ?>', filename);
-
+        console.log(newfilename);
         var formData = new FormData();
         formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
         formData.append("filepath", newfilename);
         $.ajax({
-            url: 'data/upload_shop_front_image.php',
+            url: 'data/upload_shop_front_image',
             data: formData,
             processData: false,
             contentType: false,
@@ -178,102 +196,27 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         //alert("카메라")
         window.Android.openCamera();
     }
-<?php
-    function getFileFromCustomerSrv($fileName){
-        $url = 'https://customer.banjjakpet.com/upload/appupload/'.$fileName;
-        $outFileName  = "upload/appupload/down_file.jpg";
-        if(!file_exists("upload/appupload/".$fileName)) {
-            $options = array(
-                CURLOPT_FILE    => fopen($outFileName, 'w'),
-                CURLOPT_TIMEOUT =>  28800, // set  8 hours
-                CURLOPT_URL     => $url
-            );
-
-            $ch = curl_init();
-            curl_setopt_array($ch, $options);
-            curl_exec($ch);
-            curl_close($ch);
-        }
-    }
-
-    $downResult = getFileFromCustomerSrv("down_file1.jpg");
-?>
 
     //안드에서 업로드가 끝나면 무조건 호출..
     function uploadEnd(fileName) {
-
-        var post_file = 'filename=' + fileName;
-        $.ajax({
-            url: 'data/customerFileBridge.php',
-            data: post_data,
-            type: 'POST',
-            success: function(data){
-
-            },
-            error: function (xhr, status, error) {
-                //alert(error + "네트워크에러");
-                if(xhr.status != 0){
-                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-                }
-            }
-        });
-
-        //$("#fileuparea2").hide();
-        //$("#fileuplodingarea").show();
-        //
-        //var down_result = "<?//=getFileFromCustomerSrv()?>//"
-        //
-        //var newfilename = GetPhotoFilename('artist_front_image', '<?//= $user_id ?>//', fileName);
-        //var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
-        //var formData = new FormData();
-        //
-        //formData.append("filepath", fileName);
-        //formData.append("newfilepath", newfilename);
-        //
-        //$.ajax({
-        //    url: 'data/upload_shop_front_image_byapp.php',
-        //    data: post_data,
-        //    type: 'POST',
-        //    success: function(data) {
-        //        $("#fileuparea2").show();
-        //        $("#fileuplodingarea").hide();
-        //        if (/(MSIE|Trident)/.test(navigator.userAgent)) {
-        //            // ie 일때 input[type=file] init.
-        //            $("#addimgfile").replaceWith($("#addimgfile").clone(true));
-        //        } else {
-        //            // other browser 일때 input[type=file] init.
-        //            $("#addimgfile").val("");
-        //        }
-        //        addwidth = " style='width:30%' ";
-        //        mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
-        //        //location.reload();
-        //        location.href = location.pathname;
-        //    },
-        //    error: function(xhr, status, error) {
-        //        //alert(error + "네트워크에러");
-		//		if(xhr.status != 0){
-		//			alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-		//		}
-        //    }
-        //});
-    }
-
-    function bridgeUploadEnd(fileName){
         $("#fileuparea2").hide();
         $("#fileuplodingarea").show();
 
         var newfilename = GetPhotoFilename('artist_front_image', '<?= $user_id ?>', fileName);
         var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+     
         var formData = new FormData();
 
         formData.append("filepath", fileName);
         formData.append("newfilepath", newfilename);
 
         $.ajax({
-            url: 'data/upload_shop_front_image_byapp.php',
+            url: 'data/upload_shop_front_image_byapp',
+           
             data: post_data,
             type: 'POST',
             success: function(data) {
+                        
                 $("#fileuparea2").show();
                 $("#fileuplodingarea").hide();
                 if (/(MSIE|Trident)/.test(navigator.userAgent)) {
@@ -285,14 +228,14 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                 }
                 addwidth = " style='width:30%' ";
                 mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
-                //location.reload();
-                location.href = location.pathname;
+               location.href = location.pathname;
+           
             },
             error: function(xhr, status, error) {
                 //alert(error + "네트워크에러");
-                if(xhr.status != 0){
-                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-                }
+				if(xhr.status != 0){
+					alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+				}
             }
         });
     }
@@ -332,7 +275,6 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
             // IE < 9
             document.selection.createRange().pasteHTML(html);
         }
-
         if(checkMobile()  == true){
             galleryup();
         } else {
@@ -340,27 +282,12 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
         }
     }
-
-    function checkMobile(){
-        var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
-        if ( varUA.indexOf('android') > -1) {
-            //안드로이드
-            return true;
-        } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
-            //IOS
-            return 'ios';
-        } else {
-            //아이폰, 안드로이드 외
-            return 'other';
-        }
-    }
 </script>
-
 <script>
 function deleteImage(path) {
     var post_data = 'path=' + path;
     $.ajax({
-        url: 'data/delete_front_image.php',
+        url: 'data/delete_front_image',
         data: post_data,
         type: 'POST',
         success: function(data) {
@@ -375,7 +302,7 @@ function deleteImage(path) {
 function selectImage(path) {
     var post_data = 'path=' + path;
     $.ajax({
-        url: 'data/change_front_image.php',
+        url: 'data/change_front_image',
         data: post_data,
         type: 'POST',
         success: function(data) {
@@ -387,10 +314,11 @@ function selectImage(path) {
         }
     });
 }
+
+$(document).ready(function(){
+    $('#btn_page_prev').prop('href','shop_main')
+})
 </script>
 
 
-	
-<?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
-?>
+

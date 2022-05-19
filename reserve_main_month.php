@@ -341,7 +341,7 @@ $is_rest_public_holiday = 1;
 $working_sql = "select * from tb_working_schedule where customer_id = '" . $user_id . "';";
 $working_result = mysqli_query($connection, $working_sql);
 if ($working_datas = mysqli_fetch_object($working_result)) {
-    $is_rest_public_holiday = $worki추ng_datas->rest_public_holiday;
+    $is_rest_public_holiday = $working_datas->rest_public_holiday;
 }
 
 // 개인 정기 휴일 설정 1이 쉰다.

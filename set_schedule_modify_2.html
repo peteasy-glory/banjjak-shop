@@ -800,7 +800,7 @@ $await_cnt = $gram[0]['cnt'];
                                                 <?php
                                                 for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
                                                     ?>
-                                                    <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_start"]==date('g',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+                                                    <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_start"]==date('g',$i))?'selected':'';?>><?php echo (date('H',$i)>=12)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
                                                 <?php } ?>
                                             </select>
                                         </div>
@@ -810,7 +810,7 @@ $await_cnt = $gram[0]['cnt'];
                                                 <?php
                                                 for($i=strtotime('09:00');$i<=strtotime('23:00');$i+=3600){
                                                     ?>
-                                                    <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_end"]==date('g',$i))?'selected':'';?>><?php echo (date('H',$i)>=13)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
+                                                    <option value="<?php echo date('G',$i);?>" <?php echo ($data["day_end"]==date('g',$i))?'selected':'';?>><?php echo (date('H',$i)>=12)?'오후':'오전';?> <?php echo date('g:i',$i);?></option>
                                                 <?php } ?>
                                             </select>
                                         </div>
@@ -976,6 +976,7 @@ $await_cnt = $gram[0]['cnt'];
 
         $(document).ready(function(){
             $('#header_bell').css('display','none');
+            $('#btn_page_prev').prop('href','set_schedule_modify_1')
         });
     </script>
 
