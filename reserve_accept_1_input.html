@@ -1027,7 +1027,16 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                             </div>
                                             <?php } ?>
                                             <?php
-                                            if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] ){
+                                            $sql_option = "
+                                                SELECT *
+                                                FROM tb_product_common_option
+                                                WHERE customer_id = '".$user_id."'
+                                            ";
+                                            $result_option = mysqli_query($connection, $sql_option);
+                                            while($row_option = mysqli_fetch_assoc($result_option)){
+                                                $data["bath_option_list"][] = $row_option;
+                                            }
+                                            if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] || count($data['bath_option_list']) > 0){
                                             ?>
                                                 <div class="form-group-cell middle">
                                                     <div class="form-group-item">
@@ -1046,7 +1055,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                                 <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="이중모_목욕:<?php echo $data["product_dog_common"][0]['double_hair_price'];?>" id="leg1"><em><span>이중모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['double_hair_price']);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                                 <?php
-                                                                $sql_option = "
+                                                                /*$sql_option = "
                                                                             SELECT *
                                                                             FROM tb_product_common_option
                                                                             WHERE customer_id = '".$user_id."'
@@ -1054,7 +1063,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                                 $result_option = mysqli_query($connection, $sql_option);
                                                                 while($row_option = mysqli_fetch_assoc($result_option)){
                                                                     $data["bath_option_list"][] = $row_option;
-                                                                }
+                                                                }*/
                                                                 if(count($data['bath_option_list']) > 0){
                                                                 for($i=0;$i<count($data['bath_option_list']);$i++){
                                                                 ?>

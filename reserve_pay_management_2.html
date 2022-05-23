@@ -980,7 +980,17 @@ if(count($arr)>0){
                                     $data["product_dog_common"][] = $row;
                                 }
 
-                                if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] ){
+                                $sql_option = "
+                                    SELECT *
+                                    FROM tb_product_common_option
+                                    WHERE customer_id = '".$user_id."'
+                                ";
+                                $result_option = mysqli_query($connection, $sql_option);
+                                while($row_option = mysqli_fetch_assoc($result_option)){
+                                    $data["bath_option_list"][] = $row_option;
+                                }
+
+                                if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] || count($data['bath_option_list']) > 0){
 
                                     //$bath = explode(":",$beauty_info[8]);
                                     // 털특징별 상품
@@ -1020,7 +1030,7 @@ if(count($arr)>0){
                                                             </div>
                                                         <?php } ?>
                                                         <?php
-                                                        $sql_option = "
+                                                        /*$sql_option = "
                                                                             SELECT *
                                                                             FROM tb_product_common_option
                                                                             WHERE customer_id = '".$user_id."'
@@ -1028,7 +1038,7 @@ if(count($arr)>0){
                                                         $result_option = mysqli_query($connection, $sql_option);
                                                         while($row_option = mysqli_fetch_assoc($result_option)){
                                                             $data["bath_option_list"][] = $row_option;
-                                                        }
+                                                        }*/
                                                         for($i=0;$i<count($data['bath_option_list']);$i++){
                                                             ?>
                                                             <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair-type" <?php echo (in_array($data['bath_option_list'][$i]['title'], $bath))?'checked':'';?> value="<?php echo $data['bath_option_list'][$i]['title'];?>:<?php echo $data['bath_option_list'][$i]['price'];?>" id="leg1"><em><span><?php echo $data['bath_option_list'][$i]['title'];?></span><strong>+<?php echo number_format($data['bath_option_list'][$i]['price']);?>원</strong></em></label></div>

@@ -2146,8 +2146,8 @@ function data_etc_memo($tmp){
         var workTimeStart = '<?php echo $tws[0]['working_start'];?>';
         var workTimeEnd = '<?php echo $tws[0]['working_end'];?>';
 
-        var line_hieght = ((now_hours-workTimeStart)*60+now_m)*2.07;
-        var end_time = ((workTimeEnd-workTimeStart)*60)*2.07;
+        var line_hieght = ((now_hours-workTimeStart)*60+now_m)*1.35;
+        var end_time = ((workTimeEnd-workTimeStart)*60)*1.35;
         console.log(line_hieght, end_time);
         if(line_hieght>0 && line_hieght<end_time){
             $(".calendar-week-current-time").css("top",line_hieght+"px");
