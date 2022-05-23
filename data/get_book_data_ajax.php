@@ -119,14 +119,14 @@ switch($clear['mode']){
             $res = mysqli_query($connection, $que);
             $rows = mysqli_fetch_assoc($res);
             for ($i = 0; $i <= 14; $i++) {
-                if (!empty($row['worktime' . $i . '_disp_yn'] == 'y')) {
+                if ($rows['worktime' . $i . '_disp_yn'] == 'y') {
                     if ($i < 10) {
                         array_push($dog_product_title, $dog_product_arr[$i]);
                     } else {
-                        if (!empty($row['worktime' . $i . '_title'])) {
-                            $dog_product_seq[$row['worktime' . $i . '_title']] = 'beauty' . $beauty;
+                        if (!empty($rows['worktime' . $i . '_title'])) {
+                            $dog_product_seq[$rows['worktime' . $i . '_title']] = 'beauty' . $beauty;
                             $option_name[] = 'beauty' . $beauty . "_price";
-                            array_push($dog_product_title, $row['worktime' . $i . '_title']);
+                            array_push($dog_product_title, $rows['worktime' . $i . '_title']);
                             $beauty++;
                         }
                     }
@@ -146,11 +146,13 @@ switch($clear['mode']){
             }
             if($_POST['petType'] == 'dog')  $petType = '개';
             if($_POST['petType'] == 'cat')  $petType = '고양이';
+            $sql = '';
             for($i=0;$i<count($worktime['title']);$i++){
                 $que_main = "SELECT * FROM tb_product_dog_static 
                     WHERE customer_id = '{$user_id}' AND first_type = '{$petType}' AND (second_type = '{$_POST['serviceType']}' OR direct_title = '{$_POST['serviceType']}')
                     AND ".$dog_product_seq[$worktime['title'][$i]]."_price != ''
                 ";
+                $sql .= $que_main;
 
                 //echo $que;
                 $res_main = sql_query($que_main);
@@ -172,7 +174,7 @@ switch($clear['mode']){
                 }
             }
             $json['data'] = $html;
-
+            $json['sql'] = $sql;
 
         } else {
 
