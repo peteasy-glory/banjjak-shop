@@ -1,5 +1,7 @@
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TFunc.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TSql.php");
 
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
@@ -19,12 +21,14 @@ $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
 
 
-$shop_title	= "예약관리";
+$shop_title	= "빈시간 판매";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
 unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'reserve_main_day?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+$_SESSION['backurl2'] = 'reserve_time_sale_step1_3';
+$_SESSION['week_type'] = '1';
 
 $from = $_GET['from'];
 
@@ -431,15 +435,61 @@ $data["time_schedule"]["is_time_type"] = $rows->is_time_type;
 $ing_cnt = 0;
 
 
-$worker_id = $_GET['worker'];
-if(empty($worker_id)){
-//    print_r($data['artist']);
-    $worker_id = $data['artist'][0]['artist_id'];
+
+$total_cnt = 0;
+$que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$artist_id}'";
+$sftt = sql_fetch_array($que);
+if(count($sftt)>0){
+    foreach($sftt as $rs){
+        $ed[] = $rs['worker'].','.$rs['empty_date'].' '.$rs['empty_datetime'];
+        $total_cnt++;
+    }
 }
 
-$que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$artist_id}' AND worker = '{$worker_id}'";
-$sft = sql_fetch_array($que);
-$empty_date = explode("|",$sft[0]['empty_date']);
+$start_time = $end_time = '';
+$chk_time = array();
+$que = "SELECT * FROM tb_payment_log WHERE year = '{$yy}' AND month = '{$mm}' AND day = '{$dd}' AND artist_id = '{$user_id}' AND is_cancel = 0 AND data_delete = '0' ";
+//echo $que;
+$tpl1 = sql_fetch_array($que);
+if(count($tpl1)>0){
+    foreach($tpl1 as $tpl1){
+        $start_time = strtotime($tpl1['hour'].':'.$tpl1['minute']);
+        $end_time = strtotime($tpl1['to_hour'].':'.$tpl1['to_minute']);
+        for($i=$start_time;$i<$end_time;$i+=1800){
+            $chk_time[$tpl1['worker']][] = date('H:i',$i);
+        }
+    }
+}
+
+
+$combine_currdate = $yy.TFunc::strToFillZero($mm, 2).TFunc::strToFillZero($dd, 2);
+$reserve_sql = new TReserveSql($connection);
+$CantReservationDay = $reserve_sql->qry_cant_reservation_day($artist_id, $combine_currdate);
+$CantReservationWeekNor = $reserve_sql->qry_cant_reservation_week_nor($artist_id);
+$st_date_time= $combine_currdate.TFunc::strToFillZero($time_open, 2)."00";
+$fi_date_time= $combine_currdate.TFunc::strToFillZero($time_close, 2)."00";
+$GetReservationChkDay = $reserve_sql->qry_get_reservation_chk_day($artist_id, $st_date_time, $fi_date_time);
+if(TFunc::checkPC() == "PC") {
+    $memo_count = 0;
+    foreach ($GetReservationChkDay as $val){
+        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['cellphone'], $val['reservation_date']);
+        $GetReservationChkDay[$memo_count]['etc_memo'] = $tmp_memo[0]['before_memo'];
+        $memo_count ++;
+    }
+}
+
+function data_dash($tmp){
+    if ($tmp == ""){
+        $tmp = "내용 없음";
+        return $tmp;
+    }
+    $tmp = substr_replace($tmp, '-', 4, 0);
+    $tmp = substr_replace($tmp, '-', 7, 0);
+    $tmp = substr_replace($tmp, ' ', 10, 0);
+    $tmp = substr_replace($tmp, ':', 13, 0);
+    return $tmp;
+}
+
 ?>
     <!-- container -->
     <section id="container">
@@ -476,7 +526,7 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                         <!--
                         //	select태그는 투명을로 위로 띄웟고 , change 시 txt클래스내 문구 변경으로 디자인 처리
                         -->
-                        <select>
+                        <select id="today_sel">
                             <?for($i=-15;$i<0;$i++){?>
                                 <option value="<?= (int) date('Y', strtotime($selected_date)-86400*$i) ?>.<?= (int) date('m', strtotime($selected_date)-86400*$i) ?>.<?= (int) date('d', strtotime($selected_date)-86400*$i) ?>" data-rol1="<?=date('m.d', strtotime($selected_date)-86400*$i)?>" data-rol2="<?= $daily[date('w', strtotime($yy . '-' . $mm . '-' . $dd))] ?>"><?= (int) date('m', strtotime($selected_date)-86400*$i) ?>월 <?= (int) date('d', strtotime($selected_date)-86400*$i) ?>일</option>
                             <?}?>
@@ -556,7 +606,21 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                     $nowdate = date('Y-m-d',strtotime($selected_date));//현재 날짜
                                                     $nowdatetime = strtotime($nowdate." ".$thisTime); //현재날짜시간
 
-                                                    $crw = cant_reservation_day($connection, $artist_id, $artist['name'], $nowdate); //날짜만으로 예약금지 일자 검색
+                                                    $crw =null; //날짜만으로 예약금지 일자 검색
+                                                    if (count($CantReservationDay) < 1){
+                                                        $crw = null;
+                                                    }else{
+                                                        foreach ($CantReservationDay as $val){
+                                                            if(trim($val['worker']) == $artist['name']
+                                                                && strtotime($val['start_datetime']) <= $nowdatetime
+                                                                && strtotime($val['end_datetime']) > $nowdatetime
+                                                            ){
+                                                                $crw = $val;
+                                                                break;
+                                                            }
+                                                            $crw = null;
+                                                        }
+                                                    }
 
                                                     $thisTimeTo = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_open.':00')))));
                                                     $thisTimeFrom = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_close.':00')))));
@@ -568,7 +632,18 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                     }
 
                                                     //정기휴일 확인.
-                                                    $crwn = cant_reservation_week_nor($connection, $artist_id);
+                                                    $crwn = null;
+                                                    if (count($CantReservationWeekNor) < 1){
+                                                        $crwn = null;
+                                                    }else{
+                                                        foreach ($CantReservationWeekNor as $val){
+                                                            if(trim($val['customer_id']) == $artist_id){
+                                                                $crwn = TFunc::artist_reservation_chk($val);
+                                                                break;
+                                                            }
+                                                            $crwn = null;
+                                                        }
+                                                    }
                                                     $today_disp = date('w',strtotime($nowdate));
                                                     if(in_array($today_disp,$crwn)) {
                                                         $div_class = 'break';
@@ -577,35 +652,33 @@ $empty_date = explode("|",$sft[0]['empty_date']);
 
                                                     //해당 일자 예약 가져오기
                                                     $is_rev_true = '';
-                                                    $chk_rev = get_reservation_chk($user_id, $artist['name'], date('Y-n-j',strtotime($nowdate)),$thisTime);
+                                                    $chk_rev = [];
+                                                    if (count($GetReservationChkDay) < 1){
+                                                        $chk_rev = null;
+                                                    }else{
+                                                        foreach ($GetReservationChkDay as $val){
+                                                            if(trim($val['reservation_date']) == str_replace("-","",$nowdate).str_replace(":","",$thisTime)
+                                                                && trim($val['worker']) == $artist['name']){
+                                                                $chk_rev[] = $val;
+                                                                //array_splice($chk_rev, 150, 2);
+                                                                break;
+                                                            }
+                                                            $chk_rev = null;
+                                                        }
+                                                    }
                                                     if($chk_rev){
                                                         $is_rev_true = 'go-payment';
                                                     }
 
+                                                    $star_date_time = strtotime($nowdate.' '.$thisTime);
 
                                                     ?>
 
-                                                    <div class="calendar-day-body-col <?=$div_class?> "
-                                                         data-worker2="<?= $artist['nicname'] ?>"
-                                                         data-worker="<?= $artist['name'] ?>"
-                                                         data-date="<?= $nowdate ?>"
-                                                         data-time="<?= $thisTime ?>"
-                                                         data-time-to="<?= $thisTimeTo ?>"
-                                                         data-time-from="<?= $thisTimeFrom ?>"
-                                                         data-hour="<?= sprintf('%02d', $t) ?>"
-                                                         data-minute="<?= sprintf('%02d', $t30) ?>"
-                                                         data-rowspan="" data-time="<?= $thisTime ?>"
-                                                         date-session-id="<?= $session_id[$firstTime] ?>"
-                                                         data-pay_seq="<?=$payment_log_seq?>"
-                                                         data-phseq="<?=$data['private_holiday'][$artist['name']]['phseq']?>"
-                                                         data-status="<?php echo $status;?>"
-                                                    >
+                                                    <div class="calendar-day-body-col <?=$div_class?> ">
 
                                                         <?php if($div_class != 'break'){ ?>
                                                             <div class="calendar-drag-item-group">
                                                                 <?php
-
-
 
                                                                 if(!empty($chk_rev)){
                                                                     for($a=0;$a<count($chk_rev);$a++){
@@ -631,12 +704,16 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                                     <?php }} else { ?>
                                                                     <div class="calendar-check-value">
                                                                         <label class="form-radiobox large">
-                                                                            <?php if($div_class != 'no-reservation'){ ?>
-                                                                                <input type="checkbox" id="check_time_sale" class="time-chk" value="<?php echo $artist['name'].','.$nowdate.' '.$thisTime;?>" onclick="fn_time_sale()"><span class="form-check-icon"><em></em></span>
-                                                                            <?php } ?>
+                                                                            <?php
+                                                                            if($div_class != 'no-reservation'){
+                                                                                $val = $artist['name'] . ',' . $nowdate . ' ' . $thisTime;
+                                                                                if(!in_array($thisTime,$chk_time[$artist['name']])){
+                                                                                    ?>
+                                                                                    <input type="checkbox" class="time-chk" <?php echo (in_array($val,$ed))?'checked':'';?> value="<?php echo $val;?>" data-no_sel="<?php echo $val;?>" onclick="fn_time_sale()"><span class="form-check-icon"><em></em></span>
+                                                                                <?php }} ?>
                                                                         </label>
                                                                     </div>
-                                                                    <?php } ?>
+                                                                <?php } ?>
                                                             </div>
                                                         <?php } else { ?>
                                                             <?php
@@ -655,10 +732,10 @@ $empty_date = explode("|",$sft[0]['empty_date']);
 
                                             </div>
                                             <?php $ing_cnt++; }}?>
-                                    <div class="calendar-day-current-time" style="top:15%;">
+                                    <!--<div class="calendar-day-current-time" style="top:15%;">
                                         <div class="bar"></div>
-                                        <div class="value"><?php echo date('H:i');?></div>
-                                    </div>
+                                        <div class="value"><?php /*echo date('H:i');*/?></div>
+                                    </div>-->
                                 </div>
                             </div>
                         </div>
@@ -685,9 +762,15 @@ $empty_date = explode("|",$sft[0]['empty_date']);
             </div>
         </div>
         <!-- //page-body -->
-        <a href="javascript:;" class="btn-page-bottom selected-done"><span id="time_sale_count">0</span>타임 선택완료</a>
+        <a href="javascript:;" class="btn-page-bottom selected-done"><span id="time_sale_count"><?php echo $total_cnt;?></span>타임 선택완료</a>
     </section>
-
+    <form action="./reserve_time_sale_step2_1" method="post" name="frm">
+        <input type="hidden" name="worker" value="<?php echo $worker_id;?>">
+        <input type="hidden" name="year" value="<?php echo $yy;?>">
+        <input type="hidden" name="month" value="<?php echo $mm;?>">
+        <input type="hidden" name="day" value="<?php echo $dd;?>">
+        <textarea name="choose_date" id="choose_date" cols="30" rows="10" style="display: none;"></textarea>
+    </form>
 
     <article id="reserveCalendarPop2" class="layer-pop-wrap">
         <div class="layer-pop-parent">
@@ -1160,13 +1243,13 @@ $empty_date = explode("|",$sft[0]['empty_date']);
 
                 var yymm    = $(this).val().split(".");
                 if(yymm[1]>=10){
-                    location.href="reserve_main_day?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2];
+                    location.href="reserve_time_sale_step1_3?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2];
                 }else if(yymm[1]<10 && yymm[2]<10){
-                    location.href="reserve_main_day?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2].replace("0","");
+                    location.href="reserve_time_sale_step1_3?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2].replace("0","");
                 }else if(yymm[1]>10 && yymm[2]<10){
-                    location.href="reserve_main_day?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2].replace("0","");
+                    location.href="reserve_time_sale_step1_3?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2].replace("0","");
                 }else{
-                    location.href="reserve_main_day?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2];
+                    location.href="reserve_time_sale_step1_3?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2];
                 }
 
             });
@@ -1254,7 +1337,30 @@ $empty_date = explode("|",$sft[0]['empty_date']);
             var artist_id = '<?php echo $artist_id;?>';
             $('.time-chk').each(function () {
                 if ($(this).is(':checked') == true) {
-                    console.log($(this).val())
+                    chk_date.push($(this).val());
+                    count++;
+                }
+            });
+
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax',
+                data : {'mode':'awaitAddDay','artist_id':artist_id,'data':chk_date,'sel_date':$('#today_sel option:selected').val()},
+                dataType : 'json',
+                success : function(json){
+                    $('#time_sale_count').text(json.cnt);
+                }
+            });
+
+            //$("#time_sale_count").text(count);
+        }
+
+        function fn_time_sale_no() {
+            var count = 0;
+            var chk_date = new Array;
+            var artist_id = '<?php echo $artist_id;?>';
+            $('.time-chk').each(function () {
+                if ($(this).is(':checked') == true) {
                     chk_date.push($(this).val());
                     count++;
                 }
@@ -1273,18 +1379,18 @@ $empty_date = explode("|",$sft[0]['empty_date']);
             //$("#time_sale_count").text(count);
         }
 
-        
+
         //금주 빈시간 전체선택
         $(document).on('click','#chkAll',function(){
 
             var cnt = 0;
             var date_text = '';
+            var chk_date = $('#today_sel option:selected').val();
             if($(this).is(':checked')==true) {
                 $('.time-chk').each(function () {
                     if ($(this).is(':checked') == false) {
                         $(this).prop('checked', true);
                     }
-
                     $('#empty_title').text('금주 빈시간 전체해제');
                     cnt++;
                 });
@@ -1296,6 +1402,7 @@ $empty_date = explode("|",$sft[0]['empty_date']);
 
                 $('#choose_date').val(date_text);
                 $('#time_sale_count').text(cnt);
+                fn_time_sale();
             } else {
                 $('.time-chk').each(function () {
                     if ($(this).is(':checked') == true) {
@@ -1303,7 +1410,16 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                     }
                     $('#empty_title').text('금주 빈시간 전체선택');
                 });
-                $('#time_sale_count').text('0');
+
+                $.ajax({
+                    type : 'post',
+                    url : './data/get_book_data_ajax',
+                    data : {'mode':'noAllChk','data':chk_date},
+                    dataType : 'json',
+                    success : function(json){
+                        $('#time_sale_count').text(json.cnt);
+                    }
+                });
             }
         });
 
@@ -1311,12 +1427,35 @@ $empty_date = explode("|",$sft[0]['empty_date']);
         $(document).ready(function(){
             $('#empty_time_bar').css('display','block');
             $('#header_bell').css('display','none');
-            $('#time_sale_count').text('<?php echo count($empty_date)-1;?>')
+
+        });
+
+        //선택완료
+        $(document).on('click','.selected-done',function(){
+            var cnt = 0;
+            var date_text = '';
+            $('.time-chk').each(function () {
+                if ($(this).is(':checked') == true) {
+                    date_text += $(this).val()+'|';
+                    cnt++;
+                }
+            });
+            $('#choose_date').val(date_text);
+            if(!cnt){
+                popalert.open('reserveCalendarPop99','최소한 한개 이상 타임을 선택해주세요.');
+                return false;
+            }
+
+            if(!date_text){
+                popalert.open('reserveCalendarPop99','데이터 선택에 오류가 있습니다. 새로고침 후 다시 선택해주세요.');
+                return false;
+            }
+            document.frm.submit();
         });
     </script>
 
 
 
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

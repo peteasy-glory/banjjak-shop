@@ -1,5 +1,5 @@
 <?php
-require '/var/www/html/subdomain/banjjak_sol/vendor/autoload.php';
+//require '/var/www/html/subdomain/banjjak_sol/vendor/autoload.php';
 
 use Aws\S3\S3Client;
 use Aws\Exception\AwsException;

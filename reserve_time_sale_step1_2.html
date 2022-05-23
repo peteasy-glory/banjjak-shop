@@ -1,6 +1,7 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
-
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TFunc.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TSql.php");
 
 
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
@@ -19,7 +20,7 @@ $shop_title	= "빈시간 판매하기";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
-
+$_SESSION['week_type'] = '0';
 
 $from = $_GET['from'];
 
@@ -33,7 +34,7 @@ $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 $week = $_GET['week'];
 
-$backurl = $_GET['backurl'];
+$_SESSION['backurl1'] = 'reserve_time_sale_step1_2';
 
 $daily = array('일', '월', '화', '수', '목', '금', '토');
 $selected_date = $yy . "-" . $mm . "-" . $dd;
@@ -619,10 +620,127 @@ if(empty($worker_id)){
     $worker_id = $data['artist'][0]['artist_id'];
 }
 
-$que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$artist_id}' AND worker = '{$worker_id}'";
-$sft = sql_fetch_array($que);
-$empty_date = explode("|",$sft[0]['empty_date']);
+$total_cnt = 0;
+$que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$artist_id}' AND worker = '{$worker}'";
+$sftt = sql_fetch_array($que);
+if(count($sftt)>0){
+    foreach($sftt as $rs){
+        $ed[] = $rs['empty_date'].' '.$rs['empty_datetime'];
+        $total_cnt++;
+    }
+}
 
+//타임제일경우 확인하기
+if($data["time_schedule"]["is_time_type"]==2) {
+    $que = " SELECT * FROM `tb_artist_list` WHERE artist_id='{$artist_id}' AND is_view = '2' AND is_out = '2' GROUP BY name ORDER BY sequ_prnt asc, is_main DESC, nicname ASC";
+    //echo $que;
+    $result = mysqli_query($connection, $que);
+    while ($artist_rows = mysqli_fetch_assoc($result)) {
+        $que = "SELECT * FROM tb_time_schedule WHERE artist_id = '{$artist_id}' AND artist_name = '{$artist_rows['name']}'";
+        $row = sql_fetch_array($que);
+        if(!empty($row[0]['res_time_off'])) {
+            $time_schedule[$artist_rows['name']] = explode(',', $row[0]['res_time_off']);
+            for($i=0;$i<count($time_schedule[$artist_rows['name']]);$i++) {
+                $tsc[$artist_rows['name']][] = substr($time_schedule[$artist_rows['name']][$i], 0, 5);
+            }
+        }
+    }
+}
+
+// 예약중건 추출
+$data['reservation'] = array();
+$sql = "SELECT
+    res.* ,
+    DATE_FORMAT( CONCAT( res.year,'-',res.month,'-',res.day,' ',res.hour,':',IFNULL(res.minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) res_time_start
+FROM
+    `tb_reservation` res
+WHERE
+    DATE_FORMAT( CONCAT( res.year,'-',res.month,'-',res.day ), '%Y-%m-%d' ) >= DATE_FORMAT( '{$yy}-{$mm}-{$dd}' , '%Y-%m-%d' )
+    AND res.update_time > DATE_ADD(now(), INTERVAL -10 MINUTE )
+    AND worker = '{$worker}'
+";
+//echo $sql;
+$arr = sql_fetch_array($sql);
+
+if(count($arr)>0){
+    foreach($arr as $arr) {
+        $res_time['datetime'][] = strtotime($arr['res_time_start']);
+        $res_time['datetime_time'][] = strtotime($arr['res_time_start']);
+        $res_time['time_start'][] = strtotime($arr['res_time_start']);
+        $res_time['daterow'][] = $arr['rowspan'];
+        $res_time['worker'][] = $arr['worker'];
+    }
+}
+
+for($i=0;$i<count($res_time);$i++) {
+    for ($k = 1; $k < $res_time['daterow'][$i]; $k++) {
+        array_push($res_time['datetime_time'], $res_time['datetime_time'][$i]+(1800*$k));
+    }
+}
+
+$rt_cnt = count($res_time['datetime']);
+sort($res_time['datetime_time']);
+sort($res_time['datetime']);
+
+$que = "SELECT * FROM tb_working_schedule WHERE customer_id = '{$artist_id}'";
+//echo $que;
+$tws = sql_fetch_array($que);
+
+$reserve_sql = new TReserveSql($connection);
+$CantReservationWeek = $reserve_sql->qry_cant_reservation_week($artist_id, $worker, $first_date, $last_date);
+$CantReservationWeekNor = $reserve_sql->qry_cant_reservation_week_nor($artist_id);
+$st_date_time= $first_date.TFunc::strToFillZero($time_open, 2)."00";
+$fi_date_time= $last_date.TFunc::strToFillZero($time_close, 2)."00";
+$st_date_time = str_replace("-", "", $st_date_time);
+$fi_date_time = str_replace("-", "", $fi_date_time);
+$GetReservationChk = $reserve_sql->qry_get_reservation_chk($artist_id, $worker, $st_date_time, $fi_date_time);
+
+if(TFunc::checkPC() == "PC") {
+    $memo_count = 0;
+    foreach ($GetReservationChk as $val){
+        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['cellphone'], $val['reservation_date']);
+        $GetReservationChk[$memo_count]['etc_memo'] = $tmp_memo[0]['before_memo'];
+        $memo_count ++;
+    }
+}
+
+function artist_reservation_chk($row){
+    if($row['is_sunday']==1){
+        $regular_break_day[] = 0;
+    }
+    if($row['is_monday']==1) {
+        $regular_break_day[] = 1;
+    }
+    if($row['is_tuesday']==1) {
+        $regular_break_day[] = 2;
+    }
+    if($row['is_wednesday']==1) {
+        $regular_break_day[] = 3;
+    }
+    if($row['is_thursday']==1) {
+        $regular_break_day[] = 4;
+    }
+    if($row['is_friday']==1) {
+        $regular_break_day[] = 5;
+    }
+    if($row['is_saturday']==1) {
+        $regular_break_day[] = 6;
+    }
+
+    return $regular_break_day;
+}
+
+function data_dash($tmp){
+    if ($tmp == ""){
+        $tmp = "내용 없음";
+        return $tmp;
+    }
+    $tmp = substr_replace($tmp, '-', 4, 0);
+    $tmp = substr_replace($tmp, '-', 7, 0);
+    $tmp = substr_replace($tmp, ' ', 10, 0);
+    $tmp = substr_replace($tmp, ':', 13, 0);
+    return $tmp;
+}
 ?>
 
 <!-- container -->
@@ -726,39 +844,77 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                 <div class="calendar-week-header-row">
                                     <div class="calendar-week-header-col time"></div>
                                     <?php foreach ($date_week_list as $key => $val) { ?>
-                                        <div class="calendar-week-header-col <? if (date('Y-m-d', strtotime($key)) == date('Y-m-d')) { ?>today<? } ?>"><div class="th"><?= $daily[date('w', strtotime($key))] ?></div><div class="day"><a href="reserve_main_day?ch=day&yy=<?= date('Y', strtotime($key)) ?>&mm=<?= date('m', strtotime($key)) ?>&dd=<?= date('d', strtotime($key)) ?>&backurl=<?= urlencode($_SERVER['PHP_SELF']) ?>" class="text_day" style=""><?= (int) date('d', strtotime($key)) ?></a></div></div>
+                                        <div class="calendar-week-header-col <? if (date('Y-m-d', strtotime($key)) == date('Y-m-d')) { ?>today<? } ?>">
+                                            <div class="th"><?= $daily[date('w', strtotime($key))] ?></div>
+                                            <div class="day"><a href="reserve_main_day?ch=day&yy=<?= date('Y', strtotime($key)) ?>&mm=<?= date('m', strtotime($key)) ?>&dd=<?= date('d', strtotime($key)) ?>&backurl=<?= urlencode($_SERVER['PHP_SELF']) ?>" class="text_day" style=""><?= (int) date('d', strtotime($key)) ?></a>
+                                            </div>
+                                        </div>
                                     <?}?>
                                 </div>
                             </div>
                             <!-- calendar 시작 -->
-                            <div class="calendar-week-body">
-                                <?php for ($h = $time_open; $h < $time_close; $h++) { ?>
+                            <div class="calendar-week-body" id="week_body_start">
+                                <?php
+                                $time_count = 0;
+                                $curr_time = (int)(microtime(TRUE) * 1000);
+                                for ($h = $time_open; $h < $time_close; $h++) {
+                                    $offset_time = ((int)(microtime(TRUE) * 1000)) - $curr_time;
+                                    TFunc::console("time_count: " . $time_count." offset_time: ".$offset_time);
+                                    $time_count ++;
+                                    ?>
                                     <?php
-                                    $week_day = substr($first_date,8,2); $cnt = 0; for ($t30 = 0; $t30 < 60; $t30 += 30) {
+                                    $week_day = substr($first_date,8,2); $cnt = 0;
+                                    $time_count_t30 = 0;
+                                    for ($t30 = 0; $t30 < 60; $t30 += 30) {
+                                        TFunc::console("time_count_t30: " . $time_count_t30);
+                                        $time_count_t30 ++;
+
                                         $thisTime = sprintf('%02d', $h) . ":" . sprintf('%02d', $t30);
+                                        $startTime = $h;
+                                        $thisTimeEnd = date('H:i',strtotime($thisTime.' +30 minute'));
                                         ?>
+                                        <?php if($thisTime <= date('H:i') && $thisTimeEnd > date('H:i') ){ ?>
+                                            <div class="calendar-week-current-time" id="time_schedule_<?php echo $thisTime;?>" data-curTime="<?php echo $thisTime;?>" data-nowTime="<?php echo date('H:i');?>"><div class="bar"></div><div class="value"><?php echo date('h:i');?></div></div>
+                                        <?php } ?>
                                         <div class="calendar-week-body-row">
                                             <div class="calendar-week-body-col time">
-                                                <?php if($thisTime == '09:00'){ ?>
+                                                <?php if($thisTime == sprintf('%02d',$tws[0]['working_start']).':00' && $thisTime < '12:00'){ ?>
                                                     <div class="day-division-label">오전</div>
+                                                <?php } else if($thisTime == sprintf('%02d',$tws[0]['working_start']).':00' && $thisTime >= '12:00'){ ?>
+                                                    <div class="day-division-label">오후</div>
                                                 <?php } else if($thisTime == '12:00'){ ?>
                                                     <div class="day-division-label">오후</div>
                                                 <?php } else { ?>
                                                     <div class="day-division-label"></div>
                                                 <?php } ?>
-                                                <div class="time-label"><div class="time-start-label"><?=$thisTime?></div><div class="time-end-label"></div></div>
+                                                <div class="time-label"><div class="time-start-label"><?=date('h:i',strtotime($thisTime))?></div><div class="time-end-label"></div></div>
                                             </div>
                                             <?php
 
+                                            $week_list_count = 0;
                                             foreach ($date_week_list as $key => $val) {
+                                                TFunc::console("week_list_count: " . $week_list_count);
+                                                $week_list_count ++;
                                                 unset($crw);
                                                 unset($div_class);
                                                 //해당 일자에 tb_private_holiday 데이터가 있는지 확인다. 2020-02-24 james
                                                 $nowdate = date("Y-m-d",strtotime($first_date." +".$cnt." day"));//현재 날짜
                                                 $nowdatetime = strtotime($nowdate." ".$thisTime); //현재날짜시간
-                                                $crw = cant_reservation_week($connection, $artist_id, $worker, $nowdate); //날짜만으로 예약금지 일자 검색
-                                                //print_r($crw);
 
+//                                                $crw1 = cant_reservation_week($connection, $artist_id, $worker, $nowdate); //날짜만으로 예약금지 일자 검색
+                                                $crw =null; //날짜만으로 예약금지 일자 검색
+                                                if (count($CantReservationWeek) < 1){
+                                                    $crw = null;
+                                                }else{
+                                                    foreach ($CantReservationWeek as $val){
+                                                        if($val['start_datetime'] <= $nowdate." ".$thisTime
+                                                            && $val['end_datetime'] > $nowdate." ".$thisTime){
+                                                            $crw = $val;
+                                                            break;
+                                                        }
+                                                        $crw = null;
+                                                    }
+                                                }
                                                 $thisTimeTo = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_open.':00')))));
                                                 $thisTimeFrom = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_close.':00')))));
 
@@ -770,12 +926,26 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                 }
 
                                                 //정기휴일 확인.
-                                                $crwn = cant_reservation_week_nor($connection, $artist_id);
+//                                                $crwn1 = cant_reservation_week_nor($connection, $artist_id);
+                                                $crwn = null;
+                                                if (count($CantReservationWeekNor) < 1){
+                                                    $crwn = null;
+                                                }else{
+                                                    foreach ($CantReservationWeekNor as $val){
+                                                        if(trim($val['customer_id']) == $artist_id){
+                                                            $crwn = artist_reservation_chk($val);
+                                                            break;
+                                                        }
+                                                        $crwn = null;
+                                                    }
+                                                }
                                                 $today_disp = date('w',strtotime($nowdate));
                                                 if(in_array($today_disp,$crwn)) {
                                                     $div_class = 'break';
                                                     $status = '정기휴일';
                                                 }
+
+
 
                                                 if($div_class == 'break'){
                                                     $prseq = $crw['ph_seq'];
@@ -787,18 +957,35 @@ $empty_date = explode("|",$sft[0]['empty_date']);
 
                                                 //해당 일자 예약 가져오기
                                                 $is_rev_true = '';
-                                                $chk_rev = get_reservation_chk($user_id, $worker_id, date('Y-n-j',strtotime($nowdate)),$thisTime);
+
+//                                                $chk_rev1 = get_reservation_chk($user_id, $worker_id, date('Y-n-j',strtotime($nowdate)),$thisTime);
+                                                $chk_rev = [];
+                                                if (count($GetReservationChk) < 1){
+                                                    $chk_rev = null;
+                                                }else{
+                                                    foreach ($GetReservationChk as $val){
+                                                        if(trim($val['reservation_date']) == str_replace("-","",$nowdate).str_replace(":","",$thisTime)){
+                                                            $chk_rev[] = $val;
+                                                            //array_splice($chk_rev, 150, 2);
+                                                            break;
+                                                        }
+                                                        $chk_rev = null;
+                                                    }
+                                                }
+
                                                 if($chk_rev){
                                                     $is_rev_true = 'go-payment';
                                                 }
 
-                                                $cur_dt = $nowdate.' '.$thisTime;
+                                                $star_date_time = strtotime($select_day.' '.$thisTime);
+
                                                 ?>
                                                 <div class="calendar-week-body-col <?=$div_class?> ">
 
                                                     <?php if($div_class != 'break'){ ?>
                                                         <div class="calendar-drag-item-group">
                                                             <?php
+
                                                             if($cnt == 6) {
                                                                 $week_day = substr($first_date,8,2);
                                                                 $cnt = 0;
@@ -807,46 +994,57 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                             }
 
                                                             ?>
-                                                            <?=$reserv_text?>
-                                                            <?
-                                                            if($h == $time_open && $t30 == 0){
-                                                                echo $holiday_1;
-                                                            }
-                                                            ?>
+
 
                                                             <?php
-                                                            if(!empty($chk_rev)){
+                                                            if(!empty($chk_rev)){//예약이 있을 경우
                                                                 for($a=0;$a<count($chk_rev);$a++){
-
                                                                     $type = explode("|",$chk_rev[$a]['product']);
-
-                                                                    $time_start = strtotime($yy.'-'.$mm.'-'.$dd.' '.$time);
+                                                                    $time_start = strtotime($yy.'-'.$mm.'-'.$dd.' '.$thisTime);
                                                                     $time_end = strtotime($yy.'-'.$mm.'-'.$dd.' '.$chk_rev[$a]['to_hour'].':'.$chk_rev[$a]['to_minute']);
-                                                                    $style_height = make_rev_calc_height($time_start,$time_end);
+                                                                    if($chk_rev[$a]['is_no_show']==1){
+                                                                        $style_height = 100;
+                                                                    } else {
+                                                                        //기본 미용 선택이 없을경우 100으로 만든다.
+                                                                        $binfo = explode("|",$chk_rev[$a]['product']);
+
+                                                                        /*if(empty($binfo[3])){
+                                                                            $style_height = 100;
+                                                                        } else {*/
+                                                                        $style_height = make_rev_calc_height($time_start,$time_end);
+                                                                        //}
+                                                                    }
+
                                                                     ?>
                                                                     <!-- 해당 일자 일정 표시-->
-                                                                    <div class="calendar-week-time-item no-reservation  " data-pay_seq="<?php echo $chk_rev[$a]['payment_log_seq'];?>"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer; border:none !important;background-color:#f4f4f4;">
+                                                                    <div class="calendar-week-time-item no-reservation " data-pay_seq="<?php echo $chk_rev[$a]['payment_log_seq'];?>"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer; border:none !important;background-color:#f4f4f4;">
 
                                                                     </div>
-
                                                                     <!-- 해당 일자 일정 표시 끝-->
-                                                                <?php }} else { ?>
+                                                                    <?php
+                                                                }} else { //예약이 없을경우
+                                                                print_r($chk_rev);
+                                                                ?>
 
                                                                 <div class="calendar-check-value">
                                                                     <label class="form-radiobox large">
                                                                         <?php if($div_class != 'no-reservation'){ ?>
-                                                                            <input type="checkbox" id="check_time_sale" class="time-chk" <?php if(in_array($cur_dt,$empty_date)) { echo 'checked'; }?> value="<?php echo $nowdate.' '.$thisTime;?>" onclick="fn_time_sale()"><span class="form-check-icon"><em></em></span>
+                                                                            <input type="checkbox" id="check_time_sale" class="time-chk" <?php if(in_array($cur_dt,$ed)) { echo 'checked'; }?> value="<?php echo $nowdate.' '.$thisTime;?>" onclick="fn_time_sale()"><span class="form-check-icon"><em></em></span>
                                                                         <?php } ?>
                                                                     </label>
                                                                 </div>
+                                                                <?php
+                                                                //print_r($res_time['datetime']);
+                                                            } //예약이 없을경우 끝
 
-                                                                <?php } ?>
+                                                            ?>
                                                         </div>
                                                     <?php } else { ?>
                                                         <?php
                                                         if($status == '정기휴일' && $thisTime == '09:00'){
                                                             echo $status;
                                                         }
+
                                                         if($status == '예약금지' && substr($crw['start_datetime'],-5) == $thisTime){
                                                             echo $status;
                                                         }
@@ -856,6 +1054,7 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                                             $cnt++;
                                                         }
                                                         ?>
+
                                                     <?php } ?>
                                                 </div>
                                             <?php } ?>
@@ -863,7 +1062,7 @@ $empty_date = explode("|",$sft[0]['empty_date']);
                                     <?php } ?>
                                 <?php } ?>
                                 <!-- 20220211 수정 : 현재시간 추가 -->
-                                <div class="calendar-week-current-time" style="top:15%;"><div class="bar"></div><div class="value"><?php echo date('H:i');?></div></div>
+                                <!--<div class="calendar-week-current-time" style="top:15%;"><div class="bar"></div><div class="value"><?php /*echo date('H:i');*/?></div></div>-->
                                 <!-- //20220211 수정 : 현재시간 추가 -->
                             </div>
                             <!-- calendar 끝 -->
@@ -1069,127 +1268,28 @@ $empty_date = explode("|",$sft[0]['empty_date']);
         // - a태그는 disabled 클래스 추가
         // - button 태그는 disabled 속성 추가
         -->
-        <a href="javascript:;" class="btn-page-bottom selected-done"><span id="time_sale_count">0</span>타임 선택완료</a>
+        <a href="javascript:;" class="btn-page-bottom selected-done"><span id="time_sale_count"><?php echo $total_cnt;?></span>타임 선택완료</a>
     </div>
     <!-- //page-bottom -->
 </section>
 <!-- //container -->
 <!-- 선택된 데이터 넘기기 위한 폼-->
 <form action="./reserve_time_sale_step2_1" method="post" name="frm">
-    <input type="text" name="worker" value="<?php echo $worker_id;?>">
-    <input type="text" name="year" value="<?php echo $yy;?>">
-    <input type="text" name="month" value="<?php echo $mm;?>">
-    <input type="text" name="day" value="<?php echo $dd;?>">
-    <textarea name="choose_date" id="choose_date" cols="30" rows="10"></textarea>
+    <input type="hidden" name="worker" value="<?php echo $worker_id;?>">
+    <input type="hidden" name="year" value="<?php echo $yy;?>">
+    <input type="hidden" name="month" value="<?php echo $mm;?>">
+    <input type="hidden" name="day" value="<?php echo $dd;?>">
+    <textarea name="choose_date" id="choose_date" cols="30" rows="10" style="display: none;"></textarea>
 </form>
 <!-- 20220225 수정 : 페이지 전체용 커버 추가 -->
 <div class="page-cover"></div>
 <!-- //20220225 수정 -->
 
 <script src="/static/pub/js/Sortable.min.js"></script>
-<script>
-    $(function(){
-        /*
-        $( "#sortable" ).sortable({
-            placeholder: "ui-state-highlight",
-            cancel:''
-        });
-        $( "#sortable" ).disableSelection();
-        */
 
-        //https://github.com/SortableJS/Sortable
-
-        $('.calendar-week-body-col').each(function(){
-            if(!$(this).hasClass('break') && !$(this).hasClass('time')){
-                //휴무가 아닐 경우 드래그앤 드롭 가능 처리
-                var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0] , {
-                    group : 'shared',
-                    delay : 500,
-                    delayOnTouchOnly : true,
-                    ghostClass: 'guide',
-                    draggable : '.calendar-week-time-item',
-                    onStart : function(evt){
-                        //드래그 시작
-                        console.log('drag start');
-                    },
-                    onEnd : function(evt){
-                        //드래그 끝
-                        console.log('drag end');
-                        //evt.to;    // 현재 아이템
-                        //evt.from;  // 이전 아이템
-                        //evt.oldIndex;  // 이전 인덱스값
-                        //evt.newIndex;  // 새로운 인덱스값
-                    },
-                    onUpdate : function(evt){
-                        console.log('update');
-                    },
-                    onUpdate : function(evt){
-                        console.log('onChange');
-                    },
-                    onRemove: function (/**Event*/evt) {
-                        console.log('remove');
-                    }
-
-                });
-            }
-        });
-
-    });
-</script>
 <script>
     var EMPTY_TIME = new Array();
     $(function(){
-        /*
-        $( "#sortable" ).sortable({
-            placeholder: "ui-state-highlight",
-            cancel:''
-        });
-        $( "#sortable" ).disableSelection();
-        */
-
-        //https://github.com/SortableJS/Sortable
-
-        $('.calendar-week-body-col').each(function(){
-            if(!$(this).hasClass('break') && !$(this).hasClass('time')){
-                //휴무가 아닐 경우 드래그앤 드롭 가능 처리
-                var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0] , {
-                    group : 'shared',
-                    delay : 500,
-                    delayOnTouchOnly : true,
-                    ghostClass: 'guide',
-                    draggable : '.calendar-week-time-item',
-                    onStart : function(evt){
-                        //드래그 시작
-                        console.log('drag start');
-                    },
-                    onEnd : function(evt){
-                        //드래그 끝
-                        console.log('drag end');
-                        //evt.to;    // 현재 아이템
-                        //evt.from;  // 이전 아이템
-                        //evt.oldIndex;  // 이전 인덱스값
-                        //evt.newIndex;  // 새로운 인덱스값
-                    },
-                    onUpdate : function(evt){
-                        console.log('update');
-                    },
-                    onUpdate : function(evt){
-                        console.log('onChange');
-                    },
-                    onRemove: function (/**Event*/evt) {
-                        console.log('remove');
-                    }
-
-                });
-            }
-        });
-
-        /*$(document).on('click','.break',function(){
-            console.log('예약금지설정취소 클릭')
-            $('#reserveCalendarPop10').addClass('actived');
-            $('.btn-reserv-block-cancel').data('worker',$(this).data('worker')).data('phseq',$(this).data('phseq'));
-        });*/
-
 
 
 
@@ -1644,13 +1744,13 @@ $empty_date = explode("|",$sft[0]['empty_date']);
             data : {'mode':'awaitAdd','artist_id':artist_id,'worker':worker,'data':chk_date},
             dataType : 'json',
             success : function(json){
-               $('#time_sale_count').text(json.cnt);
+                $('#time_sale_count').text(json.cnt);
             }
         });
 
         //$("#time_sale_count").text(count);
     }
-    
+
 
 
     //금주 빈시간 전체선택
@@ -1712,6 +1812,9 @@ $empty_date = explode("|",$sft[0]['empty_date']);
     $(document).ready(function(){
         $('#empty_time_bar').css('display','block');
         $('#header_bell').css('display','none');
-        $('#time_sale_count').text('<?php echo count($empty_date)-1;?>')
+        $('#time_sale_count').text('<?php echo $total_cnt;?>');
+        <?php /*if(isset($_SESSION['empty_reg'])){ */?>/*
+        popalert.open('reserveCalendarPop5','빈시간 판매가 정상적으로 등록되었습니다.');
+        */<?php /*unset($_SESSION['empty_reg']);} */?>
     });
 </script>
