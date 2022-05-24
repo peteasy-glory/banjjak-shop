@@ -93,7 +93,7 @@ if(count($arr)>0){
 						<div class="form-group-item">
 							<div class="form-item-label">이름</div>
 							<div class="form-item-data">
-								<input type="text" name="name" class="form-control" value="<?=$data['name']?>" readonly >
+								<input type="text" name="name" class="form-control" value="<?=$data['name']?>" <?=($data['name'] != '')? "readonly" : "" ?> >
 							</div>
 						</div>
 					</div>

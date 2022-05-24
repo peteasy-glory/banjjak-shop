@@ -1132,38 +1132,65 @@ switch($clear['mode']){
     //주 단위 빈시간 판매 데이터 업데이트
     case 'awaitAdd':
         //빈시간 판매 데이터를 삭제한다.
-        $que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND worker = '{$_POST['worker']}'";
-        //echo $que;
-        $rows = sql_fetch_array($que);
-        if(!$rows[0]['artist_id']){
-            $sql  = "INSERT INTO tb_sale_free_time_temp SET ";
-            $sql .= "artist_id  = '{$_POST['artist_id']}', ";
-            $sql .= "worker     = '{$_POST['worker']}', ";
-            $sql .= "empty_date = '{$_POST['data'][0]}|', ";
-            $sql .= "reg_dt     = NOW() ";
-            //echo $sql;
-            sql_query($sql);
-        } else {
-            $tmp = explode("|",$rows[0]['empty_date']);
-            //print_r($tmp);
-            for($i=0;$i<count($_POST['data']);$i++){
-                if(!in_array($_POST['data'][$i],$tmp)){
-                    array_push($tmp, $_POST['data'][$i]);
-                }
-            }
-            $json['cnt'] = count($tmp)-1;
-            $arr = implode("|",$tmp);
-            $sql = "UPDATE tb_sale_free_time_temp SET ";
-            $sql .= "empty_date = '{$arr}', ";
-            $sql .= "reg_dt     = NOW() ";
-            $sql .= " WHERE artist_id = '{$_POST['artist_id']}' AND worker = '{$_POST['worker']}' ";
-            //echo $sql;
-            sql_query($sql);
-
+        for($i=0;$i<count($_POST['data']);$i++){
+            $date[] = substr($_POST['data'][$i],0,10);
         }
 
+        $date = array_unique($date);
+        $date = array_values($date);
+        //print_r($date);
+        $del_date = implode("','",$date);
+
+        $worker = array();
+        $dt = array();
+        $dtworker = array();
+        for($i=0;$i<count($_POST['data']);$i++){
+            $worker[0] = $_POST['worker'];
+            $worker[1] = $_POST['data'][$i];
+            $dt[$worker[0]][] = $worker[1];
+            $dtworker[] = $worker[0];
+            $dtdate[] = substr($worker[1],0,10);
+            $dttime[] = substr($worker[1],-5);
+        }
+
+        $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND empty_date IN ('{$del_date}') AND worker = '{$_POST['worker']}'";
+        //echo $que;
+        sql_query($que);
+        for($i=0;$i<count($dtworker);$i++) {
+            $que = "SELECT COUNT(*) AS cnt FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND worker = '{$dtworker[$i]}' AND empty_date = '{$dtdate[$i]}' AND empty_datetime = '{$dttime[$i]}' ";
+            //echo $que."<br>";
+            $row = sql_fetch_array($que);
+            if(!$row[0]['cnt']){
+                $sql = "INSERT INTO tb_sale_free_time_temp SET ";
+                $sql .= "artist_id          = '{$_POST['artist_id']}', ";
+                $sql .= "worker             = '{$dtworker[$i]}', ";
+                $sql .= "empty_date         = '{$dtdate[$i]}', ";
+                $sql .= "empty_datetime     = '{$dttime[$i]}', ";
+                $sql .= "reg_dt             = NOW() ";
+                //echo $sql;
+                sql_query($sql);
+            }
+        }
+
+        $total_cnt = 0;
+        $que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}'";
+        $sftt = sql_fetch_array($que);
+        if(count($sftt)>0){
+            foreach($sftt as $rs){
+                $tmp = explode('|',$rs['empty_date']);
+                for($i=0;$i<count($tmp);$i++) {
+                    if(!empty($tmp[$i])) {
+                        $ed[$rs['worker']][] = $tmp[$i];
+                        $total_cnt++;
+                    }
+                }
+            }
+        }
+        $json['cnt'] = $total_cnt;
+        $json['sql'] = $sql;
         echo json_encode($json);
         break;
+    //빈 시간 판매시 세션에 저장한다.
 
     //일 단위 빈시간 판매 데이터 업데이트
     case 'awaitAddDay':

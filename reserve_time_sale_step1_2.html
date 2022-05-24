@@ -1740,10 +1740,11 @@ function data_dash($tmp){
 
         $.ajax({
             type : 'post',
-            url : './data/get_book_data_ajax',
+            url : './data/get_book_data_ajax.php',
             data : {'mode':'awaitAdd','artist_id':artist_id,'worker':worker,'data':chk_date},
             dataType : 'json',
             success : function(json){
+                console.log(json.sql);
                 $('#time_sale_count').text(json.cnt);
             }
         });
