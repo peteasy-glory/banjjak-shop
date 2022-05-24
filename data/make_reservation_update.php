@@ -3,7 +3,18 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 /*print_r($_SESSION);
 print_r($_POST);*/
-$user_id = $_SESSION['gobeauty_user_id'];
+//$user_id = $_SESSION['gobeauty_user_id'];
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
 
 $total_price = 0;
 $clear = array();
@@ -17,6 +28,11 @@ $row = sql_fetch($res);
 $rs = explode("|",$row['product']);
 $is_vat = $row['is_vat'];
 
+$plus_que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}' ";
+$plus_res = sql_query($plus_que);
+$plus_row = sql_fetch($plus_res);
+
+
 $option_name = array('bath_price'=>'목욕',
     'part_price'=>'부분미용',
     'bath_part_price'=>'부분+목욕',
@@ -25,7 +41,13 @@ $option_name = array('bath_price'=>'목욕',
     'all_price'=>'전체미용',
     'spoting_price'=>'스포팅',
     'scissors_price'=>'가위컷',
-    'summercut_price'=>'썸머컷');
+    'summercut_price'=>'썸머컷',
+    'beauty1_price' =>$plus_row["worktime10_title"],
+    'beauty2_price' =>$plus_row["worktime11_title"],
+    'beauty3_price' =>$plus_row["worktime12_title"],
+    'beauty4_price' =>$plus_row["worktime13_title"],
+    'beauty5_price' =>$plus_row["worktime14_title"]
+);
 
 $product  = '';
 

@@ -15,6 +15,10 @@ if($_SESSION['artist_flag'] === true){
 
 $total_price = 0;
 
+$plus_que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$shop_id}' ";
+$plus_res = sql_query($plus_que);
+$plus_row = sql_fetch($plus_res);
+
 $option_name = array('bath_price'=>'목욕',
     'part_price'=>'부분미용',
     'bath_part_price'=>'부분+목욕',
@@ -23,7 +27,13 @@ $option_name = array('bath_price'=>'목욕',
     'all_price'=>'전체미용',
     'spoting_price'=>'스포팅',
     'scissors_price'=>'가위컷',
-    'summercut_price'=>'썸머컷');
+    'summercut_price'=>'썸머컷',
+    'beauty1_price' =>$plus_row["worktime10_title"],
+    'beauty2_price' =>$plus_row["worktime11_title"],
+    'beauty3_price' =>$plus_row["worktime12_title"],
+    'beauty4_price' =>$plus_row["worktime13_title"],
+    'beauty5_price' =>$plus_row["worktime14_title"]
+);
 
 $product = '';
 $phone = $_GET['cellphone'];
