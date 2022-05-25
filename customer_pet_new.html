@@ -44,7 +44,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 			<div class="form-group" id="tmp_user_join">
 				<div class="form-group-cell">
 					<div class="form-group-item">
-						<div class="form-item-label">전화번호</div>
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;전화번호</div>
 						<div class="form-item-data">
 							<div class="form-control-btns">
 								<input type="text" id="tuj_cellphone" name="cellphone" class="form-control" value="<?php echo $cellphone;?>" placeholder="입력"/>
@@ -67,7 +67,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                 </div>
 				<div class="form-group-cell">
 					<div class="form-group-item">
-						<div class="form-item-label">펫 이름</div>
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;펫 이름</div>
 						<div class="form-item-data">
 							<input type="text" id="tuj_pet_name" name="pet_name" class="form-control" placeholder="펫 이름 입력">
 						</div>
@@ -75,7 +75,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 				</div>
 				<div class="form-group-cell">
 					<div class="form-group-item">
-						<div class="form-item-label">품종</div>
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;품종</div>
 						<div class="form-item-data type-2">
 							<div class="pet-breed-select">
 								<div class="breed-select pet_kind">
@@ -153,7 +153,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						<div class="form-item-label">메모</div>
 						<div class="form-item-data">							
 							<input type="text" name="memo" class="form-control" placeholder="메모를 입력해주세요"/>	
-							<div class="form-input-info">*필수항목만 입력해도 예약등록 가능</div>
+							<div class="form-input-info" style="color:red;">* 필수항목만 입력해도 예약등록 가능</div>
 						</div>
 					</div>
 				</div>

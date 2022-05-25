@@ -13,7 +13,7 @@ function rsa_sha1_sign($policy, $private_key_filename) {
     openssl_sign($policy, $signature, $pkeyid);
 
 
-    
+
     // free the key from memory
     openssl_free_key($pkeyid);
 
