@@ -720,6 +720,7 @@ $tws = sql_fetch_array($que);
 $reserve_sql = new TReserveSql($connection);
 $CantReservationWeek = $reserve_sql->qry_cant_reservation_week($artist_id, $worker, $first_date, $last_date);
 $CantReservationWeekNor = $reserve_sql->qry_cant_reservation_week_nor($artist_id);
+$CantReservationWeekOff = $reserve_sql->qry_cant_reservation_week_off($artist_id);
 $st_date_time= $first_date.TFunc::strToFillZero($time_open, 2)."00";
 $fi_date_time= $last_date.TFunc::strToFillZero($time_close, 2)."00";
 $st_date_time = str_replace("-", "", $st_date_time);
@@ -980,6 +981,27 @@ function data_etc_memo($tmp){
                                                     $status = '예약금지';
                                                 }
 
+                                                // 휴게시간 확인
+                                                $crwn = null;
+                                                if (count($CantReservationWeekOff) < 1){
+                                                    $crwn = null;
+                                                }else{
+                                                    foreach ($CantReservationWeekOff as $val){
+                                                        $off_array = explode(',',$val['res_time_off']);
+
+                                                        for($i=0;$i<count($off_array);$i++){
+                                                            $off_start_time = explode('~',$off_array[$i])[0];
+                                                            if($thisTime == $off_start_time){
+                                                                $div_class = 'break';
+                                                                $status = '휴게시간';
+                                                                break;
+                                                            }else{
+
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
                                                 //정기휴일 확인.
 //                                                $crwn1 = cant_reservation_week_nor($connection, $artist_id);
                                                 $crwn = null;
@@ -999,8 +1021,6 @@ function data_etc_memo($tmp){
                                                     $div_class = 'break';
                                                     $status = '정기휴일';
                                                 }
-
-
 
                                                 if($div_class == 'break'){
                                                     $prseq = $crw['ph_seq'];
@@ -1209,6 +1229,10 @@ function data_etc_memo($tmp){
 
                                                         if($status == '예약금지' && substr($crw['start_datetime'],-5) == $thisTime){
                                                             echo $status;
+                                                        }
+
+                                                        if($status == '휴게시간'){
+                                                            //echo $status;
                                                         }
                                                         if($cnt == 6) {
                                                             $cnt = 0;
@@ -1695,7 +1719,7 @@ function data_etc_memo($tmp){
         });
 
         $(document).on('click','.break',function(){
-            if($(this).data('status')!='정기휴일') {
+            if($(this).data('status')=='예약금지') {
                 $('#reserveCalendarPop10').addClass('actived');
                 $('.btn-reserv-block-cancel').data('worker', $(this).data('worker')).data('phseq', $(this).data('phseq'));
             }
