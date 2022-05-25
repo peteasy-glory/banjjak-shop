@@ -1,0 +1,566 @@
+<?
+$from = $_GET['from'];
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+?>
+
+<?
+$t = (isset($_GET['t']) && $_GET['t']) ? $_GET['t'] : '';
+$cnt = (isset($_GET['cnt']) && $_GET['cnt']) ? $_GET['cnt'] : '0';
+$yy = (isset($_GET['yy']) && $_GET['yy']) ? $_GET['yy'] : date('Y');
+$mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
+$dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
+
+$check_time_sale_day = $_GET['chkArray'];
+$str_arr = "";
+
+$selDt = $yy . "-" . $mm . "-" . $dd;
+
+if ($t == "p") {
+	$b_yy = date("Y", strtotime($selDt . "-1day"));
+	$b_mm = date("m", strtotime($selDt . "-1day"));
+	$b_dd = date("d", strtotime($selDt . "-1day"));
+
+	$selDt = $b_yy . "-" . $b_mm . "-" . $b_dd;
+} elseif ($t == "n") {
+	$a_yy = date("Y", strtotime($selDt . "+1day"));
+	$a_mm = date("m", strtotime($selDt . "+1day"));
+	$a_dd = date("d", strtotime($selDt . "+1day"));
+
+	$selDt = $a_yy . "-" . $a_mm . "-" . $a_dd;
+}
+
+$daily = array('일','월','화','수','목','금','토');
+$date = date('m.d', strtotime($selDt)); 
+$weekday = $daily[date('w', strtotime($selDt))];  
+
+$fulldate = $date."(".$weekday.")";
+?>
+
+<?php
+$data = array();
+$_SESSION['bjj_stop_direct_flag'] = "1";
+$block_height = 40; // 블럭 높이
+
+// 예약중건 추출
+$data['reservation'] = array();
+$sql['reservation'] = "SELECT
+    res.* ,
+    DATE_FORMAT( CONCAT( res.year,'-',res.month,'-',res.day,' ',res.hour,':',IFNULL(res.minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) res_time_start
+FROM
+    `tb_reservation` res
+WHERE
+    DATE_FORMAT( CONCAT( res.year,'-',res.month,'-',res.day ), '%Y-%m-%d' ) = DATE_FORMAT( '{$yy}-{$mm}-{$dd}' , '%Y-%m-%d' )
+    AND res.update_time > DATE_ADD(now(), INTERVAL -10 MINUTE )
+";
+
+$result = mysqli_query($connection, $sql['reservation']);
+while ($rows = mysqli_fetch_assoc($result)) {
+    if ($worker = $rows['worker']) {
+        $date =  $rows['year'] . '-' . $rows['month'] . '-' . $rows['day'] . ' ' . $rows['hour'] . ":" . $rows['minute'] . ":00";
+        $now = date_create($date);
+        $time = date_format($now, "H:i");
+
+        $data['reservation'][$worker][$time]['data'] = $reservation[$worker][$time]['data'] = $rows; // 예약중인 건에 대한 정보
+
+        $time_start = date2timestamp(strtotime(date('Y-m-d H:i', strtotime($rows['res_time_start']))));
+        $time_end =  $time_start + (int) ($rows['rowspan'] * (60 * 30));
+        $time_full = ($time_end - $time_start) ? ($time_end - $time_start) : (60 * 30);
+
+        $time_block_cnt = $time_full / (60 * 30); // 블럭갯수
+
+        $rowspan['reservation'][$worker][$time] = $time_block_cnt;
+
+        for ($h = $time_start; $h < $time_end; $h += (60 * 30)) {
+            $rowspan['reservation'][$worker][$time]['time'][] = $thisTime;
+            $data['reservation'][$worker][$time]['time'][] = $reservation[$worker][$time]['time'][] = date('H:i', $h); // 각 시간대 저장
+        }
+    }
+}
+
+
+// 결제완료건 추출
+$data['payment'] = array();
+$sql['payment'] = "SELECT
+    pay.* ,
+    DATE_FORMAT( CONCAT( pay.year,'-',pay.month,'-',pay.day,' ',pay.hour,':',IFNULL(pay.minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) res_date ,
+    DATE_FORMAT( CONCAT( pay.year,'-',pay.month,'-',pay.day,' ',pay.hour,':',IFNULL(pay.minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) res_time_start ,
+    DATE_FORMAT( CONCAT( pay.year,'-',pay.month,'-',pay.day,' ',pay.to_hour,':',IFNULL(pay.to_minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) res_time_end
+FROM
+    `tb_payment_log` AS pay
+WHERE
+    DATE_FORMAT( CONCAT( pay.year,'-',pay.month,'-',pay.day ), '%Y-%m-%d' ) = DATE_FORMAT( '{$yy}-{$mm}-{$dd}' , '%Y-%m-%d' ) AND
+    pay.artist_id = '{$artist_id}' AND
+    pay.is_cancel = 0 AND
+	pay.data_delete = '0'
+";
+
+$result = mysqli_query($connection, $sql['payment']);
+while ($rows = mysqli_fetch_assoc($result)) {
+    $worker = $rows['worker'];
+    if ($worker) {
+        $datetime1 = new DateTime($rows['res_time_start']);
+        $datetime2 = new DateTime($rows['res_time_end']);
+        $interval = $datetime2->diff($datetime1);
+
+        $resTime = date('H:i', strtotime($rows['res_time_start']));
+		
+        $rowspan_count = ($interval->format('%h') * 60) / 30;
+
+
+        $time_start = date2timestamp(strtotime(date('Y-m-d H:i', strtotime($rows['res_time_start']))));
+        $time_end = date2timestamp(strtotime(date('Y-m-d H:i', strtotime($rows['res_time_end']))));
+        $time = ($time_end - $time_start) ? ($time_end - $time_start) : (60 * 30);
+		
+        $time_block_cnt = $time / (60 * 30); // 블럭갯수
+
+        $rowspan['payment'][$worker][$resTime] = $time_block_cnt;
+        $data['payment'][$worker][$resTime]['data'] = $rows;
+        for ($t = 0; $t < $time_block_cnt; $t++) {
+            $thisTime = date('H:i', strtotime($rows['res_time_start'] . ' +' . ($t * 30) . ' minute'));
+            $data['payment'][$worker][$resTime]['time'][] = $thisTime;
+        }
+    }
+
+    // $data['payment'][] = $payment;
+
+}
+// 결제완료건 추출
+
+foreach ($data['payment'] as $key => $val) ksort($data['payment'][$key]);
+foreach ($rowspan['payment'] as $key => $val) ksort($rowspan['payment'][$key]);
+
+// 일일 오픈시간과 종료시간을 가지고 온다.
+$sql['schedule'] = "select * from tb_working_schedule where customer_id='{$artist_id}'";
+$result = mysqli_query($connection, $sql['schedule']);
+$data['schedule'] = $schedule = $rows = mysqli_fetch_assoc($result);
+$order_my = isset($order_my) ? $order_my : array();
+ksort($order_my);
+
+// 미용사별 근무시간
+$data['private_holiday'] = array();
+$week_idx = date('w', strtotime($yy . '-' . $mm . '-' . $dd));
+$sql['artist'] = " SELECT * FROM `tb_artist_list` WHERE artist_id='{$artist_id}' AND is_view = '2' and is_out != '1' GROUP BY name ORDER BY sequ_prnt asc, is_main DESC, nicname ASC";
+
+$result = mysqli_query($connection, $sql['artist']);
+while ($artist_rows = mysqli_fetch_assoc($result)) {
+    $data['artist'][] = $artist_rows;
+}
+
+// 법정 공휴일 쉬는 여부 true가 쉰다.
+$is_rest_public_holiday = false;
+$working_sql = "select * from tb_working_schedule where customer_id = '" . $user_id . "';";
+$working_result = mysqli_query($connection, $working_sql);
+if ($working_datas = mysqli_fetch_object($working_result)) {
+    $is_rest_public_holiday = ($working_datas->rest_public_holiday == 1) ? true : false;
+}
+
+// 공휴일
+$is_public_holiday = false;
+$sql_public_holiday = "SELECT * FROM tb_public_holiday WHERE year = $yy AND month = $mm AND day = $dd";
+$sql_public_holiday_result = mysqli_query($connection, $sql_public_holiday);
+while ($sql_public_holiday_row = mysqli_fetch_object($sql_public_holiday_result)) {
+    if ($sql_public_holiday_row->day == $dd) {
+        $is_public_holiday = true;
+    }
+}
+
+foreach ($data['artist'] as $key => $artist) {
+	// 20200716 ulmo 해당 요일에 대한 업무시간 재조정 
+	$sql = "
+		SELECT * 
+		FROM `tb_artist_list`
+		WHERE artist_id = '".$artist["artist_id"]."' 
+			AND NAME = '".$artist["name"]."'
+			AND WEEK = '".$week_idx."'
+			AND is_view = '2'
+	";
+	$result = mysqli_query($connection, $sql);
+	$row = mysqli_fetch_array($result);
+	$data['artist'][$key]["time_start"] = $row["time_start"];
+	$data['artist'][$key]["time_end"] = $row["time_end"];
+
+    // 임시휴일[START]
+    $sql_private_holiday = "SELECT * FROM(
+        SELECT 
+            pholiday.* ,
+            DATE_FORMAT( CONCAT( pholiday.start_year,'-',pholiday.start_month,'-',pholiday.start_day,' ',pholiday.start_hour,':',IFNULL(pholiday.start_minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) pri_start_date ,
+            DATE_FORMAT( CONCAT( pholiday.end_year,'-',pholiday.end_month,'-',pholiday.end_day,' ',IF(pholiday.end_hour = 24 AND (pholiday.end_minute IS NULL OR pholiday.end_minute = 0), '23', pholiday.end_hour),':',IF(pholiday.end_hour = 24 AND pholiday.end_minute IS NULL, '59', IFNULL(pholiday.end_minute,'00')),':00' ), '%Y-%m-%d %H:%i' ) pri_end_date ,
+            DATE_FORMAT( CONCAT( pholiday.start_year,'-',pholiday.start_month,'-',pholiday.start_day,' ',pholiday.start_hour,':',IFNULL(pholiday.start_minute,'00'),':00' ), '%Y-%m-%d %H:%i' ) pri_start_time ,
+            DATE_FORMAT( CONCAT( pholiday.end_year,'-',pholiday.end_month,'-',pholiday.end_day,' ',IF(pholiday.end_hour = 24 AND (pholiday.end_minute IS NULL OR pholiday.end_minute = 0), '23', pholiday.end_hour),':',IF(pholiday.end_hour = 24 AND pholiday.end_minute IS NULL, '59', IFNULL(pholiday.end_minute,'00')),':00' ), '%Y-%m-%d %H:%i' ) pri_end_time
+        FROM 
+            tb_private_holiday pholiday 
+    ) A
+    WHERE 
+        A.customer_id='{$artist_id}'
+        AND A.worker='{$artist['name']}'
+        AND DATE_FORMAT( '{$yy}-{$mm}-{$dd} 00:00' , '%Y-%m-%d %H:%i' ) <= A.pri_end_date AND A.pri_start_date <= DATE_FORMAT( '{$yy}-{$mm}-{$dd} 23:59' , '%Y-%m-%d %H:%i' )
+    ORDER BY
+        A.pri_start_date ASC
+    ";
+    $result_private_holiday = mysqli_query($connection, $sql_private_holiday);
+    $private = array();
+    while ($private_holiday_rows = mysqli_fetch_assoc($result_private_holiday)) {
+		$tmp_start_hour = $private_holiday_rows['start_hour'];
+		$tmp_end_hour = $private_holiday_rows['end_hour'];
+
+		if($private_holiday_rows['start_hour'] == 0){
+			$tmp_start_hour = $data['schedule']['working_start']; // 업무시작시간으로 설정
+		}else{
+			if($private_holiday_rows['start_hour'] < $data['schedule']['working_start']){
+				$tmp_start_hour = $data['schedule']['working_start']; // 업무시작시간으로 설정
+			}
+		}
+		if($private_holiday_rows['end_hour'] == 0){
+			$tmp_end_hour = $data['schedule']['working_end']; // 업무마감시간으로 설정
+		}else{
+			if($private_holiday_rows['end_hour'] > $data['schedule']['working_end']){
+				$tmp_end_hour = $data['schedule']['working_end']; // 업무마감시간으로 설정
+			}
+		}
+
+		$tmp_start_date = DATE("Y-m-d H:i", STRTOTIME($yy."-".$mm."-".$dd." ".$tmp_start_hour.":".$private_holiday_rows['start_minute']));
+		$tmp_end_date = DATE("Y-m-d H:i", STRTOTIME($yy."-".$mm."-".$dd." ".$tmp_end_hour.":".$private_holiday_rows['end_minute']));
+
+        $time = date('H:i', strtotime($tmp_start_date));
+        $time_start = date2timestamp(strtotime(date('Y-m-d H:i', strtotime($tmp_start_date))));
+        $time_end = date2timestamp(strtotime(date('Y-m-d H:i', strtotime($tmp_end_date))));
+
+        $sec = ($time_end - $time_start) ? ($time_end - $time_start) : (60 * 30);
+        $time_block_cnt = $sec / (60 * 30); // 블럭갯수
+
+        // 30분간격으로 시간을 저장한다.
+        for ($h = $time_start; $h < $time_end; $h += (60 * 30)) {
+            $private[$private_holiday_rows['worker']][] = date('H:i', $h);
+        }
+
+        $data['private_holiday'][$artist['name']]['time'] = $private[$artist['name']];
+        $data['private_holiday'][$artist['name']]['count'][$time] = (int) $time_block_cnt;
+        $data['private_holiday'][$artist['name']]['data'][$time] = $private_holiday_rows;
+    }
+}
+
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [END]
+$sql = "select * from tb_working_schedule where customer_id='{$artist_id}'";
+$result = mysqli_query($connection, $sql);
+$rows = mysqli_fetch_object($result);
+ksort($order_my);
+
+$data['week_time'] = array();
+$data['week_time']['working_start'] = $rows->working_start;
+$data['week_time']['working_end'] = $rows->working_end;
+
+// 2020.03.24 시간 예약 활성화, 비활성화 관련 
+$time_off_sql = "select * from tb_time_off where customer_id = '{$artist_id}' ";
+$time_off_result = mysqli_query($connection, $time_off_sql);
+$time_off_row = mysqli_fetch_object($time_off_result);
+
+$data["time_off"] = array();
+$data["time_off"]["res_time_off"] = $time_off_row->res_time_off;
+
+// 2020.04.08 ulmo 예약 스케줄 운영방식 선택
+$sql = "select * from tb_time_schedule where artist_id = '{$artist_id}' ";
+$result = mysqli_query($connection, $sql);
+$rows = mysqli_fetch_object($result);
+
+$data["time_schedule"] = array();
+$data["time_schedule"]["res_time_off"] = $rows->res_time_off;
+
+$sql = "select is_time_type from tb_shop where customer_id = '{$artist_id}' ";
+$result = mysqli_query($connection, $sql);
+$rows = mysqli_fetch_object($result);
+
+$data["time_schedule"]["is_time_type"] = $rows->is_time_type;
+?>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="reserve-sale-wrap">
+			<div class="con-title-group">
+				<h4 class="con-title">1. 판매할 시간을 선택하세요.</h4>
+			</div>			
+			<!-- 캘린더 정렬
+			<div class="reserve-calendar-sort">
+				<div class="sort-left">
+					<button type="button" class="btn-reserve-calendar-sort">월</button>
+					<button type="button" class="btn-reserve-calendar-sort">주</button>
+					<button type="button" class="btn-reserve-calendar-sort actived">일</button>
+				</div>
+				<div class="sort-right">
+					<select>
+						<option value="">미용</option>
+					</select>
+				</div>
+			</div>
+			<!-- //캘린더 정렬 -->
+			<!-- 캘린더 상단 -->
+			<div class="reserve-calendar-top">
+				<button type="button" class="btn-reserve-calendar-ui btn-month-prev"><span class="icon icon-calendar-prev-small"></span></button>
+				<div class="reserve-calendar-title">
+					<div class="txt"><?= $fulldate ?></div>
+					<select>
+                        <?for($i=-15;$i<0;$i++){?>
+						<option value="<?= (int) date('Y', strtotime($selDt)-86400*$i) ?>.<?= (int) date('m', strtotime($selDt)-86400*$i) ?>.<?= (int) date('d', strtotime($selDt)-86400*$i) ?>" data-rol1="<?=date('m.d', strtotime($selDt)-86400*$i)?>" data-rol2="<?= $daily[date('w', strtotime($yy . '-' . $mm . '-' . $dd))] ?>"><?= (int) date('m', strtotime($selDt)-86400*$i) ?>월 <?= (int) date('d', strtotime($selDt)-86400*$i) ?>일</option>
+						<?}?>
+                        <?for($i=0;$i<15;$i++){?>
+						<option value="<?= (int) date('Y', strtotime($selDt)-86400*$i) ?>.<?= (int) date('m', strtotime($selDt)-86400*$i) ?>.<?= (int) date('d', strtotime($selDt)-86400*$i) ?>" <?if($i==0) echo "selected";?> data-rol1="<?=date('m.d', strtotime($selDt)-86400*$i)?>" data-rol2="<?= $daily[date('w', strtotime($yy . '-' . $mm . '-' . $dd))] ?>"><?= (int) date('m', strtotime($selDt)-86400*$i) ?>월 <?= (int) date('d', strtotime($selDt)-86400*$i) ?>일</option>
+						<?}?>
+					</select>
+				</div>
+				<button type="button" class="btn-reserve-calendar-ui btn-month-next"><span class="icon icon-calendar-next-small"></span></button>
+			</div>
+			<!-- //캘린더 상단 -->
+			<!-- 캘린더 선택 -->
+			<div class="reserve-calendar-all-select">
+				<label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em>금주 빈시간 전체선택</em></span></label>
+			</div>
+			<!-- //캘린더 선택 -->
+			<!-- 캘린더 상세 -->
+			<div>
+				<div class="reserve-calendar-data">
+					<div class="reserve-calendar-inner">
+						<!--
+						// calendar-month-header-col 클래스 정의
+						// calendar-month-body-col 클래스 정의
+						//	break : 휴무 및 예약금지
+						// calendar-drag-item-group : 드래그 가능한 영역
+						// calendar-drag-item : 드래그 아이템
+						-->
+						<!--
+						// calendar-week-time-item 상황별 클래스값
+						// yellow : 앱-선결제
+						// purple : 앱-매장결제
+						// green : 매장예약
+						// red : NoShow
+						// gray : 승인대기
+						-->
+						<div class="calendar-day-wrap">
+							<div class="calendar-day-header">
+								<div class="calendar-day-header-row">
+									<div class="calendar-day-header-col time"></div>
+								<?	foreach ((array) $data['artist'] as $key => $artist) { ?>
+									<div class="calendar-day-header-col"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></div>
+								<? } ?>
+								<!-- pettester@peteasy.kr
+									<div class="calendar-day-header-col">빙빙돌아가는회전목마처럼</div>
+									<div class="calendar-day-header-col">돈 스파이크 마이크</div>
+									<div class="calendar-day-header-col">케이</div>
+								-->
+								</div>
+							</div>
+							<div class="calendar-day-body">
+							<?	
+								$temp= array();
+								for ($t = $data['schedule']['working_start']; $t < $data['schedule']['working_end']; $t++) { ?>
+                                <?php 
+									for ($t30 = 0; $t30 < 60; $t30 += 30) {
+                                        $thisTime = sprintf('%02d', $t) . ":" . sprintf('%02d', $t30); // 현재 시간
+								?>
+								<div class="calendar-day-body-row">
+									<div class="calendar-day-body-col time">
+											<!--div class="day-division-label">오전</div-->
+										<div class="time-label">
+											<div class="time-start-label"><?=$thisTime?></div>
+											<div class="time-end-label"><?= date('H:i', strtotime($thisTime . ' +30 minutes')) ?></div></div>								
+									</div>
+                                <?php foreach ((array) $data['artist'] as $artist_key => $artist) {
+									
+									$holiday_1  = "";
+									$div_class  = "";
+									$print_work = false;
+
+									$payment_artist = $data['payment'][$artist['name']];
+									$reservation_artist = $data['reservation'][$artist['name']];
+
+									$thisDate = "{$yy}-{$mm}-{$dd}";
+									$thisTime = sprintf('%02d', $t) . ":" . sprintf('%02d', $t30); // 현재 시간
+									$thisTimeTo = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($thisDate . ' ' . $thisTime)))));
+									$thisTimeFrom = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($thisDate . ' ' . $thisTime)))) + (60 * 30));
+
+									$payment_time = $payment_artist[$thisTime]['time'];
+									$reservation_time = $reservation_artist[$thisTime]['time'];
+									$private_holiday = $data['private_holiday'][$artist['name']]['time'];
+
+									$payment_time = isset($payment_time) ? $payment_time : array();
+									$reservation_time = isset($reservation_time) ? $reservation_time : array();
+									$private_holiday = isset($private_holiday) ? $private_holiday : array();
+
+									$css_line = $t30 == 30 ? "line_solid" : '';
+									if($data["time_schedule"]["is_time_type"] == "2" && strpos($data["time_schedule"]["res_time_off"], $thisTimeTo."~".$thisTimeFrom) !== false){
+										// 타임제 선택시 비활성화
+										$css_line = 'time';
+									}
+
+									if (in_array($thisTime, $payment_time)) {
+										$firstTime = $thisTime;
+										$payment_time[$firstTime]['time'] = isset($payment_time[$firstTime]['time']) ? $payment_time[$firstTime]['time'] : array();
+										$status = in_array($thisTime, $payment_time[$firstTime]['time']) ? '' : ""; // 예약중
+									} else if (in_array($thisTime, $reservation_time)) {
+										$firstTime = $thisTime;
+										$reservation_artist[$firstTime]['time'] = isset($reservation_artist[$firstTime]['time']) ? $reservation_artist[$firstTime]['time'] : array();
+										$status = in_array($thisTime, $reservation_artist[$firstTime]['time']) ? "" : ""; // 예약됨
+
+										$date =  $rows_year . '-' . $rows_month . '-' . $rows_day . ' ' . $reservation_artist[$firstTime]['time'][count($reservation_artist[$firstTime]['time']) - 1] . ":00";
+										$now = date_create($date);
+										$date_add = date_add($now, date_interval_create_from_date_string("30 minutes"));
+										$lastTime = date_format($date_add, "H:i");
+
+										$date =  $rows_year . '-' . $rows_month . '-' . $rows_day . ' ' . $reservation_artist[$firstTime]['time'][count($reservation_artist[$firstTime]['time']) - 1] . ":00";
+										$now = date_create($date);
+										$date_add = date_add($now, date_interval_create_from_date_string("30 minutes"));
+										$lastTime = date_format($date_add, "H:i");
+									} else {
+										$status = '';
+									}
+
+									// 시간을 숫자타입으로 변경
+									$int_thisTime = (int) date('Hi', strtotime($thisTime));
+									$int_time_start = (int) date('Hi', strtotime($artist['time_start']));
+									$int_time_end = (int) date('Hi', strtotime($artist['time_end']));
+
+									$payment_artist[$firstTime]['time'] = isset($payment_artist[$firstTime]['time']) ? $payment_artist[$firstTime]['time'] : array();
+									$reservation_artist[$firstTime]['time'] = isset($reservation_artist[$firstTime]['time']) ? $reservation_artist[$firstTime]['time'] : array();
+									
+									if (in_array($thisTime, $private_holiday)) {
+										// 근무시간 외 시간
+										$holiday_1  = "정기휴일";
+										$div_class  = "break";
+									} else if ($int_thisTime < $int_time_start || $int_thisTime >= $int_time_end) {
+										// 근무시간 외 시간
+										$holiday_1  = "예약금지";
+										$div_class  = "break";
+									} else if ($is_rest_public_holiday && $is_public_holiday) {
+										// 공휴일
+										$holiday_1  = "공휴일";
+										$div_class  = "break";
+									} else if (in_array($thisTime, $payment_artist[$firstTime]['time'])) {
+										// 예약완료된 시간
+										$holiday_1  = "예약완료된 시간";
+										$div_class  = "break";
+									} /* else if (in_array($thisTime, $reservation_artist[$firstTime]['time'])) {
+										// 예약중인 시간
+										$holiday_1  = "예약중";
+										$div_class  = "break";
+									} else if (in_array($thisTime, $reservation_artist[$firstTime]['time']) && $reservation_artist[$firstTime]['data']['customer_id'] == $user_id) {
+										// 예약중인 시간
+										$holiday_1  = "예약중";
+										$div_class  = "break";
+									}*/ else if(strpos($data["time_off"]["res_time_off"], $thisTimeTo."~".$thisTimeFrom) !== false){
+										// 시간예약 비활성화
+										$holiday_1  = "시간예약중지";
+										$div_class  = "break";
+									}
+								?>
+									<div class="calendar-day-body-col <?= $div_class ?>">
+										<? 
+											if ($holiday_1 !== "" && $temp[$artist['name']] != $holiday_1) {
+												$temp[$artist['name']] = $holiday_1
+										?>
+											<?= $holiday_1 ?>
+										<? } else { ?> 
+										<div class="calendar-check-value">
+											<label class="form-radiobox large">
+											<input type="checkbox" name="check_time_sale_day" value="<?= $selDt?>^<?=$artist['name']?>^<?= $thisTime ?>">
+											<span class="form-check-icon">
+												<em></em>
+											</span>
+											</label>
+										</div>
+										<? } ?>
+									</div>
+								<? } ?>
+								</div>
+								<? } ?>
+							<? } ?>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //캘린더 상세 -->
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:fn_submit();" class="btn-page-bottom"><span><?= $cnt ?></span>타임 선택완료</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script>
+	$(".calendar-day-body").on("click","input[name='check_time_sale_day']", function(event){
+		var count = $(".btn-page-bottom span").text();
+
+		if ($(this).is(':checked')) {
+			count++;
+		} else {
+			count--;
+		}
+		
+		$(".btn-page-bottom span").text(count);
+	})
+
+	$(".btn-month-prev").click(function (e) {
+		fn_day_motion("p");
+	})
+
+	$(".btn-month-next").click(function (e) {
+		fn_day_motion("n");
+	})
+
+	function fn_day_motion(v) {
+		var d = "<?= $selDt ?>".split("-");
+		var count = $(".btn-page-bottom span").text();
+		
+		var chkArray = new Array();
+
+		$("input[name='check_time_sale_day']:checked").each(function() { 
+			var tmpVal = $(this).val(); 
+			chkArray.push(tmpVal);
+		});
+
+		location.href="reserve_time_sale_step1_3?t=" + v + "&yy=" + d[0] + "&mm=" + d[1] + "&dd=" + d[2] + "&cnt=" + count + "&chkArray=" + chkArray;
+	}
+
+	function fn_submit() {
+		var cnt = $(".btn-page-bottom span").text();
+		if (cnt < 1) {
+			alert("빈 시간을 선택해주세요");
+			return false;
+		}
+		
+		var chkArray = new Array();
+
+		$("input[name='check_time_sale_day']:checked").each(function() { 
+			var tmpVal = $(this).val(); 
+			chkArray.push(tmpVal);
+		});
+		location.href = "reserve_time_sale_step2_1?chkArray=" + chkArray;
+	}
+</script>
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

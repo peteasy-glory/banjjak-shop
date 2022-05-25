@@ -1,0 +1,113 @@
+<form action="data/change_password?find_passwd=1" id="next_form" method="POST">
+	<div class="basic-data-group middle">
+		<div class="form-group">
+			<div class="form-group-cell">
+				<div class="form-group-item">
+					<div class="form-item-label">이메일 아이디</div>
+					<div class="form-item-data">
+						<input type="text" name="customer_id" class="form-control" placeholder="입력" value="<?=$rows->id?>">
+						<div class="form-input-info">* 이메일 아이디를 정확히 입력하지 않으면 비밀번호가 변경되지 않습니다.</div>
+					</div>
+				</div>
+			</div>
+			<div class="form-group-cell">
+				<!-- 오류시 valid-error 클래스 추가 -->
+				<div class="form-group-item valid-error">
+					<div class="form-item-label">새 비밀번호</div>
+					<div class="form-item-data">
+						<input type="password" class="form-control" placeholder="비밀번호입력(6~20자 영문, 숫자포함)" name="gobeauty_pwd" id="gobeauty_pwd" onfocusout="ck_pwd()" required />
+					</div>
+					<div id="MsgPw">
+<!--						<div class="form-input-valid font-color-error">유효성체크</div>-->
+					</div>
+				</div>
+			</div>
+			<div class="form-group-cell">
+				<!-- 오류시 valid-error 클래스 추가 -->
+				<div class="form-group-item valid-error">
+					<div class="form-item-label">새 비밀번호 확인</div>
+					<div class="form-item-data">
+						<input type="password" class="form-control" placeholder="입력" name="gobeauty_pwd_ck" id="gobeauty_pwd_ck" onkeyup="ck_pwd2()" required />
+					</div>
+					<div id="MsgPwck">
+<!--						<div class="form-input-valid font-color-error">유효성체크</div>-->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="basic-data-group middle page-bottom">
+		<input type="submit" onclick="return check_all();" href="#" class="cell_confirm btn-page-bottom" style="border: none;" value="비밀번호 변경"></input>
+	</div>
+</form>
+<script>
+    function ck_pwd() {
+        var pwd = document.getElementById("gobeauty_pwd")
+        var MsgPw = document.getElementById("MsgPw")
+        var isPwd = /^(?=.*[a-zA-Z])((?=.*\d)|(?=.*\W)).{6,20}$/
+
+        if (!isPwd.test(pwd.value)) {
+            MsgPw.style.display = "block";
+            // MsgPw.className = 'error'
+            MsgPw.innerHTML = "<font style='font-size:13px;color:red;'>숫자포함 최소 6자리 이상</font>"
+            //            pwd.focus()
+            return false;
+        } else {
+            MsgPw.style.display = "block";
+            // MsgPw.className = 'vaild'
+            MsgPw.innerHTML = "<font style='font-size:13px;color:green;'>ok</font>"
+            return true;
+        }
+    }
+
+
+    function ck_pwd2() {
+        var pwd_ck = document.getElementById("gobeauty_pwd_ck")
+        var pwd = document.getElementById("gobeauty_pwd").value
+        var MsgPwck = document.getElementById("MsgPwck")
+
+        if (pwd_ck.value != pwd || pwd_ck.value == "") {
+            MsgPwck.style.display = "block";
+            // MsgPwck.className = 'error'
+            MsgPwck.innerHTML = "<font style='font-size:13px;color:red;'>비밀번호가 일치하지 않습니다.</font>"
+            //            pwd_ck.focus()
+            return false;
+        } else {
+            MsgPw.style.display = "none";
+            // MsgPwck.className = 'vaild'
+            MsgPwck.innerHTML = "<font style='font-size:13px;color:green;'>ok</font>"
+            return true;
+        }
+    }
+
+    function check_all() {
+        if (!ck_pwd()) {
+            $.MessageBox({
+                buttonDone: "확인",
+                message: "비밀번호를 확인해주세요."
+            }).done(function() {});
+            return false;
+        }
+        if (!ck_pwd2()) {
+            $.MessageBox({
+                buttonDone: "확인",
+                message: "비밀번호 확인을 확인해주세요."
+            }).done(function() {});
+            return false;
+        }
+        /*      if (!ck_name()) {
+                        $.MessageBox({
+                            buttonDone      : "확인",
+                            message         : "닉네임을 확인해주세요."
+                        }).done(function(){
+                                var id = document.getElementById("name");
+                                id.focus();
+                        });
+                        return false;
+                }
+        */
+        //        document.getElementById('next_form').submit();
+        return true;
+    }
+</script>

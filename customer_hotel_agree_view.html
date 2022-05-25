@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">호텔동의서</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="customer-view-wrap">
+			
+			<div class="grid-layout btn-grid-group">
+				<div class="grid-layout-inner">
+					<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">다운로드</a></div>
+					<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">수정</a></div>
+				</div>
+			</div>
+			<!-- 고객정보 -->
+			<div class="basic-data-group customer-view-user">
+				<div class="con-title-group">
+					<h4 class="con-title">고객 정보</h4>
+				</div>
+				<div class="flex-table">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">고객명</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									김반짝									
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									010-1234-1234									
+								</div>		
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //고객정보 -->
+			<!-- 펫정보 -->
+			<div class="basic-data-group customer-view-pet">
+				<div class="con-title-group">
+					<h4 class="con-title">펫 정보</h4>
+				</div>
+				<!-- 20211227 수정 -->
+				<div class="customer-view-pet-picture">
+					<div class="item-thumb">
+						<div class="user-thumb large"><img src="/static/pub/images/user_thumb.png" alt=""></div>						
+					</div>
+					<div class="item-user-info">
+						<div class="item-user-info-inner">
+							<div class="user-name">콩이</div>
+							<div class="user-cate">포메라니안</div>
+						</div>
+					</div>
+				</div>
+				<!-- //20211227 수정 -->
+				
+				<div class="flex-table">
+					<!-- 20211227 수정
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">펫 이름</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									콩이									
+								</div>		
+							</div>
+						</div>
+					</div>
+					-->
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">성별</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									남아									
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">중성화 여부</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									O									
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">예방접종</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									2차 이하									
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">질병기록</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									없음									
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">특이사항</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									없음									
+								</div>		
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //펫정보 -->
+			<!-- 호텔동의서 상세내용 -->
+			<div class="basic-data-group customer-view-agree">
+				<div class="con-title-group">
+					<h4 class="con-title">호텔동의서 상세내용</h4>
+				</div>
+				<div class="customer-view-agree-info">가게이름 은(는) 호텔이용견의 나이가 10세 이상인 노령견이나, 질병이 있는 경우 건강상태를 고려하여 안내사항을 말씀드리고, 호텔 동의서를 받고자 합니다.</div>
+				<div class="pay-card-group">
+					<div class="pay-card-cell all"><label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em><strong>모두 동의</strong></em></span></label></div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em>호텔 동의서</em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" name="payCard" checked disabled><span class="form-check-icon"><em>개인정보 수집 및 허용</em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용시에 노령견에게 쇼크 및 스트레스의 원인이 될 수 있으며,증상이 심각할 경우 사망까지 이를 수 있습니다.2. 노령견이나, 예민한 견의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다. 3. 당일 반려견의 컨디션이 좋지 않거나, 구토, 설사, 
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="customer-view-agree-date">
+					<div class="item-date">2021.09.22</div>
+					<div class="item-name">김반짝</div>
+				</div>
+			</div>
+			<!-- //호텔동의서 상세내용 -->
+			<!-- 서명 -->
+			<div class="basic-data-group small">
+				<div class="con-title-group">
+					<h4 class="con-title">서명</h4>
+				</div>
+				<div class="user-sign-wrap">
+				</div>
+			</div>
+			<!-- //서명 -->
+		</div>
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+</body>
+</html>

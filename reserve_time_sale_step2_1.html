@@ -1,0 +1,339 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+//print_r($_POST);
+$crypto = new Crypto();
+
+?>
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <div class="reserve-sale-wrap">
+            <div class="con-title-group">
+                <h4 class="con-title">2. 판매할 고객을 선택하세요</h4>
+            </div>
+            <div>
+                <div class="con-title-group">
+                    <h5 class="con-title">정렬방식</h5>
+                    <form action="./reserve_time_sale_step2_1" method="get" name="searchFrm" onchange="document.searchFrm.submit();">
+                        <select name="order_by" class="arrow">
+                            <option value="update_time2" <?php echo ($_GET['update_time2']=='')?'selected':'';?>>최신순</option>
+                            <option value="pet_name" <?php echo ($_GET['pet_name']=='')?'selected':'';?>>가나다순</option>
+                            <option value="pet_type" <?php echo ($_GET['pet_type']=='')?'selected':'';?>>견종별</option>
+                        </select>
+                    </form>
+                </div>
+                <div class="reserve-data-all-select">
+                    <label class="form-radiobox large"><input type="checkbox" name="allChk" id="allChk" value="y"><span class="form-check-icon"><em>전체선택</em></span></label>
+                </div>
+                <div>
+                    <div class="customer-all-inquiry-list">
+                        <table class="customer-table">
+                            <form action="./reserve_time_sale_step3_1" method="post" name="f">
+                                <colgroup>
+                                    <!-- 20220211 수정 -->
+                                    <col style="width:25%">
+                                    <col style="width:25%">
+                                    <col style="width:20%">
+                                    <col style="width:20%">
+                                    <!-- //20220211 수정 -->
+                                </colgroup>
+                                <thead>
+                                <!-- 20220211 수정 -->
+                                <tr>
+                                    <th>펫이름/등급</th>
+                                    <th>견종</th>
+                                    <th>전화번호</th>
+                                    <th>펫 보유 수</th>
+                                </tr>
+                                <!-- //20220211 수정 -->
+                                </thead>
+                                <tbody>
+                                <!-- 20220211 수정 -->
+                                <?php
+                                if(!isset($_GET['order_by']))   $order_by = 'ORDER BY a.update_time2 DESC';
+                                if(!empty($_GET['order_by'])){
+                                    if($_GET['order_by'] == 'ORDER BY a.update_time2'){
+                                        $order_by = 'ORDER BY a.update_time2 DESC';
+                                    } else if($_GET['order_by'] == 'pet_name'){
+                                        $order_by = 'ORDER BY a.pet_name ASC';
+                                    } else if($_GET['order_by'] == 'pet_type'){
+                                        $order_by = 'ORDER BY a.type DESC, a.pet_type ASC';
+                                    }
+                                }
+                                $que = "
+                                SELECT * FROM (
+                                SELECT 
+                                    pl.cellphone, 
+                                    IFNULL(SUM(pl.local_price), '0') AS sum_local_price, 
+                                    IFNULL(SUM(pl.local_price_cash), '0') AS sum_local_price_cash, 
+                                    pl.pet_seq, 
+                                    mp.pet_seq AS mypet_seq,
+                                    pl.customer_id,
+                                    IFNULL(acl.pet_name, IFNULL(mp.name, SUBSTRING_INDEX(SUBSTRING_INDEX(pl.product,'|',1),'|',-1))) AS pet_name,					   
+                                    (
+                                        SELECT payment_log_seq
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as payment_log_seq,						 
+                                    (
+                                        SELECT update_time
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as update_time2,
+                                    (
+                                        SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(product,'|',4),'|',-1) AS service
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as service,
+                                    (
+                                        SELECT SUBSTRING_INDEX(SUBSTRING_INDEX(product,'|',5),'|',-1) AS service2
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as service2,
+                                    (
+                                        SELECT is_cancel
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as is_cancel,
+                                    (
+                                        SELECT IFNULL(cancel_time, '')
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        ORDER BY update_time DESC
+                                        LIMIT 0 , 1
+                                    ) as cancel_time,
+                                    (
+                                        SELECT COUNT(*) as cnt
+                                        FROM tb_payment_log
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                            AND product_type = 'B'
+                                        LIMIT 0 , 1
+                                    ) as cnt,
+                                    mp.type,
+                                    mp.pet_type,
+                                    (
+                                        SELECT IFNULL(ba_seq, '') as ba_seq
+                                        FROM tb_beauty_agree
+                                        WHERE artist_id = '" . $user_id . "'
+                                            AND pet_id = pl.pet_seq
+                                            AND doc_type = '0'
+                                        LIMIT 0 , 1
+                                    ) as ba_seq,
+                                    'beauty' AS payment_type,
+                                    (
+                                        SELECT reserve
+                                        FROM tb_user_reserve
+                                        WHERE is_delete = '2'
+                                            AND artist_id = '" . $user_id . "'
+                                            AND cellphone = pl.cellphone
+                                        LIMIT 0 , 1
+                                    ) as user_reserve
+                                FROM tb_payment_log AS pl
+                                    LEFT OUTER JOIN tb_artist_customer_list AS acl ON pl.pet_seq = acl.pet_seq
+                                    LEFT OUTER JOIN tb_mypet AS mp ON pl.pet_seq = mp.pet_seq
+                                WHERE pl.artist_id = '" . $user_id . "'
+                                    AND pl.cellphone != ''
+                                    AND (pl.pet_seq != '' OR pl.pet_seq != '0')
+                                    AND pl.data_delete = '0'
+                                GROUP BY pl.cellphone
+                                ) AS a {$order_by}
+                                ";
+                                //echo $que;
+                                $pay = sql_fetch_array($que);
+                                if(count($pay)>0){
+                                    foreach($pay as $pay){
+                                        unset($data);
+                                        $data = get_mypet_info($crypto, $user_id, $pay['cellphone'],$access_key,$secret_key);
+
+                                        if(count($data)>0){
+                                            $que = "SELECT * FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$pay['customer_id']}'";
+                                            //echo $que;
+                                            $grade = sql_fetch_array($que);
+                                            if(empty($grade[0]['grade_ord'])){
+                                                $gr = 'vip';
+                                            } else {
+                                                if($grade[0]['grade_ord']==1){
+                                                    $gr = 'vip';
+                                                } else if($grade[0]['grade_ord']==1){
+                                                    $gr = 'normal';
+                                                } else if($grade[0]['grade_ord']==1){
+                                                    $gr = 'normalb';
+                                                }
+                                            }
+                                            ?>
+                                            <tr class="customer-table-cell">
+                                                <td>
+                                                    <div class="customer-table-toggle">
+                                                        <span class="toggle-title"><span class="ellipsis"><?php echo $pay['pet_name'];?> </span></span>
+                                                        <span class="toggle-grade">
+                                            <label class="form-radiobox large"><input type="checkbox" name="person[]" class="person" value="<?php echo $data[0]['cus'];?>" onclick="fn_time_sale();"><span class="form-check-icon"><em></em></span></label>
+                                            <span class="icon icon-grade-<?php echo $gr;?>"></span>
+                                        </span>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="customer-table-txt"><strong><?php echo ($data[0]['type']=='dog')?'개':'고양이';?></strong></div>
+                                                    <div class="customer-table-txt"><?php echo $data[0]['pet_type'];?></div>
+                                                </td>
+                                                <td>
+                                                    <div class="customer-table-txt"><?php echo $pay['cellphone'];?></div>
+                                                </td>
+                                                <td>
+                                                    <div class="customer-table-txt"><?php echo count($data);?></div>
+                                                    <div class="customer-table-txt">
+                                                        <?php
+                                                        unset($p_name);
+                                                        for($i=0;$i<count($data);$i++){
+                                                            if($i<3) {
+                                                                $p_name[] = $data[$i]['name'];
+                                                            }
+                                                        }
+
+                                                        echo $ppname = implode('/',$p_name);
+                                                        if(count($data)>3)  echo '이 외';
+                                                        ?>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        <?php }}} ?>
+                                </tbody>
+                            </form>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="javascript:;" class="btn-page-bottom" id="select_person_cnt">0명 선택</a>
+    </div>
+    <!-- //page-bottom -->
+
+    <article id="memberGradeComPop1" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">등급이 부여되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+<!-- //container -->
+
+<script>
+    $(document).on('click','#allChk',function(){
+        var cnt = 0;
+        if($(this).is(':checked')==true){
+            $('.person').each(function(){
+                $(this).prop('checked',true);
+                cnt++;
+            });
+        } else {
+            $('.person').each(function(){
+                $(this).prop('checked',false);
+            });
+            cnt = 0;
+        }
+
+        $("#select_person_cnt").text(cnt+'명 선택');
+    });
+    function fn_time_sale() {
+        var count = 0;
+
+        $('.person').each(function () {
+            if ($(this).is(':checked') == true) {
+                count++;
+            }
+        });
+
+        $("#select_person_cnt").text(count+'명 선택');
+    }
+    //선택완료
+    $(document).on('click','.selected-done',function(){
+        var cnt = 0;
+        var date_text = '';
+        $('.person').each(function () {
+            if ($(this).is(':checked') == true) {
+                cnt++;
+            }
+        });
+        $('#select_person_cnt').val(cnt+'명 선택');
+    });
+
+
+    $(document).on('click','#select_person_cnt',function(){
+        var count = 0;
+        $('.person').each(function () {
+            if ($(this).is(':checked') == true) {
+                count++;
+            }
+        });
+
+        console.log(count)
+        if(!count){
+            popalert.open('memberGradeComPop1','최소한 한개 한명이상 선택을하셔야 합니다.');
+            return false;
+        }
+        document.f.submit();
+    });
+    $(document).ready(function (){
+        $('#empty_time_bar').css('display','block');
+        $('#empty_time_bar .bar').css('width','66.6%');
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
+    })
+</script>
+</body>
+</html>

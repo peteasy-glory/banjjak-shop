@@ -1,0 +1,348 @@
+<?
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+?>   
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="reserve-sale-wrap">
+			<div class="con-title-group">
+				<h4 class="con-title">1. 판매할 시간을 선택하세요.</h4>
+			</div>			
+			<!-- 캘린더 정렬 -->
+			<div class="reserve-calendar-sort">
+				<div class="sort-left">
+					<!-- actived클래스 추가시 활성화 -->
+					<button type="button" class="btn-reserve-calendar-sort actived">월</button>
+					<button type="button" class="btn-reserve-calendar-sort" onclick="location.href='reserve_time_sale_step1_2'">주</button>
+					<button type="button" class="btn-reserve-calendar-sort" onclick="location.href='reserve_time_sale_step1_3'">일</button>
+				</div>
+				<div class="sort-right">
+					<select>
+						<option value="">미용</option>
+					</select>
+				</div>
+			</div>
+			<!-- //캘린더 정렬 -->
+			<!-- 캘린더 상단 -->
+			<div class="reserve-calendar-top">
+				<button type="button" class="btn-reserve-calendar-ui btn-month-prev"><span class="icon icon-calendar-prev-small"></span></button>
+				<div class="reserve-calendar-title">
+					<div class="txt">2021.11</div>
+					<!--
+					//	select태그는 투명을로 위로 띄웟고 , change 시 txt클래스내 문구 변경으로 디자인 처리
+					-->
+					<select>
+						<option value="">2021년  11월</option>
+						<option value="">2021년  11월</option>
+						<option value="">2021년  11월</option>
+					</select>
+				</div>
+				<button type="button" class="btn-reserve-calendar-ui btn-month-next"><span class="icon icon-calendar-next-small"></span></button>
+			</div>
+			<!-- //캘린더 상단 -->
+			<!-- 캘린더 선택 -->
+			<div class="reserve-calendar-all-select">
+				<label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em>금주 빈시간 전체선택</em></span></label>
+			</div>
+			<!-- //캘린더 선택 -->
+			<!-- 캘린더 상세 -->
+			<div>
+				<div class="reserve-calendar-data">
+					<div class="reserve-calendar-inner">
+						<!--
+						// calendar-month-header-col 클래스 정의
+						// sunday : 일요일
+						//	saturday : 토요일
+
+						// calendar-month-body-col 클래스 정의
+						// before : 이전월
+						// after : 다음월
+						//	sunday : 일요일
+						//	saturday : 토요일
+						//	break :휴무
+						//	holiday :공휴일
+						// today : 오늘
+						// calendar-drag-item-group : 드래그 가능한 영역
+						// calendar-drag-item : 드래그 아이템
+						-->
+						<!--
+						// calendar-week-time-item 상황별 클래스값
+						// yellow : 앱-선결제
+						// purple : 앱-매장결제
+						// green : 매장예약
+						// red : NoShow
+						// gray : 승인대기
+						-->
+						<div class="calendar-month-wrap">
+							<div class="calendar-month-header">
+								<div class="calendar-month-header-row">
+									<div class="calendar-month-header-col sunday">일</div>
+									<div class="calendar-month-header-col">월</div>
+									<div class="calendar-month-header-col">화</div>
+									<div class="calendar-month-header-col">수</div>
+									<div class="calendar-month-header-col">목</div>
+									<div class="calendar-month-header-col">금</div>
+									<div class="calendar-month-header-col saturday">일</div>
+								</div>
+							</div>
+							<div class="calendar-month-body">
+
+								<div class="calendar-month-body-row">
+									<!-- 전달 날짜 - 시작-->
+									<div class="calendar-month-body-col before break sunday">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">28</div><div class="state"></div></div>
+											<div class="calendar-drag-item-group"></div>
+											<div class="calendar-total-value"></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col before">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">29</div><div class="state"></div></div>
+											<div class="calendar-drag-item-group"></div>
+											<div class="calendar-total-value"></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col before">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">30</div><div class="state"></div></div>
+											<div class="calendar-drag-item-group"></div>
+											<div class="calendar-total-value"></div>
+										</div>
+									</div>
+									<!-- 전달 날짜 - 끝-->
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">1</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">2</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col break">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">3</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">4</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+								</div>
+
+								<div class="calendar-month-body-row">
+									<div class="calendar-month-body-col break sunday">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">5</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">6</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">7</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col today">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">8</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">9</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col break">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">10</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">11</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+								</div>
+
+								<div class="calendar-month-body-row">
+									<div class="calendar-month-body-col break sunday">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">12</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">13</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">14</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">15</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">16</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col break">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">17</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">18</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+								</div>
+
+								<div class="calendar-month-body-row">
+									<div class="calendar-month-body-col break sunday">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">19</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">20</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">21</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">22</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">23</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col break">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">24</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">25</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+								</div>
+
+								<div class="calendar-month-body-row">
+									<div class="calendar-month-body-col break sunday">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">26</div><div class="state">정휴</div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">27</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">		
+											<div class="calendar-day-value"><div class="number">28</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">29</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col">
+										<div class="calendar-col-inner">									
+											<div class="calendar-day-value"><div class="number">30</div><div class="state"></div></div>
+											<div class="calendar-check-value"><label class="form-radiobox large"><input type="checkbox" name="check"><span class="form-check-icon"><em></em></span></label></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col break after">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">1</div><div class="state">정휴</div></div>
+										</div>
+									</div>
+									<div class="calendar-month-body-col after">
+										<div class="calendar-col-inner">
+											<div class="calendar-day-value"><div class="number">2</div><div class="state"></div></div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //캘린더 상세 -->
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="reserve_time_sale_step2_1" class="btn-page-bottom">9타임 선택완료</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+	
+</body>
+</html>

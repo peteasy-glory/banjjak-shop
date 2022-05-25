@@ -1,0 +1,201 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+?>      
+
+<script>
+    function wrapWindowByMask() {
+        //화면의 높이와 너비를 구한다.
+        var maskHeight = $(document).height();
+        var maskWidth = $(window).width();
+
+        //마스크의 높이와 너비를 화면 것으로 만들어 전체 화면을 채운다.
+        $('#mask').css({
+            'width': maskWidth,
+            'height': maskHeight
+        });
+
+        //애니메이션 효과 - 일단 1초동안 까맣게 됐다가 80% 불투명도로 간다.
+        $('#mask').fadeIn(1000);
+        $('#mask').fadeTo("slow", 0.8);
+
+        var windows = document.getElementById('window');
+        windows.style.top = '100px';
+        $('.window').show();
+    }
+    $(document).ready(function() {
+        //닫기 버튼을 눌렀을 때
+        $('.window .close_button').click(function(e) {
+            //링크 기본동작은 작동하지 않도록 한다.
+            e.preventDefault();
+            $('#mask, .window').hide();
+        });
+
+        //검은 막을 눌렀을 때
+        $('#mask').click(function() {
+            $(this).hide();
+            $('.window').hide();
+        });
+    });
+</script>
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">약관동의</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="join-wrap">
+			<div class="join-desc">우리 만난 적은 없지만,<br>약관동의가 필요해요</div>
+			<div class="agree-check-list">
+				<div class="agree-check-item all">
+					<div class="item-inner">
+						<div class="check-subject">전체선택</div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="checkall"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+				</div>
+				<div class="agree-check-item">
+					<div class="item-inner">
+						<div class="check-subject font-underline"><a href="terms4">반짝 이용약관 동의(필수)</a></div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="agree1" class="agree_list"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+				</div>
+				<div class="agree-check-item">
+					<div class="item-inner">
+						<div class="check-subject font-underline"><a href="terms3">개인정보 수집 및 이용 동의(필수)</a></div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="agree2" class="agree_list"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+				</div>
+				<div class="agree-check-item">
+					<div class="item-inner">
+						<div class="check-subject font-underline"><a href="terms1">위치기반서비스 이용동의(선택)</a></div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="agree3" class="agree_list"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+				</div>
+				<div class="agree-check-item">
+					<div class="item-inner">
+						<div class="check-subject">마켓팅정보 수신동의(선택)</div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="agree4" class="agree_list"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+				</div>
+				<div class="agree-check-item minor">
+					<div class="item-inner">
+						<div class="check-subject">만 14세 이상입니다.(필수)</div>
+						<div class="check-value"><label class="form-checkbox"><input type="checkbox" id="agree5" class="agree_list"><span class="form-check-icon"><em></em></span></label></div>
+					</div>
+					<div class="check-info">만 14세 이상 고객만 가입 가능합니다.</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom disabled" id="next_img">다음</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+
+
+<script>
+    $("#checkall").click(function() {
+        //만약 전체 선택 체크박스가 체크된상태일경우
+        if ($("#checkall").prop("checked")) {
+            //해당화면에 전체 checkbox들을 체크해준다
+            $("input[type=checkbox]").prop("checked", true);
+            
+            $("#next_img").removeClass("disabled").prop("href","join2");
+            
+            /*
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_on.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "registration_1.php";
+            */
+            // 전체선택 체크박스가 해제된 경우
+        } else {
+            //해당화면에 모든 checkbox들의 체크를해제시킨다.
+            $("input[type=checkbox]").prop("checked", false);
+            
+            $("#next_img").addClass("disabled").prop("href","#");
+            
+            /*
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_off.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "#";
+            */
+        }
+    });
+
+    $(".agree_list").click(function() {
+        checkall_toggle();
+        /*
+        if ($("#agree1").prop("checked") && $("#agree2").prop("checked") && $("#agree3").prop("checked")) {
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_on.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "registration_1.php";
+        } else {
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_off.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "#";
+        }
+        */
+        if ($("#agree1").prop("checked") &&
+            $("#agree2").prop("checked") &&
+            $("#agree5").prop("checked") )
+        {
+            $("#next_img").removeClass("disabled").prop("href","join2");
+
+            /*
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_on.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "registration_1.php";
+			*/
+        } else {
+            $("#next_img").addClass("disabled").prop("href","#");
+
+            /*
+            var element = document.getElementById("next_img");
+            element.src = "<?= $image_directory ?>/next_off.png";
+            var nextlink = document.getElementById("nextlink");
+            nextlink.href = "#";
+			*/
+        }
+    });
+
+    function checkall_toggle() {
+        if ($("#agree1").prop("checked") &&
+            $("#agree2").prop("checked") &&
+            $("#agree3").prop("checked") &&
+            $("#agree4").prop("checked") &&
+            $("#agree5").prop("checked")  )
+        {
+            $("#checkall").prop("checked", true);
+        } else {
+            $("#checkall").prop("checked", false);
+        }
+    }
+</script>
+
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_no_gnb.php");
+?>

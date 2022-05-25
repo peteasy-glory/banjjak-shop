@@ -1,0 +1,144 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+?>
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="<?=$_SESSION['backurl2']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">회원 탈퇴</div>
+
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="user-hack-wrap">
+			<div class="hack-info">회원탈퇴 전에 유의사항을 반드시 확인해주세요.</div>
+			<div class="hack-detail">
+				<div class="detail-txt">*탈퇴 시 보유하고 계신 포인트, 쿠폰은 소멸되며 재발행이 불가능합니다.</div>
+				<div class="detail-txt">*탈퇴한 계정의 이용기록은 모두 삭제되며, 삭제된 데이터는 복구되지 않습니다.<br>(단, 작성된 리뷰와 결제내역은 5년까지 보관)</div>
+				<div class="detail-txt">*탈퇴 후에는 본인여부 확인이 불가하여 게시글을 임의로 삭제해드릴수 없습니다.</div>
+				<div class="detail-txt"><em>[삭제되는 정보]</em>이메일아이디, 닉네임, 휴대폰 번호, 주문이력, 단골, 포인트, 쿠폰</div>
+			</div>
+			<div class="hack-check"><label class="form-checkbox"><input type="checkbox" id="ckb"><span class="form-check-icon"><em>탈퇴 유의사항을 확인했습니다.</em></span></label></div>			
+			
+			<!-- 20211110 수정 : 이미지명 및 속성 수정 -->
+			<div class="hack-visual">
+				<div class="visual"><img src="/static/pub/images/icon/img-illust-4@2x.png" alt="" width="203"></div>
+			</div>
+		</div>		
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom disabled" id="btn_del">탈퇴합니다.</a>
+	</div>
+	<!-- //page-bottom -->
+
+
+	<!--  회원 탈퇴 질문 -->
+	<article id="hackMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">탈퇴하시겠습니까?</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" id="btn_confirm">확인</button>
+						<button type="button" class="btn btn-cancel" onclick="pop.close();">취소</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //회원 탈퇴 질문 -->
+	
+	<!--  회원 탈퇴 완료 -->
+	<article id="hackMsg2" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">탈퇴되었습니다.<br>메인화면으로 이동합니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close(); location.href='/data/logout_process'; ">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //회원 탈퇴 완료 -->
+</section>
+<!-- //container -->
+
+<script>
+
+	$(document).ready(function(){
+		//체크박스 : 변화
+		$("#ckb").change(function(){
+			var bchk = $("#ckb").is(':checked');
+			console.log(bchk);
+
+			if(bchk == true){
+				$("#btn_del").removeClass("disabled");
+			}else{
+				$("#btn_del").addClass("disabled");
+			}
+		});
+		
+		//버튼 : 탈퇴합니다.
+		$("#btn_del").click(function(){
+			console.log("click");
+
+			var bchk = $("#ckb").is(':checked');
+			if(bchk == true){
+				pop.open('hackMsg1');
+			}
+		});
+
+		//탈퇴 확인
+		$("#btn_confirm").click(function(){
+			pop.close();
+
+			$.ajax({
+				url : "data/user_del",
+				type : "post",
+				dataType : "json",
+				data : 
+				{
+				},
+				error:function(request,status,error){
+				},
+			}).done(function(data) {
+				if(data.ret == true){
+					//성공 시 로직
+					pop.open('hackMsg2');
+				}
+			});
+		});
+	});
+ 
+</script>
+
+
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_no_gnb.php");
+?>

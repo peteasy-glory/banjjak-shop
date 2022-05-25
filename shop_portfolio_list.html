@@ -1,0 +1,364 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "포트폴리오 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$app = new App();
+$is_android = $app->is_app();
+
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$shop_sql = "select * from tb_shop where customer_id = '" . $user_id . "'";
+$shop_result = mysqli_query($connection, $shop_sql);
+if ($shop_datas = mysqli_fetch_object($shop_result)) {
+    $front_image = $shop_datas->front_image;
+    $name = $shop_datas->name;
+    $working_years = $shop_datas->working_years;
+    $self_introduction = $shop_datas->self_introduction;
+    $professional_field = $shop_datas->professional_field;
+    $career = $shop_datas->career;
+    $license_indexs = $shop_datas->license_indexs;
+    $region_and_cost = $shop_datas->region_and_cost;
+    $enable_flag = $shop_datas->enable_flag;
+    $update_time = $shop_datas->update_time;
+}
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- page-contents -->  
+		<div class="page-contents">
+			<div class="master-portfolio-wrap">
+				<a href="#" onclick="javascript:MemofocusNcursor();" id="fileuparea" class="btn btn-outline-purple btn-middle-size btn-border-radius-5"><em>추가하기</em></a>
+				<a href="#" onclick="javascript:galleryup();" style="display: none;" id="fileuparea2" class="btn btn-outline-purple btn-middle-size btn-border-radius-5"><em>추가하기</em></a>
+				<div style="display:block;position:absolute;top:-50px"><input type="file" accept="image/*" name=imgupfile id=addimgfile></div>
+				<div class="master-portfolio-list">
+					<ul id="sortable" class="list-inner" >
+						
+						<?
+			            $shop_sql = "SELECT * FROM tb_portfolio WHERE customer_id = '" . $user_id . "' ORDER BY sort_number asc";
+			            $shop_result = mysqli_query($connection, $shop_sql);
+						$portfolio_cnt = mysqli_num_rows($shop_result); // 포트폴리오 갯수
+			            for ($ii = 0; $shop_datas = mysqli_fetch_object($shop_result); $ii++) {
+			                $image_value = $shop_datas->image;
+			                $sort_number = $shop_datas->sort_number;
+			            ?>
+			            
+			            	<li class="list-cell">
+								<div class="master-portfolio-item">
+									<div class="item-thumb" data-rol='<?="https://image.banjjakpet.com".$image_value?>'><img src="<?="https://image.banjjakpet.com".img_link_change($image_value)?>" alt=""></div>
+									<div class="item-info">
+										<div class="item-number"></div>
+										<button type="button" class="btn-item-hand"></button>
+									</div>
+									<button onclick="deleteImage('<?= $image_value ?>','<?= $user_id ?>');" type="button" class="btn-data-del">데이타삭제</button>
+								</div>
+							</li>
+							
+							
+							
+			                <?php
+			                if ($ii % 3 == 2) {
+			                    echo "</tr><tr>";
+			                }
+			                ?>
+			            <?php
+			            }
+			            ?>
+			            
+			            
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!-- //page-contents -->  
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<!--button type="button" id="btnSave" class="btn-page-bottom disabled">저장하기</button-->
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<!--
+<script src="/static/pub/js/jquery-ui.min.js"></script>
+<script src="/static/pub/js/jquery.ui.touch-punch.min.js"></script>
+-->
+
+<script src="/static/pub/js/Sortable.min.js"></script>
+<script>
+$(function(){
+	/*
+	$( "#sortable" ).sortable({
+		placeholder: "ui-state-highlight",
+		cancel:''
+    });
+	$( "#sortable" ).disableSelection();
+	*/
+
+	//https://github.com/SortableJS/Sortable
+
+	var el = document.getElementById('sortable');
+	var sortable = Sortable.create(el , {
+		handle : '.btn-item-hand',
+		delay : 0,
+		ghostClass: 'guide',
+		dataIdAttr:'data-id',
+		onStart : function(evt){
+			//드래그 시작 
+			console.log('drag start');
+		},
+		onEnd : function(evt){
+			//드래그 끝
+			console.log('drag end');
+			
+			$(".list-inner .list-cell").each(function(){
+				//console.log($(".list-inner .list-cell").index($(this))+" -- "+$(this).find(".item-thumb").attr("data-rol"));
+
+				var idx	= $(".list-inner .list-cell").index($(this));
+				var url	= $(this).find(".item-thumb").attr("data-rol");
+				change_sort(url, '<?=$user_id?>', idx);
+				
+				$(this).find(".item-number").text(idx);
+				
+				
+				
+				
+			});
+		},
+		onUpdate : function(evt){
+			console.log('update');
+		},
+		onUpdate : function(evt){
+			console.log('onChange');
+		},
+		onRemove: function (/**Event*/evt) {
+			console.log('remove');
+		}
+		
+	});
+
+	$(document).on('click' , '.btn-data-del' , function(){
+	                if(<?=intval($portfolio_cnt) ?> > 1){
+                    $(this).parents('.list-cell').remove();
+                }
+            });
+
+});
+</script>
+
+
+
+<script language="javascript">
+    $('#addimgfile').bind('change', function(e) {
+        $("#fileuparea").hide();
+        $("#fileuplodingarea").show();
+        var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+            alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+            $("#fileuparea").show();
+            $("#fileuplodingarea").hide();
+            return;
+        }
+
+        var filename = $("input[name=imgupfile]")[0].files[0].name;
+        var newfilename = GetPhotoFilename('customer_photo', '<?= $user_id ?>', filename);
+        var formData = new FormData();
+
+        formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+        formData.append("filepath", newfilename);
+        $.ajax({
+            url: 'data/upload_portfolio',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            success: function(data) {
+               
+                location.reload();
+
+            },
+            error: function(xhr, status, error) {
+                // alert(error+"에러발생");
+            }
+        });
+    });
+
+    //안드로이드 앱일경우애만 ... 실행..
+    $(document).ready(function() {
+        //dvck=getDeviceCheck();
+        if (<?= $is_android ?> == 1) {
+            $("#fileuparea").hide();
+            $("#fileuparea2").show();
+        }
+    });
+
+    function galleryup() {
+        //alert("갤러리")
+        window.Android.openGallery();
+    }
+
+    function cameraup() {
+        //alert("카메라")
+        window.Android.openCamera();
+    }
+
+    //안드에서 업로드가 끝나면 무조건 호출..
+    function uploadEnd(fileName) {
+        //              alert(fileName);
+        $("#fileuparea").hide();
+        $("#fileuparea2").show();
+
+        var newfilename = GetPhotoFilename('appupload_photo', '<?= $user_id ?>', fileName);
+        //              alert(newfilename);
+
+        var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+        //              alert(post_data);
+        var formData = new FormData();
+        formData.append("filepath", fileName);
+        formData.append("newfilepath", newfilename);
+        $.ajax({
+            url: 'data/upload_portfolio_byapp',
+            data: post_data,
+            type: 'POST',
+            success: function(data) {
+                // alert(data);
+                $("#fileuparea2").show();
+                $("#fileuparea").hide();
+
+                if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+                    // ie 일때 input[type=file] init.
+                    $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+                } else {
+                    // other browser 일때 input[type=file] init.
+                    $("#addimgfile").val("");
+                }
+
+                addwidth = " style='width:30%' ";
+                mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";
+                location.href = location.pathname;
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+				if(xhr.status != 0){
+					alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+				}
+            }
+        });
+    }
+
+    function MemofocusNcursor() {
+        html = "<div id='upimgarea'></div>";
+        //document.getElementById('dmemo').focus();
+        var sel, range;
+        if (window.getSelection) {
+            // IE9 and non-IE
+            sel = window.getSelection();
+            if (sel.getRangeAt && sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                range.deleteContents();
+
+                // Range.createContextualFragment() would be useful here but is
+                // non-standard and not supported in all browsers (IE9, for one)
+                var el = document.createElement("div");
+                el.innerHTML = html;
+                var frag = document.createDocumentFragment(),
+                    node, lastNode;
+                while ((node = el.firstChild)) {
+                    lastNode = frag.appendChild(node);
+                }
+                range.insertNode(frag);
+
+                // Preserve the selection
+                if (lastNode) {
+                    range = range.cloneRange();
+                    range.setStartAfter(lastNode);
+                    range.collapse(true);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
+            }
+        } else if (document.selection && document.selection.type != "Control") {
+            // IE < 9
+            document.selection.createRange().pasteHTML(html);
+        }
+        $("#addimgfile").trigger("click");
+    }
+</script>
+
+
+<script>
+    function change_sort(path, user_id, sort_number) {
+        var post_data = 'path=' + path + '&user_id=' + user_id + '&sort_number=' + sort_number;
+        $.ajax({
+            url: 'data/change_sort_portfolio',
+            data: post_data,
+            type: 'POST',
+            success: function(data) {
+                
+            },
+            error: function(xhr, status, error) {
+                
+            }
+        });
+    }
+    
+
+	var portfolio_cnt = <?=intval($portfolio_cnt)?>; // 포트폴리오 갯수
+    function deleteImage(path, user_id) {
+        var post_data = 'path=' + path + '&user_id=' + user_id;
+        
+		if(portfolio_cnt == "1"){ // 포트폴리오가 한개일때 삭제 방지
+	popalert.open('firstRequestMsg1', '포트폴리오가 1개 이상 있어야합니다.');
+        }else{	
+				$.ajax({
+					url: 'data/delete_portfolio',
+					data: post_data,
+					type: 'POST',
+					success: function(data) {
+                       location.reload();
+					},
+					error: function(xhr, status, error) {
+						
+					}
+				});
+		}
+    }
+$(document).ready(function(){
+    $('#btn_page_prev').prop('href','shop_main')
+})
+</script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

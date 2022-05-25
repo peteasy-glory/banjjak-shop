@@ -1,0 +1,33 @@
+
+	<?php
+		$result_id = $rows->id;
+		$id_pos = strpos($result_id, "@");
+		if ($id_pos > 3)
+		{
+			$result_id = substr($result_id, 0, $id_pos - 3)."***".substr($result_id, $id_pos, strlen($rows->id));
+		} else {
+			$result_id = substr($result_id, 0, 3)."***".substr($result_id, 6, strlen($rows->id));
+		}
+	?>
+	
+	<div class="member-find-data">
+		<div class="member-find-result">
+			<div class="result-msg">고객님이 사용하신 이메일 아이디의 일부분입니다.</div>
+			<div class="result-value"><?=$result_id?></div>
+		</div>
+	</div>
+		
+	<!-- page-bottom -->
+<!--	<div class="page-bottom">-->
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+<!--		<a href="login" class="btn-page-bottom">확인(로그인 하기)</a>-->
+<!--	</div>-->
+	<!-- //page-bottom -->
+<!-- //container -->
+    <script>
+        $(".page-bottom").removeClass("btn_display");
+    </script>

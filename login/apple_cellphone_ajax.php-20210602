@@ -1,0 +1,268 @@
+<?php
+	include "../include/configure.php";
+	include "../include/Crypto.class.php";
+	include "../include/session.php";
+	include "../include/db_connection.php";
+	include "../include/php_function.php";
+
+	$data = array();
+	$return_data = array("code" => "999999", "data" => "잘못된 접근입니다.");
+	$r_mode = ($_POST["mode"] && $_POST["mode"] != "")? $_POST["mode"] : "";
+
+	if($r_mode){
+		if($r_mode == "get_customer_cellphone"){
+			$return_data = array("code" => "000000", "data" => "OK");
+		}else if($r_mode == "get_customer_cnt"){
+			$r_email = ($_POST["email"] && $_POST["email"] != "")? $_POST["email"] : "";
+			$r_sub = ($_POST["sub"] && $_POST["sub"] != "")? $_POST["sub"] : ""; // 추후에 검증값 등록되면 이걸로 체크
+
+			$sql = "
+				SELECT *
+				FROM tb_customer
+				WHERE id = '".$r_email."'
+			";
+			$result = mysql_query($sql);
+			$cnt = mysql_num_rows($result);
+			
+			$return_data = array("code" => "000000", "data" => $cnt);
+		}else if($r_mode == "set_login_process"){
+			$r_email = ($_POST["email"] && $_POST["email"] != "")? $_POST["email"] : "";
+
+			$sql = "
+				SELECT *
+				FROM tb_customer
+				WHERE id = '".$r_email."'
+			"; // one more chk
+			$result = mysql_query($sql);
+			$cnt = mysql_num_rows($result);
+			$row = mysql_fetch_assoc($result);
+			
+			if($cnt > 0){
+				$_SESSION['gobeauty_user_id'] = $row["id"];
+				$_SESSION['gobeauty_user_nickname'] = $row["nickname"];
+
+				// 20200716 ulmo 최근 로그인 시간 기록
+				$last_login_sql = "
+					UPDATE tb_customer SET
+						last_login_time = NOW()
+					WHERE id = '".$r_email."'
+						AND nickname = '".$row["nickname"]."'
+				";
+				$last_login_result = mysql_query($last_login_sql);
+
+				if($row["artist_flag"] == "1"){	// 펫샵의 아티스트
+					$artist_sql = "SELECT * FROM tb_shop_artist WHERE artist_id = '".$r_email."' AND del_yn = 'N'";
+					$artist_result = mysql_query($artist_sql);
+
+					if($artist_data = mysql_fetch_assoc($artist_result)){
+						$_SESSION['artist_flag'] = true;
+						$_SESSION['shop_user_id'] = $artist_data["customer_id"];
+						$_SESSION['shop_user_nickname'] = $artist_data["name"];
+					}
+				}
+
+				$url = "";
+				$user_agent = $_SERVER['HTTP_USER_AGENT'];
+				if ($user_agent) {
+					$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+					if ($token_index > 0) {
+						$url = "APP_GOBEAUTY_iOS";
+					}
+					$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+					if ($token_index > 0) {
+						$url = "APP_GOBEAUTY_AND";
+					}
+				}
+				if($url == ""){ // empty url
+					if($row["my_shop_flag"] == "1"){
+						if($pc == "1"){
+							$url = $shop_directory."/index_pc.php";
+						}else{
+							$url = $shop_directory."/index.php";
+						}
+					}else{
+						$url = $mainpage_directory."/index.php";
+					}
+				}
+
+				$return_data = array("code" => "000000", "data" => $url);	// 로그인 성공
+			}else{
+				$return_data = array("code" => "000001", "data" => "회원 로그인에 실패했습니다.");
+			}
+		}else if($r_mode == "tmp_code"){
+			$crypto = new Crypto();
+			$rand_data = cetificationnumber6();
+			$code = $crypto->encode(trim($rand_data), $access_key, $secret_key);
+			$return_data = array("code" => "000000", "data" => array("rand" => $rand_data, "code" => $code));
+		}else if($r_mode == "chk_code"){
+			$crypto = new Crypto();
+			$r_code = ($_POST["code"] && $_POST["code"] != "")? $_POST["code"] : "";
+			$r_auth = ($_POST["auth"] && $_POST["auth"] != "")? $_POST["auth"] : "";
+
+			if($r_code != "" && $r_auth != ""){
+				$code = $crypto->encode(trim($r_code), $access_key, $secret_key);
+				if($code == $r_auth){
+					$return_data = array("code" => "000000", "data" => "OK");
+				}else{
+					$return_data = array("code" => "000001", "data" => "인증번호가 틀립니다. 다시 확인해 주세요.".$code);
+				}
+			}else{
+				$return_data = array("code" => "000002", "data" => "중요 데이터가 누락되었습니다.");
+			}
+		}else if($r_mode == "set_insert_customer"){
+			$crypto = new Crypto();
+			$r_customer_id = ($_POST["apple_email"] && $_POST["apple_email"] != "")? $_POST["apple_email"] : "";
+			$r_pwd = ($_POST["checknum"] && $_POST["checknum"] != "")? $_POST["checknum"] : "";
+			$r_sub = ($_POST["sub"] && $_POST["sub"] != "")? $_POST["sub"] : "";
+			$r_cellphone = ($_POST["cellphone"] && $_POST["cellphone"] != "")? $_POST["cellphone"] : "";
+
+			if($r_customer_id != "" && $r_pwd != "" && $r_sub != "" && $r_cellphone != ""){
+				$id_pos = strpos($r_customer_id, "@");
+				$random_number = sprintf("%06d",rand(000000,999999));
+				$nickname = "";
+				if ($id_pos > 5) {
+					$nickname = substr($r_customer_id, 0, $id_pos-3)."_".$random_number;
+				} else {
+					$nickname = substr($r_customer_id, 0, $id_pos)."_".$random_number;
+				}
+				$cellphone = $crypto->encode(trim($r_cellphone), $access_key, $secret_key);
+
+				// 가입 처리
+				$sql = "
+					insert into tb_customer (
+						id,password,nickname,last_login_time,registration_time,
+						push_option,is_regist_by_apple,cellphone
+					) values (
+						'".$r_customer_id."','".make_password_hash($r_pwd)."','".$nickname."','".date('Y-m-d H:i:s')."','".date('Y-m-d H:i:s')."',
+						1,'".$r_sub."','".$cellphone."'
+					)
+				";
+				$result = mysql_query($sql);
+				if($result){
+					$_SESSION['gobeauty_user_id'] = $r_customer_id;
+					$_SESSION['gobeauty_user_nickname'] = $nickname;
+
+					$url = "";
+					$user_agent = $_SERVER['HTTP_USER_AGENT'];
+					if ($user_agent) {
+						$token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+						if ($token_index > 0) {
+							$url = "APP_GOBEAUTY_iOS";
+						}
+						$token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+						if ($token_index > 0) {
+							$url = "APP_GOBEAUTY_AND";
+						}
+					}
+					if($url == ""){ // empty url
+						$url = $mainpage_directory."/index.php";
+					}
+
+					$return_data = array("code" => "000000", "data" => $url);
+				}else{
+					$return_data = array("code" => "000001", "data" => "회원 가입에 실패했습니다.");
+				}
+			}else{
+				$return_data = array("code" => "000001", "data" => "중요 데이터가 누락되었습니다.");
+			}
+		}else if($r_mode == "set_update_customer"){
+			$r_cellphone = ($_POST["cellphone"] && $_POST["cellphone"] != "")? $_POST["cellphone"] : "";
+			$r_customer_id = ($_POST["email"] && $_POST["email"] != "")? $_POST["email"] : "";
+			$r_apple_auth = ($_POST["apple_auth"] && $_POST["apple_auth"] != "")? $_POST["apple_auth"] : ""; // apple_sub (회원키)
+
+			$sql = "
+				UPDATE tb_customer SET
+					cellphone = '".$r_cellphone."',
+					is_regist_by_apple = '".$r_apple_auth."'
+				WHERE customer_id = '".$r_customer_id."'
+			";
+			$result = mysql_query($sql);
+			if($sql){
+				$return_data = array("code" => "000000", "data" => "OK");
+			}else{
+				$return_data = array("code" => "000001", "data" => "회원 변경에 실패했습니다.");
+			}
+		}else if($r_mode == "set_update_customer_data"){
+			$r_cellphone = ($_POST["cellphone"] && $_POST["cellphone"] != "")? $_POST["cellphone"] : "";
+			$r_customer_id = ($_POST["email"] && $_POST["email"] != "")? $_POST["email"] : "";
+			$flag = false;
+
+			if($r_cellphone != "" && $r_customer_id != ""){
+				//주문에 아이디 넣기
+				$sql = "
+					UPDATE tb_payment_log SET 
+						customer_id = '".$r_customer_id."'  
+					WHERE cellphone = '".$r_cellphone."' 
+						AND (customer_id IS NULL OR customer_id = '')
+				";
+				$result = mysql_query($sql);
+				if($result){
+					//임시회원 찾기
+					$sql = "
+						SELECT * 
+						FROM tb_tmp_user 
+						WHERE cellphone = '".$r_cellphone."' 
+					";
+					$result = mysql_query($sql);
+					while ($row = mysql_fetch_assoc($result)) {
+						$tmp_seq = $row["tmp_seq"];
+
+						if($tmp_seq != ""){
+							//펫 소유 변경하기
+							$sql = " UPDATE tb_mypet SET customer_id = '".$r_customer_id."', tmp_yn = 'N' WHERE tmp_seq = '".$tmp_seq."' ";
+							$result_1 = mysql_query($sql);
+
+							//쿠폰 소유 변경하기
+							$sql = " UPDATE tb_user_coupon SET customer_id = '".$r_customer_id."' WHERE tmp_seq = '".$tmp_seq."' ";
+							$result_2 = mysql_query($sql);
+							$sql = " UPDATE tb_coupon_history SET customer_id = '".$r_customer_id."' WHERE tmp_seq = '".$tmp_seq."' ";
+							$result_3 = mysql_query($sql);
+
+							if($result_1 && $result_2 && $result_3){
+								$sql = "
+									DELETE FROM tb_tmp_user
+									WHERE tmp_seq = '".$tmp_seq."'
+										AND cellphone = '".$r_cellphone."' 
+								";
+								$result = mysql_query($sql);
+								if($result){
+									//임시회원 흔적 삭제하기
+									$sql = "UPDATE tb_mypet SET tmp_seq = NULL WHERE tmp_seq = '".$tmp_seq."'";
+									mysql_query($sql);
+
+									$sql = "UPDATE tb_user_coupon SET tmp_seq = NULL WHERE tmp_seq = '".$tmp_seq."'";
+									mysql_query($sql);
+
+									$sql = "UPDATE tb_coupon_history SET tmp_seq = NULL WHERE tmp_seq = '".$tmp_seq."'";
+									mysql_query($sql);
+
+									$return_data = array("code" => "000000", "data" => "OK");
+								}else{
+									$return_data = array("code" => "000005", "data" => "회원 갱신에 실패했습니다.");
+								}
+							}else{
+								$return_data = array("code" => "000004", "data" => "회원 갱신에 실패했습니다.");
+							}
+						}
+					}
+				}else{
+					$return_data = array("code" => "000001", "data" => "회원 갱신에 실패했습니다.");
+				}
+			}else{
+				$return_data = array("code" => "000003", "data" => "회원 갱신에 실패했습니다.");
+			}
+		}else{
+			$return_data = array("code" => "999997", "data" => "허용되지 않은 접근입니다.");
+		}
+	}else{
+		$return_data = array("code" => "999998", "data" => "올바르지 않은 접근입니다.");
+	}
+
+	echo json_encode($return_data, JSON_UNESCAPED_UNICODE);
+
+	function cetificationnumber6(){
+		srand((float) microtime() * 1000000);
+		$rand_code = substr(rand(10000000, 99999999), 0, 6);
+		return $rand_code;
+	}
+?>

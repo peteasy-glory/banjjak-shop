@@ -1,0 +1,540 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+$cellphone = $_GET['cellphone'];
+$customer_id = $_GET['customer_id'];
+$tmp_seq = $_GET['tmp_seq'];
+
+
+
+$shop_title	= "신규등록";
+$header_right	= '
+	
+';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">		
+		<div class="user-pet-add">
+			<form id="form_reservation_new">
+				<input type="hidden" name="artist_id" value="<?=$user_id ?>" /> 
+				<input type="hidden" name="customer_id" value="<?=$customer_id ?>" />
+				<input type="hidden" name="tmp_seq" value="<?=$tmp_seq ?>" />
+				<input type="hidden" name="pet_seq" value="" /> 
+			<div class="form-group" id="tmp_user_join">
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;전화번호</div>
+						<div class="form-item-data">
+							<div class="form-control-btns">
+								<input type="text" id="tuj_cellphone" name="cellphone" class="form-control" value="<?php echo $cellphone;?>" placeholder="입력"/>
+								<button type="button" class="btn btn-outline-purple btn-round btn-inline cellphone_chk">중복확인</button>
+							</div>
+						</div>
+					</div>
+				</div>
+                <div class="form-group-cell middle" id="pet_choose" style="display:none;margin-top:20px;">
+                    <div class="form-group-item">
+                        <div class="form-item-label">펫 선택</div>
+                        <div class="form-item-data type-2">
+                            <div class="grid-layout basic">
+                                <div class="grid-layout-inner" id="pet_list">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;펫 이름</div>
+						<div class="form-item-data">
+							<input type="text" id="tuj_pet_name" name="pet_name" class="form-control" placeholder="펫 이름 입력">
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label"><span style="color:red;font-weight:bold;">*</span>&nbsp;품종</div>
+						<div class="form-item-data type-2">
+							<div class="pet-breed-select">
+								<div class="breed-select pet_kind">
+									<label class="form-toggle-box" for="tuj_pet_kind_dog"><input type="radio" id="tuj_pet_kind_dog" name="pet_kind" value="dog" checked><em><span>강아지</span></em></label>
+									<label class="form-toggle-box" for="tuj_pet_kind_cat"><input type="radio" id="tuj_pet_kind_cat" name="pet_kind" value="cat"><em><span>고양이</span></em></label>
+								</div>
+								<!-- 강아지 -->
+								<div style="display:block">
+									<select id="tuj_pet_type" name="pet_type" class="select pet_type">
+										<option value="">선택</option>
+									</select>
+								</div>
+								<!-- //강아지 -->
+								<input type="text" name="pet_type2" placeholder="품종을 적어주세요." style="display: none;" class="input input_full" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">생일</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout margin-12">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-3">
+										<select id="tuj_pet_year" name="pet_year" class="select select_year" dir="rtl">
+											<?php for ($y = 2000; $y <= (int) date('Y'); $y++) { ?>
+												<option value="<?= $y ?>" <?= ($y == DATE("Y"))? "selected" : "" ?>><?= $y ?></option>
+											<?php } ?>
+										</select>
+									</div>
+									<div class="grid-layout-cell grid-3">
+										<select id="tuj_pet_month" name="pet_month" class="select select_month" dir="rtl">
+											<?php for ($m = 1; $m <= 12; $m++) { ?>
+												<option value="<?= $m ?>"><?= $m ?></option>
+											<?php } ?>
+										</select>
+									</div>
+									<div class="grid-layout-cell grid-3">
+										<select id="tuj_pet_day" name="pet_day" class="select select_day" dir="rtl"></select>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">성별 선택</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="gender1"><input type="radio" id="tuj_pet_gender_m" name="pet_gender" value="남아" checked><em>남아</em></label></div>
+									<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="gender2"><input type="radio" id="tuj_pet_gender_w" name="pet_gender" value="여아"><em>여아</em></label></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">중성화</div>
+						<div class="form-item-data type-2">
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="neutralize1"><input type="radio"  id="tuj_neutral_0" name="neutral" value="0" checked><em>X</em></label></div>
+									<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="neutralize2"><input type="radio" id="tuj_neutral_1" name="neutral" value="1" ><em>O</em></label></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-label">메모</div>
+						<div class="form-item-data">							
+							<input type="text" name="memo" class="form-control" placeholder="메모를 입력해주세요"/>	
+							<div class="form-input-info" style="color:red;">* 필수항목만 입력해도 예약등록 가능</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-group-cell">
+					<div class="form-group-item">
+						<div class="form-item-data">							
+							<label class="form-checkbox"><input type="checkbox" name="submit_and_reserv"><span class="form-check-icon"><em><strong>등록 후 즉시예약</strong></em></span></label>
+						</div>
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<!-- //page-body -->
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="#" class="btn-page-bottom tmp_user_submit_btn">등록</a>
+	</div>
+	<!-- //page-bottom -->	
+</section>
+<!-- //container -->
+
+<script>
+
+    var is_vaildate = ("<?=$cellphone?>" != "")? true : false;
+
+	function get_pet_kind(pet_type, selected_value){
+		$.ajax({
+			url: 'data/tmp_user_join_ajax.php',
+			data: {
+				mode : "get_pet_kind",
+				pet_type : pet_type
+			},
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				if(data.code == "000000"){ // success
+					//console.log(data.data);
+					var html = '';
+					html += '<select>';
+					$.each(data.data, function(i, v){
+						if(v.name != "기타"){
+							var is_selected = (v.name == selected_value)? "selected" : "";
+							html += '	<option value="'+v.name+'" '+is_selected+' >'+v.name+'</option>';
+						}
+					});
+					var is_selected = (selected_value == "기타")? "selected" : "";
+					html += '	<option value="기타" '+is_selected+' >기타</option>';
+					html += '</select>';
+
+					$("#tuj_pet_type").html('').html(html);
+				}else{
+					popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+				}
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}
+
+	function day_change(this_year, this_month) {
+		var html = '';
+		var month_last_day = new Date(this_year, this_month, 0).getDate(); // 월의 마지막일을 구한다.
+
+		for (var d = 0; d <= month_last_day; d++) {
+			var is_selected = (d == 1)? "selected" : "";
+			html += '<option value="'+d+'" '+is_selected+'>'+d+'</option>';
+		}
+
+		return html;
+	}
+
+	function get_cellphone_chk(artist_id, cellphone){
+		$.ajax({
+			url: 'data/tmp_user_join_ajax.php',
+			data: {
+				mode : "get_cellphone_chk",
+				artist_id : artist_id,
+				cellphone : cellphone
+			},
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				if(data.code == "000000"){ // success
+					//console.log(data.data);
+					if(data.data.result == true){
+						$("#tuj_cellphone").css("background-color", "#cfc");
+						is_vaildate = true;
+
+						get_mypet(cellphone, '');
+					}else{
+						popalert.open('firstRequestMsg1', data.data.message);
+						
+						// to do something..
+						$("#tuj_cellphone").css("background-color", "#fcc").focus();
+						is_vaildate = false;
+
+						var pet_type = $("input[name='pet_kind']:checked").val();
+
+						get_pet_kind(pet_type, '');
+
+						$("input[name='pet_name']").val('');
+						$("input[name='pet_kind']:radio[value='dog']").prop("checked", true);
+						$("select[name='pet_type']").val(0);
+						$("input[name='pet_type2']").removeClass("on").val('');
+						$("select[name='pet_year']").val('2020');
+						$("select[name='pet_month']").val('1');
+						$("select[name='pet_day']").val('1');
+						$("input[name='pet_gender']:radio[value='남아']").prop("checked", true);
+						$("input[name='neutral']:radio[value='0']").prop("checked", true);
+						$("select[name='pet_weight1']").val('5');
+						$("select[name='pet_weight2']").val('0');
+						$("input[name='pet_seq']").val('');
+						$("input[name='tmp_seq']").val('');
+						$("input[name='customer_id']").val('');
+
+						
+						//$("#tuj_pet_list").html(''); // pet_list init
+					}
+
+				}else{
+					popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+				}
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}
+	
+	function submit_validate(){
+		var message = "";
+		if($("#tmp_user_join input[name='pet_name']").val() == ""){
+			message = "펫이름을 적어주세요.";
+			is_submit = false;
+		}else if($("#tmp_user_join input[name='cellphone']").val() == ""){
+			message = "전화번호를 적어주세요.";
+			is_submit = false;
+		}else if($("#tmp_user_join input[name='cellphone']").val() != "" && $("#tmp_user_join input[name='cellphone']").val().length < 8){
+			message = "전화번호를 적어주세요.";
+			is_submit = false;
+		}else if($("#tmp_user_join select[name='pet_type'] option:selected").val() == "기타" && $("#tmp_user_join input[name='pet_type2']").val() == ""){
+			message = "기타 - 품종을 적어주세요.";
+			is_submit = false;
+		}else if(!is_vaildate){
+			message = "중복체크를 해주세요.";
+			is_submit = false;
+		}else{
+			is_submit = true;
+		}
+
+		if(!is_submit){
+			$(".tmp_user_submit_btn").prop("disabled", true);
+			$(".tmp_user_submit_direct_btn").prop("disabled", true);
+		}else{
+			$(".tmp_user_submit_btn").prop("disabled", false);
+			$(".tmp_user_submit_direct_btn").prop("disabled", false);
+		}
+
+		return message;
+	}
+
+	function get_mypet(cellphone, pet_seq){
+		var artist_id = "<?=$user_id ?>";
+		$.ajax({
+			url: 'data/tmp_user_join_ajax.php',
+			data: {
+				mode : "get_mypet",
+				cellphone : cellphone,
+				pet_seq: pet_seq,
+				artist_id: artist_id
+			},
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				if(data.code == "000000"){ // success
+					//console.log(data.data);
+					if(pet_seq != ""){
+						var pet_type = $("input[name='pet_kind']:checked").val();
+						if(pet_type == "dog"){
+							$("#tuj_pet_kind_dog_img").attr("src", "../images/dog_pet.png");
+							$("#tuj_pet_kind_cat_img").attr("src", "../images/cat_back_n.png");
+						}else{
+							$("#tuj_pet_kind_dog_img").attr("src", "../images/dog_back_n.png");
+							$("#tuj_pet_kind_cat_img").attr("src", "../images/cat_pet.png");
+						}
+
+						get_pet_kind(pet_type, data.data.pet_type);
+
+						$("input[name='pet_name']").val(data.data.name);
+						$("input[name='pet_kind']:radio[value='"+data.data.type+"']").prop("checked", true);
+						$("select[name='pet_type']").val(data.data.pet_type);
+						if(data.data.pet_type == "기타"){
+							$("input[name='pet_type2']").addClass("on").val(data.data.pet_type2);
+						}else{
+							$("input[name='pet_type2']").removeClass("on").val('');
+						}
+						$("select[name='pet_year']").val(data.data.year);
+						$("select[name='pet_month']").val(data.data.month);
+						$("select[name='pet_day']").val(data.data.day);
+						$("input[name='pet_gender']:radio[value='"+data.data.gender+"']").prop("checked", true);
+						$("input[name='neutral']:radio[value='"+data.data.neutral+"']").prop("checked", true);
+						$("select[name='pet_weight1']").val(parseFloat(data.data.weight).toFixed(1).split(".")[0]);
+						$("select[name='pet_weight2']").val(parseFloat(data.data.weight).toFixed(1).split(".")[1]);
+						$("input[name='pet_seq']").val(data.data.pet_seq);
+						$("input[name='tmp_seq']").val(data.data.tmp_seq);
+						$("input[name='customer_id']").val(data.data.customer_id);
+					}else{
+						var html = '';
+						if(data.data){
+							
+							popalert.open('firstRequestMsg1', "해당번호의 고객정보가 이미 반짝에 등록되어, 등록된 펫정보를 불러올수 있습니다.");
+                            $.each(data.data, function(i, v){
+                                html += '<div class="grid-layout-cell flex-auto">';
+                                html += '    <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" value="'+data.data[i]['pet_seq']+'" data-no="'+data.data[i]['pet_seq']+'"><em>'+data.data[i]['name']+'</em></label>';
+                                html += '</div>';
+                            });
+							// 다른 샵에서의 미용 이력이 있을 때 end by.glory-20210817
+
+						}
+
+						//$("#tuj_pet_list").html('').html(html);
+                        $("#pet_list").empty().html(html);
+                        $('#pet_choose').css('display','block');
+					}
+
+					submit_validate();
+				}else{
+					popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+					
+				}
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}
+
+    $(document).on('click','.pet-no',function(){
+        var cellphone = $("#tuj_cellphone").val();
+        var pet_seq = $(this).data('no');
+        console.log("test");
+        console.log(cellphone, pet_seq);
+        get_mypet(cellphone, pet_seq);
+
+    });
+	
+	
+	
+	function go_to_week_reservation(pet_name) {
+		location.href	= "./reserve_main_week";
+		/*
+		var form = document.createElement('form');
+		var objs;
+		objs = document.createElement('input');
+		objs.setAttribute('type', 'hidden');
+		objs.setAttribute('name', 'bjj_pet_name');
+		objs.setAttribute('value', pet_name);
+		form.appendChild(objs);
+		form.setAttribute('method', 'post');
+		form.setAttribute('action', "reserve_main_week?ch=week&backurl=<?= urlencode($_SERVER['REQUEST_URI']) ?>");
+		document.body.appendChild(form);
+		form.submit();
+		*/
+	}
+	
+	
+	
+	
+	$(document).on("change", "#tmp_user_join .pet_type", function(){
+		//$("input[name='pet_type2']").removeClass("on").val(""); // init
+
+		var value = $(this).children("option:selected").val();
+		if(value == "기타"){
+			$("input[name='pet_type2']").show();
+		}else{
+			$("input[name='pet_type2']").hide();
+		}
+	});
+
+	$(document).on("change", "#tuj_pet_year, #tuj_pet_month", function(){
+		var this_year = $("#tuj_pet_year option:selected").val();
+		var this_month = $("#tuj_pet_month option:selected").val();
+
+		$("#tuj_pet_day").html('').html(day_change(this_year, this_month));
+	});
+	
+	$(document).on("click", "#tmp_user_join .pet_kind input[type='radio']", function(){
+		var pet_type = $("input[name='pet_kind']:checked").val();
+
+		get_pet_kind(pet_type, '');
+	});
+	
+	$(document).on("click", ".cellphone_chk", function(){
+		
+		var artist_id = "<?=$user_id ?>";
+		var cellphone = $("#tuj_cellphone").val();
+		
+		if(artist_id != "" && cellphone != ""){
+			if(cellphone.length >= 8){
+				get_cellphone_chk(artist_id, cellphone);
+			}else{
+				popalert.open('firstRequestMsg1', '전화번호를 확인해주세요.');
+			}
+		}
+	});
+	
+	$(document).ready(function(){
+		$(".tmp_user_submit_btn").click(function(){
+		// to do something...
+			var message = submit_validate();
+			if(is_submit){
+				set_add_tmp_user('');
+			}else{
+				popalert.open('firstRequestMsg1', message);
+			}
+
+			return false;
+		})
+        if("<?=$cellphone?>" != ""){
+            $(".cellphone_chk").css("display","none");
+
+        }
+
+        $(".pc-header-menu-cell1").addClass("actived");
+        $('#btn_page_prev').prop('href','<?=$_SESSION['backurl2']?>');
+        
+})
+	
+	
+	
+	
+	
+	get_pet_kind($("input[name='pet_kind']:checked").val(), ''); // 품종
+	$("#tuj_pet_day").html('').html(day_change($("#tuj_pet_year option:selected").val(), $("#tuj_pet_month option:selected").val())); // 생일
+	$(".tmp_user_submit_btn").prop("disabled", true);
+	$(".tmp_user_submit_direct_btn").prop("disabled", true);
+	
+	function set_add_tmp_user(direct){
+		
+		var form_data = $("#form_reservation_new").serialize();
+		form_data += "&mode=set_add_tmp_user";
+		form_data += "&direct="+direct;
+        if("<?=$cellphone?>" != ""){
+            form_data += "&add_pet=1";
+        }
+
+		$.ajax({
+			url: 'data/tmp_user_join_ajax.php',
+			data: form_data,
+			type: 'POST',
+			dataType: 'json',
+			success: function(data) {
+				if(data.code == "000000"){ // success
+					//console.log(data.data);
+					alert("등록되었습니다.");
+					if($("input[name='submit_and_reserv']").prop("checked") === true){
+						go_to_week_reservation(data.data);
+					}else if("<?=$cellphone?>" != ""){
+                        location.href="<?=$_SESSION["backurl2"]?>";
+                    }else{
+                        location.href="customer_inquiry";
+                    }
+					
+				}else{
+					popalert.open('firstRequestMsg1', data.data+" ("+data.code+")");
+				}
+			},
+			error: function(xhr, status, error) {
+				console.log(xhr, status, error);
+			}
+		});
+	}
+</script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

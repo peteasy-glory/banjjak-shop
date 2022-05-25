@@ -1,0 +1,40 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+
+
+?>
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<div class="join-complete">
+		<div class="join-complete-inner">
+			<div class="logo"><img src="/static/pub/images/icon/img-illust-1@2x.png" alt="" width="103"/></div>			
+			<div class="complete-user-id"><?=$_SESSION['gobeauty_login_id_t']?>님.</div>
+			<div class="complete-desc">반짝 회원가입을 축하드립니다.</div>
+		</div>
+	</div>
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="login_shop" class="btn-page-bottom">로그인하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+	
+</body>
+</html>

@@ -1,0 +1,969 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+$shop_title	= ($_GET["docType"] == "1")? "호텔 동의서" : "미용 동의서";
+
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+if($_GET["aid"] == "" || $_GET["uid"] == "" || $_GET["pid"] == ""){
+	// 경고 얼럿창으로 변경
+	alert("잘못된 접근입니다.");
+	//echo "<script>location.replace('../mainpage/index.php');</script>";
+}
+
+//$s_artist_id = $_SESSION["gobeauty_user_id"];
+//$s_user_id = $_SESSION["bjj_cellphone"];
+//$s_pet_id = $_SESSION["bjj_pet_seq"];
+
+$s_artist_id = ($_GET["aid"] != "")? $_GET["aid"] : "";
+$s_user_id = ($_GET["uid"] != "")? $_GET["uid"] : "";
+$s_pet_id = ($_GET["pid"] != "")? $_GET["pid"] : "";
+$s_docType = ($_GET["docType"] != "")? $_GET["docType"] : "0";
+
+$r_ba_seq = ($_GET["ba_seq"])? $_GET["ba_seq"] : "";
+
+// 샵 검색
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$s_artist_id."'
+";
+
+$data_arr = array();
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)){
+	array_push($data_arr, $row);
+}
+foreach($data_arr AS $key => $value){
+	foreach($value AS $key2 => $value2){
+		$data["shop"][$key2] = $value2;
+	}
+}
+
+// 펫정보 검색
+$sql = "
+	SELECT *
+	FROM tb_mypet
+	WHERE pet_seq = '".$s_pet_id."'
+";
+
+$data_arr = array();
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)){
+	array_push($data_arr, $row);
+}
+foreach($data_arr AS $key => $value){
+	foreach($value AS $key2 => $value2){
+		$data["pet"][$key2] = $value2;
+	}
+}
+
+// 정회원 검색
+if($data["pet"]["customer_id"] != "" || $data["pet"]["customer_id"] != NULL){
+	$sql = "
+		SELECT *
+		FROM tb_customer
+		WHERE id = '".$data["pet"]["customer_id"]."'
+	";
+	
+	$data_arr = array();
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		array_push($data_arr, $row);
+	}
+	foreach($data_arr AS $key => $value){
+		foreach($value AS $key2 => $value2){
+			$data["customer"][$key2] = $value2;
+		}
+	}
+}
+
+function format_phone($phone){
+	$phone = preg_replace("/[^0-9]/", "", $phone);
+	$length = strlen($phone);
+
+	switch($length){
+	case 11 :
+		return preg_replace("/([0-9]{3})([0-9]{4})([0-9]{4})/", "$1-$2-$3", $phone);
+		break;
+	case 10:
+		return preg_replace("/([0-9]{3})([0-9]{3})([0-9]{4})/", "$1-$2-$3", $phone);
+		break;
+	default :
+		return $phone;
+		break;
+	}
+}
+
+
+$que = "SELECT * FROM tb_beauty_agree WHERE ba_seq = '{$r_ba_seq}'";
+//echo $que;
+$ba = sql_fetch_array($que);
+
+$que = "SELECT * FROM tb_beauty_sign WHERE customer_id = '{$s_user_id}' ORDER BY reg_date DESC LIMIT 1";
+//echo $que;
+$bs = sql_fetch_array($que);
+
+if($data["pet"]["customer_id"] != ''){
+    $tmp_yn = "N";
+}else{
+    $tmp_yn = "Y";
+}
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body" id="beauty_agree">
+		<div class="customer-view-wrap">
+			<form>
+				<input type="hidden" name="customer_id" value="<?= $data["pet"]["customer_id"]; ?>" />
+				<input type="hidden" name="artist_id" value="<?= $s_artist_id; ?>" />
+				<input type="hidden" name="user_id" value="<?= $s_user_id; ?>" />
+				<input type="hidden" name="pet_id" value="<?= $s_pet_id; ?>" />
+				<input type="hidden" name="docType" value="<?= $s_docType; ?>" />
+				<input type="hidden" name="tmp_seq" value="<?= $data["pet"]["tmp_seq"]; ?>" />
+				<input type="hidden" name="tmp_yn" value="<?= $tmp_yn; ?>" />
+				<input type="hidden" name="ba_seq" value="<?= $r_ba_seq; ?>" />
+			<!-- 고객정보 -->
+			<div class="basic-data-group customer-view-user">
+				<div class="con-title-group">
+					<h4 class="con-title">고객 정보</h4>
+				</div>
+				<div class="form-group">
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">고객명</div>
+							<div class="form-item-data">
+								<input type="text" name="customer_name" class="form-control customer_name" value="<?php echo $ba[0]['customer_name'];?>" placeholder="입력"/>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">연락처</div>
+							<div class="form-item-data">
+								<input type="text" name="cellphone" class="form-control cellphone" value="<?= $s_user_id; ?>" placeholder="입력"/>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">펫 이름</div>
+							<div class="form-item-data">
+								<input type="text" name="pet_name" value="<?= $data["pet"]["name"]; ?>" class="form-control pet_name" placeholder="입력"/>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //고객정보 -->
+			<!-- 펫정보 -->
+			<div class="basic-data-group customer-view-pet">
+				<div class="con-title-group">
+					<h4 class="con-title">펫 정보</h4>
+				</div>
+				<div class="form-group">
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">품종</div>
+							<div class="form-item-data type-2">
+								<div class="pet-breed-select">
+									<div class="breed-select pet_kind">
+										<label class="form-toggle-box" for="pet_kind_dog"><input type="radio" id="pet_kind_dog" name="pet_kind" value="dog" <?=($data["pet"]["type"] == "dog")? "checked" : ""; ?>><em><span>강아지</span></em></label>
+										<label class="form-toggle-box" for="pet_kind_cat"><input type="radio" id="pet_kind_cat" name="pet_kind" value="cat" <?=($data["pet"]["type"] == "cat")? "checked" : ""; ?>><em><span>고양이</span></em></label>
+									</div>
+									<!-- 강아지 -->
+									<div style="display:block">
+										<select id="pet_type" name="pet_type" class="select pet_type">
+											<option value="">선택</option>
+										</select>
+										<input type="text" style="display: none;" placeholder="품종" name="pet_type2" id="pet_type2" value="<?= $data["pet"]["pet_type2"]; ?>">
+									</div>
+									<!-- //강아지 -->
+									
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">생일</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout margin-12">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-3">
+											<select id="pet_year" name="pet_year" class="select select_year">
+												<?php for ($y = 2000; $y <= (int) date('Y'); $y++) { ?>
+													<option value="<?= $y ?>" <?=($data["pet"]["year"] == $y)? "selected" : ""; ?> ><?= $y ?> 년</option>
+												<?php } ?>
+											</select>
+										</div>
+										<div class="grid-layout-cell grid-3">
+											<select id="pet_month" name="pet_month" class="select select_month">
+												<?php for ($m = 1; $m <= 12; $m++) { ?>
+													<option value="<?= $m ?>" <?=($data["pet"]["month"] == $m)? "selected" : ""; ?> ><?= $m ?> 월</option>
+												<?php } ?>
+											</select>
+										</div>
+										<div class="grid-layout-cell grid-3">
+											<select id="pet_day" name="pet_day" class="select select_day">
+												<?php for ($d = 1; $d <= 31; $d++) { ?>
+													<option value="<?= $d ?>" <?=($data["pet"]["day"] == $d)? "selected" : ""; ?> ><?= $d ?> 일</option>
+												<?php } ?>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">성별 선택</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout toggle-button-group">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="pet_gender_1"><input type="radio" id="pet_gender_1" name="gender" value="남아" <?=($data["pet"]["gender"] == "남아")? "checked" : ""; ?>><em>남아</em></label></div>
+										<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="pet_gender_2"><input type="radio" id="pet_gender_2" name="gender" value="여아" <?=($data["pet"]["gender"] == "여아")? "checked" : ""; ?>><em>여아</em></label></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">중성화</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout toggle-button-group">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="neutral_1"><input type="radio"  id="neutral_1" name="neutral" value="0" <?=($data["pet"]["neutral"] == "0")? "checked" : ""; ?>><em>X</em></label></div>
+										<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="neutral_2"><input type="radio" id="neutral_2" name="neutral" value="1" <?=($data["pet"]["neutral"] == "1")? "checked" : ""; ?>><em>O</em></label></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">예방 접종</div>
+							<div class="form-item-data type-2">
+								<select id="vaccination" name="vaccination" class="vaccination" placeholder="예방접종">
+									<option value="">선택</option>
+									<option value="2차 이하" <?=($data["pet"]["vaccination"] == "2차 이하")? "selected" : ""; ?>>2차 이하</option>
+									<option value="3차 완료" <?=($data["pet"]["vaccination"] == "3차 완료")? "selected" : ""; ?>>3차 완료</option>
+									<option value="4차 완료" <?=($data["pet"]["vaccination"] == "4차 완료")? "selected" : ""; ?>>4차 완료</option>
+									<option value="5차 완료" <?=($data["pet"]["vaccination"] == "5차 완료")? "selected" : ""; ?>>5차 완료</option>
+								</select>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">질병 기록</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout toggle-button-group">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="disease_none"><input type="checkbox"  id="disease_none" value="1" class="disease_none"><em>없음</em></label></div>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="heart_trouble"><input type="checkbox" id="heart_trouble" name="heart_trouble" value="1" class="heart_trouble" <?=($data["pet"]["heart_trouble"] == "1")? "checked" : ""; ?>><em>심장 질환</em></label></div>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="dermatosis"><input type="checkbox" id="dermatosis" name="dermatosis" value="1"  class="dermatosis" <?=($data["pet"]["dermatosis"] == "1")? "checked" : ""; ?>><em>피부병</em></label></div>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="disease_etc"><input type="checkbox" id="disease_etc" value="1" class="disease_etc" <?=($data["pet"]["etc_for_disease"] != "")? "checked" : ""; ?>><em>기타</em></label></div>
+										<textarea id="etc_for_disease" style="display: none;" name="etc_for_disease" class="specialnote <?=($data["pet"]["etc_for_disease"] != "")? "on" : ""; ?>" rows="3"><?=$data["pet"]["etc_for_disease"]?></textarea>
+										<div class="grid-layout-cell grid-1">
+											<select id="luxation" name="luxation" class="luxation" placeholder="슬개골탈구">
+												<option value="">슬개골탈구</option>
+												<option value="없음" <?=($data["pet"]["luxation"] == "없음")? "selected" : ""; ?>>없음</option>
+												<option value="1기" <?=($data["pet"]["luxation"] == "1기")? "selected" : ""; ?>>1기</option>
+												<option value="2기" <?=($data["pet"]["luxation"] == "2기")? "selected" : ""; ?>>2기</option>
+												<option value="3기" <?=($data["pet"]["luxation"] == "3기")? "selected" : ""; ?>>3기</option>
+												<option value="4기" <?=($data["pet"]["luxation"] == "4기")? "selected" : ""; ?>>4기</option>
+											</select>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">특이사항</div>
+							<div class="form-item-data type-2">
+								<div class="grid-layout toggle-button-group">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="bite"><input type="checkbox" id="bite" name="bite" value="1" <?=($data["pet"]["bite"] == "1")? "checked" : ""; ?>><em>입질</em></label></div>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="marking"><input type="checkbox" id="marking" name="marking" value="1" <?=($data["pet"]["marking"] == "1")? "checked" : ""; ?>><em>마킹</em></label></div>
+										<div class="grid-layout-cell grid-4"><label class="form-toggle-box middle" for="mounting"><input type="checkbox" id="mounting" name="mounting" value="1" <?=($data["pet"]["mounting"] == "1")? "checked" : ""; ?>><em>마운팅</em></label></div>
+										<div class="grid-layout-cell grid-1">
+											<input type="text" name="etc_for_owner" value="<?=$data["pet"]["etc_for_owner"]?>" class="form-control" placeholder="메모를 입력해주세요"/>											
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //펫정보 -->
+			<!-- 미용동의서 상세내용 -->
+			<div class="basic-data-group customer-view-agree">
+				<div class="con-title-group">
+					<h4 class="con-title">미용동의서 상세내용</h4>
+				</div>
+				<div class="customer-view-agree-info"><?php echo $data["shop"]['name']?> 은(는) 미용요청견(묘)의 나이가 10세 이상인 노령견(묘)이나, 질병이 있는 경우 건강상태를 고려하여 안내사항을 말씀드리고, 미용 동의서를 받고자 합니다.</div>
+				<div class="pay-card-group">
+					<div class="pay-card-cell all cou_answer2"><label class="form-checkbox"><input type="checkbox"  class="allchk" <?php echo ($ba[0]['is_agree']==1 && $ba[0]['is_customer']==1)?'checked':'';?> name="payCard"><span class="form-check-icon"><em><strong>모두 동의</strong></em></span></label></div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check cou_answer2">
+								<label class="form-checkbox"><input type="checkbox" name="is_agree" value="1" <?php echo ($ba[0]['is_agree']==1)?'checked':'';?> placeholder="동의서"><span class="form-check-icon"><em><?=($s_docType == "1")? "호텔 동의서" : "미용 동의서" ?></em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								<?php if($s_docType == "1"){ ?>
+                                        1. 위탁하고자 하는 동물은 반드시 내, 외부 기생충에 감염되어 있지 않아야 하며, 일 년 이내의 각종 예방접종이 완료되어 있어야 합니다.<br /><br />
+										2. 위탁자가 위탁 기간 중 목욕 또는 미용을 원하는 경우 별도의 비용이 추가됩니다.<br /><br />
+										3. 위탁 기간 중 발생할 수 있는 응급 상황에 치료를 필요로 하는 경우 위탁자의 동의하에 치료를 진행하고, 만약 연락이 안 될 경우에는 진료기록을 남기고 진료 기록에 근거하여 위탁자는 치료비를 별도로 부담하셔야 합니다.<br /><br />
+										4. 만약 불가피한 천재지변으로 인해 최선을 다했음에도 불구하고 사망이나 실종 시에는 본 매장 또는 치료를 진행한 병원, 관계 병원에게 책임을 묻지 않습니다.<br /><br />
+										5. 사전 통보 없이 5일 이상 연락이 되지 않을 시 견주가 반려견에 대한 권리를 포기하는 것으로 인정하는 것에 동의하며, 해당 견은 시·구청에 유기동물로 보고되며 유기동물보호소로 이송되고 견주에 대한 정보는 시·구청으로 보고됩니다. <br /><br />
+										(반려견 유기 시 300만 원 이하 과태료 부과)<br /><br />
+										6. 위탁받은 동물이 매장 물건을 훼손 ˙파손할 시에는 위탁자 본인 또는 대리인은 보상해주셔야 합니다.<br /><br />
+										7. 이용이 제한 될 수 있는 특이사항(예: 공격성이 있음, 전염성 병이 있음, 노령견, 환경변화에 예민함 등)을 숨긴 채 투숙했을 시 조기 퇴실을 요구할 수 있음에 동의합니다.<br /><br />
+										8. 환경적응에 미숙한 아이들의 경우, 위탁관리 후 갑작스러운 환경변화와 분리불안 등의 스트레스로 원치 않는 상황(지병 악화,질병,사망 등)이 발생할 수 있음을 미리 알려드립니다. 이로 인하여 발생하는 상황(지병 악화,질병,사망 등)에 대해 위탁자는 본 매장에 어떠한 법적인 책임도 묻지 않을 것에 동의합니다.<br /><br />
+										9. 위탁자 본인 또는 대리인은 이상의 내용을 자세히 읽고 이해했으며, 이상의 사항들에 대해 동의합니다.<br /><br />
+										10. 동의서 작성일 이후부터 차후 위탁을 이용하시는 모든 기간에 동일하게 적용됨을 확인합니다.<br /><br />
+								<?php }else{ ?>
+                                        1. 백내장, 치주염, 관절염, 당뇨병, 심장질환 등과 같이 노령견에서 흔히 발생하는 질병은 미용 시에 노령견(묘)에게 쇼크 및 스트레스의 원인이 될 수 있으며, 증상이 심각할 경우 사망까지 이를 수 있습니다.<br /><br />
+										2. 노령견(묘)이나, 예민한 견(묘)의 경우 미용 시 받는 스트레스가 더 심할 수 있습니다. 또한, 미용 및 목욕 시 평소보다 오래 서 있게 되어, 관절에 무리가 올 수 있으며, 이런 경우 미용 후에 일시적으로 다리를 절 수 있습니다.<br /><br />
+										3. 당일 반려견(묘)의 컨디션이 좋지 않거나, 구토, 설사, 감기 증상이 있을 경우, 미용 후에 증상이 더 심해질 수 있으므로 미용을 미루시는 것이 좋습니다.<br /><br />
+										4. 목욕 시 적절한 물 온도 유지 및 수압 체크를 하여도 노령견(묘)은 신경계 및 심장혈관 상태가 비교적 약하여, 심장마비로 인한 쇼크 사망사고가 발생할 수도 있습니다.<br /><br />
+										5. 반려견(묘)의 질병에 대해 사전에 고지하지 않은 경우, 그 질병에 대해 책임지지 않습니다.<br /><br />
+										6. 미용 전 보이지 않던 피부 질환이 미용 후 노출되어 긁거나 핥아 2차 감염이 발생할 수 있습니다. 미용 전 피부 상태를 잘 확인하시고 주의해주세요.<br /><br />
+										7. 엉킴이 있는 경우 미용 전 이미 피부가 상해 있는 경우가 많으며, 빗질 혹은 클리핑 시 피부가 붉어지기도 합니다. 최대한 주의하나 이 과정에서 상처가 발생할 수 있음을 미리 고지 드립니다.<br /><br />
+										8. 미용 전 고지 되지 않은 사항에 의해 일어난 사고는 펫샵에서 책임지지 않습니다.<br /><br />
+										9. 미용 거부가 심각하거나, 질병적 문제가 있는 경우 미용이 중단될 수 있습니다.<br /><br />
+										10. 미용 중 엉킴, 길이 등에 대한 추가비용이 발생할 수 있습니다.<br /><br />
+										11. 반려견(묘) 미용 시 발생할 수 있는 사고를 미용을 요청한 보호자는 인지 하였으며, 이와 관련하여 해당 견(묘)에게 발생하는 사고에 대해 미용을 요청한 보호자는 추후 이의 제기를 하지 않음에 동의합니다.<br /><br />
+										12. 이 미용 동의서는 작성일 이후부터 차후 미용을 이용하시는 모든 기간에 동일하게 적용됨을 확인합니다.<br /><br />
+								<?php } ?> 
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="pay-card-cell rule">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check cou_answer2">
+								<label class="form-checkbox"><input type="checkbox" name="is_customer" value="1" <?php echo ($ba[0]['is_customer']==1)?'checked':'';?> placeholder="개인정보 수집 및 허용"><span class="form-check-icon"><em>개인정보 수집 및 허용</em></span></label>
+								<button type="button" class="btn-pay-card-toggle">자세히 보기</button>
+							</div>
+							<div class="pay-card-rule">
+								<div class="pay-card-agree">
+								<?php if($s_docType == "1"){ ?>
+                                    개인정보수집/이용/제공 동의서<br /><br />
+					[개인정보 보호법] 제15조 및 제17조에 따라 아래의 내용으로 개인정보를 수집, 이용 및 제공하는데 동의합니다. <br /><br />
+					□ 개인정보의 수집 및 이용에 관한 사항 <br /><br />
+					- 수집하는 개인정보 항목 : 이름, 전화번호, 펫정보(품종,몸무게,성별 등 펫 특이사항)과 그 外 위탁동의서 기재 내용 일체 <br /><br />
+					- 개인정보의 이용 목적 : 수집된 개인정보를 선택한 펫샵에서 반려동물 위탁에 대한 상호(보호자-펫샵)동의를 위해 사용하며, 목적 외의 용도로는 사용하지 않습니다. <br /><br />
+					□ 개인정보의 보관 및 이용 기간 <br /><br />
+					- 수집, 이용 및 제공목적이 달성될 때 까지, 달성이후 [개인정보 보호법] 제21조에 따라 폐기처리합니다<br /><br />
+								<?php }else{ ?>
+                                    개인정보수집/이용/제공 동의서<br /><br />
+					[개인정보 보호법] 제15조 및 제17조에 따라 아래의 내용으로 개인정보를 수집, 이용 및 제공하는데 동의합니다. <br /><br />
+					□ 개인정보의 수집 및 이용에 관한 사항 <br /><br />
+					- 수집하는 개인정보 항목 : 이름, 전화번호, 펫정보(품종,몸무게,성별 등 펫 특이사항)과 그 外 미용동의서 기재 내용 일체 <br /><br />
+					- 개인정보의 이용 목적 : 수집된 개인정보를 선택한 펫샵에서 미용작업에 대한 상호(보호자-펫샵)동의를 위해 사용하며, 목적 외의 용도로는 사용하지 않습니다. <br /><br />
+					□ 개인정보의 보관 및 이용 기간 <br /><br />
+					- 수집, 이용 및 제공목적이 달성될 때 까지, 달성이후 [개인정보 보호법] 제21조에 따라 폐기처리합니다<br /><br />
+								<?php } ?>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="customer-view-agree-date">
+					<div class="item-date"><?= DATE("Y년 m월 d일"); ?></div>
+					<div class="item-name customer_name_confirm">회원명 입력</div>
+				</div>
+			</div>
+			<!-- //미용동의서 상세내용 -->
+			<!-- 서명 -->
+			<div class="basic-data-group small" id="signature-pad">
+				<div class="con-title-group">
+					<h4 class="con-title">서명</h4>
+				</div>
+				<div class="user-sign-wrap">
+					<canvas id="cview"></canvas>
+
+					<button type="button" class="button clear btn btn-info" data-action="clear">서명 지우기</button>
+				</div>
+			</div>
+			<!-- //서명 -->
+			</form>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom" id="beauty_agree2">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom submit_btn"><?=($r_ba_seq != "")? "수정" : "저장"; ?></a>
+	</div>
+	<!-- //page-bottom -->
+
+    <article id="reserveCalendarPop1" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">미용동의서가 저장되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.href='./<?php echo $_SESSION['backurl2'];?>';">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+
+
+</section>
+<!-- //container -->
+
+
+
+<script src="/static/pub/js/signature_pad.umd.js"></script>
+<script>
+	var wrapper = document.getElementById("signature-pad");
+	var clearButton = wrapper.querySelector("[data-action=clear]");
+	//var changeColorButton = wrapper.querySelector("[data-action=change-color]");
+	//var undoButton = wrapper.querySelector("[data-action=undo]");
+	//var savePNGButton = wrapper.querySelector("[data-action=save-png]");
+	//var saveJPGButton = wrapper.querySelector("[data-action=save-jpg]");
+	//var saveSVGButton = wrapper.querySelector("[data-action=save-svg]");
+	var canvas = wrapper.querySelector("canvas");
+	var signaturePad = new SignaturePad(canvas, {
+	  // It's Necessary to use an opaque color when saving image as JPEG;
+	  // this option can be omitted if only saving as PNG or SVG
+	  backgroundColor: 'rgb(255, 255, 255)'
+	});
+
+	// Adjust canvas coordinate space taking into account pixel ratio,
+	// to make it look crisp on mobile devices.
+	// This also causes canvas to be cleared.
+	function resizeCanvas() {
+	  // When zoomed out to less than 100%, for some very strange reason,
+	  // some browsers report devicePixelRatio as less than 1
+	  // and only part of the canvas is cleared then.
+	  var ratio =  Math.max(window.devicePixelRatio || 1, 1);
+
+	  // This part causes the canvas to be cleared
+	  canvas.width = canvas.offsetWidth * ratio;
+	  canvas.height = canvas.offsetHeight * ratio;메
+	  canvas.getContext("2d").scale(ratio, ratio);
+
+	  // This library does not listen for canvas changes, so after the canvas is automatically
+	  // cleared by the browser, SignaturePad#isEmpty might still return false, even though the
+	  // canvas looks empty, because the internal data of this library wasn't cleared. To make sure
+	  // that the state of this library is consistent with visual state of the canvas, you
+	  // have to clear it manually.
+	  signaturePad.clear();
+	}
+
+	// On mobile devices it might make more sense to listen to orientation change,
+	// rather than window resize events.
+	// 2020-04-13 ulmo 스크롤 이벤트 진행 시 초기화 되어 주석처리
+	//window.onresize = resizeCanvas;
+	//resizeCanvas();
+
+	function download(dataURL, filename) {
+	  if (navigator.userAgent.indexOf("Safari") > -1 && navigator.userAgent.indexOf("Chrome") === -1) {
+	//	window.open(dataURL);
+	//  } else {
+		var blob = dataURLToBlob(dataURL);
+		var url = window.URL.createObjectURL(blob);
+
+		var a = document.createElement("a");
+		a.style = "display: none";
+		a.href = url;
+		a.download = filename;
+
+		document.body.appendChild(a);
+		a.click();
+
+		window.URL.revokeObjectURL(url);
+	  }
+	}
+
+	// One could simply use Canvas#toBlob method instead, but it's just to show
+	// that it can be done using result of SignaturePad#toDataURL.
+	function dataURLToBlob(dataURL) {
+	  // Code taken from https://github.com/ebidel/filer.js
+	  var parts = dataURL.split(';base64,');
+	  var contentType = parts[0].split(":")[1];
+	  var raw = window.atob(parts[1]);
+	  var rawLength = raw.length;
+	  var uInt8Array = new Uint8Array(rawLength);
+
+	  for (var i = 0; i < rawLength; ++i) {
+		uInt8Array[i] = raw.charCodeAt(i);
+	  }
+
+	  return new Blob([uInt8Array], { type: contentType });
+	}
+
+	clearButton.addEventListener("click", function (event) {
+	  signaturePad.clear();
+	});
+
+	/*
+	undoButton.addEventListener("click", function (event) {
+	  var data = signaturePad.toData();
+
+	  if (data) {
+		data.pop(); // remove the last dot or line
+		signaturePad.fromData(data);
+	  }
+	});
+	*/		
+	/*
+	changeColorButton.addEventListener("click", function (event) {
+	  var r = Math.round(Math.random() * 255);
+	  var g = Math.round(Math.random() * 255);
+	  var b = Math.round(Math.random() * 255);
+	  var color = "rgb(" + r + "," + g + "," + b +")";
+
+	  signaturePad.penColor = color;
+	});
+	*/
+	/*
+	savePNGButton.addEventListener("click", function (event) {
+	  if (signaturePad.isEmpty()) {
+		alert("Please provide a signature first.");
+	  } else {
+		var dataURL = signaturePad.toDataURL();
+		download(dataURL, "signature.png");
+	  }
+	});
+	*/
+	/*
+	saveJPGButton.addEventListener("click", function (event) {
+	  if (signaturePad.isEmpty()) {
+		alert("Please provide a signature first.");
+	  } else {
+		var dataURL = signaturePad.toDataURL("image/jpeg");
+		download(dataURL, "signature.jpg");
+	  }
+	});
+	*/
+	/*
+	saveSVGButton.addEventListener("click", function (event) {
+	  if (signaturePad.isEmpty()) {
+		alert("Please provide a signature first.");
+	  } else {
+		var dataURL = signaturePad.toDataURL('image/svg+xml');
+		download(dataURL, "signature.svg");
+	  }
+	});
+	*/
+
+	$(function(){
+		pet_kind(); // 품종 초기화
+
+		// 질병 초기화
+		var is_disease = 0;
+		$("#beauty_agree .disease_list input[type='checkbox']:checked").each(function(i, v){
+			is_disease++;
+		});
+		if(is_disease == 0){
+			$("#beauty_agree .disease_none").prop("checked", true);
+		}
+
+		// 사인 canvas 크기 초기화
+		var canvas = document.getElementsByTagName('canvas')[0];
+		canvas.width  = $("#signature-pad").width();
+		canvas.height = $("#signature-pad").height();
+
+        /*var img = new Image();
+        img.onload = function(){
+            var ctx = canvas.getContext("2d");
+            ctx.drawImage(img,0,0,418,269);
+        }
+        img.src = '<?php echo $bs[0]['image'];?>';*/
+	});
+
+	// 품종 선택
+	$("#beauty_agree").on("click", ".pet_kind input[type='radio']", function(){
+		pet_kind();
+	});
+
+	$("#beauty_agree").on("change", "#pet_type", function(){
+		if ($("#pet_type").val().trim() == "기타") {
+			$("#pet_type2").show();
+		} else {
+			$("#pet_type2").hide();
+		}
+	});
+
+	// 동의서 자세히보기
+	$("#beauty_agree").on("click", ".more_btn", function(){
+		var _this = $(this);
+
+		$("#beauty_agree .txt_more").each(function(i, v){
+			if($(this).data("no") == _this.data("no")){
+				if($(this).hasClass("on")){
+					$(this).removeClass("on");
+					_this.html("자세히보기 <i class=\"fas fa-caret-down\"></i></i>");
+				}else{
+					$(this).addClass("on");
+					_this.html("자세히보기 <i class=\"fas fa-caret-up\"></i></i>");
+				}
+			}
+		});
+	});
+
+	// 동의서 동의 액션
+	$("#beauty_agree").on("click", ".cou_answer2 input", function(){
+
+		if(!$(this).hasClass("allchk")){
+			var chk_cnt = 0;
+			$(".cou_answer2 input").each(function(i, v){
+				if(!$(this).hasClass("allchk")){
+					if($(this).is(":checked") == true){
+						chk_cnt += 1;
+					}
+				}
+			});
+
+			if(chk_cnt == 2){
+				$("#beauty_agree .allchk").prop("checked", true);
+			}else{
+				$("#beauty_agree .allchk").prop("checked", false);
+			}
+		}else{
+			var is_chk = $(this).is(":checked");
+
+			if(is_chk == true){
+				$(".cou_answer2 input").each(function(i, v){
+					$(this).prop("checked", true);
+				});
+			}else{
+				$(".cou_answer2 input").each(function(i, v){
+					$(this).prop("checked", false);
+				});
+			}
+		}
+	});
+
+	// 회원명 입력시 하단에도 추가
+	$("#beauty_agree").on("keyup", ".customer_name", function(){
+		var customer_name = $(this).val();
+		$(".customer_name_confirm").text(customer_name);
+	});
+
+	// 질병여부 체크
+	$("#beauty_agree").on("click", ".disease_list input[type='checkbox']", function(){
+		var chk_cnt = 0;
+
+		if($(this).hasClass("disease_none")){
+			if($(this).prop("checked")){
+				$("#beauty_agree .heart_trouble").prop("checked", false);
+				$("#beauty_agree .dermatosis").prop("checked", false);
+				$("#beauty_agree .disease_etc").removeClass("on").prop("checked", false);
+				$("#beauty_agree #etc_for_disease").hide();
+			}
+		}else{
+			$(".disease_list input[type='checkbox']").each(function(i, v){
+				if(!$(this).hasClass("disease_none")){
+					if($(this).is(":checked")){
+						chk_cnt += 1;
+					}
+				}
+			});
+
+			if(chk_cnt == 0){
+				$("#beauty_agree .disease_none").prop("checked", true);
+			}else{
+				$("#beauty_agree .disease_none").prop("checked", false);
+			}
+		}
+	});
+
+	// 기타질병 입력창 토글
+	$("#beauty_agree").on("click", ".disease_etc", function(){
+		if($(this).hasClass("on")){
+			$(this).removeClass("on");
+			$("#etc_for_disease").hide();
+		}else{
+			$(this).addClass("on");
+			$("#etc_for_disease").show();
+		}
+	});
+
+	// 완료 버튼
+	$("#beauty_agree2").on("click", "a.submit_btn", function(){
+		var dataForm = $("#beauty_agree form").serialize();
+		var dialog = $(this);
+		var is_status = true;
+		var msg = "";
+
+		// include unchecked checkboxes. use filter to only include unchecked boxes. 
+		$.each($('#beauty_agree form input[type=checkbox]').filter(function(idx){
+				return $(this).prop('checked') === false
+			}), function(idx, el){ 
+				// attach matched element names to the formData with a chosen value. 
+				var	emptyVal = "";
+				dataForm += '&' + $(el).attr('name') + '=' + emptyVal; 
+			}
+		);
+
+		// 예외처리
+		$("#beauty_agree form input").each(function(i, v){
+			if(msg == ""){
+				if($(this).attr("type") == "text"){
+					if($(this).attr("name") == "pet_type2"){
+						if($("#beauty_agree form select.pet_type").val().trim() == "기타"){
+							if($(this).val() == ""){
+								//console.log($(this).attr("name")+":"+$(this).val());
+								msg = $(this).attr("placeholder")+" 을(를) 입력해 주세요.";
+								$(this).focus();
+								is_status = false;
+								return false;
+							}
+						}
+					}else{
+						if($(this).val() == ""  && $(this).attr("name") != 'etc_for_owner'){
+							console.log($(this).attr("name")+":"+$(this).val());
+							msg = $(this).attr("placeholder")+" 을(를) 입력해 주세요.";
+							$(this).focus();
+							is_status = false;
+							return false;
+						}
+					}
+				}else if($(this).attr("type") == "checkbox"){
+					//console.log($(this).attr("name"));
+					if($(this).attr("name") == "is_agree" || $(this).attr("name") == "is_customer"){
+						if($(this).is(":checked") != true){
+							//console.log($(this).attr("name")+":"+$(this).val());
+							msg = $(this).attr("placeholder")+" 에(게) 동의해 주세요.";
+							$(this).focus();
+							is_status = false;
+							return false;
+						}
+					}
+				}else{
+					//console.log("!"); // 예외처리 예외
+				}
+			}
+		});
+
+		$("#beauty_agree form select").each(function(i, v){
+			if(msg == ""){
+				if($(this).attr("name") == "vaccination"){
+					if($(this).children("option:selected").val() == ""){
+						msg = $(this).attr("placeholder")+" 을(를) 선택해 주세요.";
+						$(this).focus();
+						is_status = false;
+						return false;
+					}
+				}
+
+				if($(this).attr("name") == "luxation"){
+					if($(this).children("option:selected").val() == ""){
+						msg = $(this).attr("placeholder")+" 을(를) 선택해 주세요.";
+						$(this).focus();
+						is_status = false;
+						return false;
+					}
+				}
+			}
+		});
+		
+		// 예외처리 출력
+		if(msg != ""){
+			alert(msg);
+		}
+
+		//console.log(dataForm);
+		if(is_status == true){
+			console.log("성공");
+			// 이미지 저장 후 url 파라미터에 추가
+
+			if (signaturePad.isEmpty()) {
+				alert("서명이 필요합니다.");
+			} else {
+				var dataURL = signaturePad.toDataURL();
+				var artist_id = "<?= $s_artist_id; ?>";
+				var customer_id = "<?= $data['pet']['customer_id']; ?>";
+				var tmp_seq = "<?= $data['pet']['tmp_seq']; ?>";
+				var cellphone = "<?= $s_user_id; ?>";
+				var tmp_yn = "<?= $tmp_yn; ?>";
+
+				console.log(artist_id+"/"+customer_id+"/"+tmp_seq+"/"+cellphone+"/"+tmp_yn+"/"+dataURL);
+
+				//var base64ImageContent = dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+				//var blob = base64ToBlob(base64ImageContent, 'image/png');
+				var fd = new FormData();
+				fd.append('artist_id', artist_id);
+				fd.append('customer_id', customer_id);
+				fd.append('tmp_seq', tmp_seq);
+				fd.append('cellphone', cellphone);
+				fd.append('tmp_yn', tmp_yn);
+				fd.append('data', dataURL);
+
+				$.ajax({
+					type: 'POST',
+					url:'data/upload_beauty_sign.php',
+					data: fd,
+					processData: false,
+					contentType: false
+				}).done(function(data) {
+					console.log(data);
+
+					dataForm += '&sign_image=' + data;
+
+					// 다 처리되면 실행
+					$.ajax({
+						url: 'data/data_set_beauty_sign',
+						data: dataForm,
+						type: 'POST',
+						dataType: 'json',
+						success: function(data) {
+							if(data.code == "000000"){ // success
+
+								if(data.data != "update"){
+
+									if("<?=$s_docType ?>" == "1"){
+										// 호텔동의서 알림톡 발송 작성부분
+										$.ajax({
+											type: 'post',
+											data: {
+												ba_seq : data.data,
+												cellphone : cellphone
+											},
+											url: 'data/send_hotel_talk',
+											dataType: 'json',
+											error: function() {
+												alert('알림톡 발송이 실패했습니다.');
+											},
+											success: function(json) {
+												if (json.result) {
+													alert("저장되었습니다.");
+													window.history.back();
+												} else {
+													alert('알림톡 발송이 실패했습니다.');
+												}
+											}
+										});
+									}else{
+										$.ajax({
+											type: 'post',
+											data: {
+												ba_seq : data.data,
+												cellphone : cellphone
+											},
+											url: 'data/send_beauty_talk',
+											dataType: 'json',
+											error: function() {
+												alert('알림톡 발송이 실패했습니다.');
+											},
+											success: function(json) {
+												if (json.result) {
+													alert("저장되었습니다.");
+													window.history.back();
+												} else {
+													alert('알림톡 발송이 실패했습니다.');
+												}
+											}
+										});
+									}
+								}else{
+								    pop.open('reserveCalendarPop1');
+								    /*setTimeout(function(){
+                                        location.href = './<?php echo $_SESSION['backurl2'];?>';
+                                    },3000);*/
+
+								}
+							}else{
+								alert(data.data+" ("+data.code+")");
+								console.log(data.data);
+							}
+						},
+						error: function(xhr, status, error) {
+							console.log(xhr, status, error);
+						}
+					});
+				});
+			}
+		}else{
+			console.log("실패");
+			return false;
+		}
+
+        //$('#firstRequestMsg1').find('.msg-txt').text('점검중입니다.');
+        //pop.open('firstRequestMsg1');
+
+	});
+
+	// 품종 설정
+	function pet_kind(){
+		var pet_kind = $('input[name="pet_kind"]:checked').val();
+		var post_data = 'pet_type=' + pet_kind;
+
+		$.ajax({
+			url: 'data/get_pet_type.php',
+			data: post_data,
+			type: 'POST',
+			success: function(data) {
+				var array_middle = data.split(",");
+				var select = document.getElementById('pet_type');
+				select.options.length = 0; // clear out existing items
+				for (var i = 0; i < array_middle.length; i++) {
+					var d = array_middle[i];
+					d = $.trim(d);
+					select.options.add(new Option(d, d));
+					if (d == '<?= trim($data["pet"]["pet_type"]) ?>') {
+						$("#pet_type").val(d.trim()).prop("selected", true);
+					}
+				}
+				//$("#middle_region").val().prop("selected", true);
+			},
+			error: function(xhr, status, error) {}
+		});
+	}
+
+    $(document).ready(function(){
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
+    })
+
+
+</script>
+
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

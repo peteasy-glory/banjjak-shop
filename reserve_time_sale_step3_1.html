@@ -1,0 +1,155 @@
+<?
+$from = $_GET['from'];
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+$check_time_sale_day = $_GET['chkArray'];
+
+$shop_title	= "빈시간 판매하기";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+?>
+
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="reserve-sale-wrap">
+			<div class="con-title-group">
+				<h4 class="con-title">3. 혜택 설정 및 판매 메시지를 입력하세요.</h4>
+			</div>		
+			<div class="basic-data-group vmiddle">
+				<div class="form-group">
+					<div class="form-group-cell large">
+						<div class="form-group-item">
+							<div class="form-item-label">혜택 설정</div>
+							<div class="form-item-data type-2">
+								<select id="sel_sale" onchange="fn_select_change()">
+									<option value="1">정액 할인</option>
+									<option value="2">정률 할인</option>
+								</select>
+								<div class="form-bottom-info">*설정 시, 상품관리에서 설정한 가격에 할인이 적용됩니다.</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell large">
+						<div class="form-group-item">
+							<div class="form-item-data">
+								<div class="form-mulity-input">
+									<div class="input-txt">전체 서비스 총액의</div>
+									<input type="text">
+									<div class="input-unit" id="div_unit"></div>
+									<div class="input-txt">할인</div>
+								</div>
+								<div class="form-bottom-info">*설정 시, 상품관리에서 설정한 가격에 할인이 적용됩니다.</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell large">
+						<div class="form-group-item">
+							<div class="form-item-label">이미지 설정</div>
+							<div class="form-item-data type-8">
+								<div class="grid-layout btn-grid-group">
+									<div class="grid-layout-inner">
+										<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round">사진등록</button></div>
+										<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='reserve_time_sale_step3_4.html'">사진 불러오기</button></div>
+									</div>
+								</div>
+								<div  class="basic-data-group vsmall" style="display:block;">
+									<div class="picture-set-data"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell large">
+						<div class="form-group-item">
+							<div class="form-item-label">메시지 설정</div>
+							<div class="form-item-data">
+								<input type="text" class="form-control" placeholder="입력">
+							</div>
+							<div class="basic-data-group vvsmall3">
+								<button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='reserve_time_sale_step3_2.html'">메시지 불러오기</button>
+							</div>
+						</div>
+					</div>					
+				</div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">시간 메시지</h4>
+				</div>
+				<div class="user-receipt-item">
+					<?= $check_time_sale_day ?>
+					<div class="time-msg-items">
+						<h5 class="con-title">10.10 (일)</h5>
+						<div class="time-msg-detail">
+							<div class="detail-title">오전</div>
+							<div class="detail-value">12:00 / 01:00 / 02:00 / 03:00 / 04:00 / 05:00 / 06:00</div>
+						</div>
+						<div class="time-msg-detail">
+							<div class="detail-title">오후</div>
+							<div class="detail-value">12:00 / 01:00 / 02:00 / 03:00 / 04:00 / 05:00 / 06:00</div>
+						</div>
+					</div>
+					<div class="time-msg-items">
+						<h5 class="con-title">10.11 (일)</h5>
+						<div class="time-msg-detail">
+							<div class="detail-title">오후</div>
+							<div class="detail-value">12:00 / 01:00</div>
+						</div>
+					</div>
+					<div class="time-msg-items">
+						<h5 class="con-title">10.12 (일)</h5>
+						<div class="time-msg-detail">
+							<div class="detail-title">오후</div>
+							<div class="detail-value">12:00 / 01:00</div>
+						</div>
+					</div>
+				</div>
+				<div class="form-bottom-info">* 설정한 메시지와 조합되어 작성됩니다.</div>	
+				<div class="basic-data-group vmiddle">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='reserve_time_landing.html'">미리보기</button>
+				</div>			
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="reserve_time_landing.html" class="btn-page-bottom">빈시간 판매 시작하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script>
+	$(document).ready(function (){
+		fn_select_change();
+	})
+
+	function fn_select_change() {
+		var result = $("#sel_sale option:selected").val();
+		
+		if (result == 1) $("#div_unit").text("원");
+		else if (result == 2) $("#div_unit").text("%");
+	}
+</script>	
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

@@ -1,0 +1,156 @@
+<?
+$shop_title	= "예약 접수";
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+print_r($_GET);
+$searchTxt = (isset($_GET['searchTxt'])) ? $_GET['searchTxt'] : "";
+
+
+?>
+<script>
+	$(document).ready(function(){
+		if ( "<?=$searchTxt?>" != "" ) {
+			search();
+		}
+	});
+	function search() {
+	    console.log('<?php $_GET['worker'];?>')
+		var search_word = $("#search_word").val();
+		if(search_word == ""){
+			return false;
+		}
+
+		insertParam("searchTxt",search_word);
+		$("#searchList").html('');
+
+		$.ajax({
+			url: 'data/manage_customer_list_ajax',
+			data: {
+				mode: 'get_search_all',
+				search: search_word,
+				artist_id: "<?=$user_id?>"
+			},
+			dataType: 'JSON',
+			type: 'POST',
+			success: function(data) {
+				if(data.code == "000000"){
+					if(data.data){
+						var html = "";
+						$.each(data.data, function(i, v){
+							var photo = "";
+							var worker = $('#worker').val();
+                            var workTime = $('#workTime').val();
+                            var workDate = $('#workDate').val();
+
+                            if(!worker || !workTime || !workDate){
+                                alert('예약정보가 없습니다. 캘린더에서 다시 선택해주세요.');
+                                return false;
+                            }
+							if (v.payment.photo != null ) {
+								photo = `<img src="`+photo+`" alt="" >`;
+							}
+							// var photo = (v.payment.type == "cat")? "../images/cat_pet.png" : "../images/dog_pet.png";
+							var name = v.payment.product_pet_name;
+							var type = (v.payment.pet_type == "기타")? "<strong>(기타)"+v.payment.pet_type2+"</strong>" : "<strong>"+v.payment.pet_type+"</strong>";
+							var displayType = "block";
+							if ( parseInt(v.payment.is_no_show) <= 0) {
+								displayType = "none";
+							}
+							type = (v.payment.pet_type && v.payment.pet_type != "")? type : "<strong>말티즈</strong>";
+							html += `
+								<a href="reserve_accept_input?cellPhone=`+v.payment.cellphone+`&worker=`+worker+`&workTime=`+workTime+`&workDate=`+workDate+`" class="customer-card-item pet">
+									<div class="item-info-wrap">
+										<div class="item-thumb">
+											<div class="user-thumb large">
+												`+photo+`
+											</div>
+										</div>
+										<div class="item-data">
+											<div class="item-data-inner">
+												<div class="item-pet-name">`+name+`.<div class="label label-yellow middle">`+type+`</div></div>
+												<div class="item-pet-date">`+phoneFomatter(v.payment.cellphone,1)+`</div>
+												<div class="item-pet-point" style="display:`+displayType+`"><div class="label label-outline-pink label-noshow">NO SHOW `+v.payment.is_no_show+`회</div></div>
+											</div>
+										</div>
+									</div>
+								</a>`;
+						});
+						$("#searchList").html(html);
+					}
+					
+				}
+			},
+			error: function() {
+				alert('Error');
+			}
+		});
+	}	
+	
+
+	function phoneFomatter(num,type){
+		var formatNum = '';
+		if(num.length==11){
+			if(type==0){
+				formatNum = num.replace(/(\d{3})(\d{4})(\d{4})/, '$1-****-$3');
+			}else{
+				formatNum = num.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+			}
+		}else if(num.length==8){
+			formatNum = num.replace(/(\d{4})(\d{4})/, '$1-$2');
+		}else{
+			if(num.indexOf('02')==0){
+				if(type==0){
+					formatNum = num.replace(/(\d{2})(\d{4})(\d{4})/, '$1-****-$3');
+				}else{
+					formatNum = num.replace(/(\d{2})(\d{4})(\d{4})/, '$1-$2-$3');
+				}
+			}else{
+				if(type==0){
+					formatNum = num.replace(/(\d{3})(\d{3})(\d{4})/, '$1-***-$3');
+				}else{
+					formatNum = num.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+				}
+			}
+		}
+		return formatNum;
+	}
+</script>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- reserve-accept-wrap -->  
+		<div class="reserve-accept-wrap">
+            <input type="hidden" id="worker" value="<?php echo $_GET['worker'];?>">
+            <input type="hidden" id="workTime" value="<?php echo $_GET['workTime'];?>">
+            <input type="hidden" id="workDate" value="<?php echo $_GET['workDate'];?>">
+			<div class="wide-tab">
+				<div class="wide-tab-inner">
+					<!-- 활성화시 actived클래스 추가 -->
+					<div class="tab-cell actived"><a href="#" class="btn-tab-item">기존 고객 예약</a></div>
+					<div class="tab-cell"><a href="#" class="btn-tab-item">신규 고객 예약</a></div>
+				</div>
+			</div>
+			<div class="basic-data-group vmiddle">
+				<div class="form-btns">
+					<input id="search_word" type="text" placeholder="전화번호 뒷자리 또는 펫이름 입력" onkeypress="if( event.keyCode == 13 ){search();}">
+					<button type="button" onclick="search();" class="btn-data-send btn-data-search"><span class="icon icon-size-24 icon-page-search">검색</span></button>
+				</div>
+			</div>
+			<div class="basic-data-group vmiddle">
+				<!-- 검색결과 있을 때 -->
+				<div class="customer-card-list" id="searchList">
+				
+				</div>
+				<!-- //검색결과 있을 때 -->
+			</div>
+		</div>
+		<!-- //reserve-accept-wrap -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">SHOP 대문 사진 관리</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="page-contents">
+			<button type="button" class="btn btn-purple" onclick="pop.open('registerPictureMsg1');"><em>파일종류 체크</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('registerPictureMsg2');"><em>파일크기 체크</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('registerPictureMsg3');"><em>이미지삭제 체크</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('registerPictureMsg4');"><em>이미지삭제 완료</em></button>
+			<button type="button" class="btn btn-purple" onclick="pop.open('registerPictureMsg5');"><em>대문사진 적용완료</em></button>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	
+	<!-- 파일종류 체크 -->
+	<article id="registerPictureMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">gif, png, jpg, jpeg 파일만 업로드 할 수 있습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //파일종류 체크 -->
+	
+	<!-- 파일크기 체크 -->
+	<article id="registerPictureMsg2" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">파일크기는 2MB를 초과할 수 없습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //파일크기 체크 -->
+	
+	<!-- 이미지 삭제 체크 -->
+	<article id="registerPictureMsg3" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">이미지를 삭제하시겠습니까?</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">삭제</button>
+						<button type="button" class="btn btn-cancel" onclick="pop.close();">취소</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //이미지 삭제 체크 -->
+	
+	<!-- 이미지 삭제 완료  -->
+	<article id="registerPictureMsg4" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">이미지가 삭제되었습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //이미지 삭제 완료 -->
+	
+	<!-- 대문사진 적용 완료  -->
+	<article id="registerPictureMsg5" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">대문 사진으로 적용하였습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //대문사진 적용 완료 -->
+</section>
+<!-- //container -->
+
+</body>
+</html>

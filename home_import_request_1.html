@@ -1,0 +1,55 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+?>     
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">반짝 입점 신청하기</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="import-request-ready">
+			<div class="import-request-slider">
+				<div class="slider-inner">
+					<div class="swiper-container">
+						<div class="swiper-wrapper">
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_1.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_2.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_3.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_4.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_5.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_6.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_7.jpg" alt=""/></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/banner/request_8.jpg" alt=""/></div></div>
+						</div>
+					</div>
+				</div>
+				<div class="swiper-pagination"></div>
+			</div>
+			
+			<div class="import-request-info">아래 버튼을 선택하여<br>반짝 입점 신청을 진행해 주세요!</div>
+
+			<div class="grid-layout btn-grid-group">
+				<div class="grid-layout-inner">
+					<div class="grid-layout-cell grid-2"><a href="home_import_request_3?is_personal=1" class="btn btn-outline-purple btn-middle btn-round">개인</a></div>
+					<div class="grid-layout-cell grid-2"><a href="home_import_request_2" class="btn btn-outline-purple btn-middle btn-round">사업자</a></div>
+				</div>
+			</div>
+		</div>
+		
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<?
+$footer_menu = false;
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

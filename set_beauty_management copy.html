@@ -1,0 +1,1580 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$shop_title	= "상품관리";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$backurl = ($_GET['backurl'] && $_GET['backurl'] != "")? $_GET['backurl'] : "";
+$r_seq = ($_GET['seq'] && $_GET['seq'] != "")? $_GET['seq'] : 1;
+$r_seq_arr = array("", "미용상품", "미용 추가옵션", "쿠폰상품", "매장상품");
+$dog_product_arr = array(
+	"kgs" => "무게", 
+	"bath" => "목욕", 
+	"part" => "부분미용", 
+	"bath_part" => "부분+목욕", 
+	"all" => "전체미용", 
+	"spoting" => "스포팅", 
+	"scissors" => "가위컷",
+	"sanitation" => "위생", 
+	"summercut" => "썸머컷" 
+);
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+$result = mysqli_query($connection, $sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+	echo $user_id;
+	exit;
+?>
+    <script>
+	    popalert.confirm('pop2', '잘못된 접근입니다. 메인페이지로 이동합니다.', '/home_main');
+    </script>	
+<?php
+	exit;
+}
+
+// 오프라인 매장 여부 - 쿠폰, 정액제 사용 구분
+$crypto = new Crypto();
+$enc_user_id = $crypto->encode($user_id, $access_key, $secret_key);
+$sql = "
+	SELECT is_got_offline_shop 
+	FROM tb_request_artist 
+	WHERE customer_id = '".$enc_user_id."'
+";
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+$is_got_offline_shop = $row['is_got_offline_shop'];
+
+if($r_seq == "1"){
+	$sql = "
+		SELECT *,
+			if(second_type = '소형견미용', 1, 
+				if(second_type = '중형견미용', 2, 
+					if(second_type = '대형견미용', 3, 
+						if(second_type = '특수견미용', 4, 9)
+					)
+				)
+			) AS sort
+		FROM tb_product_dog_static 
+		WHERE customer_id = '".$user_id."'
+		ORDER BY sort ASC
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["product_dog_static"][] = $row;
+	}
+
+	// 기본 미용시간 호출 - 강아지
+	$sql = "
+		SELECT *
+		FROM tb_product_dog_worktime
+		WHERE is_delete = '2'
+			AND artist_id = '".$user_id."'
+	";
+	$result = mysqli_query($connection, $sql);
+	$cnt = mysqli_num_rows($result);
+	if($cnt > 0){
+		while($row = mysqli_fetch_assoc($result)){
+			$data["product_dog_worktime"] = $row;
+		}
+	}else{
+		$data["product_dog_worktime"]["worktime1"] = "30";
+		$data["product_dog_worktime"]["worktime2"] = "60";
+		$data["product_dog_worktime"]["worktime3"] = "90";
+		$data["product_dog_worktime"]["worktime4"] = "120";
+		$data["product_dog_worktime"]["worktime5"] = "180";
+		$data["product_dog_worktime"]["worktime6"] = "180";
+		$data["product_dog_worktime"]["worktime7"] = "30";
+		$data["product_dog_worktime"]["worktime8"] = "180";
+	}
+
+	// 기본 요금제 호출 - 고양이
+	$sql = "
+		SELECT * 
+		FROM tb_product_cat
+		WHERE customer_id = '".$user_id."'
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["product_cat_static"][] = $row;
+	}
+}else if($r_seq == "2"){
+	// 기본 요금제 호출 - 강아지
+	$sql = "
+		SELECT * 
+		FROM tb_product_dog_common
+		WHERE customer_id = '".$user_id."'
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["product_dog_common"][] = $row;
+	}
+
+	// 현장판단 후 결제추가옵션 - 결제라인 타지 않음
+	$sql = "
+		SELECT * 
+		FROM tb_product_common_option
+		WHERE customer_id = '".$user_id."'
+			AND type = '목욕'
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["bath_option_list"][] = $row;
+	}
+}else if($r_seq == "3"){
+	// 쿠폰, 정액제 상품
+	$sql = "
+		SELECT * 
+		FROM tb_coupon 
+		WHERE customer_id = '".$user_id."' 
+			AND del_yn = 'N' 
+			AND given > 0 
+			AND price > 0
+			AND product_type = 'B'
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["coupon"][] = $row;
+	}
+
+	// 쿠폰 설명
+	$sql = "
+		SELECT * 
+		FROM tb_coupon_memo 
+		WHERE customer_id = '".$user_id."' 
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["coupon_memo"][] = $row;
+	}
+}else if($r_seq == "4"){
+	// 상품 - 개
+	$sql = "
+		SELECT * 
+		FROM tb_product_dog_etc 
+		WHERE customer_id = '".$user_id."' 
+		ORDER BY etc_seq ASC
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["product_dog_etc"][] = $row;
+	}
+
+	// 상품 - 고양이
+	$sql = "
+		SELECT * 
+		FROM tb_product_cat_etc 
+		WHERE customer_id = '".$user_id."' 
+		ORDER BY sequence ASC
+	";
+	$result = mysqli_query($connection, $sql);
+	while($row = mysqli_fetch_assoc($result)){
+		$data["product_cat_etc"][] = $row;
+	}
+}
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-beauty-management -->  
+		<div class="set-beauty-management">
+			<div class="page-tab-group">
+				<div class="page-tab">
+					<div class="page-tab-inner">
+						<!-- 활성화시 actived클래스 추가 -->
+						<div class="tab-cell actived"><a href="set_beauty_management" class="btn-tab-item"><span>미용</span></a></div>
+						<div class="tab-cell"><a href="set_hotel_shop" class="btn-tab-item"><span>호텔</span></a></div>
+					</div>
+				</div>
+				<!-- actived클래스 추가시 활성화 -->
+				<button type="button" class="btn btn-outline-gray btn-round btn-inline btn-surtax-set actived"><div class="icon"></div>부가세 설정</button>
+			</div>
+
+			<div class="basic-data-group vsmall">
+				<div class="con-title-group">
+					<h4 class="con-title">상품구분</h4>
+				</div>
+				<div class="wide-tab">
+					<div class="wide-tab-inner">
+						<!-- 활성화시 actived클래스 추가 -->
+						<?php for($_i = 1; $_i <= 4; $_i++){ ?>
+							<!--td>
+								<a href="<?=$_SERVER["PHP_SELF"]."?seq=".$_i?>" class="product_menu <?=($r_seq == $_i)? "option_list_on" : ""; ?>" data-tab="<?="list_tab_".$_i?>"><?=$r_seq_arr[$_i]?></a>
+							</td-->
+							<div class="tab-cell <?=($r_seq == $_i)? "actived" : ""; ?>"><button onclick="location.href='<?=$_SERVER["QUERY_STRING"]."?seq=".$_i?>';" type="button" class="btn-tab-item product_menu" data-tab="<?="list_tab_".$_i?>"><?=$r_seq_arr[$_i]?></button></div>
+						<?php } ?>
+						<!--div class="tab-cell actived"><button type="button" class="btn-tab-item">미용상품</button></div>
+						<div class="tab-cell"><button type="button" class="btn-tab-item">미용 추가옵션</button></div>
+						<div class="tab-cell"><button type="button" class="btn-tab-item">쿠폰상품</button></div>
+						<div class="tab-cell"><button type="button" class="btn-tab-item">매장상품</button></div-->
+					</div>
+				</div>
+				<?php if($r_seq == "1"){ // 기본요금 ?>
+				<div class="basic-data-group middle">
+					<div class="btn-group vertical">
+						<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">미용상품 추가하기</button></div>
+						<div class="btn-group-cell"><button type="button" onclick="location.href='set_beauty_management_time'" class="btn btn-outline-purple btn-middle-size btn-round">미용 소요시간 설정하기</button></div>
+					</div>
+					<!-- 내용이 없을 경우 -->
+					<!--div class="common-none-data">
+						<div class="none-inner">
+							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+							<div class="item-info">등록된 상품이 없습니다.</div>
+						</div>
+					</div-->
+					<!-- //내용이 없을 경우 -->
+					<!-- 내용이 있을을 경우 -->
+					<div class="basic-data-group vvsmall3">
+						<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
+						<ul class="accordion-list">
+							<li class="accordion-cell actived">			
+								<button type="button" class="btn-accordion-menu">
+									<span class="accordion-menu-subject">미용별 소요시간</span>
+								</button>
+								<div class="accordion-content">
+									<div class="read-table">
+										<table>
+											<colgroup>
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+												<col style="width:12.5%;">
+											</colgroup>
+											<thead>
+												<tr>
+													<th>목욕</th>
+													<th>부분<br>미용</th>
+													<th>부분<br>+목욕</th>
+													<th>전체<br>미용</th>
+													<th>스포팅</th>
+													<th>가위컷</th>
+													<th>위생</th>
+													<th>썸머컷</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<?php for($_i = 1; $_i <= 8; $_i++){ ?>
+													<td><?=$data["product_dog_worktime"]["worktime".$_i] ?></td>
+													<?php } ?>
+												</tr>
+											</tbody>
+										</table>
+										<div class="read-table-info">(단위:분)</div>
+									</div>
+									<div class="btn-basic-action">
+										<button type="button" onclick="location.href='set_beauty_management_time'" class="btn btn-outline-purple btn-middle-size btn-round">수정하기</button>
+									</div>
+								</div>			
+							</li>      
+							<?php foreach($data["product_dog_static"] AS $key => $value){ ?>
+							<li class="accordion-cell actived">			
+								<button type="button" class="btn-accordion-menu">
+									<?php
+										$productTitle = "";
+										if ($value["in_shop_product"] == "1") $productTitle = "<div class='label label-outline-black middle'>매장상품</div>";
+										if ($value["out_shop_product"] == "1") $productTitle = "<div class='label label-outline-purple middle'>출장상품</div>";
+									?>
+									<span class="accordion-menu-subject"><?=$value["second_type"]?><?=$productTitle?></span>
+								</button>
+								<div class="accordion-content">
+									<div class="read-table">
+										<table>
+											<colgroup>
+												<col width="12%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+												<col width="11%" />
+											</colgroup>
+											<thead>
+												<tr>
+													<?php foreach($dog_product_arr AS $key2 => $value2){ ?>
+														<th><?=$value2?></th>
+													<?php } ?>
+												</tr>
+											</thead>
+											<tbody>												
+												<?php 
+													// product_sort_data
+													foreach($dog_product_arr AS $key2 => $value2){
+														$product_data_arr[$key2."_price"] = ($key2 == "kgs")? explode(",", $value["kgs"]) : explode(",", $value[$key2."_price"]);
+														$consult_data_arr["is_consult_".$key2] = ($key2 == "kgs")? explode(",", $value["kgs"]) : explode(",", $value["is_consult_".$key2]);
+													} 
+													
+													// test
+													// echo"<pre style='text-align:left;'>";print_r($product_data_arr);echo"</pre>";
+
+													for($_i = 0; $_i < count($product_data_arr["kgs_price"]); $_i++){
+												?>
+													<tr>
+													<?php 
+														foreach($dog_product_arr AS $key2 => $value2){
+															if($key2 == "kgs"){
+																if($value["is_kgs_by_price"] == "1"){
+																	echo "<th>".$product_data_arr[$key2."_price"][$_i]."Kg 당</th>";
+																}else{
+																	echo "<th>~".$product_data_arr[$key2."_price"][$_i]."Kg</th>";
+																}
+															}else{
+																if($consult_data_arr["is_consult_".$key2][$_i] == "1"){
+																	echo "<td class='consult'>상담</td>";
+																}else{
+																	echo ($product_data_arr[$key2."_price"][$_i] != "")? "<td>".number_format($product_data_arr[$key2."_price"][$_i])."</td>" : "<td> - </td>";
+																}
+															}
+														}
+													?>
+													</tr>
+												<?php } ?>
+												
+												<!--Kg당 추가 메뉴-->
+												<?php if ($value["is_over_kgs"] == "1") { ?>
+														<tr>
+															<th><?= $value["what_over_kgs"] ?>Kg~</th>
+															<td colspan="8" align="center">Kg당 <?= number_format($value["over_kgs_price"]) ?>원 추가</td>
+														</tr>
+												<?php } ?>
+											</tbody>
+										</table>
+										<div class="read-table-info">(단위:원)</div>
+									</div>
+									<div class="basic-data-group vsmall">
+										<div class="memo-item large">
+											<div class="memo-item-title">상품별 안내사항</div>
+											<div class="memo-item-txt"><?= nl2br($value["add_comment"]) ?></div>
+										</div>
+									</div>
+									<div class="btn-basic-action">
+										<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">수정하기</button>
+									</div>
+								</div>			
+							</li>      
+							<?}?>
+							<?php foreach($data["product_cat_static"] AS $key => $value){ ?>
+							<li class="accordion-cell actived">			
+								
+								<?php
+									$productTitle = "";
+									if ($value["in_shop_product"] == "1") $productTitle = "<div class='label label-outline-black middle'>매장상품</div>";
+									if ($value["out_shop_product"] == "1") $productTitle = "<div class='label label-outline-purple middle'>출장상품</div>";
+								?>
+								<button type="button" class="btn-accordion-menu">
+									<span class="accordion-menu-subject"><?=$value["first_type"]?><?=$productTitle?></span>
+								</button>
+								<div class="accordion-content">
+									<div>
+										<div class="basic-data-group vmiddle">
+											<div class="read-table">
+												<?php if($value["is_use_weight"] == "1"){ // 무게별 추가금액 O ?>
+													<table>
+														<colgroup>
+															<col style="width:16.66%;">
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th colspan="3"><strong><?=$value["second_type"]?></strong></th>
+															</tr>
+															<tr>
+																<th></th>
+																<th>단모</th>
+																<th>장모</th>
+															</tr>
+														</thead>
+														<tbody>
+															
+															<?php
+																$section_array = explode(",", $value["section"]);
+																for($_i = 0; $_i < count($section_array); $_i++){
+																	if($section_array[$_i] != ""){
+															?>
+																<tr>
+																	<th><?="~".$section_array[$_i]."Kg" ?></th>
+																	<td><?=number_format($value["short_price"] + ($_i * $value["increase_section_price"])) ?></td>
+																	<td><?=number_format($value["long_price"] + ($_i * $value["increase_section_price"])) ?></td>
+																</tr>
+															<?php 
+																	} 
+																}
+															?>
+														</tbody>
+													</table>
+													<div class="read-table-info">(단위:원)</div>
+												<?php }else{ // 무게별 추가요금 X ?>
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th colspan="2"><strong><?=$value["second_type"]?></strong></th>
+															</tr>
+															<tr>
+																<th>단모</th>
+																<th>장모</th>
+															</tr>
+														</thead>
+														<tbody>															
+															<tr>
+																<td><?=number_format($value["short_price"]) ?></td>
+																<td><?=number_format($value["long_price"]) ?></td>
+															</tr>
+														</tbody>
+													</table>
+													<div class="read-table-info">(단위:원)</div>
+												<?php } ?>
+											</div>
+										</div>
+										
+										<?php if($value["shower_price"] != "" || $value["shower_price_long"] != ""){ ?>
+										<div class="basic-data-group vmiddle">
+											<div class="read-table">
+												<table>
+													<colgroup>
+														<col style="width:auto;">
+														<col style="width:auto;">
+													</colgroup>
+													<thead>
+														<tr>
+															<th colspan="2"><strong>목욕</strong></th>
+														</tr>
+														<tr>
+															<th>목욕만</th>
+															<th>부분 목욕</th>
+														</tr>
+													</thead>
+													<tbody>
+														<tr>
+															<td><?=($value["shower_price"] != "")? number_format($value["shower_price"]) : "-" ?></td>
+															<td><?=($value["shower_price_long"] != "")?number_format($value["shower_price_long"]) : "-" ?></td>
+														</tr>
+													</tbody>
+												</table>
+												<div class="read-table-info">(단위:원)</div>
+											</div>
+										</div>
+										<?php } ?>
+
+										<?php if (($value["toenail_price"] != "" && $value["toenail_price"] != 0) || $value["addition_option_product"] != ""){ ?>
+										<div class="basic-data-group vmiddle">
+											<div class="read-table">
+												<table>
+													<colgroup>
+														<col style="width:auto;">
+														<col style="width:auto;">
+													</colgroup>
+													<thead>
+														<tr>
+															<th colspan="2"><strong>추가요금</strong></th>
+														</tr>
+														<tr>
+															
+															<?php if ($value["toenail_price"] != "" && $value["toenail_price"] != 0) { ?>
+															
+																<th style="font-weight:bold;">발톱</th>
+																<th><?= "+".number_format($value["toenail_price"]) ?></th>
+															
+															<?php } ?>
+														</tr>
+													</thead>
+													<tbody>
+														<?php
+														if ($value["addition_option_product"] != null && $value["addition_option_product"] != "") {
+															$value["addition_option_product_array"] = explode(",", $value["addition_option_product"]);
+															for ($_i = 0; $_i < sizeof($value["addition_option_product_array"]); $_i++) {
+																$addition_array = explode(":", $value["addition_option_product_array"][$_i]);
+																if($addition_array[1] != ""){
+														?>
+																<tr>
+																	<td style="font-weight:bold;"><?= $addition_array[0] ?></td>
+																	<td><?= "+".number_format(intval($addition_array[1])) ?></td>
+																</tr>
+														<?php
+																}
+															}
+														}
+														?>
+													</tbody>
+												</table>
+												<div class="read-table-info">(단위:원)</div>
+											</div>
+										</div>
+										<?php } ?>
+										<?php if ($value["hair_clot_price"] != "" || $value["ferocity_price"] != "" || $value["addition_work_product"] != ""){ ?>
+										<div class="basic-data-group vmiddle">
+											<div class="read-table">
+												<table>
+													<colgroup>
+														<col style="width:auto;">
+														<col style="width:auto;">
+													</colgroup>
+													<thead>
+														<tr>
+															<th colspan="2"><strong>현장판단 후 현장 결제추가 가능옵션</strong></th>
+														</tr>
+														<?php if($value["hair_clot_price"] > 0){ ?>
+															<tr>
+																<td style="font-weight:bold;">털엉킴</td>
+																<td><?= number_format($value["hair_clot_price"])." ~" ?> </td>
+															</tr>
+															<?php } ?>
+															<?php if($value["ferocity_price"] > 0){ ?>
+															<tr>
+																<td style="font-weight:bold;">사나움</td>
+																<td><?= number_format($value["ferocity_price"])." ~" ?></td>
+															</tr>
+														<?php } ?>
+													</thead>
+													<tbody>
+													<?php
+													if ($value["addition_work_product"] != null && $value["addition_work_product"] != "") {
+														$value["addition_work_product_array"] = explode(",", $value["addition_work_product"]);
+														for ($_i = 0; $_i < sizeof($value["addition_work_product_array"]); $_i++) {
+															$addition_array = explode(":", $value["addition_work_product_array"][$_i]);
+													?>
+															<tr>
+																<td style="font-weight:bold;"><?= $addition_array[0] ?></td>
+																<td><?= number_format(intval($addition_array[1]))." ~" ?></td>
+															</tr>
+													<?php
+														}
+													}
+													?>
+													</tbody>
+												</table>
+												<div class="read-table-info">(단위:원)</div>
+											</div>
+										</div>
+										<?php } ?>
+									</div>
+									<div class="basic-data-group vsmall">
+										<div class="memo-item large">
+											<div class="memo-item-title">상품별 안내사항</div>
+											<div class="memo-item-txt"><?= nl2br($value["add_comment"]) ?></div>
+										</div>
+									</div>
+									<div class="btn-basic-action">
+										<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">수정하기</button>
+									</div>
+								</div>			
+							</li>      
+							<?php } ?>
+						</ul>
+
+					</div>
+					<!-- //내용이 있을을 경우 -->
+				</div>
+				<?} else if($r_seq == "2"){ 
+					$isNoneData = true;
+				?>
+					<div class="basic-data-group middle">
+						<!-- 내용이 없을 경우 -->
+						<div id="noneDataForm" style="display: none;">
+							<div class="btn-group vertical">
+								<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">미용 추가옵션 등록하기</button></div>
+							</div>					
+							<div class="common-none-data">
+								<div class="none-inner">
+									<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+									<div class="item-info">등록된 상품이 없습니다.<br><span>*쿠폰/제품 탭의 등록 상품은 견주 예약과정에 나타나지 않습니다.</span></div>
+								</div>
+							</div>
+						</div>
+						<!-- //내용이 없을 경우 -->
+						<!-- 내용이 있을을 경우 -->
+						<?php foreach($data['product_dog_common'] AS $key => $value){ ?>
+						<?}?>
+						<div class="basic-data-group middle" id="dataForm">
+							<div class="basic-data-group">
+								<div class="basic-data-group vsmall">
+									<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
+									<ul class="accordion-list">    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">얼굴 디자인컷 추가</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>															
+															<?php if($value['basic_face_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>기본얼굴컷</td>
+																	<td><?= "+".number_format($value['basic_face_price']) ?></td>
+																</tr>
+															<?php } ?>
+															<?php if($value['broccoli_price'] != ""){
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>브로콜리컷</td>
+																	<td><?= "+".number_format($value['broccoli_price']) ?></td>
+																</tr>
+															<?php } ?>
+															<?php if($value['highba_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>하이바컷</td>
+																	<td><?= "+".number_format($value['highba_price']) ?></td>
+																</tr>
+															<?php } ?>
+															<?php if($value['bear_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>곰돌이컷</td>
+																	<td><?= "+".number_format($value['bear_price']) ?></td>
+																</tr>
+															<?php } ?>
+															<?php
+																if ($value['addition_face_product'] != null && $value['addition_face_product'] != "") {
+																	$value['addition_face_product_array'] = explode(",", $value['addition_face_product']);
+																	for ($_i = 0; $_i < sizeof($value['addition_face_product_array']); $_i++) {
+																		$isNoneData = false;
+																		$addition_array = explode(":", $value['addition_face_product_array'][$_i]);
+																?>
+																	<tr>
+																		<td><?= $addition_array[0] ?></td>
+																		<td><?= "+".number_format(intval($addition_array[1])) ?></td>
+																	</tr>
+																<?php
+																	}
+																}else{
+																	if($value['basic_face_price'] == "" && $value['broccoli_price'] == "" && $value['highba_price'] == "" && $value['bear_price'] == ""){
+																?>
+																	<tr>
+																		<td colspan="2">등록된 상품이 없습니다.</td>
+																	</tr>	
+																<?php
+																	}
+																}
+																?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>       
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">미용털길이 조절 추가</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php 
+															$cnt = 0;
+															for($_i = 1; $_i <= 5; $_i++){
+																if($value['beauty_length_'.$_i] != ""){
+																	$isNoneData = false;
+														?>
+															<tr>
+																<td><?= $value['beauty_length_'.$_i]."mm" ?></td>
+																<td><?= "+".number_format($value['beauty_length_'.$_i.'_price']) ?></td>
+															</tr>
+
+														<?php 
+																$cnt++;
+															}
+														}
+															if($cnt == 0){
+														?>
+															<tr>
+																<td colspan="2">등록된 상품이 없습니다.</td>
+															</tr>					
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">털 특징 별 추가요금</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+															<?php if($value['short_hair_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>단모_목욕</td>
+																	<td><?= "+".number_format($value['short_hair_price']); ?></td>
+																</tr>
+															<?php } ?>
+															<?php if($value['long_hair_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>장모_목욕</td>
+																	<td><?= "+".number_format($value['long_hair_price']); ?></td>
+																</tr>
+															<?php } ?>
+															<?php if($value['double_hair_price'] != ""){ 
+																$isNoneData = false;
+															?>
+																<tr>
+																	<td>이중모_목욕</td>
+																	<td><?= "+".number_format($value['double_hair_price']); ?></td>
+																</tr>
+															<?php } ?>
+															<?php 
+																if($data["bath_option_list"] != ""){
+																	foreach ($data["bath_option_list"] as $key => $option) { 
+																		$isNoneData = false;
+															?>
+																<tr>
+																	<td style="font-weight:bold;"><?php echo $option["title"]; ?></td>
+																	<td><?= "+".number_format($option["price"]); ?></td>
+																</tr>
+															<?php 
+																	}
+																}else{
+																	if($value['short_hair_price'] == "" && $value['long_hair_price'] == "" && $value['double_hair_price'] == ""){
+															?>
+																<tr>
+																	<td colspan="2">등록된 상품이 없습니다.</td>
+																</tr>						
+															<?php
+																	}
+																}
+															?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">현장 판단후 결제 추가 기능 옵션</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php if($value['hair_clot_price'] != ""){ 
+																$isNoneData = false;
+															?>
+															<tr>
+																<td>털엉킴</td>
+																<td><?= number_format($value['hair_clot_price'])." ~ " ?></td>
+															</tr>
+														<?php } ?>
+														<?php if($value['ferocity_price'] != ""){ 
+																$isNoneData = false;
+															?>
+															<tr>
+																<td>사나움</td>
+																<td><?= number_format($value['ferocity_price'])." ~ " ?></td>
+															</tr>
+														<?php } ?>
+														<?php if($value['tick_price'] != ""){ 
+																$isNoneData = false;
+															?>
+															<tr>
+																<td>진드기</td>
+																<td><?= number_format($value['tick_price'])." ~ " ?></td>
+															</tr>
+														<?php } ?>
+														<?php
+														if ($value['addition_work_product'] != null && $value['addition_work_product'] != "") {
+															$value['addition_work_product_array'] = explode(",", $value['addition_work_product']);
+															for ($_i = 0; $_i < sizeof($value['addition_work_product_array']); $_i++) {
+																$isNoneData = false;
+																$addition_array = explode(":", $value['addition_work_product_array'][$_i]);
+														?>
+															<tr>
+																<td style="font-weight:bold;"><?= $addition_array[0] ?></td>
+																<td><?= number_format(intval($addition_array[1]))." ~ " ?></td>
+															</tr>
+														<?php
+															}
+														}else{
+															if($value['hair_clot_price'] == "" && $value['ferocity_price'] == "" && $value['tick_price'] == ""){
+														?>
+															<tr>
+																<td colspan="2">등록된 상품이 없습니다.</td>
+															</tr>
+														<?php 
+															}
+														}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">다리</span>
+											</button>
+											<div class="accordion-content">
+												<div class="basic-data-group vvsmall4">
+													<div class="read-table">
+														<table>
+															<colgroup>
+																<col style="width:50%;">
+																<col style="width:50%;">
+															</colgroup>
+															<thead>
+																<tr>
+																	<th><strong>상품명</strong></th>
+																	<th>가격(단위:원)</th>
+																</tr>
+															</thead>
+															<tbody>
+																
+																<tr>
+																	<td>발톱</td>
+																	<td><?=($value['toenail_price'] != "")?"+".number_format($value['toenail_price']):"-"?></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</div>
+												<div class="basic-data-group vvsmall4">
+													<div class="read-table">
+														<table>
+															<colgroup>
+																<col style="width:50%;">
+																<col style="width:50%;">
+															</colgroup>
+															<thead>
+																<tr>
+																	<th><strong>상품명</strong></th>
+																	<th>가격(단위:원)</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr>
+																	<td>장화</td>
+																	<td><?=($value['trumpet_etc_price'] != "")?"+".number_format($value['trumpet_etc_price']):"-"?></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</div>
+												<div class="basic-data-group vvsmall4">
+													<div class="read-table">
+														<table>
+															<colgroup>
+																<col style="width:50%;">
+																<col style="width:50%;">
+															</colgroup>
+															<thead>
+																<tr>
+																	<th><strong>상품명</strong></th>
+																	<th>가격(단위:원)</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr>
+																	<td>방울</td>
+																	<td><?=($value['bell_price'] != "")?"+".number_format($value['bell_price']):"-"?></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</div>
+												<div class="basic-data-group vvsmall4">
+													<div class="read-table">
+														<table>
+															<colgroup>
+																<col style="width:50%;">
+																<col style="width:50%;">
+															</colgroup>
+															<thead>
+																<tr>
+																	<th><strong>상품명</strong></th>
+																	<th>가격(단위:원)</th>
+																</tr>
+															</thead>
+															<tbody>
+																<tr>
+																	<td>염색(포인트당)</td>
+																	<td><?=($value['dyeing_price'] != "")?"+".number_format($value['dyeing_price']):"-"?></td>
+																</tr>
+															</tbody>
+														</table>
+													</div>
+												</div>
+												<?php
+													if ($value['addition_option_product'] != null && $value['addition_option_product'] != "") {
+														$value['addition_option_product_array'] = explode(",", $value['addition_option_product']);
+														for ($_i = 0; $_i < sizeof($value['addition_option_product_array']); $_i++) {
+															$addition_array = explode(":", $value['addition_option_product_array'][$_i]);
+												?>
+														<div class="basic-data-group vvsmall4">
+															<div class="read-table">
+																<table>
+																	<colgroup>
+																		<col style="width:50%;">
+																		<col style="width:50%;">
+																	</colgroup>
+																	<thead>
+																		<tr>
+																			<th><strong>상품명</strong></th>
+																			<th>가격(단위:원)</th>
+																		</tr>
+																	</thead>
+																	<tbody>
+																		<tr>
+																			<td><?= $addition_array[0] ?></td>
+																			<td><?= "+".number_format(intval($addition_array[1])) ?></td>
+																		</tr>
+																	</tbody>
+																</table>
+															</div>
+														</div>
+												<?php
+														}
+													}
+												?>	
+										</li>    
+										
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">스파</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>														
+														<?php
+															if ($value['spa_option_product'] != null && $value['spa_option_product'] != "") {
+																$value['spa_option_product_array'] = explode(",", $value['spa_option_product']);
+																for ($_i = 0; $_i < sizeof($value['spa_option_product_array']); $_i++) {
+																	$isNoneData = false;
+																	$spa_array = explode(":", $value['spa_option_product_array'][$_i]);
+														?>
+																<tr>
+																	<td><?= $spa_array[0] ?></td>
+																	<td><?= "+".number_format(intval($spa_array[1])) ?></td>
+																</tr>
+														<?php
+																}
+															}else{
+														?>
+																<tr>
+																	<td colspan="2">등록된 상품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li> 
+										
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">염색</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>														
+														<?php
+															if ($value['dyeing_option_product'] != null && $value['dyeing_option_product'] != "") {
+																$value['dyeing_option_product_array'] = explode(",", $value['dyeing_option_product']);
+																for ($_i = 0; $_i < sizeof($value['dyeing_option_product_array']); $_i++) {
+																	$isNoneData = false;
+																	$dyeing_array = explode(":", $value['dyeing_option_product_array'][$_i]);
+														?>
+																<tr>
+																	<td><?= $dyeing_array[0] ?></td>
+																	<td><?= "+".number_format(intval($dyeing_array[1])) ?></td>
+																</tr>
+														<?php
+																}
+															}else{
+														?>
+																<tr>
+																	<td colspan="2">등록된 상품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>		
+										</li> 
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">기타</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:50%;">
+															<col style="width:50%;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>														
+														<?php
+															if ($value['etc_option_product'] != null && $value['etc_option_product'] != "") {
+																$value['etc_option_product'] = explode(",", $value['etc_option_product']);
+																for ($_i = 0; $_i < sizeof($value['etc_option_product']); $_i++) {
+																	$isNoneData = false;
+																	$other_array = explode(":", $value['etc_option_product'][$_i]);
+														?>
+																<tr>
+																	<td><?= $other_array[0] ?></td>
+																	<td><?= "+".number_format(intval($other_array[1])) ?></td>
+																</tr>
+														<?php
+																}
+															}else{
+														?>
+																<tr>
+																	<td colspan="2">등록된 상품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>		
+											<div class="form-bottom-info">*기타 탭의 상품은 견주예약과정에서 보이지 않습니다.<br>*추가되는 비용(다듬기 정도, 사나움 정도, 등)을 등록하여 예약관리에 활용하시면 좋습니다.</div>
+											<div class="basic-data-group vmiddle">
+												<div class="memo-item large">
+													<div class="memo-item-title">상품별 안내사항</div>
+													<div class="memo-item-txt"><?= nl2br($value["add_comment2"]) ?></div>
+												</div>
+											</div>
+											<div class="btn-basic-action">
+												<div class="grid-layout btn-grid-group">
+													<div class="grid-layout-inner">
+														<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round">수정하기</button></div>
+														<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round">삭제하기</button></div>
+													</div>
+												</div>												
+											</div>	
+										</li> 
+									</ul>
+								</div>
+							</div>	
+						</div>
+						
+						<!-- //내용이 있을을 경우 -->
+					</div>
+				<?} else if( $r_seq == "3" ) { 
+					$isNoneData = true;
+					?>
+					<div class="basic-data-group middle">
+						<!-- 내용이 없을 경우 -->
+						<div id="noneDataForm" style="display: none;">
+							<div class="btn-group vertical">
+								<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">쿠폰상품 등록하기</button></div>
+							</div>					
+							<div class="common-none-data">
+								<div class="none-inner">
+									<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+									<div class="item-info">등록된 상품이 없습니다.<br><span>*쿠폰/제품 탭의 등록 상품은 견주 예약과정에 나타나지 않습니다.</span></div>
+								</div>
+							</div>
+						</div>
+						<!-- //내용이 없을 경우 -->
+						<!-- 내용이 있을을 경우 -->
+						<div class="basic-data-group middle" id="dataForm">
+							<div class="basic-data-group">
+								<div class="con-title-group">
+									<h4 class="con-title">쿠폰 &amp; 적립상품</h4>
+									<button type="button" class="btn btn-outline-purple btn-small-size btn-inline btn-round">수정하기</button>
+								</div>
+								<div class="basic-data-group vsmall">
+									<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
+									<ul class="accordion-list">    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">쿠폰(횟수) 상품</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>이용횟수</th>
+																<th>요금(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php 
+															$idx = 0;
+															foreach($data["coupon"] AS $key => $value){ 
+																if($value["type"] == "C"){
+																	$isNoneData = false;
+														?>
+																<tr>
+																	<td style="font-size:12px;"><?= $value['name'] ?></td>
+																	<td style="font-size:12px;"><?= number_format($value['given'])."회" ?></td>
+																	<td style="font-size:12px;"><?= number_format($value['price']) ?></td>
+																</tr>
+														<?php 
+																	$idx++;
+																}
+															} 
+
+															if($idx == 0){
+														?>
+																<tr>
+																	<td colspan="3">등록된 상품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+												<div class="basic-data-group vmiddle">
+												<?php 
+													$coponMemo = "";
+													foreach($data["coupon_memo"] AS $key => $value){ 
+														if($value["coupon_memo"] != ""){
+															$coponMemo .= $value["coupon_memo"]."<br>";
+														}
+													}
+												?>
+													<div class="memo-item large">
+														<div class="memo-item-title">상품별 안내사항</div>
+														<div class="memo-item-txt"><?=$coponMemo?></div>
+													</div>
+												</div>
+											</div>			
+										</li>       
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">정액 적립 요금 상품</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>실 적립금</th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php 
+															$idx = 0;
+															foreach($data["coupon"] AS $key => $value){ 
+																if($value["type"] == "F"){
+																	$isNoneData = false;
+														?>
+																<tr>
+																	<td style="font-size:12px;"><?= $value['name'] ?></td>
+																	<td style="font-size:12px;"><?= number_format($value['given']) ?></td>
+																	<td style="font-size:12px;"><?= number_format($value['price']) ?></td>
+																</tr>
+														<?php 
+																	$idx++;
+																}
+															} 
+
+															if($idx == 0){
+														?>
+																<tr>
+																	<td colspan="3">등록된 상품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+												<div class="basic-data-group vmiddle">													
+													<?php 
+														$coponMemo = "";
+														foreach($data["coupon_memo"] AS $key => $value){ 
+															if($value["flat_memo"] != ""){
+																$coponMemo .= $value["coupon_memo"]."<br>";
+															}
+														}
+													?>
+													<div class="memo-item large">
+														<div class="memo-item-title">상품별 안내사항</div>
+														<div class="memo-item-txt"><?=$coponMemo?></div>
+													</div>
+												</div>
+											</div>			
+										</li>       
+									</ul>
+								</div>
+							</div>
+						</div>
+						<!-- //내용이 있을을 경우 -->
+					</div>
+				<?php } else if($r_seq == "4") { // 제품 
+					$isNoneData = true;
+					?>
+					<div class="basic-data-group middle">
+						<div id="noneDataForm" style="display: none;">
+							<!-- 내용이 없을 경우 -->
+							<div class="btn-group vertical">
+								<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">매장상품 추가하기</button></div>
+							</div>					
+							<div class="common-none-data">
+								<div class="none-inner">
+									<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+									<div class="item-info">등록된 상품이 없습니다.</div>
+								</div>
+							</div>
+						</div>
+						<!-- //내용이 없을 경우 -->
+						<!-- 내용이 있을을 경우 -->
+						<div class="basic-data-group middle" id="dataForm" style="display: block;">
+							<div class="basic-data-group">
+								<div class="con-title-group">
+									<h4 class="con-title">매장상품</h4>
+									<button type="button" class="btn btn-outline-purple btn-small-size btn-inline btn-round">수정하기</button>
+								</div>
+								<div class="basic-data-group vsmall">
+									<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
+									<ul class="accordion-list">    
+										<li class="accordion-cell actived">			
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">용품</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php
+															$idx = 0;
+															foreach($data["product_dog_etc"] AS $key => $value){
+																if($value["product_kind"] == "1"){
+																	$isNoneData = false;
+														?>
+															<tr>
+																<td><?= $value['name'] ?></td>
+																<td><?= number_format($value['price']) ?></td>
+															</tr>
+														<?php
+																	$idx++;
+																}
+															}
+															if($idx == 0){
+														?>
+																<tr>
+																	<td colspan="2" class="no_product">등록한 제품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>       
+										<li class="accordion-cell actived">	
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">간식</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>															
+															<?php
+																$idx = 0;
+																foreach($data["product_dog_etc"] AS $key => $value){
+																	if($value["product_kind"] == "2"){
+																		$isNoneData = false;
+															?>
+															<tr>
+																<td><?= $value['name'] ?></td>
+																<td><?= number_format($value['price']) ?></td>
+															</tr>
+														<?php
+																	$idx++;
+																}
+															}
+															if($idx == 0){
+														?>
+																<tr>
+																	<td colspan="2" class="no_product">등록한 제품이 없습니다.</td>
+																</tr>
+														<?php
+															}
+														?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>       
+										<li class="accordion-cell actived">	
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">사료</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>															
+															<?php
+																$idx = 0;
+																foreach($data["product_dog_etc"] AS $key => $value){
+																	if($value["product_kind"] == "3"){
+																		$isNoneData = false;
+															?>
+															<tr>
+																<td><?= $value['name'] ?></td>
+																<td><?= number_format($value['price']) ?></td>
+															</tr>
+															<?php
+																		$idx++;
+																	}
+																}
+																if($idx == 0){
+															?>
+																	<tr>
+																		<td colspan="2" class="no_product">등록한 제품이 없습니다.</td>
+																	</tr>
+															<?php
+																}
+															?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>    
+										<li class="accordion-cell actived">	
+											<button type="button" class="btn-accordion-menu">
+												<span class="accordion-menu-subject">기타</span>
+											</button>
+											<div class="accordion-content">
+												<div class="read-table">
+													<table>
+														<colgroup>
+															<col style="width:auto;">
+															<col style="width:auto;">
+														</colgroup>
+														<thead>
+															<tr>
+																<th><strong>상품명</strong></th>
+																<th>가격(단위:원)</th>
+															</tr>
+														</thead>
+														<tbody>
+														<?php
+															$idx = 0;
+															foreach($data["product_dog_etc"] AS $key => $value){
+																if($value["product_kind"] == "4"){
+																	$isNoneData = false;
+														?>
+															<tr>
+																<td><?= $value['name'] ?></td>
+																<td><?= number_format($value['price']) ?></td>
+															</tr>
+															<?php
+																		$idx++;
+																	}
+																}
+																if($idx == 0){
+															?>
+																	<tr>
+																		<td colspan="2" class="no_product">등록한 제품이 없습니다.</td>
+																	</tr>
+															<?php
+																}
+															?>
+														</tbody>
+													</table>
+												</div>
+											</div>			
+										</li>    
+									</ul>
+								</div>
+							</div>							
+						</div>						
+						<!-- //내용이 있을을 경우 -->
+					</div>
+				<?}?>
+				<?			
+					//$isNoneData = true;		
+					if ($isNoneData){
+				?>
+					<script>
+						$("#noneDataForm").css('display','block');
+						$("#dataForm").css('display','none');
+					</script>
+				<?
+					}
+				?>
+
+				<div class="basic-data-group">
+					<div class="con-title-group">
+						<h4 class="con-title">안내사항</h4>
+					</div>
+					<div class="form-group middle">
+						<div class="form-group-cell middle">
+							<div class="form-group-item">
+								<div class="form-item-label">공통 안내</div>
+								<div class="form-item-data">
+									<input type="text" class="form-control" placeholder="입력"/>
+									<div class="form-input-info">0/1000</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="grid-layout btn-grid-group">
+						<div class="grid-layout-inner">
+							<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">저장</a></div>
+							<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round">삭제</a></div>
+						</div>
+					</div>
+				</div>
+			</div>	
+					
+		</div>
+		<!-- //set-beauty-management -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

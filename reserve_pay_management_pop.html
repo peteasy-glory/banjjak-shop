@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">작업 / 결제관리</div>
+	<div class="header-right">
+		<div class="label-group">
+			<div class="label label-outline-purple middle"><em>예약확정</em></div>
+		</div>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg1');"><em>날짜/직원변경1</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg2');"><em>날짜/직원변경2</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg3');"><em>쿠폰 적용</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg4');"><em>단골고객 적용</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg5');"><em>적립금 적용</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg6');"><em>최종결제액 적용</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg7');"><em>결제완료</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('reservePayManagementMsg8');"><em>펫샵적립금 적립시정 안내</em></button>
+	</div>
+	<!-- //page-body -->	
+
+	<!-- 짜/직원변경1 -->
+	<article id="reservePayManagementMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-title">날짜/ 미용사 변경</div>
+						<div class="msg-txt">1. 변경을 위해 주간 스케줄로 이동합니다.<br>현재 페이지에서 저장하지 않은 정보는 분실될 수 있으니 변경전에 확인해주세요.<br><br>2. 변경을 완료하기 전에 다른 페이지로 이동하면 오류가 발생할 수 있으니 주의해주세요.<br><br>변경하시겠습니까?<br><br>[주의] 주간 스케줄표에서만 변경 가능합니다!</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">변경</button>
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">취소</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //짜/직원변경1 -->
+
+	<!-- 날짜/직원변경2  -->
+	<article id="reservePayManagementMsg2" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-header">
+						<h4 class="con-title">실장</h4>
+					</div>
+					<div class="pop-body type-3">
+						<div class="msg-txt">2021.09.08&nbsp;&nbsp;&nbsp;&nbsp;오후 01:30<br><br>선택한 예약을<br>이 곳으로 변경합니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">예약변경취소</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //날짜/직원변경2 -->
+
+	<!-- 쿠폰 적용  -->
+	<article id="reservePayManagementMsg3" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">쿠폰이 적용되었습니다.<br>최종 결제액을 확인해주세요.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //쿠폰 적용 -->
+
+	<!-- 단골고객 적용  -->
+	<article id="reservePayManagementMsg4" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">단골 고객 할인이 적용되었습니다.<br>최종 결제액을 확인해주세요.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</article>
+	<!-- //단골고객 적용 -->
+
+	<!-- 적립금 적용  -->
+	<article id="reservePayManagementMsg5" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">적립금이 적용되었습니다.<br>최종 결제액을 확인해주세요.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //적립금 적용 -->
+
+	<!-- 최종결제액 적용  -->
+	<article id="reservePayManagementMsg6" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">최종 결제액이 적용되었습니다.<br>최종 결제액을 확인해주세요.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //최종결제액 적용 -->
+
+	<!-- 결제완료  -->
+	<article id="reservePayManagementMsg7" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">결제가 완료처리되었습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //결제완료 -->
+
+	<!-- 펫샵적립금 적립시정 안내  -->
+	<article id="reservePayManagementMsg8" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-title">펫샵적립금 적립시점 안내</div>
+						<div class="msg-txt text-align-left">해당 미용종료시간 10분이 지나면 자동으로 직접 설정하신 기준에 따라 자동 적립됩니다.<br>(설정방법: <strong>상세설정 > 적립금설정</strong>)</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">닫기</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //펫샵적립금 적립시정 안내 -->
+
+</section>
+<!-- //container -->
+
+</body>
+</html>

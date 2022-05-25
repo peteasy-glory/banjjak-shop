@@ -1,0 +1,888 @@
+<?php
+$shop_title	= "미용 추가옵션 등록/수정";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$backurl = $_GET['backurl'];
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$professional_name = $_GET['first_type'];
+$second_type = $_GET['second_type'];
+if (!$second_type) {
+    $second_type = '소형견미용';
+}
+
+$dog_product_title = array();
+$dog_product_arr = array(
+    "무게",
+    "목욕",
+    "부분미용",
+    "부분+목욕",
+    "위생",
+    "위생+목욕",
+    "전체미용",
+    "스포팅",
+    "가위컷",
+    "썸머컷"
+);
+$dog_product_seq = array(
+    "목욕"         =>'bath',
+    "부분미용"      =>'part',
+    "부분+목욕"     =>'bath_part',
+    "위생"         =>'sanitation',
+    "위생+목욕"    =>'sanitation_bath',
+    "전체미용"     =>'all',
+    "스포팅"      =>'spoting',
+    "가위컷"      =>'scissors',
+    "썸머컷"       =>'summercut'
+);
+$option_name = array('bath_price','part_price','bath_part_price','sanitation_price','sanitation_bath_price','all_price','spoting_price','scissors_price','summercut_price');
+$option_chk_name = array('is_consult_bath','is_consult_part','is_consult_bath_part','is_consult_sanitation','is_consult_sanitation_bath','is_consult_all',
+    'is_consult_spoting','is_consult_scissors','is_consult_summercut','is_consult_beauty1','is_consult_beauty2','is_consult_beauty3','is_consult_beauty4','is_consult_beauty5');
+$cnt = 10;
+$beauty = 1;
+$que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}'";
+$res = mysqli_query($connection, $que);
+$row = mysqli_fetch_assoc($res);
+for($i=1;$i<=14;$i++){
+    if(!empty($row['worktime'.$i.'_disp_yn'] == 'y')){
+        if($i<10){
+            array_push($dog_product_title, $dog_product_arr[$i]);
+        } else {
+            $dog_product_seq[$row['worktime'.$i.'_title']] = 'beauty'.$beauty;
+            $option_name[] = 'beauty'.$beauty."_price";
+            array_push($dog_product_title, $row['worktime'.$i.'_title']);
+            $beauty++;
+        }
+    }
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+
+$result = mysqli_query($connection,$sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+$crypto = new Crypto();
+$enc_artist_id = $crypto->encode(trim($user_id), $access_key, $secret_key);
+$sql = "
+	SELECT * 
+	FROM tb_request_artist 
+	WHERE customer_id = '" . $enc_artist_id . "'
+";
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)) {
+    $data['request_artist'] = $row;
+    $is_offline = ($row['is_got_offline_shop'] == NULL) ? 0 : $row['is_got_offline_shop'];
+}
+
+// 기본 요금제 호출 - 강아지
+$sql = "
+	SELECT * 
+	FROM tb_product_cat 
+	WHERE customer_id = '".$user_id."'		
+";
+//echo $sql;
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)){
+    $data["product_cat"][] = $row;
+}
+
+if(!isset($data['product_cat'])){
+    $total_option_cnt = 2;
+} else {
+    //등록된 옵션의 갯수를 구한다.
+    $section = get_explode_data($data['product_cat'][0]['section']);
+    $total_option_cnt = count($section);
+
+}
+
+
+
+//무게당
+$n_section = get_explode_data($data['product_cat'][0]['section']);
+
+//무게당
+$n_extra_tmp = get_explode_data($data['product_cat'][0]['addition_option_product']);
+for($i=0;$i<count($n_extra_tmp);$i++) {
+    $tmp = explode(":",$n_extra_tmp[$i]);
+    $n_extra['name'][] = $tmp[0];
+    $n_extra['price'][] = $tmp[1];
+}
+
+//현장결제 추가
+$n_work_tmp = get_explode_data($data['product_cat'][0]['addition_work_product']);
+for($i=0;$i<count($n_work_tmp);$i++) {
+    $tmp = explode(":",$n_work_tmp[$i]);
+    $n_work['name'][] = $tmp[0];
+    $n_work['price'][] = $tmp[1];
+}
+?>
+
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <form action="./data/save_beauty_managerment_add2" name="f" method="post">
+            <input type="hidden" name="backurl" value="<?php echo $backurl;?>">
+        <!-- set-beauty-add -->
+        <div class="set-beauty-add">
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">상품분류</h4>
+                </div>
+                <div class="basic-data-group vvsmall2">
+                    <div class="wide-tab">
+                        <div class="wide-tab-inner">
+                            <!-- 활성화시 actived클래스 추가 -->
+                            <div class="tab-cell"><a href="set_beauty_management_add" class="btn-tab-item">강아지</a></div>
+                            <div class="tab-cell actived"><a href="#" class="btn-tab-item">고양이</a></div>
+                        </div>
+                    </div>
+
+                    <div class="basic-data-group vmiddle">
+                        <div class="form-group">
+                            <div class="form-group-cell middle">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">제공방식</div>
+                                    <div class="form-item-data type-2">
+                                        <div class="grid-layout toggle-button-group">
+                                            <div class="grid-layout-inner">
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="10" <?php echo (($data['product_cat'][0]['in_shop_product']=='1' && $data['product_cat'][0]['out_shop_product']=='0') || !isset($data['product_dog_static'][0]['in_shop_product']) )?'checked':''; ?>><em>매장상품</em></label></div>
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="01" <?php echo ($data['product_cat'][0]['in_shop_product']=='0' && $data['product_cat'][0]['out_shop_product']=='1')?'checked':''; ?>><em>출장상품</em></label></div>
+                                                <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="offer" value="11" <?php echo ($data['product_cat'][0]['in_shop_product']=='1' && $data['product_cat'][0]['out_shop_product']=='1')?'checked':''; ?>><em>출장/매장</em></label></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 미용 -->
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">미용</h4>
+                </div>
+                <div class="basic-data-group none">
+                    <div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-data">
+                                    <div class="horizontal-swiper-scoller">
+                                        <div class="scroller-inner">
+                                            <div class="read-table scroller-table">
+                                                <table>
+                                                    <colgroup>
+                                                        <col style="width:33.33%;">
+                                                        <col style="width:33.33%;">
+                                                        <col style="width:33.33%;">
+                                                    </colgroup>
+                                                    <thead>
+                                                    <tr>
+                                                        <th>무게 당 추가 금액</th>
+                                                        <th>단모</th>
+                                                        <th>장모</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                    <tr>
+                                                        <td class="no-padding">
+                                                            <div class="form-table-select">
+                                                                <select name="increase_section_price" id="increase_section_price" dir="rtl">
+                                                                    <?php
+                                                                        for ($pi = 0; $pi <= 200000; $pi = $pi + 500) {
+                                                                            echo "<option value='" . $pi . "'";
+                                                                            if ($pi == intval($data["product_cat"][0]["increase_section_price"])) {
+                                                                                echo " selected";
+                                                                            }
+                                                                            echo ">" . number_format($pi) . "</option>";
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                        <td class="no-padding">
+                                                            <div class="form-table-select">
+                                                                <select name="p_short_price" id="p_short_price" dir="rtl" style="width: calc(100% - 10px);">
+                                                                    <option value="">선택안함</option>
+                                                                    <?php
+                                                                        for ($pi = 5000; $pi <= 500000; $pi = $pi + 500) {
+                                                                            echo "<option value='" . $pi . "'";
+                                                                            if ($pi == intval($data["product_cat"][0]["short_price"])) {
+                                                                                echo " selected";
+                                                                            }
+                                                                            echo ">" . number_format($pi) . "</option>";
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                        <td class="no-padding">
+                                                            <div class="form-table-select">
+                                                                <select name="p_long_price" id="p_long_price" dir="rtl" style="width: calc(100% - 10px);">
+                                                                    <option value="">선택안함</option>
+
+                                                                    <?php
+                                                                        for ($pi = 5000; $pi <= 500000; $pi = $pi + 500) {
+                                                                            echo "<option value='" . $pi . "'";
+                                                                            if ($pi == intval($data["product_cat"][0]["long_price"])) {
+                                                                                echo " selected";
+                                                                            }
+                                                                            echo ">" . number_format($pi) . "</option>";
+                                                                        }
+                                                                    ?>
+                                                                </select>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-label">무게당 추가요금설정</div>
+                                <div class="form-item-data type-2">
+                                    <div class="form-check-group">
+                                        <div class="form-check-inner">
+                                            <div class="check-cell"><label class="form-radiobox">
+                                                    <input type="radio" name="time2" class="set_kgs" value="1" <?php echo ($data['product_cat'][0]['is_use_weight']==1)?'checked':'';?>>
+                                                    <span class="form-check-icon"><em>설정</em></span></label>
+                                            </div>
+                                            <div class="check-cell"><label class="form-radiobox">
+                                                    <input type="radio" name="time2" class="set_kgs" value="2"  <?php echo ($data['product_cat'][0]['is_use_weight']!=1)?'checked':'';?>>
+                                                    <span class="form-check-icon"><em>설정안함</em></span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 설정일 경우 -->
+                        <div class="form-group-cell middle set-beauty-yn" style="display:<?php echo ($data['product_cat'][0]['is_use_weight']==1)?'block':'none';?>;">
+                            <div class="horizontal-swiper-scoller">
+                                <div class="scroller-inner">
+                                    <div class="read-table scroller-table">
+                                        <table>
+                                            <colgroup>
+                                                <col style="width:33.33%;">
+                                                <col style="width:33.33%;">
+                                                <col style="width:33.33%;">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>무게</th>
+                                                <th>단모</th>
+                                                <th>장모</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="kgs_weight">
+
+                                                <!--<tr>
+                                                    <td class="no-padding">
+                                                        <div class="form-table-select">
+                                                            <select id="section0" name="section[]" class="add-weight-data">
+                                                                <?php
+                                                                    for ($_i = 0; $_i <= 50; $_i = $_i + 0.1) {
+                                                                ?>
+                                                                    <option value='<?=$_i?>' <?php echo ($_i == trim($n_section[0]))?'selected':'';?> >~ <?=$_i?>kg</option>
+                                                                <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td class="no-padding vertical-center">
+                                                        <div class="font-size-14">
+                                                            <span class="short-hair-price"><?php echo number_format($data['product_cat'][0]['short_price']);?></span>원<br>
+                                                            (<span class="short-hair-kgs">0</span>원)
+                                                        </div>
+                                                    </td>
+                                                    <td class="no-padding vertical-center">
+                                                        <div class="font-size-14">
+                                                            <span class="long-hair-price"><?php echo number_format($data['product_cat'][0]['long_price']);?></span>원<br>
+                                                            (<span class="long-hair-kgs">0</span>원)
+                                                        </div>
+                                                    </td>
+                                                </tr>-->
+
+                                                   <?php
+
+                                                    $base = $data['product_cat'][0]['increase_section_price'];
+                                                    $short = $data['product_cat'][0]['short_price'];
+                                                    $long = $data['product_cat'][0]['long_price'];
+                                                    for($k=0;$k<count($n_section);$k++){
+
+                                                        $short_price = ($base*$k)+$short;
+                                                        $long_price = ($base*$k)+$long;
+
+                                                        $short_price1 = ($base*$k);
+                                                        $long_price1 = ($base*$k);
+
+                                                    ?>
+                                                <tr>
+                                                    <td class="no-padding">
+                                                        <div class="form-table-select">
+                                                            <select name="section[]" class="add-weight-data">
+                                                                <?php
+                                                                    for ($_i = 0; $_i <= 50; $_i = $_i + 0.1) {                                                                        
+                                                                ?>
+                                                                    <option value='<?=$_i?>' <?php echo (trim($_i) == trim($n_section[$k]))?'selected':'';?> >~ <?=$_i?>kg</option>
+                                                                <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                    <td class="no-padding vertical-center">
+                                                        <div class="font-size-14">
+                                                            <span class="short-hair-price"><?php echo number_format($short_price);?></span>원<br>
+                                                            (<span class="short-hair-kgs"><?php echo number_format($short_price1);?></span>원)
+                                                        </div>
+                                                    </td>
+                                                    <td class="no-padding vertical-center">
+                                                        <div class="font-size-14">
+                                                            <span class="long-hair-price"><?php echo number_format($long_price);?></span>원<br>
+                                                            (<span class="long-hair-kgs"><?php echo number_format($long_price1);?></span>원)
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="basic-data-group vvsmall2">
+                                <div class="btn-basic-action">
+                                    <div class="grid-layout btn-grid-group">
+                                        <div class="grid-layout-inner">
+                                            <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round beauty-area-add">구간추가</a></div>
+                                            <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round beauty-area-del">구간삭제</a></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- //설정일 경우 -->
+                    </div>
+                </div>
+            </div>
+            <!-- //미용 -->
+            <!-- 목욕 -->
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">목욕</h4>
+                </div>
+                <div class="basic-data-group none">
+                    <div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-data">
+                                    <div class="read-table">
+                                        <table>
+                                            <colgroup>
+                                                <col style="width:50%;">
+                                                <col style="width:50%;">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>단모</th>
+                                                <th>장모</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            <tr>
+                                                <td class="no-padding">
+                                                    <div class="form-table-select">
+                                                        <select id="p_shower_price" name="p_shower_price" dir="rtl">
+                                                            <option value="">선택안함</option>
+                                                            <?php
+                                                            for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {
+                                                                echo "<option value='" . $pi . "'";
+                                                                if ($pi == intval($data["product_cat"][0]["shower_price"])) {
+                                                                    echo " selected";
+                                                                }
+                                                                echo ">" . $pi . "</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                                <td class="no-padding">
+                                                    <div class="form-table-select">
+                                                        <select id="p_shower_price_long" name="p_shower_price_long" dir="rtl">
+                                                            <option value="">선택안함</option>
+                                                            <?php
+                                                            for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {
+                                                                echo "<option value='" . $pi . "'";
+                                                                if ($pi == intval($data["product_cat"][0]["shower_price_long"])) {
+                                                                    echo " selected";
+                                                                }
+                                                                echo ">" . $pi . "</option>";
+                                                            }
+                                                            ?>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <!--<div class="basic-data-group vvsmall2">
+                                        <div class="btn-basic-action">
+                                            <div class="grid-layout btn-grid-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round">구간추가</a></div>
+                                                    <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round">구간삭제</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- //목욕 -->
+            <!-- 추가요금 -->
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">추가요금</h4>
+                </div>
+                <div class="basic-data-group none">
+                    <div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-data">
+                                    <div class="read-table">
+                                        <table>
+                                            <colgroup>
+                                                <col style="width:50%;">
+                                                <col style="width:50%;">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>상품명</th>
+                                                <th>가격</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="extra_tbody">
+                                                <tr>
+                                                    <td class="title">발톱</td>
+                                                    <td class="no-padding">
+                                                        <div class="form-table-select form-flex">
+                                                            <div class="form-unit-label">+</div>
+                                                            <select name="p_toenail_price[]" id="p_toenail_price">
+                                                                <option value="">선택</option>
+                                                                <?php
+                                                                for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {
+                                                                    echo "<option value='" . $pi . "'";
+                                                                    if ($pi == $data["product_cat"][0]["toenail_price"]) {
+                                                                        echo " selected";
+                                                                    }
+                                                                    echo ">" . $pi . "</option>";
+                                                                }
+                                                                ?>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <?php for($k=0;$k<count($n_extra['name']);$k++){ ?>
+                                                <tr class="extra-tmp">
+                                                    <td class="no-padding">
+                                                        <div class="form-table-select">
+                                                            <input type="text" name="extra_text[]" value="<?php echo $n_extra['name'][$k];?>" placeholder="입력" class="">
+                                                        </div>
+                                                    </td>
+                                                    <td class="no-padding">
+                                                        <div class="form-table-select form-flex">
+                                                            <div class="form-unit-label">+</div>
+                                                            <select name="extra_price[]">
+                                                                <option value="">선택</option>
+                                                                <?php for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {?>
+                                                                    <option value='<?=$pi?>' <?php echo ($pi == trim($n_extra['price'][$k]))?'selected':'';?> ><?=$pi?></option>
+                                                                <?php } ?>
+                                                            </select>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="basic-data-group vvsmall2">
+                                        <div class="btn-basic-action">
+                                            <div class="grid-layout btn-grid-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round add-extra">상품추가</a></div>
+                                                    <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round del-extra">상품삭제</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 상품추가 클릭시 복사를 하기위한 div -->
+            <div style="display:none">
+                <table id="extra_tmp">
+                    <tr class="extra-tmp">
+                        <td class="no-padding">
+                            <div class="form-table-select">
+                                <input type="text" name="extra_text[]" placeholder="입력" class="">
+                            </div>
+                        </td>
+                        <td class="no-padding">
+                            <div class="form-table-select form-flex">
+                                <div class="form-unit-label">+</div>
+                                <select name="extra_price[]">
+                                    <option value="">선택</option>
+                                    <?php for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {?>
+                                        <option value="<?php echo $pi;?>"><?php echo $pi;?></option>
+                                    <?php } ?>
+                                </select>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- 상품추가 클릭시 복사를 하기위한 div 끝 -->
+
+            <!-- //추가요금 -->
+            <!-- 현장판단 후 현장 결제추가 가능옵션 -->
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">현장판단 후 현장 결제추가 가능옵션</h4>
+                </div>
+                <div class="basic-data-group none">
+                    <div class="form-group">
+                        <div class="form-group-cell middle">
+                            <div class="form-group-item">
+                                <div class="form-item-data">
+                                    <div class="read-table">
+                                        <table>
+                                            <colgroup>
+                                                <col style="width:50%;">
+                                                <col style="width:50%;">
+                                            </colgroup>
+                                            <thead>
+                                            <tr>
+                                                <th>상품명</th>
+                                                <th>가격</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="tbody_start">
+                                            <tr>
+                                                <td class="title">털엉킴</td>
+                                                <td class="no-padding">
+                                                    <div class="form-table-select form-flex">
+                                                        <select name="p_hair_clot_price[]" id="p_hair_clot_price">
+                                                            <option value="">선택안함</option>
+                                                            <?php for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {?>
+                                                                <option value="<?php echo $pi;?>" <?php echo ($pi == $data["product_cat"][0]["hair_clot_price"])?'selected':'';?>><?php echo $pi;?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                        <div class="form-unit-label">~</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <?php for($k=0;$k<count($n_work['name']);$k++){ ?>
+                                            <tr class="out-tmp">
+                                                <td class="no-padding">
+                                                    <div class="form-table-select">
+                                                        <input type="text" name="p_ferocity_text[]" value="<?php echo $n_work['name'][$k];?>" placeholder="입력" class="">
+                                                    </div>
+                                                </td>
+                                                <td class="no-padding">
+                                                    <div class="form-table-select form-flex">
+                                                        <select name="p_ferocity_price[]" id="p_ferocity_price">
+                                                            <option value="">선택안함</option>
+                                                            <?php for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {?>
+                                                                <option value="<?php echo $pi;?>" <?php echo ($pi == $n_work['price'][$k])?'selected':'';?>><?php echo $pi;?></option>
+                                                            <?php } ?>
+                                                        </select>
+                                                        <div class="form-unit-label">~</div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <?php } ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="basic-data-group vvsmall2">
+                                        <div class="btn-basic-action">
+                                            <div class="grid-layout btn-grid-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round add-out">상품추가</a></div>
+                                                    <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round del-out">상품삭제</a></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 현장결제 클릭시 복사를 하기위한 div -->
+            <div style="display:none">
+                <table id="out_tmp">
+                    <tr class="out-tmp">
+                        <td class="no-padding">
+                            <div class="form-table-select">
+                                <input type="text" name="p_ferocity_text[]" placeholder="입력" class="">
+                            </div>
+                        </td>
+                        <td class="no-padding">
+                            <div class="form-table-select form-flex">
+                                <select name="p_ferocity_price[]" id="p_ferocity_price">
+                                    <option value="">선택안함</option>
+                                    <?php for ($pi = 500; $pi <= 500000; $pi = $pi + 500) {?>
+                                        <option value="<?php echo $pi;?>"><?php echo $pi;?></option>
+                                    <?php } ?>
+                                </select>
+                                <div class="form-unit-label">~</div>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <!-- 현장결제 클릭시 복사를 하기위한 div 끝 -->
+            <!-- //현장판단 후 현장 결제추가 가능옵션 -->
+            <div class="basic-data-group">
+                <div class="form-group-cell">
+                    <div class="form-group-item">
+                        <div class="form-item-label">추가설명</div>
+                        <div class="form-item-data">
+                            <textarea name="add_comment" id="add_comment" class="form-control"><?php echo $data['product_cat'][0]['add_comment']; ?></textarea>
+                            <div class="form-input-info">0/1000</div>
+                        </div>
+                    </div>
+                </div>
+                <!--<div class="form-group">
+                    <div class="form-group-cell middle">
+                        <div class="form-group-item">
+                            <div class="form-item-label">추가설명</div>
+                            <div class="form-item-data">
+                                <input type="text" name="add_comment" value="<?php /*echo $data['product_cat'][0]['add_comment'];*/?>" class="form-control" placeholder="입력" maxlength="1000">
+                                <div class="form-input-info">0/1000</div>
+                                <div class="form-bottom-info">*작성 내용을 정확히 확인하고 저장버튼을 눌러주세요. 잘못 설정된 가격에 대한 책임은 펫샵회원에게 있습니다.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </div>
+        <!-- //set-beauty-add -->
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="javascript:;" class="btn-page-bottom btn-save">저장하기</a>
+    </div>
+    </form>
+    <!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+<script>
+    //저장하기 클릭시
+    $(document).on('click','.btn-save',function(){
+        if($('.set_kgs:checked').val() == 1){
+            var cnt = 0;
+            $('.add-weight-data').each(function(index){
+                if($('.add-weight-data:eq('+index+') option:selected').val() == 0){
+                    cnt++;
+                }
+            });
+            if(cnt>0){
+                alert('추가요금, 기본요금을 입력해 주세요');
+                $('#section0').focus();
+                return false;
+            }
+        }
+
+        if(confirm('저장하시겠습니까?')){
+            document.f.submit();
+        }
+    });
+    //구간추가
+    $(document).on('click','.beauty-area-add',function(){
+        var bt_div = $('#kgs_weight > tr:eq(0)').clone();
+        var short_hair = parseInt($('#p_short_price option:selected').val());
+        var long_hair = parseInt($('#p_long_price option:selected').val());
+        var kg = parseInt($('#increase_section_price option:selected').val());
+
+        $('#kgs_weight').append(bt_div);
+        $('.short-hair-price').each(function(index){
+            $('.short-hair-price:eq('+index+')').text(comma((index*kg)+short_hair));
+        });
+        $('.long-hair-price').each(function(index){
+            $('.long-hair-price:eq('+index+')').text(comma((index*kg)+long_hair));
+        });
+        $('.short-hair-kgs').each(function(index){
+            $('.short-hair-kgs:eq('+index+')').text(comma((index*kg)));
+        });
+        $('.long-hair-kgs').each(function(index){
+            $('.long-hair-kgs:eq('+index+')').text(comma((index*kg)));
+        });
+    });
+
+    //구간 삭제
+    $(document).on('click','.beauty-area-del',function(){
+        var total_cnt = $('#kgs_weight tr').length;
+        if(total_cnt > 1) {
+            $('#kgs_weight>tr:last-child').remove();
+        }
+    });
+
+    //미용 kg당 추가요금설정 클릭시
+    $(document).on('click','.set_kgs',function(){
+        if($(this).val() == 1){
+            var short_hair = parseInt($('#p_short_price option:selected').val());
+            var long_hair = parseInt($('#p_long_price option:selected').val());
+            var kg = parseInt($('#increase_section_price option:selected').val());
+            if(kg == 0){
+                alert('무게 당 추가 금액을 먼저 변경해주세요.');
+                return false;
+            }
+            /*if(short_hair == 0){
+                alert('무게 당 추가 금액을 먼저 변경해주세요.');
+                return false;
+            }
+            if(long_hair == 0){
+                alert('무게 당 추가 금액을 먼저 변경해주세요.');
+                return false;
+            }*/
+
+            $('.short-hair-price').each(function(index){
+                $('.short-hair-price:eq('+index+')').text(comma((index*kg)+short_hair));
+            });
+            $('.long-hair-price').each(function(index){
+                $('.long-hair-price:eq('+index+')').text(comma((index*kg)+long_hair));
+            });
+            $('.short-hair-kgs').each(function(index){
+                $('.short-hair-kgs:eq('+index+')').text(comma((index*kg)));
+            });
+            $('.long-hair-kgs').each(function(index){
+                $('.long-hair-kgs:eq('+index+')').text(comma((index*kg)));
+            });
+            
+            $('.set-beauty-yn').css('display','block');
+        } else {
+            $('.set-beauty-yn').css('display','none');
+        }
+    });
+
+    //무게 당 추가 금액 변경시 현재 등록된 데이터 변경
+    $('#increase_section_price, #p_short_price, #p_long_price').change(function(){
+        var short_hair = parseInt($('#p_short_price option:selected').val());
+        var long_hair = parseInt($('#p_long_price option:selected').val());
+        var kg = parseInt($('#increase_section_price option:selected').val());
+
+        $('.short-hair-price').each(function(index){
+            $('.short-hair-price:eq('+index+')').text(comma((index*kg)+short_hair));
+        });
+        $('.long-hair-price').each(function(index){
+            $('.long-hair-price:eq('+index+')').text(comma((index*kg)+long_hair));
+        });
+        $('.short-hair-kgs').each(function(index){
+            $('.short-hair-kgs:eq('+index+')').text(comma((index*kg)));
+        });
+        $('.long-hair-kgs').each(function(index){
+            $('.long-hair-kgs:eq('+index+')').text(comma((index*kg)));
+        });
+    });
+
+
+    //무게당 금액 변경 확인
+    $('#section0').change(function(){
+       if($('#increase_section_price option:selected').val() == 0){
+           $('#section0 option:eq(0)').prop('selected',true);
+           alert('무게 당 추가 금액을 먼저 변경해주세요.');
+           return false;
+       }
+    });
+
+    //추가요금 추가클릭시
+    $(document).on('click','.add-extra',function(){
+        var extra_div = $('#extra_tmp tr').clone();
+        $('#extra_tbody').append(extra_div);
+    });
+
+    //추가요금 삭제클릭시
+    $(document).on('click','.del-extra',function(){
+        var cnt = $('.extra-tmp').length;        
+        if(cnt > 1){
+            $('#extra_tbody .extra-tmp:last').remove();
+        }
+    });
+
+
+    //현장판단 후 현장 결제추가 가능옵션 추가클릭시
+    $(document).on('click','.add-out',function(){
+        var extra_div = $('#out_tmp tr').clone();
+        $('#tbody_start').append(extra_div);
+    });
+
+    //현장판단 후 현장 결제추가 가능옵션 삭제클릭시
+    $(document).on('click','.del-out',function(){
+        var cnt = $('.out-tmp').length;
+        if(cnt > 1){
+            $('#tbody_start .out-tmp:last').remove();
+        }
+    });
+    function calc_hair(){
+
+    }
+
+    //콤마찍기
+    function comma(str) {
+        str = String(str);
+        return str.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
+    }
+    
+    $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_beauty_management')
+        });
+
+</script>
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

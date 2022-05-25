@@ -1,0 +1,476 @@
+<?php
+$shop_title	= "매장상품 등록/수정";
+
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+$backurl = $_GET['backurl'];
+$user_id = $_SESSION['gobeauty_user_id'];
+$user_name = $_SESSION['gobeauty_user_nickname'];
+
+$first_type = $_REQUEST['first_type'];
+$second_type = $_REQUEST['second_type'];
+if (!$second_type) {
+    $second_type = '추가공통옵션';
+}
+
+$data = array();
+$sql = "
+	SELECT *
+	FROM tb_shop
+	WHERE customer_id = '".$user_id."'		
+";
+$result = mysqli_query($connection, $sql);
+$shop_cnt = mysqli_num_rows($result);
+$data['shop'] = mysqli_fetch_assoc($result);
+
+if($shop_cnt <= 0){
+    ?>
+    <script>
+        $.MessageBox({
+            buttonDone: "확인",
+            message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        }).done(function() {
+            location.href = "<?= $mainpage_directory ?>/index.php";
+        });
+    </script>
+    <?php
+}
+
+$is_offline = 0;
+
+$sql = "
+	SELECT * 
+	FROM tb_request_artist 
+	WHERE customer_id = '" . $user_id . "'
+";
+$result = mysqli_query($connection, $sql);
+while($row = mysqli_fetch_assoc($result)) {
+    $data['request_artist'] = $row;
+    $is_offline = ($row['is_got_offline_shop'] == NULL) ? 0 : $row['is_got_offline_shop'];
+}
+
+// 오프라인 매장 여부 - 쿠폰, 정액제 사용 구분
+$sql = "
+	SELECT is_got_offline_shop 
+	FROM tb_request_artist 
+	WHERE customer_id = '".$user_id."'
+";
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+$is_got_offline_shop = $row['is_got_offline_shop'];
+
+
+/*$sql = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '{$user_id}'";
+echo $sql;
+$arr = sql_fetch_array($sql);
+foreach($arr as $list){
+    if($list['product_kin']==)
+    $data['product_shop']['kind'][] = $list;
+}*/
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->
+    <form action="./data/save_store_add" name="f" method="post">
+        <input type="hidden" name="mode" value="beautyStoreAdd">
+	<div class="page-body">
+		<!-- set-store-add -->  
+		<div class="set-store-add">
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">용품</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap good1-div">
+							<!-- 추가 타입 -->
+                            <?php
+                                $sql = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '{$user_id}' AND product_kind = 1";
+                                //echo $sql;
+                                $arr = sql_fetch_array($sql);
+                                foreach($arr as $list){
+                            ?>
+							<div class="form-vertical-cell">
+								<div class="grid-layout basic">
+									<div class="grid-layout-inner flex-nowrap">
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+										<div class="grid-layout-cell flex-1"><input type="text" name="good1_name[]" value="<?php echo $list['name'];?>" placeholder="입력"></div>
+										<div class="grid-layout-cell flex-1">
+                                            <select name="good1_price[]" class="coupon-price" >
+                                                <option value="">선택안함</option>
+                                                <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                                    <option value="<?php echo $i; ?>" <?php echo ($list['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                <?php } ?>
+                                            </select>
+										</div>
+										<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+									</div>
+								</div>
+							</div>
+							<?php } ?>
+							<!-- //추가 타입 -->
+
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round goods-add-btn">추가하기</button>
+				</div>
+
+                <div id="goods1_div" style="display:none">
+                    <div class="form-vertical-cell goods1-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner flex-nowrap">
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                <div class="grid-layout-cell flex-1"><input type="text" name="good1_name[]" placeholder="입력"></div>
+                                <div class="grid-layout-cell flex-1">
+                                    <select name="good1_price[]">
+                                        <option value="">선택안함</option>
+                                        <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                            <option value="<?php echo $i; ?>" ><?php echo $i; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">간식</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap good2-div">
+							<!-- 추가 타입 -->
+                            <?php
+                            $sql = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '{$user_id}' AND product_kind = 2";
+                            //echo $sql;
+                            $arr = sql_fetch_array($sql);
+                            foreach($arr as $list){
+                                ?>
+                                <div class="form-vertical-cell">
+                                    <div class="grid-layout basic">
+                                        <div class="grid-layout-inner flex-nowrap">
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="good2_name[]" value="<?php echo $list['name'];?>" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1">
+                                                <select name="good2_price[]" class="coupon-price" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                                        <option value="<?php echo $i; ?>" <?php echo ($list['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+							<!-- //추가 타입 -->
+
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round goods2-add-btn">추가하기</button>
+				</div>
+                <div id="goods2_div" style="display:none">
+                    <div class="form-vertical-cell goods2-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner flex-nowrap">
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                <div class="grid-layout-cell flex-1"><input type="text" name="good2_name[]" placeholder="입력"></div>
+                                <div class="grid-layout-cell flex-1">
+                                    <select name="good2_price[]">
+                                        <option value="">선택안함</option>
+                                        <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                            <option value="<?php echo $i; ?>" ><?php echo $i; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">사료</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap good3-div">
+							<!-- 추가 타입 -->
+                            <?php
+                            $sql = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '{$user_id}' AND product_kind = 3";
+                            //echo $sql;
+                            $arr = sql_fetch_array($sql);
+                            foreach($arr as $list){
+                                ?>
+                                <div class="form-vertical-cell">
+                                    <div class="grid-layout basic">
+                                        <div class="grid-layout-inner flex-nowrap">
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="good3_name[]" value="<?php echo $list['name'];?>" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1">
+                                                <select name="good3_price[]" class="coupon-price" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                                        <option value="<?php echo $i; ?>" <?php echo ($list['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+							<!-- //추가 타입 -->
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round goods3-add-btn">추가하기</button>
+				</div>
+                <div id="goods3_div" style="display:none">
+                    <div class="form-vertical-cell goods3-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner flex-nowrap">
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                <div class="grid-layout-cell flex-1"><input type="text" name="good3_name[]" placeholder="입력"></div>
+                                <div class="grid-layout-cell flex-1">
+                                    <select name="good3_price[]">
+                                        <option value="">선택안함</option>
+                                        <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                            <option value="<?php echo $i; ?>" ><?php echo $i; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">기타</h4>
+				</div>
+				<div class="basic-data-group vvsmall3">
+					<div class="form-vertical-group">
+						<div class="form-vertical-header">
+							<div class="grid-layout basic">
+								<div class="grid-layout-inner flex-nowrap">
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label"></div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">상품명</div></div>
+									<div class="grid-layout-cell flex-1"><div class="form-item-label">가격(단위:원)</div></div>
+									<div class="grid-layout-cell flex-auto w-px-55"><div class="form-item-label">삭제</div></div>
+								</div>
+							</div>
+						</div>
+						<div class="form-vertical-body drag-sort-wrap good4-div">
+							<!-- 추가 타입 -->
+                            <?php
+                            $sql = "SELECT * FROM tb_product_dog_etc WHERE customer_id = '{$user_id}' AND product_kind = 4";
+                            //echo $sql;
+                            $arr = sql_fetch_array($sql);
+                            foreach($arr as $list){
+                                ?>
+                                <div class="form-vertical-cell">
+                                    <div class="grid-layout basic">
+                                        <div class="grid-layout-inner flex-nowrap">
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="good4_name[]" value="<?php echo $list['name'];?>" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1">
+                                                <select name="good4_price[]" class="coupon-price" >
+                                                    <option value="">선택안함</option>
+                                                    <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                                        <option value="<?php echo $i; ?>" <?php echo ($list['price'] == $i)?'selected':'';?>><?php echo $i; ?></option>
+                                                    <?php } ?>
+                                                </select>
+                                            </div>
+                                            <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php } ?>
+							<!-- //추가 타입 -->
+
+						</div>
+					</div>
+				</div>
+				<div class="btn-basic-action">
+					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round goods4-add-btn">추가하기</button>
+				</div>
+                <div id="goods4_div" style="display:none">
+                    <div class="form-vertical-cell goods4-cell">
+                        <div class="grid-layout basic">
+                            <div class="grid-layout-inner flex-nowrap">
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
+                                <div class="grid-layout-cell flex-1"><input type="text" name="good4_name[]" placeholder="입력"></div>
+                                <div class="grid-layout-cell flex-1">
+                                    <select name="good4_price[]">
+                                        <option value="">선택안함</option>
+                                        <?php for($i = 0 ; $i <= 50000 ; $i+=100 ){ ?>
+                                            <option value="<?php echo $i; ?>" ><?php echo $i; ?></option>
+                                        <?php } ?>
+                                    </select>
+                                </div>
+                                <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+			</div>
+		</div>
+		<!-- //set-store-add -->  
+	</div>
+    </form>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom btn-save">저장하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script src="/static/pub/js/Sortable.min.js"></script>
+<script>
+$(function(){
+	//https://github.com/SortableJS/Sortable
+    $(document).on('click','.btn-save',function(){
+       document.f.submit();
+    });
+
+	$('.drag-sort-wrap').each(function(){
+		var sortable = Sortable.create($(this)[0] , {
+			delay : 0,
+			ghostClass: 'guide',
+			draggable : '.form-vertical-cell',
+			handle : '.btn-data-handler',
+			onStart : function(evt){
+				//드래그 시작 
+				console.log('drag start');
+			},
+			onEnd : function(evt){
+				//드래그 끝
+				console.log('drag end');
+				//evt.to;    // 현재 아이템
+				//evt.from;  // 이전 아이템
+				//evt.oldIndex;  // 이전 인덱스값
+				//evt.newIndex;  // 새로운 인덱스값
+			},
+			onUpdate : function(evt){
+				console.log('update');
+			},
+			onUpdate : function(evt){
+				console.log('onChange');
+			},
+			onRemove: function (/**Event*/evt) {
+				console.log('remove');
+			}
+			
+		});
+	});
+
+	$(document).on('click' , '.btn-data-trash' , function(){
+		$(this).parents('.form-vertical-cell').remove();
+	});
+
+    //용품 추가하기
+    $(document).on('click','.goods-add-btn',function(){
+        var bt_div = $('#goods1_div .goods1-cell').clone();
+        $('.good1-div').append(bt_div);
+    });
+    //간식 추가하기
+    $(document).on('click','.goods2-add-btn',function(){
+        var bt_div = $('#goods2_div .goods2-cell').clone();
+        $('.good2-div').append(bt_div);
+    });
+    //사료 추가하기
+    $(document).on('click','.goods3-add-btn',function(){
+        var bt_div = $('#goods3_div .goods3-cell').clone();
+        $('.good3-div').append(bt_div);
+    });
+    //기타 추가하기
+    $(document).on('click','.goods4-add-btn',function(){
+        var bt_div = $('#goods4_div .goods4-cell').clone();
+        $('.good4-div').append(bt_div);
+    });
+});
+
+function sampleAdd(){
+	var _html = "";
+	_html += '<div class="form-vertical-cell">';
+	_html += '	<div class="grid-layout basic">';
+	_html += '		<div class="grid-layout-inner flex-nowrap">';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>';
+	_html += '			<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>';
+	_html += '			<div class="grid-layout-cell flex-1">';
+	_html += '				<select>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '					<option value="">선택안함</option>';
+	_html += '				</select>';
+	_html += '			</div>';
+	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-trash">휴지통</button></div>';
+	_html += '		</div>';
+	_html += '	</div>';
+	_html += '</div>';
+
+	$('#sample1').append(_html);
+
+};
+
+        $(document).ready(function(){
+            $('#btn_page_prev').prop('href','set_beauty_store');
+        });
+
+</script>
+
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

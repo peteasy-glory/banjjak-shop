@@ -1,0 +1,69 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "MY SHOP";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$sql = "select * from tb_shop where customer_id = '".$user_id."';";
+$qry	= mysqli_query($connection, $sql);
+$shop_data	= mysqli_fetch_assoc($qry);
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="board-more" style="margin:8px 0 8px 0;"><a href="https://partner.banjjakpet.com/stats_sale"><button type="button" class="btn btn-middle-size btn-round btn-outline-purple"><img src="../static/pub/images/icon/10-ic-24-admin-all-menu-money@2x_purple.png" style="width:20px;height:20px;">&nbsp;판매실적 조회</button></a></div>
+		<div class="master-shop-main">
+			<div class="master-shop-main-inner">
+				<div class="master-shop-main-cell">
+					<div class="master-shop-gate">
+						<div class="content-thumb"><img src="<?="https://image.banjjakpet.com".img_link_change($shop_data['front_image'])?>" alt=""></div>
+						<div class="master-shop-gate-ui"><a href="shop_gate_picture_list">마이샵 대문관리</a></div>
+					</div>
+				</div>
+				<div class="master-shop-main-cell">
+					<div class="master-shop-main-menu">
+						<div class="menu-inner">
+							<div class="menu-cell"><a href="shop_management"><div><div class="icon icon-shop-info"></div><div class="txt">샵정보관리</div></div></a></div>
+							<div class="menu-cell"><a href="shop_portfolio_list"><div><div class="icon icon-shop-portfolio"></div><div class="txt">포트폴리오</div></div></a></div>
+							<div class="menu-cell"><a href="shop_review_list"><div><div class="icon icon-shop-review"></div><div class="txt">후기관리</div></div></a></div>
+							<div class="menu-cell"><a href="shop_blog_list"><div><div class="icon icon-shop-blog"></div><div class="txt">블로그관리</div></div></a></div>
+						</div>
+					</div>
+				</div>
+				<div class="master-shop-main-cell">
+					<!--<a href="reserve_view?type=beauty&artist_id=<?= $user_id ?>" class="btn btn-yellow btn-middle-size border-radius-5"><strong>마이샵 노출상태 확인하기</strong></a>-->
+				</div>
+			</div>
+		</div>
+
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

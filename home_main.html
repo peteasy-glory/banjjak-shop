@@ -1,0 +1,801 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = 'home_main';
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = 'home_main';
+
+$shop_title	= "MY SHOP";
+$header_menu	= true;
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+if($_SESSION['artist_flag'] === true){
+    ?>
+    <script>
+        location.href="reserve_main_month";
+    </script>
+    <?php
+}
+
+// 최초 앱 실행시 토큰 저장
+if($_SESSION['is_token'] == "1"){
+    $_SESSION['is_token'] == "0";
+    $user_agent = $_SERVER['HTTP_USER_AGENT'];
+    if ($user_agent) {
+        $token_index_and = strpos($user_agent, "APP_GOPET_PARTNER_AND");
+        $token_index_ios = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
+        if($token_index_and > 0){ // 안드로이드일때
+            ?>
+            <script>
+                var token = window.Android.onAppGetToken();
+                //alert(token);
+                $.ajax({
+                    url: 'include/save_token',
+                    data: {
+                        id : "<?=$_SESSION['gobeauty_user_id']?>",
+                        token : token,
+                        is_android : "yes"
+                    },
+                    type: 'POST',
+                    success: function(data){
+                        //alert(data+"1");
+                        //location.reload();
+                        if(data == "OK"){
+                            //location.replace("../home_main");
+                            //alert("ok");
+                        }else{
+                            alert("no");
+                        }
+                    },
+                    error : function(xhr, status, error) {
+                    }
+                });
+            </script>
+            <?php
+        }else if($token_index_ios > 0){ // ios 일때
+            ?>
+            <script>
+                function SaveTokeniOS(userid, usertoken){
+                    //alert(usertoken);
+                    $.ajax({
+                        url: 'include/save_token',
+                        data: {
+                            id : "<?=$_SESSION['gobeauty_user_id']?>",
+                            token : usertoken,
+                            is_android : "no"
+                        },
+                        type: 'POST',
+                        success: function(data){
+                            //alert(data+"1");
+                            //location.reload();
+                            if(data == "OK"){
+                                //location.replace("../home_main");
+                                //alert("ok");
+                            }else{
+                                alert("no");
+                            }
+                        },
+                        error : function(xhr, status, error) {
+                        }
+                    });
+                }
+                //var token = window.webkit.onAppGetToken();
+                //alert(token);
+            </script>
+            <?php
+        }
+    }
+}
+
+
+// 공지사항 가져오기
+$notice = array();
+$notice_seq = "";
+$notice_title = "공지사항이 없습니다.";
+
+$sql = "
+	SELECT *
+	FROM tb_admin_notice
+	WHERE is_delete = '0'
+		AND is_main = '1'
+	ORDER BY reg_dt DESC
+";
+$result = mysqli_query($connection, $sql);
+$notice_cnt = mysqli_num_rows($result);
+if($notice_cnt > 0){
+	while($row = mysqli_fetch_assoc($result)){
+		$notice[] = $row;
+	}
+	$notice_seq = $notice[0]['notice_seq'];
+	$notice_title = $notice[0]['title'];
+}
+
+
+
+
+
+
+// 예약현황
+$today_yy = date('Y');
+$today_mm = date('m');
+
+$last_day = date("t", strtotime($yy . "-" . $mm . "-01")); // 1. 총일수 구하기
+$start_week = date("w", strtotime($yy . "-" . $mm . "-01")); // 2. 시작요일 구하기
+$total_week = ceil(($last_day + $start_week) / 7); // 3. 총 몇 주인지 구하기
+$last_week = date('w', strtotime($yy . "-" . $mm . "-" . $last_day)); // 4. 마지막 요일 구하기
+$day = 1; // 5. 화면에 표시할 화면의 초기값을 1로 설정
+						// 8. 첫번째 주이고 시작요일보다 $j가 작거나 마지막주이고 $j가 마지막 요일보다 크면 표시하지 않아야하므로
+                        //    그 반대의 경우 -  ! 으로 표현 - 에만 날자를 표시한다.
+$rest_word = "";
+
+$current_time = date("" . $yy . "-" . $mm . "-" . $day . " 00:00:00");
+$next_3month_time = date("Y-m-d 00:00:00", strtotime("+3 months"));
+$next_3month_int = strtotime($next_3month_time);
+
+$cal_time = date('Y-m-d 00:00:00');
+$current_int = strtotime($current_time);
+$cal_int = strtotime($cal_time);
+$data = array();
+
+// 법정 공휴일 쉬는 여부 1이 쉰다.
+$is_rest_public_holiday = 1;
+$working_sql = "select * from tb_working_schedule where customer_id = '" . $user_id . "';";
+$working_result = mysqli_query($connection, $working_sql);
+if ($working_datas = mysqli_fetch_object($working_result)) {
+    $is_rest_public_holiday = $working_datas->rest_public_holiday;
+}
+
+// 개인 정기 휴일 설정 1이 쉰다.
+$is_monday = 0;
+$is_tuesday = 0;
+$is_wednesday = 0;
+$is_thursday = 0;
+$is_friday = 0;
+$is_saturday = 0;
+$is_sunday = 0;
+$get_regular_sql = "select * from tb_regular_holiday where customer_id = '" . $user_id . "';";
+$get_regular_result = mysqli_query($connection, $get_regular_sql);
+if ($get_regular_datas = mysqli_fetch_object($get_regular_result)) {
+    $is_monday = $get_regular_datas->is_monday;
+    $is_tuesday = $get_regular_datas->is_tuesday;
+    $is_wednesday = $get_regular_datas->is_wednesday;
+    $is_thursday = $get_regular_datas->is_thursday;
+    $is_friday = $get_regular_datas->is_friday;
+    $is_saturday = $get_regular_datas->is_saturday;
+    $is_sunday = $get_regular_datas->is_sunday;
+}
+
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [START]
+$holiweek_arr = array();
+$sql_regular = "select * from tb_regular_holiday where customer_id = '" . $user_id . "';";
+$sql_regular_result = mysqli_query($connection, $sql_regular);
+if ($sql_regular_row = mysqli_fetch_object($sql_regular_result)) {
+    $holiweek_arr[0] = $sql_regular_row->is_sunday;
+    $holiweek_arr[1] = $sql_regular_row->is_monday;
+    $holiweek_arr[2] = $sql_regular_row->is_tuesday;
+    $holiweek_arr[3] = $sql_regular_row->is_wednesday;
+    $holiweek_arr[4] = $sql_regular_row->is_thursday;
+    $holiweek_arr[5] = $sql_regular_row->is_friday;
+    $holiweek_arr[6] = $sql_regular_row->is_saturday;
+}
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [END]
+
+// 2019.01.07 developlay - 휴일일 추출 [START]
+$holiday_arr = array();
+$sql_public_holiday = "select * from tb_public_holiday where year = " . $yy . " and month = " . $mm . ";";
+$sql_public_holiday_result = mysqli_query($connection, $sql_public_holiday);
+while ($sql_public_holiday_row = mysqli_fetch_object($sql_public_holiday_result)) {
+    array_push($holiday_arr, $sql_public_holiday_row->day);
+}
+// 2019.01.07 developlay - 휴일일 추출 [END]
+
+$holiday_array = array(0);
+$select_public_holiday = "select * from tb_public_holiday where year = " . $yy . " and month = " . $mm . ";";
+$select_result = mysqli_query($connection, $select_public_holiday);
+while ($select_datas = mysqli_fetch_object($select_result)) {
+    $a_day = $select_datas->day;
+    array_push($holiday_array, $a_day);
+}
+
+// 휴일 일정
+$artist_query = "SELECT GROUP_CONCAT(DISTINCT name ORDER BY name ASC) as worker FROM tb_artist_list WHERE artist_id = '{$user_id}' GROUP BY artist_id";
+$artist_result = mysqli_query($connection, $artist_query);
+$artist_data = mysqli_fetch_object($artist_result);
+
+$private_all_holiday_array = array();
+$private_notall_holiday_array = array();
+$ph_sql = "SELECT *, GROUP_CONCAT(A.worker ORDER BY A.worker ASC) AS worker 
+		FROM(
+			SELECT 
+				*,
+				DATE_FORMAT(CONCAT(start_year,'-',start_month,'-',start_day,' ',start_hour,':',IFNULL('00',start_minute),':00'),'%Y-%m-%d %H:%i:%s') as start_date, 
+        		DATE_FORMAT(CONCAT(end_year,'-',end_month,'-',end_day,' ',IF(end_hour = 24 AND (end_minute IS NULL OR end_minute = 0), '23', end_hour),':',IF(end_hour = 24 AND end_minute IS NULL, '59', IFNULL('00',end_minute)),':00'),'%Y-%m-%d %H:%i:%s') as end_date
+			FROM tb_private_holiday 
+			WHERE customer_id = '{$user_id}' AND ('{$yy}' BETWEEN start_year AND end_year) AND ('{$mm}' BETWEEN start_month AND end_month)
+		)A
+		GROUP BY start_date, end_date, customer_id";
+$ph_result = mysqli_query($connection, $ph_sql);
+while ($ph_datas = mysqli_fetch_object($ph_result)) {
+    $type = $ph_datas->type;
+    $sy = $ph_datas->start_year;
+    $sm = $ph_datas->start_month;
+    $sd = $ph_datas->start_day;
+    $sh = $ph_datas->start_hour;
+    $ey = $ph_datas->end_year;
+    $em = $ph_datas->end_month;
+    $ed = $ph_datas->end_day;
+    $eh = $ph_datas->end_hour;
+    if ($type == "all" && $artist_data->worker == $ph_datas->worker) {
+        if ($sm < $mm && $em > $mm) {
+            $sd = 1;
+            $ed = (int) date('t', strtotime("$yy-$mm-01"));
+            for ($index = $sd; $index <= $ed; $index++) {
+                array_push($private_all_holiday_array, $index);
+            }
+        } else if ($sm == $mm && $em != $mm) {
+            $ed = (int) date('t', strtotime("$yy-$mm-01"));
+            for ($index = $sd; $index <= $ed; $index++) {
+                array_push($private_all_holiday_array, $index);
+            }
+        } else if ($em == $mm && $sm != $mm) {
+            $sd = 1;
+            for ($index = $sd; $index <= $ed; $index++) {
+                array_push($private_all_holiday_array, $index);
+            }
+        } else {
+            for ($index = $sd; $index <= $ed; $index++) {
+                array_push($private_all_holiday_array, $index);
+            }
+        }
+    } else if ($type == "notall" || $type == "not") {
+        array_push($private_notall_holiday_array, $sd);
+    }
+}
+
+$payment_log	= array();
+$payment_total	= 0;
+$o_sql = "SELECT * FROM tb_payment_log 
+            WHERE artist_id = '" . $user_id . "' 
+            AND year = '" . $yy . "' 
+            AND month = '" . intval($mm) . "' 
+            AND day = '" . $dd . "' 
+            AND is_cancel = 0
+            AND is_no_show = 0";
+
+//echo $o_sql;
+$o_result = mysqli_query($connection, $o_sql);
+while ($o_rows = mysqli_fetch_array($o_result)) {
+	$payment_total++;
+    $payment_log[] = $o_rows;
+}
+
+//print_r($payment_log);
+
+
+
+$waiting_list_count = 0;
+$pet_sql = "
+	SELECT tpl.approval, tpl.update_time, tm.*, tc.id, tc.cellphone
+	FROM tb_payment_log tpl, tb_mypet tm, tb_customer tc
+	WHERE tpl.approval = 0
+		AND tpl.pet_seq = tm.pet_seq 
+		AND tpl.customer_id = tc.id
+		AND tc.enable_flag = 1
+		AND tpl.artist_id = '{$user_id}' 
+	ORDER BY tpl.update_time DESC
+";
+$pet_result = mysqli_query($connection, $pet_sql);
+for ($count_pet_datas = 0; $pet_datas = mysqli_fetch_object($pet_result); $count_pet_datas++) {
+	$diff_12hours_time = strtotime("-12 hours");
+	$update_time = strtotime($pet_datas->update_time);
+	
+	$pet_type = $pet_datas->pet_type;
+	$pet_type2 = $pet_datas->pet_type2;
+	$str_pet_type = $pet_type == '기타' ? "$pet_type2" : "$pet_type";
+	$str_pet_type = $str_pet_type ? "$str_pet_type" : "기타(미기입)";
+
+	$crypto = new Crypto();
+	$cellphone = $pet_datas->cellphone;
+	$cellphone = $crypto->decode($cellphone, $access_key, $secret_key);
+
+	if ($update_time > $diff_12hours_time) {
+		$waiting_list_count++;
+		$data["pet"][] = array(
+			"pet_seq" => $pet_datas->pet_seq,
+			"pet_name" => $pet_datas->name_for_owner,
+			"pet_type" => $str_pet_type,
+			"cellphone" => $cellphone,
+			"update_dt" => DATE("Y-m-d", STRTOTIME($pet_datas->update_time))."<br/>".DATE("H:i", STRTOTIME($pet_datas->update_time))
+		);
+	}
+}
+
+
+//----- 댓글 안단 후기 댓글 수 조회
+$review_count	= 0;
+$review_sql =
+	"SELECT count(review_seq) AS review_count
+		FROM tb_usage_reviews
+		WHERE artist_reply is null
+		AND is_delete = 0
+		AND artist_id = '{$user_id}'";
+$review_result = mysqli_query($connection, $review_sql);
+// error_log('----- $review_sql : ' . $review_sql);
+if ($review_result_rows = mysqli_fetch_object($review_result)) {
+	$review_count = $review_result_rows->review_count;
+}
+
+$rating = 0;
+$cnt = 0;
+$review_sql = "SELECT * FROM tb_usage_reviews 
+WHERE artist_id = '" . $user_id . "' 
+AND is_delete = 0 
+ORDER BY update_time DESC;";
+$review_result = mysqli_query($connection, $review_sql);
+$listData	= array();
+for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinionkey++) {
+    $rating += $review_rows['rating'];
+    $cnt++;
+}
+?>
+
+<style>
+    .ui-dialog { padding: 0px; }
+    .ui-dialog .ui-dialog-content { padding: 0px; }
+    .ui-dialog-titlebar { display: none; }
+    .ui-widget-overlay { background-color: rgba(0, 0, 0, 0.8); opacity: 1; }
+    .ui-dialog-buttonset { width: 100%; }
+    .ui-dialog .ui-dialog-buttonpane { padding: 0px !important; margin-top: 0px; }
+    .ui-widget.ui-widget-content { border: 0px; }
+    .ui-dialog .ui-dialog-buttonpane button { display: inline-block; width: 50%; height: 50px; padding: 0px; margin: 0px; border: 0px; background-color: #222; padding: 0px !important; margin: 0px !important; border-radius: 0px; border: 0px; font-size: 14px; color:white}
+
+    #popup_wrap { display: none; }
+    #popup_wrap .custom-modal-content { margin: 0px auto; width: 100%; }
+    #popup_wrap .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
+    #popup_wrap .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; }
+    #popup_wrap .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; }
+    #popup_wrap .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap .swiper-wrapper { height: auto; }
+    #popup_wrap .swiper-slide {  }
+    #popup_wrap .swiper-slide img { width: 100%; height: auto; vertical-align: top; }
+    #popup_wrap .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
+    #popup_wrap .swiper-pagination-bullet { margin: 0px 5px; }
+    #popup_wrap .swiper-pagination-bullet-active { background-color: #999; }
+</style>
+
+
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+	    <div class="common-bottom-ui left" style="position:fixed;bottom:74px; z-index:10">
+            <a href="customer_inquiry"><img src="https://image.banjjakpet.com/images/icon-circle-float_search.png" alt="" style="width:64px;"></a>
+        </div>	
+		<div class="user-main-info store">
+			<div class="info-item-wrap">
+				<div class="thumb-data">
+					<div class="content-thumb small"><img src="<?= "https://image.banjjakpet.com".img_link_change($front_image) ?>" alt=""/></div>
+				</div>
+				<div class="txt-data">
+					<div class="txt-data-inner">
+						<div class="user-name"><?=$name?></div>
+						<!-- 20211223 수정 -->
+						<div class="user-btns"><a href="/shop_main">마이샵 관리 이동</a></div>
+						<!-- //20211223 수정 -->	
+						<div class="user-grade"><div class="icon icon-size-16 icon-star-white"></div><em><?php echo ($rating != 0 && $cnt != 0)? number_format(($rating/$cnt),1,".",""): 0;?></em>(<?php echo $cnt;?>+)</div>
+					</div>
+				</div>
+			</div>
+			<div class="info-list-wrap">
+				<div class="list-cell"><a href="reserve_main_day"><div class="title">오늘일정</div><div class="value"><?=$payment_total?></div></a></div>
+				<div class="list-cell"><a href="reserve_advice_list_1"><div class="title">상담대기</div><div class="value"><?=$waiting_list_count?></div></a></div>
+				<div class="list-cell"><a href="shop_review_list"><div class="title">신규후기</div><div class="value"><?=$review_count?></div></a></div>
+				<div class="list-cell"><a href="customer_inquiry"><div class="title">전체고객</div><div class="value"></div></a></div>
+			</div>
+		</div>
+		
+		<!--<div class="partner-middle-banner">
+			<div class="icon icon-size-24 icon-cart-black"></div>
+			<div class="txt">반짝 파트너 전문몰</div>
+			<a href="https://www.gopet.kr/pet/shop/item_special_mall_home.php?backurl=%2Fpet%2Fshop%2Findex.php" class="btn btn-outline-darkgray btn-vsmall-size btn-inline"><em>바로가기</em></a>
+		</div>-->
+		
+		<div class="basic-data-group mainlist_none" style="display:none;">
+
+			<!-- 리스트 1개 이상 있을 때
+			<div class="today-reserve-wrap">
+			</div>
+			//리스트 1개 이상 있을 때 -->
+
+			
+			<!-- 리스트 아예 없을 때 -->
+			<!--<div class="reserve-after-none">
+				<div class="item-desc">이후 확정된 예약일정이 없습니다.<br>빈 시간을 판매해보세요.</div>
+				<div class="item-btn"><a href="reserve_time_sale_step1_3" class="btn-point-underline">빈 시간 판매 알아보기</a></div>
+				<div class="item-btn-buy">						
+					<a href="reserve_time_sale_step1_3" class="btn btn-outline-gray btn-inline btn-border-radius-4">빈 시간 판매하기</a>
+				</div>
+			</div>-->
+			<!-- //리스트 아예  없을 때 -->
+		</div>
+		
+		<div class="basic-data-group mainlist">
+
+			<!-- 리스트 1개 이상 있을 때 -->
+			<div class="today-reserve-wrap">			
+				<div class="con-title-group">
+					<div class="con-title">오늘의 예약 <?=$payment_total?>개</div>
+                    <?php
+                        if($payment_total>1){
+                    ?>
+                    <form action="./home_main" method="get" name="search">
+					<select name="view_artist_id" class="sort-select" onchange="document.search.submit();">
+                        <option value="">전체선택</option>
+                        <?php
+                        $sql = "
+                                SELECT 
+                                      *                                    
+                                FROM tb_artist_list
+                                WHERE artist_id = '".$user_id."'
+                                AND is_out = 2 AND is_view = 2
+                                GROUP BY name
+                            ";
+                        $result = mysqli_query($connection, $sql);
+                        while($row = mysqli_fetch_array($result)){
+                        ?>
+                            <option value="<?php echo $row['name'];?>" <?php echo ($row['name']==$_GET['view_artist_id'])?'selected':'';?>><?php echo $row['nicname'];?></option>
+                        <?php } ?>
+					</select>
+                    </form>
+                    <?php } ?>
+				</div>
+				<!-- 리스트 있을 때 -->
+				<?php
+                    if($payment_total>0){
+                ?>
+				<div class="today-reserve-list">
+					<?php
+                    $cnt = 0;
+                    $date_same = array();
+                    $artist_same = array();
+                    $que = "
+                                SELECT * FROM tb_payment_log 
+                                WHERE artist_id = '" . $user_id . "' 
+                                AND year = '" . $yy . "' 
+                                AND month = '" . intval($mm) . "' 
+                                AND day = '" . $dd . "' 
+                                AND is_cancel = 0
+                                AND is_no_show = 0 ";
+                    if(!empty($_GET['view_artist_id'])){
+                        $que .= " AND worker = '{$_GET['view_artist_id']}' ";
+                    }
+                        $que .= " GROUP BY worker ORDER BY worker ";
+
+
+                        $pl1 = sql_fetch_array($que);
+                        foreach($pl1 as $pl1){
+                            $beauty_info = explode("|",$pl1['product']);
+                            $que = "SELECT * FROM tb_artist_list WHERE artist_id = '{$user_id}' AND name = '{$pl1['worker']}' GROUP BY name ";
+                            $tal = sql_fetch_array($que);
+
+
+                    $que1 = "
+                                SELECT * FROM tb_payment_log 
+                                WHERE artist_id = '" . $user_id . "' 
+                                AND year = '" . $yy . "' 
+                                AND month = '" . intval($mm) . "' 
+                                AND day = '" . $dd . "'
+                                AND worker = '" . $pl1['worker'] . "'
+                                AND is_cancel = 0
+                                AND is_no_show = 0      
+                                ORDER BY hour ASC                         
+                            ";
+                    //echo $que1;
+                    $pl = sql_fetch_array($que1);
+                    foreach($pl as $pl){
+
+                        $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pl['pet_seq']}'";
+                        //echo $que;
+                        $tm = sql_fetch_array($que);
+
+                        if(!empty($tm[0]['photo'])){
+                            $img = "https://image.banjjakpet.com".img_link_change($tm[0]['photo']);   
+                        } else {
+                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pl['pet_seq']}' ORDER BY upload_dt DESC LIMIT 1";
+                            $rw = sql_fetch_array($sql);
+                            if(!empty($rw[0]['file_path'])){
+                                $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);     
+                            } else {
+                                if ($tm[0]['type'] == 'dog') {
+                                    $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
+                                } else {
+                                    $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
+                                }
+                            }
+                        }
+                        $yellow_type = $tm[0]['pet_type'];
+                        if($tm[0]['pet_type'] == '기타'){
+                            $yellow_type = $tm[0]['pet_type2'];
+                        }
+                    ?>
+					<div class="list-cell">
+						<div class="customer-card-item">
+							<div class="item-info-wrap">
+								<div class="item-thumb" onclick="showPortfolioGallery('<?php echo $img;?>');"><div class="user-thumb large"><img src="<?php echo $img;?>" alt=""/></div></div>
+								<div class="item-data"  onclick="location.href='reserve_pay_management_2?payment_log_seq=<?php echo $pl['payment_log_seq'];?>&thisTimeStart=<?php echo sprintf('%02d',$pl['hour']).':'.sprintf('%02d',$pl['minute']);?>&thisTimeEnd=<?php echo sprintf('%02d',$pl['to_hour']).':'.sprintf('%02d',$pl['to_minute']);?>';">
+									<div class="item-data-inner">
+										<div class="item-name"><?php echo $tm[0]['name'];?> <div class="label label-yellow middle"><strong><?php echo $yellow_type ?></strong></div></div>
+										<div class="item-option">
+											<div class="option-cell"><div class="icon icon-size-16 icon-time-purple"></div><?php echo ($pl['hour']>=13)?'오후':'오전';?> <?php echo sprintf('%02d',$pl['hour']).':'.sprintf('%02d',$pl['minute']);?>-<?php echo sprintf('%02d',$pl['to_hour']).':'.sprintf('%02d',$pl['to_minute']);?></div>
+											<div class="option-cell"><?php echo $tal[0]['nicname'];?></div>
+										</div>
+										<div class="item-reserve-data">
+											<div class="item-reserve-cell">
+												<div class="cell-title">예약상품</div>
+												<div class="cell-value">
+													<div class="item-reserve-option">
+														<div class="option-cell"><?php echo $beauty_info[3];?></div>
+														<div class="option-cell"><?php echo $beauty_info[4];?></div>
+													</div>
+												</div>
+											</div>
+											<div class="item-reserve-cell">
+												<div class="cell-title">예약자</div>
+												<div class="cell-value"><?php echo $pl['cellphone'];?></div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="item-btns">
+								<a href="tel:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">통화하기</a>
+								<a href="sms:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">문자하기</a>
+							</div>
+						</div>
+					</div>
+					<?}}?>
+				</div>
+				<!-- //리스트 있을 때 -->
+				<?}else{?>
+				<!-- 리스트 1개 이상 없을 때 -->
+				<div class="reserve-after-none">
+					<div class="item-desc">이후 확정된 예약일정이 없습니다.</div>
+					<!--<div class="item-btn"><a href="reserve_time_sale_step1_3" class="btn-point-underline">빈 시간 판매 알아보기</a></div>
+					<div class="item-btn-buy">						
+						<a href="reserve_time_sale_step1_3" class="btn btn-outline-gray btn-inline btn-border-radius-4">빈 시간 판매하기</a>
+					</div>-->
+				</div>
+				<!-- /리스트 1개 이상  없을 때 -->
+				<?}?>
+			</div>
+			<!-- //리스트 1개 이상 있을 때 -->
+
+			
+			<!-- 리스트 아예 없을 때
+			<div class="reserve-after-none">
+				<div class="item-desc">이후 확정된 예약일정이 없습니다.<br>빈 시간을 판매해보세요.</div>
+				<div class="item-btn"><a href="#" class="btn-point-underline">빈 시간 판매 알아보기</a></div>
+				<div class="item-btn-buy">						
+					<a href="#" class="btn btn-outline-gray btn-inline btn-border-radius-4">빈 시간 판매하기</a>
+				</div>
+			</div>
+			//리스트 아예  없을 때 -->
+		</div>
+
+		<div class="basic-data-group">
+			<div class="common-customer">
+				<div class="item-tel"><a href="tel:1661-9956">고객센터 <em>1661-9956</em></a></div>
+				<div class="item-mail"><a href="mailTo:help@peteasy.kr">help@peteasy.kr</a></div>				
+			</div>
+		</div>
+		<div class="page-footer">
+			<!-- 20211223 수정 -->
+			<div class="footer-business">
+				<button type="button" class="btn-footer-business" style="color:#000;">(주)펫이지 사업자 정보</button>
+				<div class="footer-address">
+					<div class="footer-address-cell">대표: 신동찬</div>
+					<div class="footer-address-cell">사업자등록번호: 157-86-01070 사업자정보확인</div>
+					<div class="footer-address-cell">통신판매업 제 2021-서울종로-0183호</div>
+					<div class="footer-address-cell">서울시 종로구 종로6 5층 서울창조경제혁신센터</div>
+					<div class="footer-address-cell">개인정보 담당자: 이석범 privacy@peteasy.kr</div>
+				</div>
+			</div>
+			<!-- //20211223 수정 -->
+			<!-- 20211223 수정 -->
+			<!--
+			<div class="footer-customer-menu">
+				<ul>
+					<li><a href="#">미용샵/호텔입점신청</a></li>
+					<li><a href="#">쇼핑입점/제휴광고문의</a></li>
+				</ul>
+			</div>
+			-->
+            <div class="footer-etc-menu">
+                <ul>
+                    <li><a href="terms4">이용약관</a></li>
+                    <li><a href="terms3">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            <!--<div class="footer-etc-menu">
+                <ul>
+                    <li><a>고객센터</a></li>
+                    <li><a href="tel:1661-9956">1661-9956</a></li>
+                </ul>
+            </div>
+            <div class="footer-etc-menu">
+                <ul>
+                    <li><a href="mailTo:help@peteasy.kr">help@peteasy.kr</a></li>
+                </ul>
+            </div>-->
+			<!-- //20211223 수정 -->
+			<div class="footer-copy">©PetEasy Co. Ltd. All rights reserved</div>
+		</div>
+
+	</div>
+	<!-- //page-body -->
+
+    <article id="talkExam" class="layer-pop-wrap" style="z-index: 100002;">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">
+                            <img id="gallery" src="/images/example_talk.jpg" alt="미용 종료 알림 발송톡 예시 입니다.">
+                        </div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+
+    <div id="popup_wrap">
+        <div class="custom-modal-content">
+            <div class="popup_img">
+                <div class="swiper-container_front">
+                    <div class="swiper-wrapper">
+                        <div class="swiper-slide">
+                            <a href="javascript:;">
+                                <img src="/images/banner/sent_cell.jpg" />
+                            </a>
+                        </div>
+                    </div>
+                    <!-- Add Arrows -->
+                    <div class="next"><i class="fas fa-chevron-left"></i></div>
+                    <div class="prev"><i class="fas fa-chevron-right"></i></div>
+                    <div class="swiper-pagination_front"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</section>
+<!-- //container -->
+<script>
+
+    function getCookie_popup(name) {
+        var obj = name + "=";
+        var x = 0;
+        while (x <= document.cookie.length) {
+            var y = (x + obj.length);
+            if (document.cookie.substring(x, y) == obj) {
+                if ((endOfCookie = document.cookie.indexOf(";", y)) == -1)
+                    endOfCookie = document.cookie.length;
+                return unescape(document.cookie.substring(y, endOfCookie));
+            }
+            x = document.cookie.indexOf(" ", x) + 1;
+            if (x == 0)
+                break;
+        }
+        return "";
+    }
+    function setCookie_popup(name, value, expiredays) {
+        var todayDate = new Date();
+        todayDate.setDate(todayDate.getDate() + expiredays);
+        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure ';
+    }
+
+    $(document).ready(function(){
+        if (getCookie_popup('guide_beauty_shop') != 'Y') {
+            $("#popup_wrap").dialog({
+                modal: true,
+                title: "",
+                autoOpen: true,
+                //maxWidth: "96%",
+                //minHeight: Number($(window).height()) - 40,
+                //width: 'auto',
+                //height: 'auto',
+                autoSize: false,
+                resize: 'auto',
+                resizable: false,
+                draggable: false,
+                buttons: {
+                    '오늘 그만보기': function() {
+                        setCookie_popup('guide_beauty_shop', 'Y', 1);
+                        $(this).dialog("close");
+                    },
+                    "자세히 보기": function() {
+                        location.href = "mypage_notice_view?notice_seq=17";
+                            //setCookie_popup('guide_beauty_shop', 'Y', 1);
+                        $(this).dialog("close");
+                    }
+                },
+                open: function(event, ui) {
+                    // swiper2.update();
+                    $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                    $(event.target).parent().css('top', '50%'); // dialog fixed
+                    $(event.target).parent().css('left', '50%'); // dialog fixed
+                    $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                    //$('.ui-dialog').position({ my: "center", at: "center", of: window });
+                },
+                close: function() {
+                }
+            });
+        }
+    });
+
+	var artist_id = '<?=$artist_id ?>';
+	
+	function get_customer_count(artist_id){
+		$.ajax({
+			url: 'data/manage_customer_allview_ajax.php',
+			data: {
+				mode: "get_customer_count",
+				artist_id: artist_id
+			},
+			type: 'POST',
+			dataType: 'JSON',
+			success: function(data) {
+				console.log(data);
+				if(data.code == "000000"){
+					console.log(data.data);
+					$(".info-list-wrap .value:eq(3)").text(data.data);
+				}else{
+					alert(data.data+"("+data.code+")");
+					console.log(data.data);
+				}
+			},
+			error: function(xhr, status, error) {
+				//alert(error + "네트워크에러");
+				if(xhr.status != 0){
+					alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+				}
+			}
+		});
+	}
+	get_customer_count(artist_id);
+
+	function showPortfolioGallery(img){
+	    $('#gallery').prop('src',img);
+	    popalert.open('talkExam');
+    }
+</script>
+
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

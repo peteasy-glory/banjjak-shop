@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="ko" class="">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">상품관리</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-hotel-management -->  
+		<div class="set-hotel-management">
+			<div class="page-tab-group">
+				<div class="page-tab">
+					<div class="page-tab-inner">
+						<!-- 활성화시 actived클래스 추가 -->
+						<div class="tab-cell"><a href="#" class="btn-tab-item"><span>미용</span></a></div>
+						<div class="tab-cell actived"><a href="#" class="btn-tab-item"><span>호텔</span></a></div>
+					</div>
+				</div>
+				<!-- actived클래스 추가시 활성화 -->
+				<button type="button" class="btn btn-outline-gray btn-round btn-inline btn-surtax-set actived"><div class="icon"></div>부가세 설정</button>
+			</div>
+			<div class="basic-data-group vsmall">
+				<div class="con-title-group">
+					<h4 class="con-title">상품구분</h4>
+				</div>
+				<div class="wide-tab">
+					<div class="wide-tab-inner">
+						<!-- 활성화시 actived클래스 추가 -->
+						<div class="tab-cell"><button type="button" class="btn-tab-item">호텔상품</button></div>
+						<div class="tab-cell actived"><button type="button" class="btn-tab-item">매장상품</button></div>
+					</div>
+				</div>
+				<div class="basic-data-group middle">
+					<!-- 내용이 없을 경우 -->
+					<div class="btn-group vertical">
+						<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">판매상품 등록하기</button></div>
+					</div>					
+					<div class="common-none-data">
+						<div class="none-inner">
+							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+							<div class="item-info">등록된 상품이 없습니다.</div>
+							<div class="item-desc">*쿠폰/제품 탭의 등록 상품은 견주 예약과정에 나타나지 않습니다.<br>*매장판매 상품등록/관리에 활용하시면 좋습니다.</div>
+						</div>
+					</div>
+					<!-- //내용이 없을 경우 -->
+					<!-- 내용이 있을을 경우 -->
+					<div class="basic-data-group middle">
+						<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
+						<div class="con-title-group">
+							<h4 class="con-title">매장상품</h4>
+							<button type="button" class="btn btn-outline-purple btn-small-size btn-inline btn-round">수정하기</button>
+						</div>
+						<div class="basic-data-group vsmall">
+							<ul class="accordion-list">    
+								<li class="accordion-cell actived">			
+									<button type="button" class="btn-accordion-menu">
+										<span class="accordion-menu-subject">용품</span>
+									</button>
+									<div class="accordion-content">
+										<div class="read-table">
+											<table>
+												<colgroup>
+													<col style="width:auto;">
+													<col style="width:auto;">
+												</colgroup>
+												<thead>
+													<tr>
+														<th><strong>상품명</strong></th>
+														<th>가격(단위:원)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>			
+								</li>       
+								<li class="accordion-cell actived">	
+									<button type="button" class="btn-accordion-menu">
+										<span class="accordion-menu-subject">간식</span>
+									</button>
+									<div class="accordion-content">
+										<div class="read-table">
+											<table>
+												<colgroup>
+													<col style="width:auto;">
+													<col style="width:auto;">
+												</colgroup>
+												<thead>
+													<tr>
+														<th><strong>상품명</strong></th>
+														<th>가격(단위:원)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>			
+								</li>       
+								<li class="accordion-cell actived">	
+									<button type="button" class="btn-accordion-menu">
+										<span class="accordion-menu-subject">사료</span>
+									</button>
+									<div class="accordion-content">
+										<div class="read-table">
+											<table>
+												<colgroup>
+													<col style="width:auto;">
+													<col style="width:auto;">
+												</colgroup>
+												<thead>
+													<tr>
+														<th><strong>상품명</strong></th>
+														<th>가격(단위:원)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>			
+								</li>    
+								<li class="accordion-cell actived">	
+									<button type="button" class="btn-accordion-menu">
+										<span class="accordion-menu-subject">기타</span>
+									</button>
+									<div class="accordion-content">
+										<div class="read-table">
+											<table>
+												<colgroup>
+													<col style="width:auto;">
+													<col style="width:auto;">
+												</colgroup>
+												<thead>
+													<tr>
+														<th><strong>상품명</strong></th>
+														<th>가격(단위:원)</th>
+													</tr>
+												</thead>
+												<tbody>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+													<tr>
+														<td>상품명</td>
+														<td>20,000</td>
+													</tr>
+												</tbody>
+											</table>
+										</div>
+									</div>			
+								</li>    
+							</ul>
+						</div>
+					</div>					
+					<div class="basic-data-group">
+						<div class="con-title-group">
+							<h4 class="con-title">안내사항</h4>
+						</div>
+						<div class="form-group middle">
+							<div class="form-group-cell middle">
+								<div class="form-group-item">
+									<div class="form-item-label">공통 안내</div>
+									<div class="form-item-data">
+										<input type="text" class="form-control" placeholder="입력"/>
+										<div class="form-input-info">0/1000</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="basic-data-group vvsmall3">
+						<div class="grid-layout btn-grid-group">
+							<div class="grid-layout-inner">
+								<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">저장</a></div>
+								<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round">삭제</a></div>
+							</div>
+						</div>
+					</div>
+					<!-- //내용이 있을을 경우 -->
+				</div>
+			</div>			
+		</div>
+		<!-- //set-hotel-management -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+	
+</body>
+</html>

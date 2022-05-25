@@ -1,0 +1,244 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/common/TEmoji.php");
+
+$emoji = new TEmoji();
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "샵 이용 후기 관리";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$sql = "
+        SELECT *
+        FROM tb_shop
+        WHERE customer_id = '".$user_id."'
+    ";
+$result = mysqli_query($connection, $sql);
+$row = mysqli_fetch_assoc($result);
+$shop_img = ($row["front_image"] && $row["front_image"] != "")? "https://image.banjjakpet.com".img_link_change($row["front_image"]): img_link_change($image_directory."/who4.png");
+
+$review_sql =
+    "SELECT B.name ,A.* 
+    FROM tb_usage_reviews A
+    INNER JOIN tb_shop B ON A.artist_id = B.customer_id
+    WHERE A.artist_id = '" . $user_id . "'
+        AND A.is_delete = 0
+    ORDER BY A.reg_time DESC;";
+
+$review_result = mysqli_query($connection, $review_sql);
+$listData	= array();
+for ($opinionkey = 0; $review_rows = mysqli_fetch_object($review_result); $opinionkey++) {
+	$listData[]	= 	$review_rows;
+}
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		
+		<div class="master-review-wrap">
+			<?if(count($listData)==0){?>
+			<div class="common-none-data">
+				<div class="none-inner">
+					<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+					<div class="item-info">이용 후기가 없습니다.<span>단골 고객께 후기를 권유해 보는 것은 어떨까요?</span></div>
+				</div>
+			</div>
+			<?}else{?>
+			<!-- 내용이 있을 때 -->			
+			<div class="review-detail-list">
+				<!-- 하나의 아이템 -->
+				<?foreach($listData as $key => $review_rows){
+					
+					//print_r($review_rows);
+                    $shop_name = $review_rows->name;
+					$artist_reply = $emoji->emojiDBToStr($review_rows->artist_reply);
+                    $artist_reply =  preg_replace("/\r\n|\r|\n/", '<br/>', $artist_reply);
+					$artist_id = $review_rows->artist_id;
+                    $photo = ($review_rows->photo) ? "https://image.banjjakpet.com".img_link_change($review_rows->photo) : img_link_change($image_directory."/who4.png");
+					$review = $emoji->emojiDBToStr($review_rows->review);
+					$review_images = $review_rows->review_images;
+					$rating = $review_rows->rating;
+					$payment_log_seq = $review_rows->payment_log_seq;
+					$review_customer_id = $review_rows->customer_id;
+					$nickname = $review_rows->nickname;
+					$update_time = $review_rows->reg_time;
+					$reply_time = substr($review_rows->reply_time,0, 10);
+					//strtotime($update_time)
+					$pic = 0;
+					$review_images_array;
+					$first_img = "";
+					$review_images_array = explode("|", $review_images);
+					$review_images_array_size = sizeof($review_images_array);
+					
+					if ($review_images_array_size > 0) {
+					$first_img = $review_images_array[0];
+					$pic = 1;
+					} else {
+					$first_img = $review_images;
+					}
+					if(trim($review_images) == ""){
+                        $pic = 0;
+                    }
+
+					$review =  str_replace("width:30%", "width:100%", $review);
+                    
+				?>
+				<div class="review-detail-cell">
+					<div class="comment-item">
+						<div class="item-user-info">
+							<div class="user-thumb-wrap">
+								<div class="user-thumb"><img src="<?= $photo ?>" alt=""></div>
+							</div>
+							<div class="user-data">
+								<div class="data-inner">
+									<div class="user-name"><?= $nickname ?></div>
+									<div class="user-grade">
+										<div class="icon-star-group">
+											<?for($i=0;$i<$rating;$i++){?>
+											<div class="icon icon-size-16 icon-star-yellow"></div>
+											<?}?>
+											<?for($i=0;$i<5-$rating;$i++){?>
+											<div class="icon icon-size-16 icon-star-graZ"></div>
+											<?}?>
+											
+										</div>
+										
+										<div class="time"><?=date("Y-m-d", strtotime($update_time))?></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<?if($pic>0){?>
+						<div class="item-gallery">
+							<div class="portfolio-list-wrap">
+								<div class="list-inner">
+									<?
+									foreach($review_images_array as $key => $val){?>
+									<div class="list-cell"><div class="btn-portfolio-item"><img src="<?="https://image.banjjakpet.com".img_link_change($val)?>" alt=""></div></div>
+									<?}?>
+								</div>
+							</div>
+						</div>
+						<?}?>
+						<div class="item-detail"><?= strip_tags($review) ?></div>
+											
+					</div>					
+					<?php
+					if ($artist_reply == "") {
+					?>
+					<div class="comment-item-btns"><a href="shop_review_recommend_write?key=add&payment_log_seq=<?= $payment_log_seq ?>&artist_id=<?= $artist_id ?>" class="btn btn-outline-purple btn-middle-size btn-border-radius-5"><em>답글 작성</em></a></div>
+					<?}else{?>
+					<div class="recomment-list">
+						<div class="recomment-cell">
+							<div class="recomment-item">
+								<div class="user-thumb-wrap">
+									<div class="user-thumb"><img src="<?=$shop_img?>" alt=""></div>
+								</div>		
+								<div class="recomment-data"  >
+									<div class="item-name"><?=$shop_name?><span class="date"><?=$reply_time?></span></div>
+									<div class="item-detail" style=" height: auto";><?= $artist_reply ?></div>
+								</div>
+							</div>							
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-2"><a href="shop_review_recommend_write?key=add&payment_log_seq=<?= $payment_log_seq ?>&artist_id=<?= $artist_id ?>" class="btn btn-outline-gray btn-size-middle btn-border-radius-5">수정</a></div>
+									<div class="grid-layout-cell grid-2"><a href="#" onclick="popalert.confirm('pop2','삭제하시겠습니까?','data/insert_usage_review_reply_pc?key=delete&payment_log_seq=<?= $payment_log_seq ?>&artist_id=<?= $artist_id ?>')" class="btn btn-outline-gray btn-size-middle btn-border-radius-5">삭제</a></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<?}?>
+				</div>
+				<!-- //하나의 아이템 -->
+				<?}?>
+				<!-- 하나의 아이템 -->
+				<!--div class="review-detail-cell">
+					<div class="review-store-info">
+						<div class="item-name"><strong>후기 없을 때</strong><span class="item-date">2021.09.01</span></div>
+						<div class="item-info">알림톡테스트 / 말티, 푸들 / 전체미용 / ~6.9kg</div>
+					</div>
+					<div class="comment-item">
+						<div class="item-user-info">
+							<div class="user-thumb-wrap">
+								<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""></div>
+							</div>
+							<div class="user-data">
+								<div class="data-inner">
+									<div class="user-name">승우누나</div>
+									<div class="user-grade">
+										<div class="icon-star-group">
+											<div class="icon icon-size-16 icon-star-yellow"></div>
+											<div class="icon icon-size-16 icon-star-yellow"></div>
+											<div class="icon icon-size-16 icon-star-yellow"></div>
+											<div class="icon icon-size-16 icon-star-gray"></div>
+											<div class="icon icon-size-16 icon-star-gray"></div>
+										</div>
+										<div class="time">5시간 전</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						
+						<div class="item-detail">항상 세련되면서도 깔끔하게 미용해주셔서 감사드려요~ 미용 마친 후 사진까지 담아주셔서 사진보고 가족들이 넘 좋아했답니다. 다음 미용 때도 잘 부탁드릴게요!</div>
+						<div class="item-ui"><button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button></div>
+					</div>
+					<div class="recomment-list">
+						<div class="recomment-cell">
+							<div class="recomment-item">
+								<div class="user-thumb-wrap">
+									<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""></div>
+								</div>		
+								<div class="recomment-data">
+									<div class="item-name">소망애견 미용실<span class="date">1일 전</span></div>
+									<div class="item-detail">좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다.</div>
+								</div>
+							</div>							
+							<div class="grid-layout toggle-button-group">
+								<div class="grid-layout-inner">
+									<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-size-middle btn-border-radius-5">수정</a></div>
+									<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-size-middle btn-border-radius-5">삭제</a></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div-->
+				<!-- //하나의 아이템 -->
+			</div>
+			<!-- //내용이 있을 때 -->
+			<?}?>
+		</div>
+
+	</div>
+	<!-- //page-body -->
+</section>
+<!-- //container -->
+<script>
+$(document).ready(function(){
+    $('#btn_page_prev').prop('href','shop_main')
+})
+</script>
+	
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

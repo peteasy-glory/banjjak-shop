@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>반짝 - 반려미용샵의 단짝</title>
+
+    <meta name="description" content="국내 1위 펫샵전용 예약/고객관리">
+    <link rel="shortcut icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.ico" />
+    <link rel="icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.png" />
+
+    <link rel="stylesheet" href="./css/font.css">
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/style.css">
+
+    <script src="js/lib/modernizr.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/detectizr/2.2.0/detectizr.min.js"></script>
+    <script src="js/lib/gsap.min.js"></script>
+    <script src="js/lib/jquery-1.11.2.min.js"></script>
+    <script src="js/lib/intersection-observer.js"></script>
+
+    <script>
+        $( document ).ready( function(){
+            function setScreenSize() {
+                console.log( 1 );
+                let vh = window.innerHeight * 0.01;
+
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            }
+
+            setScreenSize();
+        });
+
+		function goSofaIframe(url){
+			document.getElementById("main_frame").src = url;
+		}
+
+    </script>
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=f2cf1f3b7e2ca88cb298196078ef550f"></script>
+</head>
+<body>
+    <div class="wrap frame">
+
+        <div class="inner-wrap">
+            <div class="frame-info">
+                <div class="frame-info-header">
+                    <h2><img src="./img/frame/logo.png" alt=""></h2>
+                </div>
+
+                <div class="frame-info-content">
+                    <dl>
+                        <dt>
+                            내 <span>반려생활</span>의 든든한 <span>단짝</span>
+                        </dt>
+                        <dd>
+                            미용 예약, 산책, 쇼핑부터! 반려생활의 모든 것
+                        </dd>
+                    </dl>
+
+                    <div class="review">
+                        <div class="review-bx">
+                            <div class="review-title">
+                                <img src="./img/frame/ic_review.png" alt="">
+                                <span>미용 포토리뷰</span>
+                            </div>
+							<a href="javascript:goSofaIframe('https://gopet.kr/pet/mainpage/item_product_page.php?no=CN-BANJJAK-A01');"><img src="./uploads/product/house/pet_sofa.png" alt=""></a>
+
+                            <div class="download-bx">
+                                <div class="app-download">
+                                    <h3>앱으로 더 편하게 아이와 생활하세요.</h3>
+                                    <ul>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <img src="./img/frame/ic_android.png" alt="">
+                                                <span>Google play</span>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="javascript:;">
+                                                <img src="./img/frame/ic_apple.png" alt="">
+                                                <span>App Store</span>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="ltd">
+                        ©PetEasy Co. Ltd. All rights reserved
+                    </div>
+                </div>
+            </div>
+            
+            <div class="frame-bx">
+                <iframe id=main_frame  src="https://gopet.kr/pet/mainpage/index_lisa.php" frameborder="0"></iframe>
+                <!-- 팝업 노출 -> class : on -->
+                <div class="popup">
+                    <div class="popup-bx">
+                        <div class="popup-content">
+                            <a class="popup-btn-close" href="javascript:;">
+                                <img src="./img/frame/btn_close.png" alt="">
+                            </a>
+
+                            <div class="popup-info">
+                                <div class="logo"><img src="./img/frame/logo.png" alt=""></div>
+                                <dl>
+                                    <dt>
+                                        산책은 앱에서 이용 가능하세요
+                                    </dt>
+                                    <dd>
+                                        산책할 때마다 쌓이는 포인트로<br>
+                                        미용, 쇼핑 할인!
+                                    </dd>
+                                </dl>
+
+                                <img class="img-dog" src="./img/frame/img_dog.png" alt="">
+                            </div>
+
+                            <div class="popup-btn">
+                                <a href="javascript:;">
+                                    지금 다운로드
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

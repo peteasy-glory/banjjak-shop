@@ -1,0 +1,138 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "접수 권한 수정하기";
+$header_right	= '
+	
+';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$artist_seq = $_GET['artist_seq'];
+$que = "SELECT * FROM tb_shop_artist WHERE artist_seq = '{$artist_seq}'";
+$row = sql_fetch_array($que);
+
+?>
+
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- set-right-input -->  
+		<div class="set-right-input">
+			<div class="basic-data-group vmiddle">
+				<div class="basic-data-group vmiddle">
+					<div class="form-group">
+						<div class="form-group-cell">
+							<div class="form-group-item">
+								<div class="form-item-label">직원이름 입력</div>
+								<div class="form-item-data">
+									<input type="text" name="artist_name" id="artist_name" value="<?php echo $row[0]['name'];?>" class="form-control" placeholder="입력">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+		</div>
+		<!-- //set-right-input -->  
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a href="javascript:;" class="btn-page-bottom btn-save">수정하기</a>
+	</div>
+	<!-- //page-bottom -->
+    <!--  예약거부 -->
+    <article id="gooutcancel" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">일치하는 회원ID가 없습니다.<br><br>
+                            정확한 ID를 확인해 주세요</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm btn-ok" onclick="popalert.close();">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <!-- //예약거부 -->
+
+    <article id="msgReload" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">직원권한이 등록되었습니다.</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm btn-ok" onclick="location.href='./set_right';">확인</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+</section>
+<!-- //container -->
+
+<script>
+    //저장하기
+    $(document).on('click','.btn-save',function(){
+        if($('#artist_id').val() == ''){
+            popalert.open('gooutcancel','누락된 정보가 있습니다. 새로고침해주세요.');
+            return false;
+        }
+        if($('#artist_name').val() == ''){
+            popalert.open('gooutcancel','직원이름을 입력해주세요.');
+            $('#artist_name').focus();
+            return false;
+        }
+        $.ajax({
+            type : 'post',
+            url : './data/proc_shop_artist',
+            data : {'type':'modify','artist_seq':'<?php echo $artist_seq;?>','artist_name':$('#artist_name').val()},
+            dataType : 'json',
+            success : function(json){
+                if(json.flag == true){
+                    popalert.open('msgReload','수정되었습니다.');
+                } else {
+                    popalert.open('msgReload','수정시 오류가발생했습니다.');
+                }
+            }
+        });
+    });
+    $(document).ready(function(){
+        $('#header_bell').css('display','none');
+        $('#btn_page_prev').prop('href','set_right')
+    });
+</script>
+</body>
+</html>

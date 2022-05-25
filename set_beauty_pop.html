@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>반짝</title>
+	<meta name="format-detection" content="telephone=no">
+	<link href="/static/pub/css/style.css" rel="stylesheet">
+	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
+	<script src="/static/pub/js/jquery-ui.min.js"></script>    
+	<script src="/static/pub/js/swiper.min.js"></script>
+	<script src="/static/pub/js/common.js"></script>
+</head>
+<body>        
+
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
+	<div class="page-title">상품관리</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<button type="button" class="btn btn-purple" onclick="pop.open('surtaxSet');"><em>부가세설정</em></button>
+		<button type="button" class="btn btn-purple" onclick="pop.open('setBeautyMsg1');"><em>필수정보 체크</em></button>
+	</div>
+	<!-- //page-body -->	
+	
+	<!--  부가세설정 -->
+	<article id="surtaxSet" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-header">
+						<h4 class="con-title">부가세 설정</h4>
+					</div>
+					<div class="pop-body type-3">
+						<div class="msg-txt text-align-left font-color-gray">*고객에게 보여지는 가격에 부가세10%를 추가로 받으시는 분은 하단에 있는[부가세 10%추가]버튼을 눌러주세요.<br>(예: 전체미용 가격표 표기 10,000원, 고객이 실제 지불하는 금액 11,000원)</div>
+						<div class="basic-data-group vvsmall3">
+							<div class="memo-item type-2">
+								<div class="flex align-items-center justify-content-space-between">
+									<div>부가세 10% 추가</div>
+									<div><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" id="switch-toggle"><span class="bar"></span></label></div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //부가세설정 -->
+	
+	<!--  필수정보 체크 -->
+	<article id="setBeautyMsg1" class="layer-pop-wrap">
+		<div class="layer-pop-parent">
+			<div class="layer-pop-children">
+				<div class="pop-data alert-pop-data">
+					<div class="pop-body">
+						<div class="msg-txt">최소 1개의 가격표는 필수정보입니다.<br>가격표를 삭제할 수 없습니다.</div>
+					</div>
+					<div class="pop-footer">
+						<button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</article>
+	<!-- //필수정보 체크 -->
+
+</section>
+<!-- //container -->
+
+</body>
+</html>
