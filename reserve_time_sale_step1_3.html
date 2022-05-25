@@ -1344,7 +1344,7 @@ function data_dash($tmp){
 
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'awaitAddDay','artist_id':artist_id,'data':chk_date,'sel_date':$('#today_sel option:selected').val()},
                 dataType : 'json',
                 success : function(json){
@@ -1368,7 +1368,7 @@ function data_dash($tmp){
 
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'awaitAddDay','artist_id':artist_id,'data':chk_date},
                 dataType : 'json',
                 success : function(json){
@@ -1413,7 +1413,7 @@ function data_dash($tmp){
 
                 $.ajax({
                     type : 'post',
-                    url : './data/get_book_data_ajax',
+                    url : './data/get_book_data_ajax.php',
                     data : {'mode':'noAllChk','data':chk_date},
                     dataType : 'json',
                     success : function(json){
