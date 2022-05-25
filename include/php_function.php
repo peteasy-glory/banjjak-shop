@@ -570,4 +570,78 @@ function calc_passed_year($firstDate,$secondDate){
 
 	echo $years.'년'.$months.'개월';
 }
+
+//보유 펫 정보 구하기
+function get_mypet_info($crypto, $user_id, $phone,$access_key,$secret_key){
+	global $connection;
+	$cellphone_encode = $crypto->encode($phone, $access_key, $secret_key);
+	$data = array();
+	$cus = '';
+	$sql = "
+                                            SELECT *
+                                            FROM tb_customer
+                                            WHERE cellphone = '" . $cellphone_encode . "' 
+                                                and id = '{$user_id}'
+                                                and nickname not like 'cellp_%'
+                                        ";	// 20210705 by migo - cellp 제외 조건
+	//echo $sql."<p>";
+
+	$result = mysqli_query($connection, $sql);
+	$member_cnt = mysqli_num_rows($result);
+	if ($member_cnt == 0) { // (가회원)
+		$sql = "
+                                                SELECT *
+                                                FROM tb_tmp_user
+                                                WHERE cellphone = '" . $phone . "'
+                                            ";
+		//echo $sql;
+		$result = mysqli_query($connection, $sql);
+		$data["customer"] = mysqli_fetch_assoc($result);
+		$data["customer"]["tmp_yn"] = "Y";
+		$where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
+		$where_qy .= " AND mp.tmp_seq = '" . $data["customer"]["tmp_seq"] . "' ";
+		$cus = $data["customer"]["tmp_seq"];
+	} else {
+		$data["customer"] = mysqli_fetch_assoc($result);
+		$data["customer"]["tmp_yn"] = "N";
+		$where_qy  = " AND mp.tmp_yn = '" . $data["customer"]["tmp_yn"] . "' ";
+		$where_qy .= " AND mp.customer_id = '" . $data["customer"]["id"] . "' ";
+		$data["customer"]["cellphone"] = $phone;
+		$cus = $data["customer"]["id"];
+	}
+
+	// 펫 리스트 호출
+	$sql = "
+		SELECT * FROM (
+			SELECT 
+				if(sum(pl.data_delete) > 0, NULL, mp.pet_seq) AS pet_seq,
+				if(sum(pl.data_delete) > 0, NULL, mp.name) AS name, 
+				if(sum(pl.data_delete) > 0, NULL, mp.type) AS type,
+				if(sum(pl.data_delete) > 0, NULL, mp.pet_type) AS pet_type 
+			FROM tb_mypet AS mp
+				LEFT OUTER JOIN (
+					SELECT * 
+					FROM tb_payment_log
+					WHERE artist_id = '" . $user_id . "'
+				) AS pl ON mp.pet_seq = pl.pet_seq
+				
+			WHERE 1=1 
+			AND mp.data_delete = '0'
+			" . $where_qy . "
+			GROUP BY mp.pet_seq
+		) AS past
+		WHERE past.pet_seq IS NOT NULL
+	";
+	//echo $sql."<p><p>";
+	$result = mysqli_query($connection, $sql);
+	while ($row = mysqli_fetch_assoc($result)) {
+		if ($row["pet_name"] != "") {
+			$row["name"] = $row["pet_name"];
+		}
+		$row['cus'] = $cus;
+		$data["pet_list"][] = $row;
+	}
+
+	return $data["pet_list"];
+}
 ?>

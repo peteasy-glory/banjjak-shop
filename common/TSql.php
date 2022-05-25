@@ -31,6 +31,9 @@ class TReserveSql extends TSql{
     private $SQL_CANT_RESERVATION_WEEK_NOR = "SELECT * FROM tb_regular_holiday 
                                               WHERE customer_id = '%s'" ;
 
+    private $SQL_CANT_RESERVATION_WEEK_OFF = "SELECT * FROM tb_time_off 
+                                              WHERE customer_id = '%s'" ;
+
     private $SQL_GET_RESERVATION_CHK = "SELECT  A.*, B.name AS pet_name, B.pet_type AS pet_type , C.is_approve AS is_await , C.idx AS approve_seq 
                                         , CONCAT(A.year,LPAD(A.month, '2','0'),LPAD(A.day, '2','0'),LPAD(A.hour, '2','0'),LPAD(A.minute, '2','0')) AS reservation_date
                                         FROM tb_payment_log A INNER JOIN tb_mypet B ON A.pet_seq = B.pet_seq
@@ -78,6 +81,11 @@ class TReserveSql extends TSql{
 
     public function qry_cant_reservation_week_nor($artistId){
         $this->sql = sprintf($this->SQL_CANT_RESERVATION_WEEK_NOR, $artistId);
+        return $this->sql_fetch_array();
+    }
+
+    public function qry_cant_reservation_week_off($artistId){
+        $this->sql = sprintf($this->SQL_CANT_RESERVATION_WEEK_OFF, $artistId);
         return $this->sql_fetch_array();
     }
 
