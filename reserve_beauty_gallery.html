@@ -48,7 +48,7 @@ $ts = sql_fetch_array($que);
 				<div class="list-inner">
 					<div class="list-cell"><a href="javascript:;" onclick="file_view();" class="btn-gate-picture-register"><span><em>이미지 추가</em></span></a></div>
                     <?php
-                        $que = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$_GET['pet']}' AND artist_id = '{$user_id}'";
+                        $que = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$_GET['pet']}' AND artist_id = '{$user_id}' order by idx desc";
                         //echo $que;
                         $arr = sql_fetch_array($que);
 
