@@ -1353,6 +1353,10 @@ switch($clear['mode']){
             break;
         }
 
+        //발신자 테이블내 고객 번호 변경.
+        $que = "UPDATE tb_sent_cell_id SET cellphone = '{$tel}' WHERE cellphone = '{$_POST['org']}' AND artist_id = '{$user_id}'";
+        sql_query($que);
+
         //결제내역 번호를 변경한다.
         $que = "UPDATE tb_payment_log SET cellphone = '{$tel}' WHERE cellphone = '{$_POST['org']}'";
         sql_query($que);

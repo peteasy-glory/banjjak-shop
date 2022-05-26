@@ -1280,7 +1280,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                 }
 
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'modifyTel','org':$('#org_tel').val(),'tel':phone},
                     type: 'POST',
                     dataType: 'json',

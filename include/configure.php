@@ -4,8 +4,11 @@
 	$root_directory = "/user";
 	$upload_directory = "upload";
 	$upload_directory2 = "/upload";
-	$upload_static_directory = "/var/www/html/subdomain/banjjak_sol/shop";
-	$upload_static_directory2 = "/var/www/html/subdomain/banjjak_sol/shop";
+//	$upload_static_directory = "/var/www/html/subdomain/banjjak_sol/shop";
+//	$upload_static_directory2 = "/var/www/html/subdomain/banjjak_sol/shop";
+	$upload_static_directory = $document_root;
+	$upload_static_directory2 = $document_root;
+
 	$mainpage_directory = $root_directory."/mainpage";
 	$image_directory = $root_directory."/images";
 	$include_directory = $root_directory."/include";

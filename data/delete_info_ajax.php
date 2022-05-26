@@ -88,15 +88,22 @@ if($r_mode){
 					UPDATE tb_payment_log AS a ".$hotel_table." ".$play_table." SET
 						a.data_delete = '1'
 						".$approval_set."
-						".$hotel_set." 
+						".$hotel_set."
 						".$play_set."
 					WHERE a.cellphone = '".$r_cellphone."' AND a.artist_id = '".$r_artist_id."'
-					".$hotel_update." 
+					".$hotel_update."
 					".$play_update."
 				";
             $result = mysqli_query($connection,$sql);
             if($result){
-                $return_data = array("code" => "000000", "data" => "OK");
+                $sql = "UPDATE tb_sent_cell_id SET is_delete = 1 WHERE artist_id = '".$r_artist_id."' AND cellphone = '".$r_cellphone."'";
+                $result = mysqli_query($connection,$sql);
+                if($result){
+                    $return_data = array("code" => "000000", "data" => "OK");
+                }
+                else{
+                    $return_data = array("code" => "000001", "data" => "발신 정보 삭제에 실패했습니다.");
+                }
             }else{
                 $return_data = array("code" => "000001", "data" => "회원 삭제에 실패했습니다.");
             }
