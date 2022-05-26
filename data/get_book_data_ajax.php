@@ -1251,6 +1251,36 @@ switch($clear['mode']){
         echo json_encode($json);
         break;
 
+        // 일 전체선택 해제
+    case 'noAllChk':
+
+        $sel_dt = trim($_POST['data']);
+        $ex = explode('.',$sel_dt);
+        $year = $ex[0];
+        $month = sprintf('%02d',$ex[1]);
+        $day = sprintf('%02d',$ex[2]);
+        $sel_dt = $year.'-'.$month.'-'.$day;
+        $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}' AND empty_date = '{$sel_dt}'";
+        //echo $que;
+        sql_query($que);
+        $total_cnt = 0;
+        $que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}'";
+        $sftt = sql_fetch_array($que);
+        if(count($sftt)>0){
+            foreach($sftt as $rs){
+                $tmp = explode('|',$rs['empty_date']);
+                for($i=0;$i<count($tmp);$i++) {
+                    if(!empty($tmp[$i])) {
+                        $ed[$rs['worker']][] = $tmp[$i];
+                        $total_cnt++;
+                    }
+                }
+            }
+        }
+        $json['cnt'] = $total_cnt;
+        echo json_encode($json);
+        break;
+
         //임시휴일 삭제
     case 'privateDel':
         $json['flag'] = true;

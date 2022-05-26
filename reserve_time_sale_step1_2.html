@@ -689,6 +689,7 @@ $tws = sql_fetch_array($que);
 $reserve_sql = new TReserveSql($connection);
 $CantReservationWeek = $reserve_sql->qry_cant_reservation_week($artist_id, $worker, $first_date, $last_date);
 $CantReservationWeekNor = $reserve_sql->qry_cant_reservation_week_nor($artist_id);
+$CantReservationWeekOff = $reserve_sql->qry_cant_reservation_week_off($artist_id);
 $st_date_time= $first_date.TFunc::strToFillZero($time_open, 2)."00";
 $fi_date_time= $last_date.TFunc::strToFillZero($time_close, 2)."00";
 $st_date_time = str_replace("-", "", $st_date_time);
@@ -923,6 +924,27 @@ function data_dash($tmp){
                                                 if(strtotime($crw['start_datetime']) <= $nowdatetime && strtotime($crw['end_datetime']) > $nowdatetime){
                                                     $div_class = 'break';
                                                     $status = '예약금지';
+                                                }
+
+                                                // 휴게시간 확인
+                                                $crwn = null;
+                                                if (count($CantReservationWeekOff) < 1){
+                                                    $crwn = null;
+                                                }else{
+                                                    foreach ($CantReservationWeekOff as $val){
+                                                        $off_array = explode(',',$val['res_time_off']);
+
+                                                        for($i=0;$i<count($off_array);$i++){
+                                                            $off_start_time = explode('~',$off_array[$i])[0];
+                                                            if($thisTime == $off_start_time){
+                                                                $div_class = 'break';
+                                                                $status = '휴게시간';
+                                                                break;
+                                                            }else{
+
+                                                            }
+                                                        }
+                                                    }
                                                 }
 
                                                 //정기휴일 확인.
