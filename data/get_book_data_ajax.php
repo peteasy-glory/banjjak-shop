@@ -25,7 +25,7 @@ if(ctype_alnum($_POST['mode'])){
 switch($clear['mode']){
     //품종별 크기선택
     case 'getTypeSize':
-        $html = '<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size1"><input type="radio" name="size" id="size1" class="pet-size" value="" checked><em>선택안함</em></label></div>';
+        $html = '<div class="grid-layout-cell"><label class="form-toggle-box middle" for="size1"><input type="radio" name="size" id="size1" class="pet-size" value="" checked ><em>선택안함</em></label></div>';
         $json['flag'] = true;
         $json['data'] = '';
         if($_POST['type']=='dog') {
@@ -49,7 +49,7 @@ switch($clear['mode']){
             if (count($arr) > 0) {
                 foreach ($arr as $rs) {
                     $secondType = ($rs['second_type']!='직접입력')?$rs['second_type']:$rs['direct_title'];
-                    $html .= '<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size2">';
+                    $html .= '<div class="grid-layout-cell"><label class="form-toggle-box middle" for="size2">';
                     $html .= '        <input type="radio" name="size" id="size2" class="pet-size" value="'.$secondType.'" data-firstType="dog" data-secondType="'.$secondType.'">';
                     $html .= '        <em>'.$secondType.'</em>';
                     $html .= '</label>';
@@ -58,12 +58,12 @@ switch($clear['mode']){
                 $json['data'] = $html;
             }
         } else {
-            $html .= '<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size2">';
+            $html .= '<div class="grid-layout-cell"><label class="form-toggle-box middle" for="size2">';
             $html .= '        <input type="radio" name="size" id="size2" class="pet-size" value="단모" data-firstType="고양이" data-secondType="단모">';
             $html .= '        <em>단모</em>';
             $html .= '</label>';
             $html .= '</div>';
-            $html .= '<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size2">';
+            $html .= '<div class="grid-layout-cell"><label class="form-toggle-box middle" for="size2">';
             $html .= '        <input type="radio" name="size" id="size2" class="pet-size" value="장모" data-firstType="고양이" data-secondType="장모">';
             $html .= '        <em>장모</em>';
             $html .= '</label>';
@@ -77,7 +77,7 @@ switch($clear['mode']){
     case 'getBeautyServiceData':
         $json['flag'] = true;
         $json['data'] = '';
-        $html = '<div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="service1"><input type="radio" name="service" class="service-type" id="service1" checked><em>선택안함</em></label></div>';
+        $html = '<div class="grid-layout-cell"><label class="form-toggle-box middle" for="service1"><input type="radio" name="service" class="service-type" id="service1" checked><em>선택안함</em></label></div>';
         $json['flag'] = true;
         $que_pay = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$_POST['payment_log']}";
         $res_pay = sql_query($que_pay);
@@ -164,7 +164,7 @@ switch($clear['mode']){
                         $time_ = strtotime($_POST['start_time'].' +'.$worktime['time'][$i].' minute');
                     }
 
-                    $html .= '<div class="grid-layout-cell grid-2">';
+                    $html .= '<div class="grid-layout-cell">';
                     $html .= '    <label class="form-toggle-box middle" for="service2">';
                     $html .= '        <input type="radio" name="service" class="service-type" data-time="'.$time_.'" data-time="'.$worktime['time'][$i].'" value="'.$dog_product_seq[$worktime['title'][$i]].'_price">';
                     $html .= '        <em>'.$worktime['title'][$i]." ".$worktime['time'][$i].'분</em>';
@@ -185,7 +185,7 @@ switch($clear['mode']){
     case 'getBeautyKgsData'://강아지 미용 무게 금액 가져오기
         $json['flag'] = true;
         $json['data'] = '';
-        $html = '<div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" value="" class="weight" checked><em><span>선택안함</span></em></label></div>';
+        $html = '<div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" value="" class="weight" checked><em><span>선택안함</span></em></label></div>';
         $json['flag'] = true;
         //print_r($_POST);
         //개일경우
@@ -264,7 +264,7 @@ switch($clear['mode']){
                 $pr1 = ($cl[0][$i]==1)?'상담':$sv[0][$i];
                 $pr = ($cl[0][$i]==1)?'상담':number_format($sv[0][$i]).'원';
                 if($kgs[$i] != '' && $pr1 != ''){
-                    $html .= '<div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight2">';
+                    $html .= '<div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight2">';
                     $html .= '        <input type="radio" name="weight" id="weight2" class="weight" value="'.$kgs[$i].':'.$pr1.'">';
                     $html .= '        <em><span>~'.$kgs[$i].'kg</span><strong>'.$pr.'</strong></em>';
                     $html .= '</label>';
@@ -276,7 +276,7 @@ switch($clear['mode']){
             if($row['what_over_kgs']!='' && $row['over_kgs_price'] > 0){
 
 
-                $html .= '<div class="grid-layout-cell grid-2">';
+                $html .= '<div class="grid-layout-cell">';
                 $html .= '    <div class="form-toggle-options">';
                 $html .= '        <input type="radio" name="weight" id="weight2" class="weight_plus" value="'.$row['what_over_kgs'].':'.($plus_kgs_price+$row['over_kgs_price']).'">';
                 $html .= '        <div class="form-toggle-options-data">';

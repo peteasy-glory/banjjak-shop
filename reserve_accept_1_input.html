@@ -806,125 +806,238 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                     </button>
                                     <div class="accordion-content">
                                         <div class="form-group">
-                                            <div class="form-group-cell middle">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">크기 선택</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner" id="serviceType">
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size1">
-                                                                    <input type="radio" name="size" id="size1" value="" checked><em>선택안함</em></label>
+                                                <div class="form-group-cell middle grid-5-add">
+                                                    <div class="form-group-item">
+                                                        <div class="form-item-label01">크기</div>
+                                                        <div class="form-item-data type-2">
+                                                            <div class="grid-layout toggle-button-group">
+                                                                <div class="grid-layout-inner flex-dir" id="serviceType">
+                                                                    <div class="grid-layout-cell font-size-12">
+                                                                        <label class="form-toggle-box middle" for="size1">
+                                                                            <input type="radio" name="size" id="size1" value="" checked>
+                                                                            <em>선택안함</em>
+                                                                        </label>
+                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group-cell middle">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">서비스</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner" id="service_list">
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="service1" id="service">
-                                                                        <input type="radio" name="service" id="service1" class="service-type" value="" checked><em>선택안함</em></label></div>
-                                                                <?php
+                                                <div class="form-group-cell middle grid-5-add">
+                                                    <div class="form-group-item">
+                                                        <div class="form-item-label01">서비스</div>
+                                                        <div class="form-item-data type-2">
+                                                            <div class="grid-layout toggle-button-group">
+                                                                <div class="grid-layout-inner flex-dir" id="service_list">
+                                                                    <div class="grid-layout-cell">
+                                                                        <label class="form-toggle-box middle" for="service1" id="service">
+                                                                            <input type="radio" name="service" id="service1" class="service-type" value="" checked>
+                                                                            <em>선택안함</em>
+                                                                        </label>
+                                                                    </div>
+                                                                    <?php
 
-                                                                $cnt = $disp_cnt = 0;
-                                                                $dog_product_title = array();
-                                                                $option_name = array('bath_price','part_price','bath_part_price','sanitation_price','sanitation_bath_price','all_price','spoting_price','scissors_price','summercut_price');
-                                                                $dog_product_arr = array(
-                                                                    "무게",
-                                                                    "목욕",
-                                                                    "부분미용",
-                                                                    "부분+목욕",
-                                                                    "위생",
-                                                                    "위생+목욕",
-                                                                    "전체미용",
-                                                                    "스포팅",
-                                                                    "가위컷",
-                                                                    "썸머컷"
-                                                                );
-                                                                $dog_product_seq = array(
-                                                                    "목욕"         =>'bath',
-                                                                    "부분미용"      =>'part',
-                                                                    "부분+목욕"     =>'bath_part',
-                                                                    "위생"         =>'sanitation',
-                                                                    "위생+목욕"    =>'sanitation_bath',
-                                                                    "전체미용"     =>'all',
-                                                                    "스포팅"      =>'spoting',
-                                                                    "가위컷"      =>'scissors',
-                                                                    "썸머컷"       =>'summercut'
-                                                                );
-                                                                $beauty = 1;
-                                                                $productWorkTimeTitle = array("목욕", "부분미용", "부분+목욕", "위생", "위생+목욕","전체미용", "스포팅", "가위컷", "썸머컷");
-                                                                $que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}' ";
-                                                                $res = sql_query($que);
-                                                                $rows = sql_fetch($res);
-                                                                for($i=0;$i<14;$i++){
-                                                                    if(!empty($rows['worktime'.$i.'_disp_yn'] == 'y')){
-                                                                        if($i<10){
-                                                                            array_push($dog_product_title, $dog_product_arr[$i]);
-                                                                        } else {
-                                                                            if(!empty($rows['worktime'.$i.'_title'])) {
-                                                                                $dog_product_seq[$rows['worktime' . $i . '_title']] = 'beauty' . $beauty;
-                                                                                $option_name[] = 'beauty' . $beauty . "_price";
-                                                                                array_push($dog_product_title, $rows['worktime' . ($i+1) . '_title']);
-                                                                                $beauty++;
+                                                                    $cnt = $disp_cnt = 0;
+                                                                    $dog_product_title = array();
+                                                                    $option_name = array('bath_price','part_price','bath_part_price','sanitation_price','sanitation_bath_price','all_price','spoting_price','scissors_price','summercut_price');
+                                                                    $dog_product_arr = array(
+                                                                        "무게",
+                                                                        "목욕",
+                                                                        "부분미용",
+                                                                        "부분+목욕",
+                                                                        "위생",
+                                                                        "위생+목욕",
+                                                                        "전체미용",
+                                                                        "스포팅",
+                                                                        "가위컷",
+                                                                        "썸머컷"
+                                                                    );
+                                                                    $dog_product_seq = array(
+                                                                        "목욕"         =>'bath',
+                                                                        "부분미용"      =>'part',
+                                                                        "부분+목욕"     =>'bath_part',
+                                                                        "위생"         =>'sanitation',
+                                                                        "위생+목욕"    =>'sanitation_bath',
+                                                                        "전체미용"     =>'all',
+                                                                        "스포팅"      =>'spoting',
+                                                                        "가위컷"      =>'scissors',
+                                                                        "썸머컷"       =>'summercut'
+                                                                    );
+                                                                    $beauty = 1;
+                                                                    $productWorkTimeTitle = array("목욕", "부분미용", "부분+목욕", "위생", "위생+목욕","전체미용", "스포팅", "가위컷", "썸머컷");
+                                                                    $que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}' ";
+                                                                    $res = sql_query($que);
+                                                                    $rows = sql_fetch($res);
+                                                                    for($i=0;$i<14;$i++){
+                                                                        if(!empty($rows['worktime'.$i.'_disp_yn'] == 'y')){
+                                                                            if($i<10){
+                                                                                array_push($dog_product_title, $dog_product_arr[$i]);
+                                                                            } else {
+                                                                                if(!empty($rows['worktime'.$i.'_title'])) {
+                                                                                    $dog_product_seq[$rows['worktime' . $i . '_title']] = 'beauty' . $beauty;
+                                                                                    $option_name[] = 'beauty' . $beauty . "_price";
+                                                                                    array_push($dog_product_title, $rows['worktime' . ($i+1) . '_title']);
+                                                                                    $beauty++;
+                                                                                }
+                                                                            }
+                                                                        }
+                                                                        //print_r($dog_product_title);
+                                                                        if($i<9) {
+
+                                                                            if ($rows['worktime' . ($i + 1) . '_disp_yn'] == 'y' && !empty($rows['worktime' . ($i + 1)]) && !empty($productWorkTimeTitle[$i])) {
+                                                                                $worktime['title'][] = $productWorkTimeTitle[$i];
+                                                                                $worktime['time'][] = $rows['worktime' . ($i + 1)];
+                                                                            }
+                                                                        } else if($i>8){
+                                                                            if ($rows['worktime' . ($i + 1) . '_disp_yn'] == 'y' && !empty($rows['worktime' . ($i + 1).'_title']) ) {
+                                                                                $worktime['title'][] = $rows['worktime' . ($i + 1).'_title'];
+                                                                                $worktime['time'][] = $rows['worktime' . ($i + 1)];
                                                                             }
                                                                         }
                                                                     }
-                                                                    //print_r($dog_product_title);
-                                                                    if($i<9) {
 
-                                                                        if ($rows['worktime' . ($i + 1) . '_disp_yn'] == 'y' && !empty($rows['worktime' . ($i + 1)]) && !empty($productWorkTimeTitle[$i])) {
-                                                                            $worktime['title'][] = $productWorkTimeTitle[$i];
-                                                                            $worktime['time'][] = $rows['worktime' . ($i + 1)];
-                                                                        }
-                                                                    } else if($i>8){
-                                                                        if ($rows['worktime' . ($i + 1) . '_disp_yn'] == 'y' && !empty($rows['worktime' . ($i + 1).'_title']) ) {
-                                                                            $worktime['title'][] = $rows['worktime' . ($i + 1).'_title'];
-                                                                            $worktime['time'][] = $rows['worktime' . ($i + 1)];
-                                                                        }
-                                                                    }
-                                                                }
-
-                                                                for($i=0;$i<count($worktime['title']);$i++){
-                                                                    $que_main = "SELECT * FROM tb_product_dog_static
+                                                                    for($i=0;$i<count($worktime['title']);$i++){
+                                                                        $que_main = "SELECT * FROM tb_product_dog_static
                                                                         WHERE customer_id = '{$user_id}' AND first_type = '개' AND (second_type = '{$beauty_info[3]}' OR direct_title = '{$beauty_info[3]}')
                                                                         AND ".$dog_product_seq[$worktime['title'][$i]]."_price != ''
                                                                     ";
 
-                                                                    //echo $que;
-                                                                    $res_main = sql_query($que_main);
-                                                                    $row_main = sql_fetch($res_main);
-                                                                    if(count($row_main)>0){
-                                                                ?>
-                                                                    <div class="grid-layout-cell grid-2">
-                                                                        <label class="form-toggle-box middle" for="service2">
-                                                                            <input type="radio" name="service" class="service-type" value="<?php echo $dog_product_seq[$worktime['title'][$i]],'_price';?>" data-time="<?php echo strtotime($rev_date.' +'.$worktime['time'][$i].' minute');?>"><em><?php echo $worktime['title'][$i];?> <?php echo $worktime['time'][$i];?>분</em>
+                                                                        //echo $que;
+                                                                        $res_main = sql_query($que_main);
+                                                                        $row_main = sql_fetch($res_main);
+                                                                        if(count($row_main)>0){
+                                                                            ?>
+                                                                            <div class="grid-layout-cell">
+                                                                                <label class="form-toggle-box middle" for="service2">
+                                                                                    <input type="radio" name="service" class="service-type" value="<?php echo $dog_product_seq[$worktime['title'][$i]],'_price';?>" data-time="<?php echo strtotime($rev_date.' +'.$worktime['time'][$i].' minute');?>"><em><?php echo $worktime['title'][$i];?> <?php echo $worktime['time'][$i];?>분</em>
+                                                                                </label>
+                                                                            </div>
+                                                                        <?php }} ?>
+
+
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group-cell middle grid-5-add">
+                                                    <div class="form-group-item">
+                                                        <div class="form-item-label01">무게</div>
+                                                        <div class="form-item-data type-2">
+                                                            <div class="grid-layout toggle-button-group">
+                                                                <div class="grid-layout-inner flex-dir" id="kgs_list">
+                                                                    <div class="grid-layout-cell">
+                                                                    <label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" value=":0" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <?php
+                                                $sql = "
+                                            SELECT * 
+                                            FROM tb_product_dog_common
+                                            WHERE customer_id = '".$user_id."'
+                                        ";
+                                                $sql;
+                                                $result = mysqli_query($connection, $sql);
+                                                while($row = mysqli_fetch_assoc($result)){
+                                                    $data["product_dog_common"][] = $row;
+                                                }
+                                                ?>
+
+                                            <?php
+                                            $sql_option = "
+                                                SELECT *
+                                                FROM tb_product_common_option
+                                                WHERE customer_id = '".$user_id."'
+                                            ";
+                                            $result_option = mysqli_query($connection, $sql_option);
+                                            while($row_option = mysqli_fetch_assoc($result_option)){
+                                                $data["bath_option_list"][] = $row_option;
+                                            }
+                                            if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] || count($data['bath_option_list']) > 0){
+                                                ?>
+                                                <div class="form-group-cell middle grid-5-add">
+                                                    <div class="form-group-item">
+                                                        <div class="form-item-label01">털특징</div>
+                                                        <div class="form-item-data type-2">
+                                                            <div class="grid-layout toggle-button-group">
+                                                                <div class="grid-layout-inner flex-dir">
+
+                                                                    <?php if($data["product_dog_common"][0]['short_hair_price']>0){ ?>
+                                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="단모_목욕:<?php echo $data["product_dog_common"][0]['short_hair_price'];?>" id="leg1"><em><span>단모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['short_hair_price']);?>원</strong></em></label></div>
+                                                                    <?php } ?>
+                                                                    <?php if($data["product_dog_common"][0]['long_hair_price']>0){ ?>
+                                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="장모_목욕:<?php echo $data["product_dog_common"][0]['long_hair_price'];?>" id="leg1"><em><span>장모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['long_hair_price']);?>원</strong></em></label></div>
+                                                                    <?php } ?>
+                                                                    <?php if($data["product_dog_common"][0]['double_hair_price']>0){ ?>
+                                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="이중모_목욕:<?php echo $data["product_dog_common"][0]['double_hair_price'];?>" id="leg1"><em><span>이중모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['double_hair_price']);?>원</strong></em></label></div>
+                                                                    <?php } ?>
+                                                                    <?php
+                                                                    /*$sql_option = "
+                                                                                SELECT *
+                                                                                FROM tb_product_common_option
+                                                                                WHERE customer_id = '".$user_id."'
+                                                                            ";
+                                                                    $result_option = mysqli_query($connection, $sql_option);
+                                                                    while($row_option = mysqli_fetch_assoc($result_option)){
+                                                                        $data["bath_option_list"][] = $row_option;
+                                                                    }*/
+                                                                    if(count($data['bath_option_list']) > 0){
+                                                                        for($i=0;$i<count($data['bath_option_list']);$i++){
+                                                                            ?>
+                                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                                                    <input type="checkbox" name="hair_type[]" class="extra-hair-type" value="<?php echo $data['bath_option_list'][$i]['title'];?>:<?php echo $data['bath_option_list'][$i]['price'];?>" id="leg1"><em><span><?php echo $data['bath_option_list'][$i]['title'];?></span><strong>+<?php echo number_format($data['bath_option_list'][$i]['price']);?>원</strong></em></label></div>
+                                                                        <?php }} ?>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+                                                <?php
+                                                if($data["product_dog_common"][0]['beauty_length_1']>0 || $data["product_dog_common"][0]['beauty_length_2']>0 || $data["product_dog_common"][0]['beauty_length_3']>0 || $data["product_dog_common"][0]['beauty_length_4']>0 || $data["product_dog_common"][0]['beauty_length_5']>0){
+                                                    ?>
+                                                <div class="form-group-cell middle grid-5-add">
+                                                    <div class="form-group-item">
+                                                        <div class="form-item-label01">털길이</div>
+                                                        <div class="form-item-data type-2">
+                                                            <div class="grid-layout toggle-button-group">
+                                                                <div class="grid-layout-inner flex-dir">
+                                                                    <?php
+                                                                    for($i=1; $i<=5; $i++){
+                                                                    if($data["product_dog_common"][0]['beauty_length_'.$i]){
+                                                                    ?>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                                            <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" value="<?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>:<?php echo $data["product_dog_common"][0]['beauty_length_'.$i.'_price'];?>">
+                                                                            <em><span><?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>mm</span><strong>+<?php echo number_format($data["product_dog_common"][0]['beauty_length_'.$i.'_price']);?>원</strong></em>
                                                                         </label>
                                                                     </div>
-                                                                <?php }} ?>
-
-
+                                                                    <?php
+                                                                    }
+                                                                    }
+                                                                    $face = split_text($data["product_dog_common"][0]['hair_length_product']);
+                                                                    if(count($face)>0){
+                                                                    for($i=0;$i<count($face['name']);$i++){
+                                                                    ?>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                                            <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>">
+                                                                            <em><span><?php echo $face['name'][$i];?>mm</span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em>
+                                                                        </label>
+                                                                    </div>
+                                                                    <?php
+                                                                    }
+                                                                    }
+                                                                    ?>
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
-                                            <div class="form-group-cell middle">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">무게</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner" id="kgs_list">
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" value=":0" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
+                                                <?php } ?>
+
                                         </div>
                                     </div>
                                 </li>
@@ -940,7 +1053,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                     $data["product_dog_common"][] = $row;
                                 }
                                 ?>
-                                <li class="accordion-cell">
+                                <li class="accordion-cell" style=clear:left; >
                                     <button type="button" class="btn-accordion-menu">
                                     <span class="accordion-menu-subject">
                                         <h5 class="con-title">추가 서비스 선택 (선택)</h5>
@@ -951,31 +1064,31 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                             <?php
                                                 if($data["product_dog_common"][0]['basic_face_price'] > 0 || $data["product_dog_common"][0]['broccoli_price'] > 0 || $data["product_dog_common"][0]['highba_price'] > 0 || $data["product_dog_common"][0]['bear_price'] > 0 ) {
                                             ?>
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-5-add">
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">얼굴컷</div>
+                                                    <div class="form-item-label01">얼굴컷</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="radio" name="face" id="face0" value="" class="extra-face" checked><em><span>선택안함</span><strong>+0원</strong></em></label></div>
+                                                            <div class="grid-layout-inner flex-dir">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="radio" name="face" id="face0" value="" class="extra-face" checked><em><span>선택안함</span><strong>+0원</strong></em></label></div>
                                                                 <?php if($data["product_dog_common"][0]['basic_face_price'] != ''){ ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face1"><input type="radio" name="face" id="face1" value="기본얼굴컷:<?php echo $data["product_dog_common"][0]['basic_face_price'];?>" class="extra-face"><em><span>기본얼굴컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['basic_face_price']);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face1"><input type="radio" name="face" id="face1" value="기본얼굴컷:<?php echo $data["product_dog_common"][0]['basic_face_price'];?>" class="extra-face"><em><span>기본얼굴컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['basic_face_price']);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                                 <?php if($data["product_dog_common"][0]['broccoli_price'] != ''){ ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face2"><input type="radio" name="face" id="face2" value="브로콜리컷:<?php echo $data["product_dog_common"][0]['broccoli_price'];?>" class="extra-face"><em><span>브로콜리컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['broccoli_price']);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face2"><input type="radio" name="face" id="face2" value="브로콜리컷:<?php echo $data["product_dog_common"][0]['broccoli_price'];?>" class="extra-face"><em><span>브로콜리컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['broccoli_price']);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                                 <?php if($data["product_dog_common"][0]['highba_price'] != ''){ ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face3"><input type="radio" name="face" id="face3" value="하이바컷:<?php echo $data["product_dog_common"][0]['highba_price'];?>" class="extra-face"><em><span>하이바컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['highba_price']);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face3"><input type="radio" name="face" id="face3" value="하이바컷:<?php echo $data["product_dog_common"][0]['highba_price'];?>" class="extra-face"><em><span>하이바컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['highba_price']);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                                 <?php if($data["product_dog_common"][0]['bear_price'] != ''){ ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face4"><input type="radio" name="face" id="face4" value="곰돌이컷:<?php echo $data["product_dog_common"][0]['bear_price'];?>" class="extra-face"><em><span>곰돌이컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bear_price']);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face4"><input type="radio" name="face" id="face4" value="곰돌이컷:<?php echo $data["product_dog_common"][0]['bear_price'];?>" class="extra-face"><em><span>곰돌이컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bear_price']);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                                 <?php
                                                                 $face = split_text($data["product_dog_common"][0]['addition_face_product']);
                                                                 if($face['name']>0){
                                                                     for($i=0;$i<count($face['name']);$i++){
                                                                     ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face5"><input type="radio" name="face" id="face5" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face5"><input type="radio" name="face" id="face5" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                                     <?php 
                                                                     }
                                                                 }
@@ -986,114 +1099,24 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 </div>
                                             </div>
                                             <?php } ?>
-                                            <?php
-                                            if($data["product_dog_common"][0]['beauty_length_1']>0 || $data["product_dog_common"][0]['beauty_length_2']>0 || $data["product_dog_common"][0]['beauty_length_3']>0 || $data["product_dog_common"][0]['beauty_length_4']>0 || $data["product_dog_common"][0]['beauty_length_5']>0){
-                                            ?>
-                                            <div class="form-group-cell middle">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">털길이</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
-                                                                <?php
-                                                                for($i=1; $i<=5; $i++){
-                                                                    if($data["product_dog_common"][0]['beauty_length_'.$i]){
-                                                                        ?>
-                                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
-                                                                                <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" value="<?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>:<?php echo $data["product_dog_common"][0]['beauty_length_'.$i.'_price'];?>">
-                                                                                <em><span><?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>mm</span><strong>+<?php echo number_format($data["product_dog_common"][0]['beauty_length_'.$i.'_price']);?>원</strong></em>
-                                                                            </label>
-                                                                        </div>
-                                                                        <?php
-                                                                    }
-                                                                }
-                                                                $face = split_text($data["product_dog_common"][0]['hair_length_product']);
-                                                                if(count($face)>0){
-                                                                    for($i=0;$i<count($face['name']);$i++){
-                                                                    ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
-                                                                            <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>">
-                                                                            <em><span><?php echo $face['name'][$i];?>mm</span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em>
-                                                                        </label>
-                                                                    </div>
-                                                                <?php 
-                                                                    }
-                                                                }
-                                                                ?>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <?php } ?>
-                                            <?php
-                                            $sql_option = "
-                                                SELECT *
-                                                FROM tb_product_common_option
-                                                WHERE customer_id = '".$user_id."'
-                                            ";
-                                            $result_option = mysqli_query($connection, $sql_option);
-                                            while($row_option = mysqli_fetch_assoc($result_option)){
-                                                $data["bath_option_list"][] = $row_option;
-                                            }
-                                            if($data["product_dog_common"][0]['short_hair_price']>0 || $data["product_dog_common"][0]['long_hair_price']>0 || $data["product_dog_common"][0]['double_hair_price'] || count($data['bath_option_list']) > 0){
-                                            ?>
-                                                <div class="form-group-cell middle">
-                                                    <div class="form-group-item">
-                                                        <div class="form-item-label">털 특징 별</div>
-                                                        <div class="form-item-data type-2">
-                                                            <div class="grid-layout toggle-button-group">
-                                                                <div class="grid-layout-inner">
-
-                                                                <?php if($data["product_dog_common"][0]['short_hair_price']>0){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="단모_목욕:<?php echo $data["product_dog_common"][0]['short_hair_price'];?>" id="leg1"><em><span>단모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['short_hair_price']);?>원</strong></em></label></div>
-                                                                <?php } ?>
-                                                                <?php if($data["product_dog_common"][0]['long_hair_price']>0){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="장모_목욕:<?php echo $data["product_dog_common"][0]['long_hair_price'];?>" id="leg1"><em><span>장모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['long_hair_price']);?>원</strong></em></label></div>
-                                                                <?php } ?>
-                                                                <?php if($data["product_dog_common"][0]['double_hair_price']>0){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair_type" value="이중모_목욕:<?php echo $data["product_dog_common"][0]['double_hair_price'];?>" id="leg1"><em><span>이중모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['double_hair_price']);?>원</strong></em></label></div>
-                                                                <?php } ?>
-                                                                <?php
-                                                                /*$sql_option = "
-                                                                            SELECT *
-                                                                            FROM tb_product_common_option
-                                                                            WHERE customer_id = '".$user_id."'
-                                                                        ";
-                                                                $result_option = mysqli_query($connection, $sql_option);
-                                                                while($row_option = mysqli_fetch_assoc($result_option)){
-                                                                    $data["bath_option_list"][] = $row_option;
-                                                                }*/
-                                                                if(count($data['bath_option_list']) > 0){
-                                                                for($i=0;$i<count($data['bath_option_list']);$i++){
-                                                                ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair-type" value="<?php echo $data['bath_option_list'][$i]['title'];?>:<?php echo $data['bath_option_list'][$i]['price'];?>" id="leg1"><em><span><?php echo $data['bath_option_list'][$i]['title'];?></span><strong>+<?php echo number_format($data['bath_option_list'][$i]['price']);?>원</strong></em></label></div>
-                                                                <?php }} ?>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            <?php } ?>
-
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-5-add">
                                             <?php
                                                 $face = split_text($data["product_dog_common"][0]['addition_option_product']);
                                                 if((count($face)>0 && !empty($face['name'][0])) || $data["product_dog_common"][0]['toenail_price'] != '' || $data["product_dog_common"][0]['trumpet_etc_price'] != '' || $data["product_dog_common"][0]['bell_price'] != ''){
                                             ?>
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">다리</div>
+                                                    <div class="form-item-label01">다리</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
+                                                            <div class="grid-layout-inner flex-dir">
                                                                 <?php if($data["product_dog_common"][0]['toenail_price'] != ''){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" value="발톱:<?php echo $data["product_dog_common"][0]['toenail_price'];?>" id="leg1"><em><span>발톱</span><strong>+<?php echo number_format($data["product_dog_common"][0]['toenail_price']);?>원</strong></em></label></div>
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" value="발톱:<?php echo $data["product_dog_common"][0]['toenail_price'];?>" id="leg1"><em><span>발톱</span><strong>+<?php echo number_format($data["product_dog_common"][0]['toenail_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['trumpet_etc_price'] != ''){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg2"><input type="checkbox" name="leg[]" class="extra-leg" value="장화:<?php echo $data["product_dog_common"][0]['trumpet_etc_price'];?>" id="leg2"><em><span>장화</span><strong>+<?php echo number_format($data["product_dog_common"][0]['trumpet_etc_price']);?>원</strong></em></label></div>
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg2"><input type="checkbox" name="leg[]" class="extra-leg" value="장화:<?php echo $data["product_dog_common"][0]['trumpet_etc_price'];?>" id="leg2"><em><span>장화</span><strong>+<?php echo number_format($data["product_dog_common"][0]['trumpet_etc_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['bell_price'] != ''){ ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg3"><input type="checkbox" name="leg[]" class="extra-leg" value="방울:<?php echo $data["product_dog_common"][0]['bell_price'];?>" id="leg3"><em><span>방울</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bell_price']);?>원</strong></em></label></div>
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg3"><input type="checkbox" name="leg[]" class="extra-leg" value="방울:<?php echo $data["product_dog_common"][0]['bell_price'];?>" id="leg3"><em><span>방울</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bell_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                                 <?php
                                                                 $face = split_text($data["product_dog_common"][0]['addition_option_product']);
@@ -1101,7 +1124,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                                 for($i=0;$i<count($face['name']);$i++){
                                                                     ?>
 
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" id="leg1" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" id="leg1" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                                 <?php }} ?>
                                                             </div>
                                                         </div>
@@ -1113,17 +1136,17 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 $face = split_text($data["product_dog_common"][0]['spa_option_product']);
                                                 if(count($face)>0 && !empty($face['name'][0])){
                                             ?>
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-5-add">
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">스파</div>
+                                                    <div class="form-item-label01">스파</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
+                                                            <div class="grid-layout-inner flex-dir">
                                                                 <?php
                                                                 for($i=0;$i<count($face['name']);$i++){
                                                                     ?>
 
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="spa[]" class="extra-spa" id="leg1" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="spa[]" class="extra-spa" id="leg1" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                             </div>
                                                         </div>
@@ -1135,16 +1158,16 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 $face = split_text($data["product_dog_common"][0]['dyeing_option_product']);
                                                 if(count($face)>0 && !empty($face['name'][0])){
                                             ?>
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-5-add">
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">염색</div>
+                                                    <div class="form-item-label01">염색</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
+                                                            <div class="grid-layout-inner flex-dir">
                                                                 <?php
                                                                 for($i=0;$i<count($face['name']);$i++){
                                                                     ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="color[]" class="extra-color" id="color2" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="color[]" class="extra-color" id="color2" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                             </div>
                                                         </div>
@@ -1156,16 +1179,16 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 $face = split_text($data["product_dog_common"][0]['etc_option_product']);
                                                 if(count($face)>0 && !empty($face['name'][0])){
                                             ?>
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-5-add">
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">기타</div>
+                                                    <div class="form-item-label01">기타</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
+                                                            <div class="grid-layout-inner flex-dir">
                                                                 <?php
                                                                 for($i=0;$i<count($face['name']);$i++){
                                                                 ?>
-                                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="etc[]" class="extra-etc" id="color2" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="etc[]" class="extra-etc" id="color2" value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                             </div>
                                                         </div>
@@ -1205,19 +1228,19 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 if($cat['is_use_weight']==1){
                                                     $cat_sec = explode(",",$cat['section']);
                                             ?>
-                                            <div class="form-group-cell middle">
+                                            <div class="form-group-cell middle grid-3-add">
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">무게</div>
+                                                    <div class="form-item-label01">무게</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner" id="kgs_list_cat">
-                                                                <div class="grid-layout-cell grid-2">
+                                                            <div class="grid-layout-inner flex-dir" id="kgs_list_cat">
+                                                                <div class="grid-layout-cell">
                                                                     <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                         <input type="radio" name="cat_weight" class="cw" value=""  checked>
                                                                         <em><span>선택안함</span><strong>0원</strong></em></label>
                                                                 </div>
                                                                 <?php for($x=0;$x<count($cat_sec);$x++){ ?>
-                                                                <div class="grid-layout-cell grid-2">
+                                                                <div class="grid-layout-cell">
                                                                     <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                         <input type="radio" name="cat_weight" class="cw"  onclick="cat_show_view(<?php echo $x;?>);" value="<?php echo $cat_sec[$x];?>">
                                                                         <em><span></span><strong><?php echo $cat_sec[$x];?>kg</strong></em></label>
@@ -1228,21 +1251,21 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-group-cell middle" >
+                                            <div class="form-group-cell middle grid-3-add" >
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">미용</div>
+                                                    <div class="form-item-label01">미용</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-2">
+                                                            <div class="grid-layout-inner flex-dir">
+                                                                <div class="grid-layout-cell">
                                                                     <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                         <input type="radio" name="hair_kg" class="cat-hair-price " checked  value="">
                                                                         <em><span></span><strong>사용안함</strong></em></label>
                                                                 </div>
                                                                 <?php for($x=0;$x<count($cat_sec);$x++){ ?>
-                                                                <div class="grid-layout-cell grid-2 cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                                <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="단모" value="<?php echo $cat['short_price']*($x+1);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']*($x+1));?>원</strong></em></label></div>
-                                                                <div class="grid-layout-cell grid-2 cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                                <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="장모" value="<?php echo $cat['long_price']*($x+1);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']*($x+1));?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                             </div>
@@ -1252,16 +1275,16 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                             </div>
                                             <?php } else { ?>
                                             <!-- 고양이 선택시 -->
-                                            <div class="form-group-cell middle" >
+                                            <div class="form-group-cell middle grid-3-add" >
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">미용</div>
+                                                    <div class="form-item-label01">미용</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
+                                                            <div class="grid-layout-inner flex-dir">
 
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair" value="<?php echo "단모:".$cat['short_price'];?>" data-cat_hair="단모" class="cat-hair-price"><em><span>단모_미용</span><strong>+<?php echo number_format($cat['short_price']);?>원</strong></em></label></div>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hair2">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair2">
                                                                         <input type="radio" name="hair" value="<?php echo "장모:".$cat['long_price'];?>" data-cat_hair="장모" class="cat-hair-price"><em><span>장모_미용</span><strong>+<?php echo number_format($cat['long_price']);?>원</strong></em></label></div>
                                                             </div>
                                                         </div>
@@ -1269,15 +1292,15 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                 </div>
                                             </div>
                                             <?php } ?>
-                                            <div class="form-group-cell middle" >
+                                            <div class="form-group-cell middle grid-3-add" >
                                                 <div class="form-group-item">
-                                                    <div class="form-item-label">목욕</div>
+                                                    <div class="form-item-label01">목욕</div>
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="" checked ><em><span>선택안함</span><strong>0원</strong></em></label></div>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="단모"  value="<?php echo "단모:".$cat['shower_price'];?>"><em><span>단모</span><strong><?php echo number_format($cat['shower_price']);?>원</strong></em></label></div>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="장모"  value="<?php echo "장모:".$cat['shower_price_long'];?>"><em><span>장모</span><strong><?php echo number_format($cat['shower_price_long']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-inner flex-dir">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="" checked ><em><span>선택안함</span><strong>0원</strong></em></label></div>
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="단모"  value="<?php echo "단모:".$cat['shower_price'];?>"><em><span>단모</span><strong><?php echo number_format($cat['shower_price']);?>원</strong></em></label></div>
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="장모"  value="<?php echo "장모:".$cat['shower_price_long'];?>"><em><span>장모</span><strong><?php echo number_format($cat['shower_price_long']);?>원</strong></em></label></div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -1297,7 +1320,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
                                                 <div class="form-group-cell middle">
                                                     <div class="form-group-item">
-                                                        <div class="form-item-label">발톱</div>
+                                                        <div class="form-item-label01">추가서비스</div>
                                                         <div class="form-item-data type-2">
                                                             <div class="grid-layout toggle-button-group">
                                                                 <div class="grid-layout-inner">
@@ -1456,7 +1479,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
             $.ajax({
                 type : 'post',
-                url : './data/get_pet_info',
+                url : './data/get_pet_info.php',
                 data : {'mode':'petInfo','no':no,'cellphone':'<?php echo $cellPhone;?>'},
                 dataType : 'json',
                 success : function(json){
@@ -1526,7 +1549,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
             var html1 = '';
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getPrevInfo','pet':pet_no,'cellphone':phone},
                 dataType : 'json',
                 success : function(json){
@@ -1592,7 +1615,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCoupon','cid':cusid},
                 dataType : 'json',
                 success : function(json){
@@ -1618,7 +1641,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
             var cid = $(this).val();
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCouponBalance','cid':cid},
                 dataType : 'json',
                 success : function(json){
@@ -1645,7 +1668,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
              if(confirm('쿠폰을 사용하시겠습니까?')){
                  $.ajax({
                      type : 'post',
-                     url : './data/get_book_data_ajax',
+                     url : './data/get_book_data_ajax.php',
                      data : {'mode':'useCoupon','cid':cid,'cnt':cnt},
                      dataType : 'json',
                      success : function(json){
@@ -1654,7 +1677,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                              var cid = json.cid;
                              $.ajax({
                                  type : 'post',
-                                 url : './data/get_book_data_ajax',
+                                 url : './data/get_book_data_ajax.php',
                                  data : {'mode':'getCouponBalance','cid':cid},
                                  dataType : 'json',
                                  success : function(json){
@@ -1681,7 +1704,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
         function get_type_load(gt){
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getTypeSize','type':gt},
                 dataType : 'json',
                 success : function(json){
@@ -1729,7 +1752,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
             }
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
                 dataType: 'json',
                 error: function() {
@@ -1763,7 +1786,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
             if(petType || serviceType || service){
                 $.ajax({
                     type: 'post',
-                    url: 'data/get_book_data_ajax',
+                    url: 'data/get_book_data_ajax.php',
                     data: {'mode':'getBeautyServiceData','petType':petType,'serviceType':serviceType,'service':service, 'start_time': startTime},
                     dataType: 'json',
                     error: function() {
@@ -1837,7 +1860,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
         function get_prev_beauty_info(){
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
                 dataType: 'json',
                 error: function() {
@@ -1853,7 +1876,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
         }
 
         //무게 선택시
-        $(document).on('click','.weight, .extra-face, .extra-hair-length, .extra-hair-type, .extra-leg, .extra-spa, .extra-color, .extra-etc, .cat-weight, .cat-hair-price, .cat_bath, .cat-etc, .cw',function(){
+        $(document).on('click','.weight, .extra-hair-type, .extra-hair-length, .extra-face, .extra-leg, .extra-spa, .extra-color, .extra-etc, .cat-weight, .cat-hair-price, .cat_bath, .cat-etc, .cw',function(){
             make_beauty_chk();
             make_beauty_cat_chk();
         });
@@ -1892,16 +1915,15 @@ if ($customer_cellphone && $customer_cellphone != "") {
                             choose_info += '</div>';
                         }
                     }
-                });
-
-                $('.extra-face').each(function () {
+                })
+                $('.extra-hair-type').each(function () {
                     if ($(this).is(':checked') == true) {
                         if ($(this).val() != '') {
                             var tmp = $(this).val().split(':');
-                            extra_choose_info += '<div class="service-selected-list-cell">';
-                            extra_choose_info += '<div class="list-title">얼굴컷</div>';
-                            extra_choose_info += '<div class="list-data">+ ' + tmp[0] + '</div>';
-                            extra_choose_info += '</div>';
+                            choose_info += '<div class="service-selected-list-cell">';
+                            choose_info += '<div class="list-title">털특징</div>';
+                            choose_info += '<div class="list-data">+ ' + tmp[0] + '</div>';
+                            choose_info += '</div>';
                         }
                     }
                 });
@@ -1909,19 +1931,19 @@ if ($customer_cellphone && $customer_cellphone != "") {
                     if ($(this).is(':checked') == true) {
                         if ($(this).val() != '') {
                             var tmp = $(this).val().split(':');
-                            extra_choose_info += '<div class="service-selected-list-cell">';
-                            extra_choose_info += '<div class="list-title">털길이</div>';
-                            extra_choose_info += '<div class="list-data">+ ' + tmp[0] + 'mm</div>';
-                            extra_choose_info += '</div>';
+                            choose_info += '<div class="service-selected-list-cell">';
+                            choose_info += '<div class="list-title">털길이</div>';
+                            choose_info += '<div class="list-data">+ ' + tmp[0] + 'mm</div>';
+                            choose_info += '</div>';
                         }
                     }
                 });
-                $('.extra-hair-type').each(function () {
+                $('.extra-face').each(function () {
                     if ($(this).is(':checked') == true) {
                         if ($(this).val() != '') {
                             var tmp = $(this).val().split(':');
                             extra_choose_info += '<div class="service-selected-list-cell">';
-                            extra_choose_info += '<div class="list-title">털 특징 별</div>';
+                            extra_choose_info += '<div class="list-title">얼굴컷</div>';
                             extra_choose_info += '<div class="list-data">+ ' + tmp[0] + '</div>';
                             extra_choose_info += '</div>';
                         }
@@ -2085,7 +2107,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
             var petType = $("#pet_type");
             $.ajax({
                 type: 'get',
-                url: 'data/data_get_json_petkind_list',
+                url: 'data/data_get_json_petkind_list.php',
                 data: 'type=' + pet_type,
                 dataType: 'json',
                 error: function() {
