@@ -741,13 +741,13 @@ if(count($arr)>0){
                     <div class="tab-data-cell actived">
                         <div class="basic-data-group vmiddle">
                             <div class="form-group">
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-5-add">
                                     <div class="form-group-item">
-                                        <div class="form-item-label"  id="service_tab">크기 선택</div>
+                                        <div class="form-item-label"  id="service_tab">크기</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
-                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="size1"><input type="radio" name="size" class="pet-size" id="size1"><em>선택안함</em></label></div>
+                                                <div class="grid-layout-inner flex-dir">
+                                                    <div class="grid-layout-cell"><label class="form-toggle-box middle" for="size1"><input type="radio" name="size" class="pet-size" id="size1"><em>선택안함</em></label></div>
                                                     <?php
                                                         $que = "SELECT *,
                                                                         if(second_type = '소형견미용', 1, 
@@ -772,7 +772,7 @@ if(count($arr)>0){
                                                                     $second_type = ($rs['direct_title']!='')?$rs['direct_title']:$rs['second_type'];
                                                     ?>
 
-                                                    <div class="grid-layout-cell grid-2">
+                                                    <div class="grid-layout-cell">
                                                         <label class="form-toggle-box middle" for="size2">
                                                             <input type="radio" name="size" id="size2" class="pet-size" value="<?php echo ($rs['direct_title']!='')?$rs['direct_title']:$rs['second_type'];?>" <?php echo ($second_type==$beauty_info[3])?'checked':'';?>><em><?php echo ($rs['direct_title']!='')?$rs['direct_title']:$rs['second_type'];?></em>
                                                         </label>
@@ -783,13 +783,13 @@ if(count($arr)>0){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-5-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">서비스</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner" id="service_list">
-                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box middle" for="service1"><input type="radio" name="service" class="service-type" id="service1"><em>선택안함</em></label></div>
+                                                <div class="grid-layout-inner flex-dir" id="service_list">
+                                                    <div class="grid-layout-cell"><label class="form-toggle-box middle" for="service1"><input type="radio" name="service" class="service-type" id="service1"><em>선택안함</em></label></div>
                                                     <?php
 
                                                     $cnt = $disp_cnt = 0;
@@ -862,7 +862,7 @@ if(count($arr)>0){
                                                         $row_main = sql_fetch($res_main);
                                                         if(count($row_main)>0){
                                                     ?>
-                                                    <div class="grid-layout-cell grid-2">
+                                                    <div class="grid-layout-cell">
                                                         <label class="form-toggle-box middle" for="service2">
                                                             <input type="radio" name="service" class="service-type" data-time="<?php echo strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'].' +'.$worktime['time'][$i].' minute');?>" data-time="<?php echo $worktime['time'][$i];?>" value="<?php echo $dog_product_seq[$worktime['title'][$i]].'_price';?>" <?php echo ($worktime['title'][$i] == $beauty_info[4])?'checked':''; ?>>
                                                             <em><?php echo $worktime['title'][$i];?> <?php echo $worktime['time'][$i];?>분</em>
@@ -874,13 +874,13 @@ if(count($arr)>0){
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group-cell middle is-dog">
+                                <div class="form-group-cell middle is-dog grid-5-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">무게</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner" id="kgs_list">
-                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
+                                                <div class="grid-layout-inner flex-dir" id="kgs_list">
+                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
                                                     <?php
                                                     $que = "SELECT * FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}' ";
                                                     //echo $que;
@@ -928,7 +928,7 @@ if(count($arr)>0){
                                                     $pr1 = ($cl[0][$i]==1)?'상담':$sv[0][$i];
                                                     $pr = ($cl[0][$i]==1)?'상담':number_format($sv[0][$i]).'원';
                                                     ?>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight2">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight2">
                                                                    <input type="radio" name="weight" id="weight2" <?php echo ($beauty_info[5]==$kgs[$i].':'.$pr1)?'checked':'';?> class="weight" value="<?php echo $kgs[$i].':'.$pr1;?>">
                                                                     <em><span>~<?php echo $kgs[$i]?>kg</span><strong><?php echo $pr;?></strong></em>
                                                             </label>
@@ -942,7 +942,7 @@ if(count($arr)>0){
                                                         $plus_kgs = $weight_info[0];
                                                         $plus_kgs_price = $weight_info[1];
                                                     ?>
-                                                        <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-cell">
                                                             <div class="form-toggle-options">
                                                                 <input type="radio" name="weight" id="weight2" class="weight_plus" value="<?php echo (($plus_kgs > $row['what_over_kgs'])? $plus_kgs : $row['what_over_kgs']).':'.$plus_kgs_price;?>" <?php echo ($weight_info[0]>$row['what_over_kgs'])? 'checked' : '';?>>
                                                                 <div class="form-toggle-options-data">
@@ -1001,29 +1001,29 @@ if(count($arr)>0){
                                     }
 
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
-                                            <div class="form-item-label">털 특징 별</div>
+                                            <div class="form-item-label">털특징</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
+                                                    <div class="grid-layout-inner flex-dir">
 
                                                         <?php if($data["product_dog_common"][0]['short_hair_price']>0){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="hair_type[]" class="extra-hair_type" <?php echo (in_array('단모_목욕', $bath))?'checked':'';?> value="단모_목욕:<?php echo $data["product_dog_common"][0]['short_hair_price'];?>" id="leg1"><em>
                                                                         <span>단모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['short_hair_price']);?>원</strong></em>
                                                                 </label>
                                                             </div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['long_hair_price']>0){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="hair_type[]" class="extra-hair_type" <?php echo (in_array('장모_목욕', $bath))?'checked':'';?> value="장모_목욕:<?php echo $data["product_dog_common"][0]['long_hair_price'];?>" id="leg1"><em>
                                                                         <span>장모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['long_hair_price']);?>원</strong></em>
                                                                 </label>
                                                             </div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['double_hair_price']>0){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="hair_type[]" class="extra-hair_type" <?php echo (in_array('이중모_목욕', $bath))?'checked':'';?> value="이중모_목욕:<?php echo $data["product_dog_common"][0]['double_hair_price'];?>" id="leg1"><em>
                                                                         <span>이중모_목욕</span><strong>+<?php echo number_format($data["product_dog_common"][0]['double_hair_price']);?>원</strong></em>
                                                                 </label>
@@ -1041,7 +1041,7 @@ if(count($arr)>0){
                                                         }*/
                                                         for($i=0;$i<count($data['bath_option_list']);$i++){
                                                             ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair-type" <?php echo (in_array($data['bath_option_list'][$i]['title'], $bath))?'checked':'';?> value="<?php echo $data['bath_option_list'][$i]['title'];?>:<?php echo $data['bath_option_list'][$i]['price'];?>" id="leg1"><em><span><?php echo $data['bath_option_list'][$i]['title'];?></span><strong>+<?php echo number_format($data['bath_option_list'][$i]['price']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="hair_type[]" class="extra-hair-type" <?php echo (in_array($data['bath_option_list'][$i]['title'], $bath))?'checked':'';?> value="<?php echo $data['bath_option_list'][$i]['title'];?>:<?php echo $data['bath_option_list'][$i]['price'];?>" id="leg1"><em><span><?php echo $data['bath_option_list'][$i]['title'];?></span><strong>+<?php echo number_format($data['bath_option_list'][$i]['price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                     </div>
                                                 </div>
@@ -1053,18 +1053,18 @@ if(count($arr)>0){
                                 if($data["product_dog_common"][0]['beauty_length_1']>0 || $data["product_dog_common"][0]['beauty_length_2']>0 || $data["product_dog_common"][0]['beauty_length_3']>0 || $data["product_dog_common"][0]['beauty_length_4']>0 || $data["product_dog_common"][0]['beauty_length_5']>0){
                                     $hair1 = explode(":",$beauty_info[7]);
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
                                             <div class="form-item-label">털길이</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="hair_length" value = "" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
+                                                    <div class="grid-layout-inner flex-dir">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="hair_length" value = "" checked><em><span>선택안함</span><strong>0원</strong></em></label></div>
                                                         <?php
                                                         for($i=1; $i<=5; $i++){
                                                             if($data["product_dog_common"][0]['beauty_length_'.$i]){
                                                                 ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                         <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" <?php echo ($data["product_dog_common"][0]['beauty_length_'.$i.'_price'] == $hair1[1])?'checked':'';?> value="<?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>:<?php echo $data["product_dog_common"][0]['beauty_length_'.$i.'_price'];?>">
                                                                         <em><span><?php echo $data["product_dog_common"][0]['beauty_length_'.$i];?>mm</span><strong>+<?php echo number_format($data["product_dog_common"][0]['beauty_length_'.$i.'_price']);?>원</strong></em>
                                                                     </label>
@@ -1076,7 +1076,7 @@ if(count($arr)>0){
                                                         if(count($face)>0){
                                                             for($i=0;$i<count($face['name']);$i++){
                                                                 ?>
-                                                                <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                         <input type="radio" name="hair_length" id="leg1" class="extra-hair-length" <?php echo ($face['price'][$i] == $hair1[1])?'checked':'';?> value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>">
                                                                         <em><span><?php echo $face['name'][$i];?>mm</span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em>
                                                                     </label>
@@ -1107,31 +1107,31 @@ if(count($arr)>0){
 
                                     $hair = explode(":",$beauty_info[6]);
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
                                             <div class="form-item-label">얼굴컷</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input  type="radio" name="face" id="face0"  value="" class="extra-face" checked><em><span>선택안함</span><strong>+0원</strong></em></label></div>
+                                                    <div class="grid-layout-inner flex-dir">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input  type="radio" name="face" id="face0"  value="" class="extra-face" checked><em><span>선택안함</span><strong>+0원</strong></em></label></div>
                                                          <?php if($data["product_dog_common"][0]['basic_face_price'] != ''){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face1"><input type="radio" name="face" id="face1" <?php echo ($hair[0]=='기본얼굴컷')?'checked':'';?> value="기본얼굴컷:<?php echo $data["product_dog_common"][0]['basic_face_price'];?>" class="extra-face"><em><span>기본얼굴컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['basic_face_price']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face1"><input type="radio" name="face" id="face1" <?php echo ($hair[0]=='기본얼굴컷')?'checked':'';?> value="기본얼굴컷:<?php echo $data["product_dog_common"][0]['basic_face_price'];?>" class="extra-face"><em><span>기본얼굴컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['basic_face_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['broccoli_price'] != ''){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face2"><input type="radio" name="face" id="face2" <?php echo ($hair[0]=='브로콜리컷')?'checked':'';?> value="브로콜리컷:<?php echo $data["product_dog_common"][0]['broccoli_price'];?>" class="extra-face"><em><span>브로콜리컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['broccoli_price']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face2"><input type="radio" name="face" id="face2" <?php echo ($hair[0]=='브로콜리컷')?'checked':'';?> value="브로콜리컷:<?php echo $data["product_dog_common"][0]['broccoli_price'];?>" class="extra-face"><em><span>브로콜리컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['broccoli_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['highba_price'] != ''){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face3"><input type="radio" name="face" id="face3" <?php echo ($hair[0]=='하이바컷')?'checked':'';?> value="하이바컷:<?php echo $data["product_dog_common"][0]['highba_price'];?>" class="extra-face"><em><span>하이바컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['highba_price']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face3"><input type="radio" name="face" id="face3" <?php echo ($hair[0]=='하이바컷')?'checked':'';?> value="하이바컷:<?php echo $data["product_dog_common"][0]['highba_price'];?>" class="extra-face"><em><span>하이바컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['highba_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php if($data["product_dog_common"][0]['bear_price'] != ''){ ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face4"><input type="radio" name="face" id="face4" <?php echo ($hair[0]=='곰돌이컷')?'checked':'';?> value="곰돌이컷:<?php echo $data["product_dog_common"][0]['bear_price'];?>" class="extra-face"><em><span>곰돌이컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bear_price']);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face4"><input type="radio" name="face" id="face4" <?php echo ($hair[0]=='곰돌이컷')?'checked':'';?> value="곰돌이컷:<?php echo $data["product_dog_common"][0]['bear_price'];?>" class="extra-face"><em><span>곰돌이컷</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bear_price']);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                         <?php
                                                         $face = split_text($data["product_dog_common"][0]['addition_face_product']);
                                                         if($face['name']>0){
                                                         for($i=0;$i<count($face['name']);$i++){
                                                             ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face5"><input type="radio" name="face" id="face5" <?php echo ($hair[0]==$face['name'][$i])?'checked':'';?> value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="face5"><input type="radio" name="face" id="face5" <?php echo ($hair[0]==$face['name'][$i])?'checked':'';?> value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                         <?php }} ?>
                                                     </div>
                                                 </div>
@@ -1144,7 +1144,7 @@ if(count($arr)>0){
 
                                 ?>
 
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-5-add">
                                 <?php
                                     $face = split_text($data["product_dog_common"][0]['addition_option_product']);
                                     if((count($face)>0 && !empty($face['name'][0])) || $data["product_dog_common"][0]['toenail_price'] != '' || $data["product_dog_common"][0]['trumpet_etc_price'] != '' || $data["product_dog_common"][0]['bell_price'] != ''){
@@ -1153,15 +1153,15 @@ if(count($arr)>0){
                                         <div class="form-item-label">다리</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                 <?php if($data["product_dog_common"][0]['toenail_price'] != ''){ ?>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[9]>0)?'checked':'';?> value="발톱:<?php echo $data["product_dog_common"][0]['toenail_price'];?>" id="leg1"><em><span>발톱</span><strong>+<?php echo number_format($data["product_dog_common"][0]['toenail_price']);?>원</strong></em></label></div>
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[9]>0)?'checked':'';?> value="발톱:<?php echo $data["product_dog_common"][0]['toenail_price'];?>" id="leg1"><em><span>발톱</span><strong>+<?php echo number_format($data["product_dog_common"][0]['toenail_price']);?>원</strong></em></label></div>
                                                     <?php } ?>
                                                     <?php if($data["product_dog_common"][0]['trumpet_etc_price'] != ''){ ?>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg2"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[10]>0)?'checked':'';?> value="장화:<?php echo $data["product_dog_common"][0]['trumpet_etc_price'];?>" id="leg2"><em><span>장화</span><strong>+<?php echo number_format($data["product_dog_common"][0]['trumpet_etc_price']);?>원</strong></em></label></div>
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg2"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[10]>0)?'checked':'';?> value="장화:<?php echo $data["product_dog_common"][0]['trumpet_etc_price'];?>" id="leg2"><em><span>장화</span><strong>+<?php echo number_format($data["product_dog_common"][0]['trumpet_etc_price']);?>원</strong></em></label></div>
                                                     <?php } ?>
                                                     <?php if($data["product_dog_common"][0]['bell_price'] != ''){ ?>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg3"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[11]>0)?'checked':'';?> value="방울:<?php echo $data["product_dog_common"][0]['bell_price'];?>" id="leg3"><em><span>방울</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bell_price']);?>원</strong></em></label></div>
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg3"><input type="checkbox" name="leg[]" class="extra-leg" <?php echo ($beauty_info[11]>0)?'checked':'';?> value="방울:<?php echo $data["product_dog_common"][0]['bell_price'];?>" id="leg3"><em><span>방울</span><strong>+<?php echo number_format($data["product_dog_common"][0]['bell_price']);?>원</strong></em></label></div>
                                                     <?php } ?>
                                                     <?php
 
@@ -1177,7 +1177,7 @@ if(count($arr)>0){
                                                     for($i=0;$i<count($leg['name']);$i++){
                                                     ?>
 
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                 <input type="checkbox" name="leg[]" class="extra-leg" id="leg1" <?php echo (in_array($leg['name'][$i].':'.$leg['price'][$i],$tmp_chk))?'checked':'';?> value="<?php echo $leg['name'][$i];?>:<?php echo $leg['price'][$i];?>"><em><span><?php echo $leg['name'][$i];?></span><strong>+<?php echo number_format($leg['price'][$i]);?>원</strong></em></label></div>
                                                     <?php } ?>
                                                     <?php } ?>
@@ -1196,12 +1196,12 @@ if(count($arr)>0){
                                 if(count($face)>0 && !empty($face['name'][0])){
 
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
                                             <div class="form-item-label">스파</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
+                                                    <div class="grid-layout-inner flex-dir">
                                                         <?php
                                                         $a = $spa_start+1;
                                                         for($i=0;$i<$beauty_info[$spa_start];$i++){
@@ -1211,7 +1211,7 @@ if(count($arr)>0){
                                                         for($i=0;$i<count($face['name']);$i++) {
                                                         ?>
 
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="spa[]"  class="extra-spa" id="leg1" <?php echo (in_array($face['name'][$i].':'.$face['price'][$i],$tmp_chk))?'checked':'';?> value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                     </div>
@@ -1228,12 +1228,12 @@ if(count($arr)>0){
                                 $face = split_text($data["product_dog_common"][0]['dyeing_option_product']);
                                 if(count($face)>0 && !empty($face['name'][0])){
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
                                             <div class="form-item-label">염색</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
+                                                    <div class="grid-layout-inner flex-dir">
                                                         <?php
                                                         $a = $color_start+1;
                                                         for($i=0;$i<$beauty_info[$color_start];$i++){
@@ -1241,7 +1241,7 @@ if(count($arr)>0){
                                                         }
                                                         for($i=0;$i<count($face['name']);$i++){
                                                             ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="color[]" class="extra-color" id="color2" <?php echo (in_array($face['name'][$i].':'.$face['price'][$i],$tmp_chk))?'checked':'';?>  value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                     </div>
@@ -1258,12 +1258,12 @@ if(count($arr)>0){
                                 $face = split_text($data["product_dog_common"][0]['etc_option_product']);
                                 if(count($face)>0 && !empty($face['name'][0])){
                                     ?>
-                                    <div class="form-group-cell middle">
+                                    <div class="form-group-cell middle grid-5-add">
                                         <div class="form-group-item">
                                             <div class="form-item-label">기타</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
+                                                    <div class="grid-layout-inner flex-dir">
                                                         <?php
                                                         $a = $etc_start+1;
                                                         for($i=0;$i<$beauty_info[$etc_start];$i++){
@@ -1272,7 +1272,7 @@ if(count($arr)>0){
 
                                                         for($i=0;$i<count($face['name']);$i++){
                                                             ?>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="leg1">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="leg1">
                                                                     <input type="checkbox" name="etc[]" class="extra-etc" id="color2" <?php echo (in_array($face['name'][$i].':'.$face['price'][$i],$tmp_chk))?'checked':'';?>  value="<?php echo $face['name'][$i];?>:<?php echo $face['price'][$i];?>"><em><span><?php echo $face['name'][$i];?></span><strong>+<?php echo number_format($face['price'][$i]);?>원</strong></em></label></div>
                                                         <?php } ?>
                                                     </div>
@@ -1304,19 +1304,19 @@ if(count($arr)>0){
                                             $cat_sec = explode(",",$cat['section']);
                                             $serv1 = explode(':',$beauty_info[3]);
                                     ?>
-                                        <div class="form-group-cell middle">
+                                        <div class="form-group-cell middle grid-3-add">
                                             <div class="form-group-item">
                                                 <div class="form-item-label">무게</div>
                                                 <div class="form-item-data type-2">
                                                     <div class="grid-layout toggle-button-group">
-                                                        <div class="grid-layout-inner" id="kgs_list_cat">
-                                                            <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-inner flex-dir" id="kgs_list_cat">
+                                                            <div class="grid-layout-cell">
                                                                 <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                     <input type="radio" name="cat_weight" onclick="cat_show_view('');"  value="">
                                                                     <em><span></span><strong>사용안함</strong></em></label>
                                                             </div>
                                                             <?php for($x=0;$x<count($cat_sec);$x++){ ?>
-                                                                <div class="grid-layout-cell grid-2">
+                                                                <div class="grid-layout-cell">
                                                                     <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                         <input type="radio" name="cat_weight" onclick="cat_show_view(<?php echo $x;?>);" <?php echo ($serv1[0] == $cat_sec[$x])?'checked':'';?> value="<?php echo $cat_sec[$x];?>">
                                                                         <em><span></span><strong><?php echo $cat_sec[$x];?>kg</strong></em></label>
@@ -1327,13 +1327,13 @@ if(count($arr)>0){
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group-cell middle" >
+                                        <div class="form-group-cell middle grid-3-add" >
                                             <div class="form-group-item">
                                                 <div class="form-item-label">미용</div>
                                                 <div class="form-item-data type-2">
                                                     <div class="grid-layout toggle-button-group">
-                                                        <div class="grid-layout-inner">
-                                                            <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-inner flex-dir">
+                                                            <div class="grid-layout-cell">
                                                                 <label class="form-toggle-box form-toggle-price middle" for="weight1">
                                                                     <input type="radio" name="hair_kg" checked  value="">
                                                                     <em><span>선택안함</span><strong>0원</strong></em></label>
@@ -1341,9 +1341,9 @@ if(count($arr)>0){
                                                             <?php
                                                                 for($x=0;$x<count($cat_sec);$x++){
                                                             ?>
-                                                                <div class="grid-layout-cell grid-2 cat-weight kg_<?php echo $x;?>" style="display:none"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                                <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="단모" <?php echo ($serv1[1]==$cat['short_price']*($x+1))?'checked':'';?> value="<?php echo $cat['short_price']*($x+1);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']*($x+1));?>원</strong></em></label></div>
-                                                                <div class="grid-layout-cell grid-2 cat-weight kg_<?php echo $x;?>" style="display:none"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                                <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="장모" <?php echo ($serv1[1]==$cat['long_price']*($x+1))?'checked':'';?> value="<?php echo $cat['long_price']*($x+1);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']*($x+1));?>원</strong></em></label></div>
                                                             <?php } ?>
                                                         </div>
@@ -1353,15 +1353,15 @@ if(count($arr)>0){
                                         </div>
                                     <?php } else { ?>
                                         <!-- 고양이 선택시 -->
-                                        <div class="form-group-cell middle" >
+                                        <div class="form-group-cell middle grid-3-add" >
                                             <div class="form-group-item">
                                                 <div class="form-item-label">미용</div>
                                                 <div class="form-item-data type-2">
                                                     <div class="grid-layout toggle-button-group">
-                                                        <div class="grid-layout-inner">
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hair1">
+                                                        <div class="grid-layout-inner flex-dir">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                     <input type="radio" name="hair" value="<?php echo "단모:".$cat['short_price'];?>" data-cat_hair="단모" class="cat-hair-price" <?php echo ($beauty_info[4]=="단모:".$cat['short_price'])?'checked':'';?>><em><span>단모_미용</span><strong>+<?php echo number_format($cat['short_price']);?>원</strong></em></label></div>
-                                                            <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hair2">
+                                                            <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair2">
                                                                     <input type="radio" name="hair" value="<?php echo "장모:".$cat['long_price'];?>" data-cat_hair="장모" class="cat-hair-price" <?php echo ($beauty_info[4]=="장모:".$cat['long_price'])?'checked':'';?>><em><span>장모_미용</span><strong>+<?php echo number_format($cat['long_price']);?>원</strong></em></label></div>
                                                         </div>
                                                     </div>
@@ -1369,15 +1369,15 @@ if(count($arr)>0){
                                             </div>
                                         </div>
                                     <?php } ?>
-                                    <div class="form-group-cell middle" >
+                                    <div class="form-group-cell middle grid-3-add" >
                                         <div class="form-group-item">
                                             <div class="form-item-label">목욕</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
-                                                    <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="" value="" checked ><em><span>선택안함</span><strong>0원</strong></em></label></div>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="단모" <?php echo ($beauty_info[6]==$cat['shower_price'])?'checked':'';?>  value="<?php echo '단모:'.$cat['shower_price'];?>"><em><span>단모</span><strong><?php echo number_format($cat['shower_price']);?>원</strong></em></label></div>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="장모" <?php echo ($beauty_info[6]==$cat['shower_price_long'])?'checked':'';?>  value="<?php echo '장모:'.$cat['shower_price_long'];?>"><em><span>장모</span><strong><?php echo number_format($cat['shower_price_long']);?>원</strong></em></label></div>
+                                                    <div class="grid-layout-inner flex-dir">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="" value="" checked ><em><span>선택안함</span><strong>0원</strong></em></label></div>
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="단모" <?php echo ($beauty_info[6]==$cat['shower_price'])?'checked':'';?>  value="<?php echo '단모:'.$cat['shower_price'];?>"><em><span>단모</span><strong><?php echo number_format($cat['shower_price']);?>원</strong></em></label></div>
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="cat_bath" class="cat_bath" data-cat_bath="장모" <?php echo ($beauty_info[6]==$cat['shower_price_long'])?'checked':'';?>  value="<?php echo '장모:'.$cat['shower_price_long'];?>"><em><span>장모</span><strong><?php echo number_format($cat['shower_price_long']);?>원</strong></em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1392,7 +1392,7 @@ if(count($arr)>0){
 
                                     <div class="form-group-cell middle">
                                         <div class="form-group-item">
-                                            <div class="form-item-label">발톱</div>
+                                            <div class="form-item-label">추가서비스</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
@@ -1433,12 +1433,12 @@ if(count($arr)>0){
                     <div class="tab-data-cell ">
                         <div class="basic-data-group vmiddle">
                             <div class="form-group">
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-2-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">쿠폰상품</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
 
                                                         unset($tmp_chk);
@@ -1459,7 +1459,7 @@ if(count($arr)>0){
                                                             foreach($coupon as $cp1){
                                                                 if($cp1['type']=='C'){
                                                     ?>
-                                                    <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="cp1-1">
+                                                    <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="cp1-1">
                                                             <input type="checkbox" name="cp[]" id="cp1-1" value="<?php echo $cp1['coupon_seq'];?>" <?php echo (in_array($cp1['coupon_seq'],$cp_seq))?'checked':'';?>><em><span><?php echo $cp1['name'];?></span><strong>+<?php echo number_format($cp1['price']);?>원</strong></em></label></div>
                                                     <?php }}} ?>
                                                 </div>
@@ -1468,18 +1468,18 @@ if(count($arr)>0){
                                     </div>
                                 </div>
 
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-2-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">정액상품</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
                                                     if(count($coupon)>0){
                                                     foreach($coupon as $cp2){
                                                     if($cp2['type']=='F'){
                                                     ?>
-                                                        <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="cp1-1">
+                                                        <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="cp1-1">
                                                                 <input type="checkbox" name="cp[]" id="cp1-1" value="<?php echo $cp2['coupon_seq'];?>" <?php echo (in_array($cp2['coupon_seq'],$cp_seq))?'checked':'';?>><em><span><?php echo $cp2['name'];?></span><strong>+1<?php echo number_format($cp2['price']);?>원</strong></em></label></div>
                                                     <?php }}} ?>
                                                 </div>
@@ -1520,17 +1520,17 @@ if(count($arr)>0){
                                     if(count($gd1)){
 
                                 ?>
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-4-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">용품</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
                                                         foreach($gd1 as $gd1){
                                                     ?>
                                                     <input type="checkbox" name="gd_chkbox[]" value="n" id="gd_chkbox_n_<?php echo $num;?>" style="display:none"  <?php echo (!in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?>  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'disabled':'';?>>
-                                                    <div class="grid-layout-cell grid-2">
+                                                    <div class="grid-layout-cell">
                                                         <div class="form-toggle-options">
                                                             <input type="checkbox" name="gd_chkbox[]" value="y" id="gd_chkbox_y_<?php echo $num;?>"  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?> onclick="chk_box_press('gd',<?php echo $num;?>);">
                                                             <div class="form-toggle-options-data">
@@ -1565,17 +1565,17 @@ if(count($arr)>0){
                                     $gd1 = sql_fetch_array($que);
                                     if(count($gd1)){
                                 ?>
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-4-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">간식</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
                                                         foreach($gd1 as $gd1){
                                                     ?>
                                                             <input type="checkbox" name="snack_chkbox[]" value="n" id="snack_chkbox_n_<?php echo $num;?>" style="display:none"  <?php echo (!in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?>  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'disabled':'';?>>
-                                                        <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-cell">
                                                             <div class="form-toggle-options">
                                                                 <input type="checkbox" name="snack_chkbox[]" value="y" id="snack_chkbox_y_<?php echo $num;?>"  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?> onclick="chk_box_press('snack',<?php echo $num;?>);" >
                                                                 <!--<input type="checkbox" name="snack_chkbox_no[]" value="n" id="snack_chkbox_n_<?php /*echo $num;*/?>"  >-->
@@ -1611,17 +1611,17 @@ if(count($arr)>0){
                                     if(count($gd1)){
                                 ?>
 
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-4-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">사료</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
                                                         foreach($gd1 as $gd1){
                                                     ?>
                                                             <input type="checkbox" name="feed_chkbox[]" value="n" id="feed_chkbox_n_<?php echo $num;?>" style="display:none"  <?php echo (!in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?>  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'disabled':'';?>>
-                                                        <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-cell">
                                                             <div class="form-toggle-options">
                                                                 <input type="checkbox" name="feed_chkbox[]" value="y" id="feed_chkbox_y_<?php echo $num;?>"  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?> onclick="chk_box_press('feed',<?php echo $num;?>);" >
                                                                 <!--<input type="checkbox" name="feed_chkbox_box[]" value="n" id="feed_chkbox_n_<?php /*echo $num;*/?>"  >-->
@@ -1656,17 +1656,17 @@ if(count($arr)>0){
                                     $gd1 = sql_fetch_array($que);
                                     if(count($gd1)){
                                 ?>
-                                <div class="form-group-cell middle">
+                                <div class="form-group-cell middle grid-4-add">
                                     <div class="form-group-item">
                                         <div class="form-item-label">기타</div>
                                         <div class="form-item-data type-2">
                                             <div class="grid-layout toggle-button-group">
-                                                <div class="grid-layout-inner">
+                                                <div class="grid-layout-inner flex-dir">
                                                     <?php
                                                         foreach($gd1 as $gd1){
                                                     ?>
                                                             <input type="checkbox" name="et_chkbox[]" value="n" id="et_chkbox_n_<?php echo $num;?>" style="display:none"  <?php echo (!in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?>  <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'disabled':'';?>>
-                                                        <div class="grid-layout-cell grid-2">
+                                                        <div class="grid-layout-cell">
                                                             <div class="form-toggle-options">
                                                                 <input type="checkbox" name="et_chkbox[]" value="y"  id="et_chkbox_y_<?php echo $num;?>" <?php echo (in_array($gd1['etc_seq'],$goods_seq))?'checked':'';?>  onclick="chk_box_press('etc',<?php echo $num;?>);">
                                                                 <!--<input type="checkbox" name="et_chkbox_box[]" value="n" id="et_chkbox_n_<?php /*echo $num;*/?>"  >-->
