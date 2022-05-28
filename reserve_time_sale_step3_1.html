@@ -18,138 +18,760 @@ $check_time_sale_day = $_GET['chkArray'];
 $shop_title	= "빈시간 판매하기";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$is_android = 0;
+$app = new App();
+if ($app->is_app() == 1) {
+    $is_android = 1;
+}
+$work_list = $work_nick = $empty_date = $empty_time = array();
+$que = "SELECT a.empty_date, a.worker, a.empty_datetime, (SELECT nicname FROM tb_artist_list WHERE name = a.worker GROUP BY name) as nicname FROM tb_sale_free_time_temp a WHERE a.artist_id = '{$user_id}'  ORDER BY a.worker ASC, CONCAT(a.empty_date,' ',a.empty_datetime) ASC";
+//echo $que;
+$sftt = sql_fetch_array($que);
+if(count($sftt)>0){
+    foreach($sftt as $rs){
+        $work_list[] = $rs['worker'];
+        $work_nick[] = $rs['nicname'];
+        $empty_date[] = $rs['empty_date'];
+        if(substr($rs['empty_datetime'],0,2)>11){
+            $empty_time[$rs['worker']][$rs['empty_date']]['pm'][] = $rs['empty_datetime'];
+        } else {
+            $empty_time[$rs['worker']][$rs['empty_date']]['am'][] = $rs['empty_datetime'];
+        }
+
+    }
+}
+
+
+$work_list = array_unique($work_list);
+$work_list = array_values($work_list);
+
+$work_nick = array_unique($work_nick);
+$work_nick = array_values($work_nick);
+
+$empty_date = array_unique($empty_date);
+$empty_date = array_values($empty_date);
+
+//print_r($_POST);
+$user = implode("|",$_GET['person']);
+$weekString = array("일", "월", "화", "수", "목", "금", "토");
+
+
+// 미리보기페이지 데이터 가져오기
+$artist_sql = "select *, shop.photo as photo2 from tb_shop shop, tb_customer customer where shop.customer_id = '" . $artist_id . "' and shop.customer_id = customer.id;";
+$artist_result = mysqli_query($connection,$artist_sql);
+if ($artist_datas = mysqli_fetch_object($artist_result)) {
+    $artist_photo = $artist_datas->photo2;
+    $shop_name = $artist_datas->name;
+}
+
+$shop_query = "SELECT * FROM tb_request_artist WHERE customer_id = '{$artist_id}'";
+$shop_result = mysqli_query($connection,$shop_query);
+$shop_data = mysqli_fetch_object($shop_result);
+$is_got_offline_shop = $shop_data->is_got_offline_shop;
+$dec_phone = add_hyphen($shop_data->offline_shop_phonenumber,);
+$shop_address = $shop_data->offline_shop_address;
+
+$working_sql = "select * from tb_working_schedule tws, tb_regular_holiday trh where tws.customer_id = '" . $artist_id . "' and trh.customer_id = '" . $artist_id . "';";
+$working_result = mysqli_query($connection,$working_sql);
+if ($working_datas = mysqli_fetch_object($working_result)) {
+    $working_start = $working_datas->working_start;
+    $working_start = ($working_start > 11)? "오후 ".$working_start - 1 : "오전 ".$working_start ;
+    $working_end = $working_datas->working_end;
+    $working_end = ($working_end > 11)? "오후 ".$working_end - 1 : "오전 ".$working_end ;
+    $rest_public_holiday = $working_datas->rest_public_holiday;
+    $holiday = "";
+    if ($working_datas->is_monday) {
+        $holiday.= " 월요일";
+    }
+    if ($working_datas->is_tuesday) {
+        $holiday.= " 화요일";
+    }
+    if ($working_datas->is_wednesday) {
+        $holiday.= " 수요일";
+    }
+    if ($working_datas->is_thursday) {
+        $holiday.= " 목요일";
+    }
+    if ($working_datas->is_friday) {
+        $holiday.= " 금요일";
+    }
+    if ($working_datas->is_saturday) {
+        $holiday.= " 토요일";
+    }
+    if ($working_datas->is_sunday) {
+        $holiday.= " 일요일";
+    }
+    if (!$working_datas->is_monday && !$working_datas->is_tuesday && !$working_datas->is_wednesday && !$working_datas->is_thursday && !$working_datas->is_friday && !$working_datas->is_saturday && !$working_datas->is_sunday) {
+        $holiday= "없음";
+    }
+}
 ?>
 
 
-<!-- container -->
-<section id="container"> 
-	<!-- page-body -->    
-	<div class="page-body">
-		<div class="reserve-sale-wrap">
-			<div class="con-title-group">
-				<h4 class="con-title">3. 혜택 설정 및 판매 메시지를 입력하세요.</h4>
-			</div>		
-			<div class="basic-data-group vmiddle">
-				<div class="form-group">
-					<div class="form-group-cell large">
-						<div class="form-group-item">
-							<div class="form-item-label">혜택 설정</div>
-							<div class="form-item-data type-2">
-								<select id="sel_sale" onchange="fn_select_change()">
-									<option value="1">정액 할인</option>
-									<option value="2">정률 할인</option>
-								</select>
-								<div class="form-bottom-info">*설정 시, 상품관리에서 설정한 가격에 할인이 적용됩니다.</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-group-cell large">
-						<div class="form-group-item">
-							<div class="form-item-data">
-								<div class="form-mulity-input">
-									<div class="input-txt">전체 서비스 총액의</div>
-									<input type="text">
-									<div class="input-unit" id="div_unit"></div>
-									<div class="input-txt">할인</div>
-								</div>
-								<div class="form-bottom-info">*설정 시, 상품관리에서 설정한 가격에 할인이 적용됩니다.</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-group-cell large">
-						<div class="form-group-item">
-							<div class="form-item-label">이미지 설정</div>
-							<div class="form-item-data type-8">
-								<div class="grid-layout btn-grid-group">
-									<div class="grid-layout-inner">
-										<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round">사진등록</button></div>
-										<div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='reserve_time_sale_step3_4.html'">사진 불러오기</button></div>
-									</div>
-								</div>
-								<div  class="basic-data-group vsmall" style="display:block;">
-									<div class="picture-set-data"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="form-group-cell large">
-						<div class="form-group-item">
-							<div class="form-item-label">메시지 설정</div>
-							<div class="form-item-data">
-								<input type="text" class="form-control" placeholder="입력">
-							</div>
-							<div class="basic-data-group vvsmall3">
-								<button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='reserve_time_sale_step3_2.html'">메시지 불러오기</button>
-							</div>
-						</div>
-					</div>					
-				</div>
-			</div>
-			<div class="basic-data-group">
-				<div class="con-title-group">
-					<h4 class="con-title">시간 메시지</h4>
-				</div>
-				<div class="user-receipt-item">
-					<?= $check_time_sale_day ?>
-					<div class="time-msg-items">
-						<h5 class="con-title">10.10 (일)</h5>
-						<div class="time-msg-detail">
-							<div class="detail-title">오전</div>
-							<div class="detail-value">12:00 / 01:00 / 02:00 / 03:00 / 04:00 / 05:00 / 06:00</div>
-						</div>
-						<div class="time-msg-detail">
-							<div class="detail-title">오후</div>
-							<div class="detail-value">12:00 / 01:00 / 02:00 / 03:00 / 04:00 / 05:00 / 06:00</div>
-						</div>
-					</div>
-					<div class="time-msg-items">
-						<h5 class="con-title">10.11 (일)</h5>
-						<div class="time-msg-detail">
-							<div class="detail-title">오후</div>
-							<div class="detail-value">12:00 / 01:00</div>
-						</div>
-					</div>
-					<div class="time-msg-items">
-						<h5 class="con-title">10.12 (일)</h5>
-						<div class="time-msg-detail">
-							<div class="detail-title">오후</div>
-							<div class="detail-value">12:00 / 01:00</div>
-						</div>
-					</div>
-				</div>
-				<div class="form-bottom-info">* 설정한 메시지와 조합되어 작성됩니다.</div>	
-				<div class="basic-data-group vmiddle">
-					<button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='reserve_time_landing.html'">미리보기</button>
-				</div>			
-			</div>
-		</div>
-	</div>
-	<!-- //page-body -->	
-	<!-- page-bottom -->
-	<div class="page-bottom">
-		<!-- 
-		//	비활성화시 
-		// - a태그는 disabled 클래스 추가
-		// - button 태그는 disabled 속성 추가
-		-->
-		<a href="reserve_time_landing.html" class="btn-page-bottom">빈시간 판매 시작하기</a>
-	</div>
-	<!-- //page-bottom -->
-</section>
-<!-- //container -->
-<script>
-	$(document).ready(function (){
-		fn_select_change();
-	})
+    <!-- container -->
+    <section id="container">
+        <!-- page-body -->
+        <div class="page-body">
+            <form action="./data/set_reserve_time_sale" method="post" name="f">
+                <input type="hidden" name="msg_type_idx" id="msg_type_idx" value="">
+                <input type="hidden" name="filename" id="filename">
+                <input type="hidden" name="person" value="<?php echo $user;?>">
+                <div class="reserve-sale-wrap">
+                    <div class="con-title-group">
+                        <h4 class="con-title">3. 혜택 설정 및 판매 메시지를 입력하세요.</h4>
+                    </div>
+                    <div class="basic-data-group vmiddle">
+                        <div class="form-group">
+                            <div class="form-group-cell large">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">혜택 설정</div>
+                                    <div class="form-item-data type-2">
+                                        <select name="sel_sale" id="sel_sale" onchange="fn_select_change()">
+                                            <option value="1">정액 할인</option>
+                                            <option value="2">정률 할인</option>
+                                        </select>
+                                        <div class="form-bottom-info">*설정 시, 상품관리에서 설정한 가격에 할인이 적용됩니다.</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell large">
+                                <div class="form-group-item">
+                                    <div class="form-item-data">
+                                        <div class="form-mulity-input">
+                                            <div class="input-txt">전체 서비스 총액의</div>
+                                            <input type="number" name="price" id="price" value="">
+                                            <div class="input-unit" id="div_unit"></div>
+                                            <div class="input-txt">할인</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell large">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">이미지 설정</div>
+                                    <div class="form-item-data type-8">
+                                        <div class="grid-layout btn-grid-group">
+                                            <div class="grid-layout-inner">
+                                                <div class="grid-layout-cell grid-2"><button type="button" onclick="file_view();" class="btn btn-outline-gray btn-middle-size btn-round">사진등록</button></div>
+                                                <input type="file" accept="image/*" name='imgupfile' id='addimgfile' style="display:none">
+                                                <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="popalert.open('reserveImageLoad');">사진 불러오기</button></div>
+                                            </div>
+                                        </div>
+                                        <div  class="basic-data-group vsmall" id="prev_img" style="display:none;">
+                                            <div class="picture-set-data"><img src="/static/pub/images/gate_picture.jpg" alt="" id="prev_img_1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell large">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">메시지 설정</div>
+                                    <div class="form-item-data">
+                                        <!--<input type="text" class="form-control" placeholder="입력">-->
+                                        <textarea name="sel_msg" id="sel_msg" cols="30" rows="10"></textarea>
+                                    </div>
+                                    <div class="basic-data-group vvsmall3">
+                                        <button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="popalert.open('reserveMessageLoad')">메시지 불러오기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="basic-data-group">
+                        <div class="con-title-group">
+                            <h4 class="con-title">시간 메시지</h4>
+                        </div>
+                        <div class="user-receipt-item">
+                            <?= $check_time_sale_day ?>
 
-	function fn_select_change() {
-		var result = $("#sel_sale option:selected").val();
-		
-		if (result == 1) $("#div_unit").text("원");
-		else if (result == 2) $("#div_unit").text("%");
-	}
-</script>	
+<!--                            <div class="time-msg-items">-->
+                            <?php
+                            for($i=0;$i<count($work_list);$i++){
+
+                                ?>
+                                <div class="time-msg-items">
+                                    <div class="con-title-group"><h5 class="con-title"><?php echo $work_nick[$i];?></h5></div>
+                                    <?php
+                                    for($j=0;$j<count($empty_date);$j++){
+                                        if(!empty($empty_time[$work_list[$i]][$empty_date[$j]])){
+                                            ?>
+                                            <h5 class="con-title"><?php echo date('m.d',strtotime($empty_date[$j]));?> (<?php echo $weekString[date('w',strtotime($empty_date[$j]))];?>)</h5>
+                                            <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['am'])){ ?>
+                                                <div class="time-msg-detail">
+                                                    <div class="detail-title">오전</div>
+                                                    <div class="detail-value">
+                                                        <?php
+                                                        echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['am']);
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            <?php } ?>
+                                            <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['pm'])){ ?>
+                                                <div class="time-msg-detail">
+                                                    <div class="detail-title">오후</div>
+                                                    <div class="detail-value">
+                                                        <?php
+                                                        echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['pm']);
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            <?php
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                                <?php
+                            }
+                            ?>
+<!--                            </div>-->
+                        </div>
+                        <div class="form-bottom-info">* 설정한 메시지와 조합되어 작성됩니다.</div>
+                        <div class="basic-data-group vmiddle">
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="popalert.open('reserveLandingPreview')">미리보기</button>
+                        </div>
+                    </div>
+                </div>
+        </div>
+        <!-- //page-body -->
+        <!-- page-bottom -->
+        <div class="page-bottom">
+            <!--
+            //	비활성화시
+            // - a태그는 disabled 클래스 추가
+            // - button 태그는 disabled 속성 추가
+            -->
+            <a href="javascript:;" class="btn-page-bottom" id="save_btn">빈시간 판매 시작하기</a>
+        </div>
+        <!-- //page-bottom -->
+        </form>
+        <article id="reserveImageLoad" class="layer-pop-wrap full" style="z-index: 99999;">
+            <div class="layer-pop-page pop-data">
+                <div class="layer-page-header">
+                    <div class="page-title">빈시간 판매하기 기본이미지</div>
+                    <div class="header-right">
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                    </div>
+                </div>
+                <div class="layer-page-body">
+                    <div class="layer-page-inner">
+                        <div class="msg-load-wrap">
+                            <div class="shop-gate-picture-select">
+                                <div class="list-inner">
+                                    <div class="list-cell">
+                                        <!-- picture-thumb-view 클래스에 actived클래스 추가시 활성화 -->
+                                        <div class="picture-thumb-view modify">
+                                            <div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                                        </div>
+                                    </div>
+                                    <div class="list-cell">
+                                        <!-- picture-thumb-view 클래스에 actived클래스 추가시 활성화 -->
+                                        <div class="picture-thumb-view modify">
+                                            <div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-page-bottom">
+                    <!--
+                    //	비활성화시
+                    // - a태그는 disabled 클래스 추가
+                    // - button 태그는 disabled 속성 추가
+                    -->
+                    <button type="button" class="btn-page-bottom select-img">선택한 이미지 불러오기</button>
+                </div>
+            </div>
+        </article>
+
+        <article id="reserveMessageLoad" class="layer-pop-wrap full">
+            <div class="layer-pop-page pop-data">
+                <div class="layer-page-header">
+                    <div class="page-title">메시지 불러오기</div>
+                    <div class="header-right">
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                    </div>
+                </div>
+                <div class="layer-page-body">
+                    <div class="layer-page-inner">
+                        <div class="msg-load-wrap">
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="popalert.close(); load_prev_msg();">지난 메시지 불러오기</button>
+                            <div class="basic-data-group vsmall" id="message_list">
+                                <div class="msg-select-group">
+                                    <?php
+                                    $que = "SELECT * FROM tb_partner_message a LEFT JOIN tb_message_type b ON a.msg_type_idx = b.idx WHERE a.is_delete = 0";
+                                    //echo $que;
+                                    $msg = sql_fetch_array($que);
+                                    if(count($msg)>0){
+                                        foreach($msg as $msg){
+
+                                            ?>
+                                            <div class="msg-item">
+                                                <div class="item-check"><label class="form-radiobox"><input type="radio" name="message" class="msg" value="<?php echo $msg['msg_type_idx'];?>|<?php echo $msg['message'];?>"><span class="form-check-icon"><em><?php echo $msg['type_name'];?></em></span></label></div>
+                                                <div class="item-value"><?php echo $msg['message'];?></div>
+                                            </div>
+                                        <?php }} ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-page-bottom">
+                    <!--
+                    //	비활성화시
+                    // - a태그는 disabled 클래스 추가
+                    // - button 태그는 disabled 속성 추가
+                    -->
+                    <button type="button" class="btn-page-bottom" id="choose_msg">메시지 선택하기</button>
+                </div>
+            </div>
+        </article>
+
+
+        <article id="reserveMessageLoad1" class="layer-pop-wrap full">
+            <div class="layer-pop-page pop-data">
+                <div class="layer-page-header">
+                    <div class="page-title">지난 메시지 불러오기</div>
+                    <div class="header-right">
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                    </div>
+                </div>
+                <div class="layer-page-body">
+                    <div class="layer-page-inner">
+                        <div class="msg-load-wrap">
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="popalert.close(); load_prev_msg1();">메시지 불러오기</button>
+                            <div class="basic-data-group vsmall" id="message_list">
+                                <div class="msg-select-group">
+                                    <?php
+                                    $que = "SELECT * FROM tb_sale_free_time_mgr WHERE is_delete = 0 AND artist_id = '{$user_id}'";
+                                    //echo $que;
+                                    $msg = sql_fetch_array($que);
+                                    if(count($msg)>0){
+                                        foreach($msg as $msg){
+
+                                            ?>
+                                            <div class="msg-item">
+                                                <div class="item-check"><label class="form-radiobox"><input type="radio" name="message1" class="msg1" value="<?php echo $msg['message'];?>"><span class="form-check-icon"><em><?php echo $msg['type_name'];?></em></span></label></div>
+                                                <div class="item-value"><?php echo $msg['message'];?></div>
+                                            </div>
+                                        <?php }} ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layer-page-bottom">
+                    <!--
+                    //	비활성화시
+                    // - a태그는 disabled 클래스 추가
+                    // - button 태그는 disabled 속성 추가
+                    -->
+                    <button type="button" class="btn-page-bottom" id="choose_msg1">메시지 선택하기</button>
+                </div>
+            </div>
+        </article>
+
+
+        <!-- 20220414 수정 -->
+        <!-- 랜딩페이지 프리뷰 팝업 -->
+        <article id="reserveLandingPreview" class="layer-pop-wrap full">
+            <div class="layer-pop-page pop-data">
+                <div class="layer-page-header">
+                    <div class="page-title">미리보기</div>
+                    <div class="header-right">
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                    </div>
+                </div>
+                <div class="layer-page-body">
+                    <div class="layer-page-inner">
+                        <div class="reserve-landing-wrap">
+                            <div class="reserve-landing-visual"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                            <div class="basic-data-group vvsmall3">
+                                <div class="con-title-group">
+                                    <h4 class="con-title"><?php echo $shop_name; ?> 고객님 안녕하세요? </h4>
+                                </div>
+                                <div class="reserve-landing-info"></div>
+                            </div>
+                            <div class="basic-data-group vmiddle">
+                                <div class="con-title-group">
+                                    <h4 class="con-title">★ 특가 서비스 시간</h4>
+                                </div>
+                                <div class="time-msg-group">
+                                    <?php
+                                    for($i=0;$i<count($work_list);$i++){
+
+                                        ?>
+                                        <div class="time-msg-items">
+                                            <div class="con-title-group"><h5 class="con-title"><?php echo $work_nick[$i];?></h5></div>
+                                            <?php
+                                            for($j=0;$j<count($empty_date);$j++){
+                                                if(!empty($empty_time[$work_list[$i]][$empty_date[$j]])){
+                                                    ?>
+                                                    <h5 class="con-title"><?php echo date('m.d',strtotime($empty_date[$j]));?> (<?php echo $weekString[date('w',strtotime($empty_date[$j]))];?>)</h5>
+                                                    <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['am'])){ ?>
+                                                        <div class="time-msg-detail">
+                                                            <div class="detail-title">오전</div>
+                                                            <div class="detail-value">
+                                                                <?php
+                                                                echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['am']);
+                                                                ?>
+                                                            </div>
+                                                        </div>
+                                                    <?php } ?>
+                                                    <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['pm'])){ ?>
+                                                        <div class="time-msg-detail">
+                                                            <div class="detail-title">오후</div>
+                                                            <div class="detail-value">
+                                                                <?php
+                                                                echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['pm']);
+                                                                ?>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="basic-data-group">
+                                <div class="user-reserve-view">
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">펫샵 소개</h5>
+                                        <div class="simple-thumb-info">
+                                            <div class="thumb-wrap">
+                                                <div class="content-thumb small"><img src="https://image.banjjakpet.com<?= img_link_change($artist_photo) ?>" alt=""></div>
+                                            </div>
+                                            <div class="info-wrap">
+                                                <div class="info-inner">
+                                                    <div class="item-title"><?php echo $shop_name; ?></div>
+                                                    <div class="item-info"><?php echo $working_start; ?>:00 ~ <?php echo $working_end; ?>:00<br>정기휴일 : <?php echo $holiday ?><br><span>(자세한 영업시간은 예약화면에서 가능합니다)</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">매장 위치</h5>
+                                        <div class="simple-thumb-info">
+                                            <div class="thumb-wrap">
+                                                <div class="content-thumb small" style="border:none;background:none;width:30px;position:relative;"><img src="/static/pub/images/icon/ic-24-top-location@2x.png" alt="" style="width:30px;height:30px;position:absolute;top:50%;transform:translateY(-50%);"></div>
+                                            </div>
+                                            <div class="info-wrap">
+                                                <div class="info-inner">
+                                                    <div class="item-address"><?= str_replace("|", "", strstr($shop_address, "|")) ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">연락처</h5>
+                                        <div class="store-contact-data">
+                                            <div class="txt-data">
+                                                <div class="item-time"><?php echo $dec_phone; ?></div>
+                                            </div>
+                                            <a href="tel:<?php echo $dec_phone; ?>" class="btn-tel">전화하기</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+
+        <article id="memberGradeComPop" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+
+    </section>
+    <!-- //container -->
+    <script>
+        $(document).ready(function (){
+            var cnt = 0;
+            var c_msg = '';
+            fn_select_change();
+            $('#empty_time_bar').css('display','block');
+            $('#empty_time_bar .bar').css('width','100%');
+            $('#header_bell').css('display','none');
+            $('#choose_msg').on('click',function(){
+                $('.msg').each(function(){
+                    if($(this).is(':checked')==true){
+                        var mg = $(this).val().split('|');
+                        $('#msg_type_idx').val(mg[0])
+                        c_msg = mg[1];
+                        cnt++;
+                    }
+                });
+                if(!cnt){
+                    popalert.open('memberGradeComPop','메세지를 선택해주세요.');
+                    return false;
+                }
+
+                $('#sel_msg').val(c_msg);
+                $('.reserve-landing-info').text(c_msg); // 미리보기 페이지
+                popalert.close();
+            });
+            $('#choose_msg1').on('click',function(){
+                $('.msg1').each(function(){
+                    if($(this).is(':checked')==true){
+                        $('#msg_type_idx').val($(this).val())
+                        c_msg = $(this).val();
+                        cnt++;
+                    }
+                });
+                if(!cnt){
+                    popalert.open('memberGradeComPop','메세지를 선택해주세요.');
+                    return false;
+                }
+
+                $('#sel_msg').val(c_msg);
+                $('.reserve-landing-info').text(c_msg); // 미리보기 페이지
+                popalert.close();
+            });
+        })
+
+        // 메시지 입력시 미리보기 페이지에도 작성
+        $('#sel_msg').focusout(function(){
+            $('.reserve-landing-info').text($(this).val());
+        });
+
+        function load_prev_msg(){
+            popalert.open('reserveMessageLoad1');
+        }
+        function load_prev_msg1(){
+            popalert.open('reserveMessageLoad');
+        }
+        function fn_select_change() {
+            var result = $("#sel_sale option:selected").val();
+
+            if (result == 1) $("#div_unit").text("원");
+            else if (result == 2) $("#div_unit").text("%");
+        }
+
+        function file_view(){
+            var is_android = checkMobile();
+            if(is_android == true){
+                galleryup();
+            } else {
+                $("#addimgfile").click();
+
+            }
+        }
+
+
+        function checkMobile(){
+
+            var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+
+            if ( varUA.indexOf('android') > -1) {
+                //안드로이드
+                return true;
+            } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+                //IOS
+                return 'ios';
+            } else {
+                //아이폰, 안드로이드 외
+                return 'other';
+            }
+
+        }
+
+
+        $('#addimgfile').on('change', function(e) {
+            $("#fileuparea").hide();
+            $("#fileuplodingarea").show();
+            var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+            if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+                alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+                $("#fileuparea").show();
+                $("#fileuplodingarea").hide();
+                return;
+            }
+
+            var filename = $("input[name=imgupfile]")[0].files[0].name;
+            var newfilename = GetPhotoFilename('sale_free_time', '<?= $user_id ?>', filename);
+            var formData = new FormData();
+
+            formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+            formData.append("filepath", newfilename);
+            $.ajax({
+                url: 'data/upload_portfolio.php',
+                data: formData,
+                processData: false,
+                contentType: false,
+                type: 'POST',
+                success: function(data) {
+                    $('#prev_img_1').prop('src','/upload/'+data).css('width','100%');
+                    $('#prev_img').css('display','block');
+                    $('#filename').val(newfilename);
+                    //location.reload();
+                },
+                error: function(xhr, status, error) {
+                    // alert(error+"에러발생");
+                }
+            });
+        });
+        //안드로이드 앱일경우애만 ... 실행..
+        $(document).ready(function() {
+            //dvck=getDeviceCheck();
+            if (<?= $is_android ?> == 1) {
+                $("#fileuparea").hide();
+                $("#fileuparea2").show();
+            }
+            $('#btn_page_prev').prop('href','reserve_time_sale_step2_1');
+
+        });
+
+        function galleryup() {
+            //alert("갤러리")
+            window.Android.openGallery();
+        }
+
+        function cameraup() {
+            //alert("카메라")
+            window.Android.openCamera();
+        }
+
+        //안드에서 업로드가 끝나면 무조건 호출..
+        function uploadEnd(fileName) {
+
+
+            $("#fileuparea2").hide();
+            $("#fileuplodingarea").show();
+
+            var newfilename = GetPhotoFilename('sale_free_time', '<?= $user_id ?>', fileName);
+            //              alert(newfilename);
+
+            var post_data = 'filepath=' + fileName + '&newfilepath=' + newfilename;
+            //              alert(post_data);
+            var formData = new FormData();
+            formData.append("filepath", fileName);
+            formData.append("newfilepath", newfilename);
+
+            $.ajax({
+                url: 'data/upload_portfolio_sell_empty.php',
+                data: post_data,
+                type: 'POST',
+                success: function(data) {
+
+                    $("#fileuparea2").show();
+                    $("#fileuplodingarea").hide();
+
+                    if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+                        // ie 일때 input[type=file] init.
+                        $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+                    } else {
+                        // other browser 일때 input[type=file] init.
+                        $("#addimgfile").val("");
+                    }
+
+                    /*addwidth = " style='width:30%' ";
+                    mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";*/
+
+                    $('#prev_img_1').prop('src','/upload/'+newfilename).css('width','100%');
+                    $('#prev_img').css('display','block');
+                    $('#filename').val(newfilename);
+                    //location.reload();
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function MemofocusNcursor() {
+            html = "<div id='upimgarea'></div>";
+            //document.getElementById('dmemo').focus();
+            var sel, range;
+            if (window.getSelection) {
+                // IE9 and non-IE
+                sel = window.getSelection();
+                if (sel.getRangeAt && sel.rangeCount) {
+                    range = sel.getRangeAt(0);
+                    range.deleteContents();
+
+                    // Range.createContextualFragment() would be useful here but is
+                    // non-standard and not supported in all browsers (IE9, for one)
+                    var el = document.createElement("div");
+                    el.innerHTML = html;
+                    var frag = document.createDocumentFragment(),
+                        node, lastNode;
+                    while ((node = el.firstChild)) {
+                        lastNode = frag.appendChild(node);
+                    }
+                    range.insertNode(frag);
+
+                    // Preserve the selection
+                    if (lastNode) {
+                        range = range.cloneRange();
+                        range.setStartAfter(lastNode);
+                        range.collapse(true);
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                    }
+                }
+            } else if (document.selection && document.selection.type != "Control") {
+                // IE < 9
+                document.selection.createRange().pasteHTML(html);
+            }
+            $("#addimgfile").trigger("click");
+        }
+
+        $(document).on('click','#save_btn',function(){
+            if($('#price').val() == ''){
+                popalert.open('memberGradeComPop','서비스 금액을 입력해주세요.');
+                $('#price').focus();
+                return false;
+            }
+            if($('#filename').val() == ''){
+                popalert.open('memberGradeComPop','서비스 이미지를 등록해주세요.');
+                return false;
+            }
+            if($('#sel_msg').val() == ''){
+                popalert.open('memberGradeComPop','메세지를 입력 또는 선택해주세요.');
+                return false;
+            }
+
+            document.f.submit();
+        });
+
+        $(document).on('click','.picture-thumb-view',function(){
+            $('.picture-thumb-view').removeClass('actived');
+            $(this).addClass('actived');
+            $('.select-img').data('img',$(this).find('img').prop('src'));
+        });
+        $(document).on('click','.select-img',function(){
+            $('#filename').val($(this).data('img'));
+            $('#prev_img_1').prop('src',$(this).data('img'));
+            $('#prev_img').css('display','block');
+            popalert.close();
+        });
+    </script>
 
 <?
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
 ?>

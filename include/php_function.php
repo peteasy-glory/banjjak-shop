@@ -581,7 +581,7 @@ function get_mypet_info($crypto, $user_id, $phone,$access_key,$secret_key){
                                             SELECT *
                                             FROM tb_customer
                                             WHERE cellphone = '" . $cellphone_encode . "' 
-                                                and id = '{$user_id}'
+                                                #and id = '{$user_id}'
                                                 and nickname not like 'cellp_%'
                                         ";	// 20210705 by migo - cellp 제외 조건
 	//echo $sql."<p>";

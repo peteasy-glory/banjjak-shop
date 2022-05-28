@@ -466,6 +466,7 @@ $combine_currdate = $yy.TFunc::strToFillZero($mm, 2).TFunc::strToFillZero($dd, 2
 $reserve_sql = new TReserveSql($connection);
 $CantReservationDay = $reserve_sql->qry_cant_reservation_day($artist_id, $combine_currdate);
 $CantReservationWeekNor = $reserve_sql->qry_cant_reservation_week_nor($artist_id);
+$CantReservationWeekOff = $reserve_sql->qry_cant_reservation_week_off($artist_id);
 $st_date_time= $combine_currdate.TFunc::strToFillZero($time_open, 2)."00";
 $fi_date_time= $combine_currdate.TFunc::strToFillZero($time_close, 2)."00";
 $GetReservationChkDay = $reserve_sql->qry_get_reservation_chk_day($artist_id, $st_date_time, $fi_date_time);
@@ -512,8 +513,6 @@ function data_dash($tmp){
                     <div class="sort-right">
                         <select name="choose_type" id="choose_type" onchange="show_alert(this.value);">
                             <option value="beauty" selected>미용</option>
-                            <option value="hotel">호텔</option>
-                            <option value="playroom">유치원</option>
                         </select>
                     </div>
                 </div>
@@ -631,6 +630,27 @@ function data_dash($tmp){
                                                         $status = '예약금지';
                                                     }
 
+                                                    // 휴게시간 확인
+                                                    $crwn = null;
+                                                    if (count($CantReservationWeekOff) < 1){
+                                                        $crwn = null;
+                                                    }else{
+                                                        foreach ($CantReservationWeekOff as $val){
+                                                            $off_array = explode(',',$val['res_time_off']);
+
+                                                            for($i=0;$i<count($off_array);$i++){
+                                                                $off_start_time = explode('~',$off_array[$i])[0];
+                                                                if($thisTime == $off_start_time){
+                                                                    $div_class = 'break';
+                                                                    $status = '휴게시간';
+                                                                    break;
+                                                                }else{
+
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+
                                                     //정기휴일 확인.
                                                     $crwn = null;
                                                     if (count($CantReservationWeekNor) < 1){
@@ -743,23 +763,23 @@ function data_dash($tmp){
                 </div>
                 <!-- //캘린더 상세 -->
             </div>
-            <div class="reserve-calendar-float">
-                <div class="reserve-calendar-float-cell">
-                    <button type="button" onclick="location.href='reserve_main_day';"  class="btn-reserve-calendar-today"><span
-                                class="icon icon-circle-float-today"></span></button>
-                </div>
-                <div class="reserve-calendar-float-cell">
-                    <button type="button" class="btn-reserve-calendar-menu btn-reserve-calendar-toggle"><span
-                                class="icon icon-circle-float-menu"></span><em><?= $wait_count ?></em></button>
-                    <div class="reserve-calendar-float-menu">
-                        <button type="button" class="btn-float-menu" onclick="location.href='customer_inquiry';">고객조회</button>
-                        <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>
-                        <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : <?= $wait_count ?></button>
-                        <button type="button" class="btn-float-menu">예약 승인 대기 : </button>
-                        <button type="button" onclick="location.href='reserve_time_sale_step1_3'" class="btn-float-menu">빈시간 판매하기</button>
-                    </div>
-                </div>
-            </div>
+<!--            <div class="reserve-calendar-float">-->
+<!--                <div class="reserve-calendar-float-cell">-->
+<!--                    <button type="button" onclick="location.href='reserve_main_day';"  class="btn-reserve-calendar-today"><span-->
+<!--                                class="icon icon-circle-float-today"></span></button>-->
+<!--                </div>-->
+<!--                <div class="reserve-calendar-float-cell">-->
+<!--                    <button type="button" class="btn-reserve-calendar-menu btn-reserve-calendar-toggle"><span-->
+<!--                                class="icon icon-circle-float-menu"></span><em>--><?//= $wait_count ?><!--</em></button>-->
+<!--                    <div class="reserve-calendar-float-menu">-->
+<!--                        <button type="button" class="btn-float-menu" onclick="location.href='customer_inquiry';">고객조회</button>-->
+<!--                        <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>-->
+<!--                        <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : --><?//= $wait_count ?><!--</button>-->
+<!--                        <button type="button" class="btn-float-menu">예약 승인 대기 : </button>-->
+<!--                        <button type="button" onclick="location.href='reserve_time_sale_step1_3'" class="btn-float-menu">빈시간 판매하기</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
         <!-- //page-body -->
         <a href="javascript:;" class="btn-page-bottom selected-done"><span id="time_sale_count"><?php echo $total_cnt;?></span>타임 선택완료</a>
@@ -1215,12 +1235,12 @@ function data_dash($tmp){
             });
 
 
-            $('.break').on('click',function(){
-                if($(this).data('status')!='정기휴일') {
-                    $('#reserveCalendarPop10').addClass('actived');
-                    $('.btn-reserv-block-cancel').data('worker', $(this).data('worker')).data('phseq', $(this).data('phseq'));
-                }
-            });
+            // $('.break').on('click',function(){
+            //     if($(this).data('status')!='정기휴일') {
+            //         $('#reserveCalendarPop10').addClass('actived');
+            //         $('.btn-reserv-block-cancel').data('worker', $(this).data('worker')).data('phseq', $(this).data('phseq'));
+            //     }
+            // });
 
 
 
@@ -1450,7 +1470,8 @@ function data_dash($tmp){
                 popalert.open('reserveCalendarPop99','데이터 선택에 오류가 있습니다. 새로고침 후 다시 선택해주세요.');
                 return false;
             }
-            document.frm.submit();
+            //document.frm.submit();
+            location.replace('reserve_time_sale_step2_1');
         });
     </script>
 

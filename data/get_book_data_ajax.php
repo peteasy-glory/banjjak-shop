@@ -1132,6 +1132,9 @@ switch($clear['mode']){
     //주 단위 빈시간 판매 데이터 업데이트
     case 'awaitAdd':
         //빈시간 판매 데이터를 삭제한다.
+
+        // 빈시간 삭제 다시 by.glory_20220528
+        /*
         for($i=0;$i<count($_POST['data']);$i++){
             $date[] = substr($_POST['data'][$i],0,10);
         }
@@ -1140,6 +1143,9 @@ switch($clear['mode']){
         $date = array_values($date);
         //print_r($date);
         $del_date = implode("','",$date);
+        */
+        $del_date = $_POST['del_date'];
+
 
         $worker = array();
         $dt = array();
@@ -1153,9 +1159,9 @@ switch($clear['mode']){
             $dttime[] = substr($worker[1],-5);
         }
 
-        $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND empty_date IN ('{$del_date}') AND worker = '{$_POST['worker']}'";
+        $que1 = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND empty_date IN ('{$del_date}') AND worker = '{$_POST['worker']}'";
         //echo $que;
-        sql_query($que);
+        sql_query($que1);
         for($i=0;$i<count($dtworker);$i++) {
             $que = "SELECT COUNT(*) AS cnt FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}' AND worker = '{$dtworker[$i]}' AND empty_date = '{$dtdate[$i]}' AND empty_datetime = '{$dttime[$i]}' ";
             //echo $que."<br>";
@@ -1187,7 +1193,7 @@ switch($clear['mode']){
             }
         }
         $json['cnt'] = $total_cnt;
-        $json['sql'] = $sql;
+        $json['sql'] = $que1;
         echo json_encode($json);
         break;
     //빈 시간 판매시 세션에 저장한다.
@@ -1235,6 +1241,36 @@ switch($clear['mode']){
 
         $total_cnt = 0;
         $que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$_POST['artist_id']}'";
+        $sftt = sql_fetch_array($que);
+        if(count($sftt)>0){
+            foreach($sftt as $rs){
+                $tmp = explode('|',$rs['empty_date']);
+                for($i=0;$i<count($tmp);$i++) {
+                    if(!empty($tmp[$i])) {
+                        $ed[$rs['worker']][] = $tmp[$i];
+                        $total_cnt++;
+                    }
+                }
+            }
+        }
+        $json['cnt'] = $total_cnt;
+        echo json_encode($json);
+        break;
+
+        // 일 전체선택 해제
+    case 'noAllChk':
+
+        $sel_dt = trim($_POST['data']);
+        $ex = explode('.',$sel_dt);
+        $year = $ex[0];
+        $month = sprintf('%02d',$ex[1]);
+        $day = sprintf('%02d',$ex[2]);
+        $sel_dt = $year.'-'.$month.'-'.$day;
+        $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}' AND empty_date = '{$sel_dt}'";
+        //echo $que;
+        sql_query($que);
+        $total_cnt = 0;
+        $que = "SELECT * FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}'";
         $sftt = sql_fetch_array($que);
         if(count($sftt)>0){
             foreach($sftt as $rs){
