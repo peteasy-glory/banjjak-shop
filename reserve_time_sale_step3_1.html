@@ -114,7 +114,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
         <!-- page-body -->
         <div class="page-body">
             <form action="./data/set_reserve_time_sale" method="post" name="f">
-                <input type="hidden" name="msg_type_idx" id="msg_type_idx" value="">
+                <input type="hidden" name="msg_type_idx" id="msg_type_idx" value="1">
                 <input type="hidden" name="filename" id="filename">
                 <input type="hidden" name="person" value="<?php echo $user;?>">
                 <div class="reserve-sale-wrap">
@@ -290,7 +290,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
         <article id="reserveMessageLoad" class="layer-pop-wrap full">
             <div class="layer-pop-page pop-data">
                 <div class="layer-page-header">
-                    <div class="page-title">메시지 불러오기</div>
+                    <div class="page-title">기본 메시지 불러오기</div>
                     <div class="header-right">
                         <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
                     </div>
@@ -302,7 +302,12 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                             <div class="basic-data-group vsmall" id="message_list">
                                 <div class="msg-select-group">
                                     <?php
-                                    $que = "SELECT * FROM tb_partner_message a LEFT JOIN tb_message_type b ON a.msg_type_idx = b.idx WHERE a.is_delete = 0";
+                                    $que = "
+                                        SELECT a.msg_type_idx, a.message, b.type_name FROM tb_partner_message a 
+                                        LEFT JOIN tb_message_type b ON a.msg_type_idx = b.idx 
+                                        WHERE a.is_delete = 0
+                                        AND a.idx IN (1,2,3,4)
+                                    ";
                                     //echo $que;
                                     $msg = sql_fetch_array($que);
                                     if(count($msg)>0){
@@ -346,7 +351,14 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                             <div class="basic-data-group vsmall" id="message_list">
                                 <div class="msg-select-group">
                                     <?php
-                                    $que = "SELECT * FROM tb_sale_free_time_mgr WHERE is_delete = 0 AND artist_id = '{$user_id}'";
+                                    $que = "
+                                        SELECT b.message, b.msg_type_idx, c.type_name FROM tb_sale_free_time_mgr a
+                                        LEFT JOIN tb_partner_message b ON a.msg_idx = b.idx
+                                        LEFT JOIN tb_message_type c ON b.msg_type_idx = c.idx
+                                        WHERE a.artist_id = '{$user_id}'
+                                        AND a.is_delete = 0
+                                        ORDER BY a.reg_date DESC 
+                                    ";
                                     //echo $que;
                                     $msg = sql_fetch_array($que);
                                     if(count($msg)>0){
@@ -354,7 +366,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
 
                                             ?>
                                             <div class="msg-item">
-                                                <div class="item-check"><label class="form-radiobox"><input type="radio" name="message1" class="msg1" value="<?php echo $msg['message'];?>"><span class="form-check-icon"><em><?php echo $msg['type_name'];?></em></span></label></div>
+                                                <div class="item-check"><label class="form-radiobox"><input type="radio" name="message1" class="msg1" value="<?php echo $msg['msg_type_idx'];?>|<?php echo $msg['message'];?>"><span class="form-check-icon"><em><?php echo $msg['type_name'];?></em></span></label></div>
                                                 <div class="item-value"><?php echo $msg['message'];?></div>
                                             </div>
                                         <?php }} ?>
@@ -535,8 +547,9 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
             $('#choose_msg1').on('click',function(){
                 $('.msg1').each(function(){
                     if($(this).is(':checked')==true){
-                        $('#msg_type_idx').val($(this).val())
-                        c_msg = $(this).val();
+                        var mg = $(this).val().split('|');
+                        $('#msg_type_idx').val(mg[0]);
+                        c_msg = mg[1];
                         cnt++;
                     }
                 });
@@ -616,13 +629,13 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
             formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
             formData.append("filepath", newfilename);
             $.ajax({
-                url: 'data/upload_portfolio.php',
+                url: 'data/upload_portfolio_sell.php',
                 data: formData,
                 processData: false,
                 contentType: false,
                 type: 'POST',
                 success: function(data) {
-                    $('#prev_img_1').prop('src','/upload/'+data).css('width','100%');
+                    $('#prev_img_1').prop('src',data).css('width','100%');
                     $('#prev_img').css('display','block');
                     $('#filename').val(newfilename);
                     //location.reload();
