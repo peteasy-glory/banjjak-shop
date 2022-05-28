@@ -53,8 +53,59 @@ $empty_date = array_unique($empty_date);
 $empty_date = array_values($empty_date);
 
 //print_r($_POST);
-$user = implode("|",$_POST['person']);
+$user = implode("|",$_GET['person']);
 $weekString = array("일", "월", "화", "수", "목", "금", "토");
+
+
+// 미리보기페이지 데이터 가져오기
+$artist_sql = "select *, shop.photo as photo2 from tb_shop shop, tb_customer customer where shop.customer_id = '" . $artist_id . "' and shop.customer_id = customer.id;";
+$artist_result = mysqli_query($connection,$artist_sql);
+if ($artist_datas = mysqli_fetch_object($artist_result)) {
+    $artist_photo = $artist_datas->photo2;
+    $shop_name = $artist_datas->name;
+}
+
+$shop_query = "SELECT * FROM tb_request_artist WHERE customer_id = '{$artist_id}'";
+$shop_result = mysqli_query($connection,$shop_query);
+$shop_data = mysqli_fetch_object($shop_result);
+$is_got_offline_shop = $shop_data->is_got_offline_shop;
+$dec_phone = add_hyphen($shop_data->offline_shop_phonenumber,);
+$shop_address = $shop_data->offline_shop_address;
+
+$working_sql = "select * from tb_working_schedule tws, tb_regular_holiday trh where tws.customer_id = '" . $artist_id . "' and trh.customer_id = '" . $artist_id . "';";
+$working_result = mysqli_query($connection,$working_sql);
+if ($working_datas = mysqli_fetch_object($working_result)) {
+    $working_start = $working_datas->working_start;
+    $working_start = ($working_start > 11)? "오후 ".$working_start - 1 : "오전 ".$working_start ;
+    $working_end = $working_datas->working_end;
+    $working_end = ($working_end > 11)? "오후 ".$working_end - 1 : "오전 ".$working_end ;
+    $rest_public_holiday = $working_datas->rest_public_holiday;
+    $holiday = "";
+    if ($working_datas->is_monday) {
+        $holiday.= " 월요일";
+    }
+    if ($working_datas->is_tuesday) {
+        $holiday.= " 화요일";
+    }
+    if ($working_datas->is_wednesday) {
+        $holiday.= " 수요일";
+    }
+    if ($working_datas->is_thursday) {
+        $holiday.= " 목요일";
+    }
+    if ($working_datas->is_friday) {
+        $holiday.= " 금요일";
+    }
+    if ($working_datas->is_saturday) {
+        $holiday.= " 토요일";
+    }
+    if ($working_datas->is_sunday) {
+        $holiday.= " 일요일";
+    }
+    if (!$working_datas->is_monday && !$working_datas->is_tuesday && !$working_datas->is_wednesday && !$working_datas->is_thursday && !$working_datas->is_friday && !$working_datas->is_saturday && !$working_datas->is_sunday) {
+        $holiday= "없음";
+    }
+}
 ?>
 
 
@@ -134,10 +185,12 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                         <div class="user-receipt-item">
                             <?= $check_time_sale_day ?>
 
-                            <div class="time-msg-items">
-                                <?php
-                                for($i=0;$i<count($work_list);$i++){
-                                    ?>
+<!--                            <div class="time-msg-items">-->
+                            <?php
+                            for($i=0;$i<count($work_list);$i++){
+
+                                ?>
+                                <div class="time-msg-items">
                                     <div class="con-title-group"><h5 class="con-title"><?php echo $work_nick[$i];?></h5></div>
                                     <?php
                                     for($j=0;$j<count($empty_date);$j++){
@@ -153,7 +206,8 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                                                         ?>
                                                     </div>
                                                 </div>
-                                            <?php } else { ?>
+                                            <?php } ?>
+                                            <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['pm'])){ ?>
                                                 <div class="time-msg-detail">
                                                     <div class="detail-title">오후</div>
                                                     <div class="detail-value">
@@ -162,12 +216,20 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                                                         ?>
                                                     </div>
                                                 </div>
-                                            <?php }}}} ?>
-                            </div>
+                                            <?php
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                                <?php
+                            }
+                            ?>
+<!--                            </div>-->
                         </div>
                         <div class="form-bottom-info">* 설정한 메시지와 조합되어 작성됩니다.</div>
                         <div class="basic-data-group vmiddle">
-                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='reserve_time_landing.html'">미리보기</button>
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="popalert.open('reserveLandingPreview')">미리보기</button>
                         </div>
                     </div>
                 </div>
@@ -189,7 +251,7 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                 <div class="layer-page-header">
                     <div class="page-title">빈시간 판매하기 기본이미지</div>
                     <div class="header-right">
-                        <button type="button" class="btn-page-ui btn-page-close" onclick="pop.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
                     </div>
                 </div>
                 <div class="layer-page-body">
@@ -313,6 +375,119 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
         </article>
 
 
+        <!-- 20220414 수정 -->
+        <!-- 랜딩페이지 프리뷰 팝업 -->
+        <article id="reserveLandingPreview" class="layer-pop-wrap full">
+            <div class="layer-pop-page pop-data">
+                <div class="layer-page-header">
+                    <div class="page-title">미리보기</div>
+                    <div class="header-right">
+                        <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
+                    </div>
+                </div>
+                <div class="layer-page-body">
+                    <div class="layer-page-inner">
+                        <div class="reserve-landing-wrap">
+                            <div class="reserve-landing-visual"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                            <div class="basic-data-group vvsmall3">
+                                <div class="con-title-group">
+                                    <h4 class="con-title"><?php echo $shop_name; ?> 고객님 안녕하세요? </h4>
+                                </div>
+                                <div class="reserve-landing-info"></div>
+                            </div>
+                            <div class="basic-data-group vmiddle">
+                                <div class="con-title-group">
+                                    <h4 class="con-title">★ 특가 서비스 시간</h4>
+                                </div>
+                                <div class="time-msg-group">
+                                    <?php
+                                    for($i=0;$i<count($work_list);$i++){
+
+                                        ?>
+                                        <div class="time-msg-items">
+                                            <div class="con-title-group"><h5 class="con-title"><?php echo $work_nick[$i];?></h5></div>
+                                            <?php
+                                            for($j=0;$j<count($empty_date);$j++){
+                                                if(!empty($empty_time[$work_list[$i]][$empty_date[$j]])){
+                                                    ?>
+                                                    <h5 class="con-title"><?php echo date('m.d',strtotime($empty_date[$j]));?> (<?php echo $weekString[date('w',strtotime($empty_date[$j]))];?>)</h5>
+                                                    <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['am'])){ ?>
+                                                        <div class="time-msg-detail">
+                                                            <div class="detail-title">오전</div>
+                                                            <div class="detail-value">
+                                                                <?php
+                                                                echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['am']);
+                                                                ?>
+                                                            </div>
+                                                        </div>
+                                                    <?php } ?>
+                                                    <?php if(!empty($empty_time[$work_list[$i]][$empty_date[$j]]['pm'])){ ?>
+                                                        <div class="time-msg-detail">
+                                                            <div class="detail-title">오후</div>
+                                                            <div class="detail-value">
+                                                                <?php
+                                                                echo implode(' / ',$empty_time[$work_list[$i]][$empty_date[$j]]['pm']);
+                                                                ?>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            </div>
+                            <div class="basic-data-group">
+                                <div class="user-reserve-view">
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">펫샵 소개</h5>
+                                        <div class="simple-thumb-info">
+                                            <div class="thumb-wrap">
+                                                <div class="content-thumb small"><img src="https://image.banjjakpet.com<?= img_link_change($artist_photo) ?>" alt=""></div>
+                                            </div>
+                                            <div class="info-wrap">
+                                                <div class="info-inner">
+                                                    <div class="item-title"><?php echo $shop_name; ?></div>
+                                                    <div class="item-info"><?php echo $working_start; ?>:00 ~ <?php echo $working_end; ?>:00<br>정기휴일 : <?php echo $holiday ?><br><span>(자세한 영업시간은 예약화면에서 가능합니다)</span></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">매장 위치</h5>
+                                        <div class="simple-thumb-info">
+                                            <div class="thumb-wrap">
+                                                <div class="content-thumb small" style="border:none;background:none;width:30px;position:relative;"><img src="/static/pub/images/icon/ic-24-top-location@2x.png" alt="" style="width:30px;height:30px;position:absolute;top:50%;transform:translateY(-50%);"></div>
+                                            </div>
+                                            <div class="info-wrap">
+                                                <div class="info-inner">
+                                                    <div class="item-address"><?= str_replace("|", "", strstr($shop_address, "|")) ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="view-data-group">
+                                        <h5 class="con-title">연락처</h5>
+                                        <div class="store-contact-data">
+                                            <div class="txt-data">
+                                                <div class="item-time"><?php echo $dec_phone; ?></div>
+                                            </div>
+                                            <a href="tel:<?php echo $dec_phone; ?>" class="btn-tel">전화하기</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+
         <article id="memberGradeComPop" class="layer-pop-wrap">
             <div class="layer-pop-parent">
                 <div class="layer-pop-children">
@@ -354,6 +529,7 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                 }
 
                 $('#sel_msg').val(c_msg);
+                $('.reserve-landing-info').text(c_msg); // 미리보기 페이지
                 popalert.close();
             });
             $('#choose_msg1').on('click',function(){
@@ -370,9 +546,15 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
                 }
 
                 $('#sel_msg').val(c_msg);
+                $('.reserve-landing-info').text(c_msg); // 미리보기 페이지
                 popalert.close();
             });
         })
+
+        // 메시지 입력시 미리보기 페이지에도 작성
+        $('#sel_msg').focusout(function(){
+            $('.reserve-landing-info').text($(this).val());
+        });
 
         function load_prev_msg(){
             popalert.open('reserveMessageLoad1');
@@ -434,7 +616,7 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
             formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
             formData.append("filepath", newfilename);
             $.ajax({
-                url: 'data/upload_portfolio',
+                url: 'data/upload_portfolio.php',
                 data: formData,
                 processData: false,
                 contentType: false,
@@ -488,7 +670,7 @@ $weekString = array("일", "월", "화", "수", "목", "금", "토");
             formData.append("newfilepath", newfilename);
 
             $.ajax({
-                url: 'data/upload_portfolio_sell_empty',
+                url: 'data/upload_portfolio_sell_empty.php',
                 data: post_data,
                 type: 'POST',
                 success: function(data) {

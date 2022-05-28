@@ -1040,7 +1040,7 @@ function data_dash($tmp){
 
                                                                     ?>
                                                                     <!-- 해당 일자 일정 표시-->
-                                                                    <div class="calendar-week-time-item no-reservation " data-pay_seq="<?php echo $chk_rev[$a]['payment_log_seq'];?>"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer; border:none !important;background-color:#f4f4f4;">
+                                                                    <div class="calendar-week-time-item no-reservation " data-pay_seq="<?php echo $chk_rev[$a]['payment_log_seq'];?>"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer; border:none !important;background-color:#f4f4f4; z-index: 101;">
 
                                                                     </div>
                                                                     <!-- 해당 일자 일정 표시 끝-->
@@ -1052,7 +1052,7 @@ function data_dash($tmp){
                                                                 <div class="calendar-check-value">
                                                                     <label class="form-radiobox large">
                                                                         <?php if($div_class != 'no-reservation'){ ?>
-                                                                            <input type="checkbox" id="check_time_sale" class="time-chk" <?php if(in_array($cur_dt,$ed)) { echo 'checked'; }?> value="<?php echo $nowdate.' '.$thisTime;?>" onclick="fn_time_sale()"><span class="form-check-icon"><em></em></span>
+                                                                            <input type="checkbox" id="check_time_sale" class="time-chk" <?php if(in_array($cur_dt,$ed)) { echo 'checked'; }?> value="<?php echo $nowdate.' '.$thisTime;?>" onclick="fn_time_sale('<?php echo $nowdate; ?>')"><span class="form-check-icon"><em></em></span>
                                                                         <?php } ?>
                                                                     </label>
                                                                 </div>
@@ -1748,8 +1748,9 @@ function data_dash($tmp){
 
     });
 
-    function fn_time_sale() {
+    function fn_time_sale(empty_date) {
         var count = 0;
+        var empty_date = empty_date; // 해당 날짜에 마지막 하나 삭제 안됨 수정 by.glory_20220528
         var chk_date = new Array;
         var artist_id = '<?php echo $artist_id;?>';
         var worker = '<?php echo $worker;?>';
@@ -1764,7 +1765,7 @@ function data_dash($tmp){
         $.ajax({
             type : 'post',
             url : './data/get_book_data_ajax.php',
-            data : {'mode':'awaitAdd','artist_id':artist_id,'worker':worker,'data':chk_date},
+            data : {'mode':'awaitAdd','artist_id':artist_id,'worker':worker,'data':chk_date, 'del_date':empty_date},
             dataType : 'json',
             success : function(json){
                 console.log(json.sql);
@@ -1830,7 +1831,8 @@ function data_dash($tmp){
             popalert.open('reserveCalendarPop99','데이터 선택에 오류가 있습니다. 새로고침 후 다시 선택해주세요.');
             return false;
         }
-        document.frm.submit();
+        //document.frm.submit();
+        location.replace('reserve_time_sale_step2_1');
     });
 
     $(document).ready(function(){
