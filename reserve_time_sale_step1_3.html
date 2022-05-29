@@ -30,6 +30,14 @@ $_SESSION['backurl1'] = 'reserve_main_day?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['
 $_SESSION['backurl2'] = 'reserve_time_sale_step1_3';
 $_SESSION['week_type'] = '1';
 
+// 당일 이전 타임 선택된 것이 있다면 삭제
+$delete_sql = "
+    DELETE FROM tb_sale_free_time_temp
+    WHERE artist_id = '{$artist_id}'
+    AND DATE_FORMAT(empty_date,'%Y-%m-%d') < DATE_FORMAT(NOW(),'%Y-%m-%d')
+";
+mysqli_query($connection,$delete_sql);
+
 $from = $_GET['from'];
 
 $sql = array();
@@ -55,9 +63,7 @@ $t_mm = date("m", strtotime($selected_date . "+1day"));
 $t_dd = date("d", strtotime($selected_date . "+1day"));
 
 // 오늘 날짜
-$today_year = date("Y");
-$today_month = date("m");
-$today_day = date("d");
+$today_date = date("Y-m-d");
 
 // var_dump($_SESSION);
 
@@ -691,6 +697,11 @@ function data_dash($tmp){
                                                     }
 
                                                     $star_date_time = strtotime($nowdate.' '.$thisTime);
+
+                                                    // 오늘 이전 날짜 선택 못하게 방지
+                                                    if($nowdate < $today_date){
+                                                        $div_class = "break";
+                                                    }
 
                                                     ?>
 

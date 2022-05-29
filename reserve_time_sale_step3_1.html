@@ -53,7 +53,7 @@ $empty_date = array_unique($empty_date);
 $empty_date = array_values($empty_date);
 
 //print_r($_POST);
-$user = implode("|",$_GET['person']);
+$user = implode("|",$_POST['person']);
 $weekString = array("일", "월", "화", "수", "목", "금", "토");
 
 
@@ -113,7 +113,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
     <section id="container">
         <!-- page-body -->
         <div class="page-body">
-            <form action="./data/set_reserve_time_sale" method="post" name="f">
+            <form action="./data/set_reserve_time_sale.php" method="post" name="f">
                 <input type="hidden" name="msg_type_idx" id="msg_type_idx" value="1">
                 <input type="hidden" name="filename" id="filename">
                 <input type="hidden" name="person" value="<?php echo $user;?>">
@@ -400,7 +400,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                 <div class="layer-page-body">
                     <div class="layer-page-inner">
                         <div class="reserve-landing-wrap">
-                            <div class="reserve-landing-visual"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                            <div class="reserve-landing-visual"><img id="landing_img" src="/static/pub/images/gate_picture.jpg" alt=""></div>
                             <div class="basic-data-group vvsmall3">
                                 <div class="con-title-group">
                                     <h4 class="con-title"><?php echo $shop_name; ?> 고객님 안녕하세요? </h4>
@@ -635,9 +635,10 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                 contentType: false,
                 type: 'POST',
                 success: function(data) {
-                    $('#prev_img_1').prop('src',data).css('width','100%');
+                    $('#prev_img_1').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
+                    $('#landing_img').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#prev_img').css('display','block');
-                    $('#filename').val(newfilename);
+                    $('#filename').val(data);
                     //location.reload();
                 },
                 error: function(xhr, status, error) {
@@ -702,9 +703,10 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                     /*addwidth = " style='width:30%' ";
                     mkimg_str = "<img src='/upload/" + newfilename + "' " + addwidth + ">";*/
 
-                    $('#prev_img_1').prop('src','/upload/'+newfilename).css('width','100%');
+                    $('#prev_img_1').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
+                    $('#landing_img').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#prev_img').css('display','block');
-                    $('#filename').val(newfilename);
+                    $('#filename').val(data);
                     //location.reload();
                 },
                 error: function(xhr, status, error) {

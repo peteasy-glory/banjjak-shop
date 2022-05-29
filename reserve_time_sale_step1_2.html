@@ -20,6 +20,14 @@ $shop_title	= "빈시간 판매하기";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
+// 당일 이전 타임 선택된 것이 있다면 삭제
+$delete_sql = "
+    DELETE FROM tb_sale_free_time_temp
+    WHERE artist_id = '{$artist_id}'
+    AND DATE_FORMAT(empty_date,'%Y-%m-%d') < DATE_FORMAT(NOW(),'%Y-%m-%d')
+";
+mysqli_query($connection,$delete_sql);
+
 $_SESSION['week_type'] = '0';
 
 $from = $_GET['from'];
@@ -34,7 +42,11 @@ $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 $week = $_GET['week'];
 
-$_SESSION['backurl1'] = 'reserve_time_sale_step1_2';
+unset($_SESSION['backurl1']);
+unset($_SESSION['backurl2']);
+$_SESSION['backurl1'] = 'reserve_main_day?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+$_SESSION['backurl2'] = 'reserve_time_sale_step1_2';
+
 
 $daily = array('일', '월', '화', '수', '목', '금', '토');
 $selected_date = $yy . "-" . $mm . "-" . $dd;
@@ -47,9 +59,7 @@ $t_mm = date("m", strtotime($selected_date . "+1day"));
 $t_dd = date("d", strtotime($selected_date . "+1day"));
 
 // 오늘 날짜
-$today_year = date("Y");
-$today_month = date("m");
-$today_day = date("d");
+$today_date = date("Y-m-d");
 
 // var_dump($_SESSION);
 
@@ -742,6 +752,7 @@ function data_dash($tmp){
     $tmp = substr_replace($tmp, ':', 13, 0);
     return $tmp;
 }
+
 ?>
 
 <!-- container -->
@@ -1002,6 +1013,11 @@ function data_dash($tmp){
                                                 $star_date_time = strtotime($select_day.' '.$thisTime);
 
                                                 $cur_dt = $nowdate.' '.$thisTime;
+
+                                                // 오늘 이전 날짜 선택 못하게 방지
+                                                if($nowdate < $today_date){
+                                                    $div_class = "break";
+                                                }
                                                 ?>
                                                 <div class="calendar-week-body-col <?=$div_class?> ">
 

@@ -8,15 +8,12 @@ make_user_directory($upload_static_directory2 . $upload_directory2, $user_id);
 // 설정
 $allowed_ext = array('jpg', 'jpeg', 'png', 'gif');
 
-// 변수 정리
-//$error = $_FILES['myfile']['error'];
-//$name = $_FILES['myfile']['name'];
 
-$filename = $_POST['filepath'];
+$filename = $_REQUEST['filepath'];
 $filename = trim($filename);
 echo "filename:" . $filename . "<br>";
 
-$new_filename = $_POST['newfilepath'];
+$new_filename = $_REQUEST['newfilepath'];
 $new_filename = trim($new_filename);
 echo "newfile:" . $newfilename . "<br>";
 
@@ -93,36 +90,22 @@ if ($exifData['Orientation']) {
     } //if($degree)
     //로테이션 처리...를 못했으면 그냥 업로드 처리
     if ($mklotaion == false) {
-        echo "1->".$imgpath." -- ".$target;
         //move_uploaded_file($imgpath, $target);
         copy($imgpath, $target);
     }
 } else {  //if($exifData['Orientation'])
     //move_uploaded_file($imgpath, $target);
-    echo "2->".$imgpath." -- ".$target;
     copy($imgpath, $target);
     //echo "그냥업로드";
 } //if($exifData['Orientation'])
 //기존 앱에서 올린 파일 삭제..
-//@unlink($imgpath);
+$s3 = new TAwsS3('banjjak-s3', 'AKIATLSPGL6BNM6VOYWX', 'JJagfUCVzN4fCOrX3cdGHlX+8WL9PJ7T0GUHlFao');
+$s3->resizeImage($target, $target);
+$s3->fileToS3($target, $upload_directory."/".$new_filename);
+@unlink($imgpath);
 
-
-//echo $new_filename;
-// 파일 정보 출력
-/*echo "<h2>파일 정보</h2>
-<ul>
-	<li>파일명: $name</li>
-	<li>확장자: $ext</li>
-	<li>파일형식: {$_FILES['myfile']['type']}</li>
-	<li>파일크기: {$_FILES['myfile']['size']} 바이트</li>
-</ul>";
-*/
-//header('Content-type: application/json');
+//$sql = "insert into tb_portfolio (customer_id, image, update_time) value ('" . $user_id . "','" . $upload_direcoty_full_path . "', now());";
+//$result = mysqli_query($connection, $sql);
+echo $upload_direcoty_full_path;
 ?>
 
-<!-- {
-    "upfilename": "<?= $upload_direcoty_full_path ?>",
-    "allpath": "<?= $upload_static_directory2 . $upload_direcoty_full_path ?>",
-    "oldfile":"<?=$oldfile?>",
-    "newfile":"<?=$newfile?>"
-    } -->

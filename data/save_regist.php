@@ -58,7 +58,7 @@ $sql = "
         (`customer_id`, `step`, `name`, `cellphone`, `is_personal`, `is_business`, `business_number`, `business_license`, `region`, `professional`, `is_got_offline_shop`, 
          `offline_shop_name`, `offline_shop_phonenumber`, `offline_shop_address`, `update_time`, `working_years`, `lat`, `lng`, `enter_path`, `choice_service`) 
     VALUES 
-        ('".$user_id."', 5, '".$name."', '".$cellphone."', '".$is_personal."', '".$is_business."', '".$business_number."', '".$business_photo."', '".$region."', '', '".$offline."', 
+        ('".$user_id."', 5, '".$name."', '".$cellphone."', '".$is_personal."', '".$is_business."', '".$business_number."', '".$business_photo."', '".$top_region.":".$middle_region."', '', '".$offline."', 
          '".$offline_shop_name."', '".$offline_shop_phonenumber."', '".$shop_address."', NOW(), '".$working_years."', '".$lat."', '".$lat."', '', '".$cate."');
 
 ";
