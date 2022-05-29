@@ -209,7 +209,7 @@ class Allimtalk{
     }
 
     public function sendUpdateNotice_new($customerName, $petName, $shopName, $date, $changeDate, $btnLink){
-        $templateNo = "14041";
+        $templateNo = "20002";
         $btnName = "예약변경";
         $message = 
         "반려생활의 단짝, 반짝에서 ".$customerName."님의 ".addslashes($petName)." 미용 예약 변경 내용을 알려드립니다."
@@ -222,7 +222,7 @@ class Allimtalk{
     }
 
     public function sendReservationNotice_new($customerName, $petName, $shopName, $date, $btnLink){
-        $templateNo = "14040";
+        $templateNo = "20001";
         $btnName = "예약정보";
         $message =
         "반려생활의 단짝, 반짝에서 ".$customerName."님의 ".addslashes($petName)."미용예약 내용을 알려드립니다."
