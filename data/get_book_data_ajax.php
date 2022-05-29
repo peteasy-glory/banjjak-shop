@@ -667,7 +667,7 @@ switch($clear['mode']){
                 $talk = new Allimtalk();
                 //$talkBtnLink = "https://shop.gopet.kr/reserve_pay_management_2?payment_log_seq=".$pay[0]['payment_log_seq'];
                 $talk->cellphone = $row['cellphone'];
-                $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$seq;
+                $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$seq;
                 $talkResult = $talk->sendUpdateNotice_new($customerName, $petName, $shopName, $date, $changeDate, $talkBtnLink);
             }
 
@@ -745,7 +745,7 @@ switch($clear['mode']){
                 $talk = new Allimtalk();
                 //$talkBtnLink = "https://shop.gopet.kr/reserve_pay_management_2?payment_log_seq=".$pay[0]['payment_log_seq'];
                 $talk->cellphone = $row['cellphone'];
-                $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$seq;
+                $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$seq;
                 $talkResult = $talk->sendReservationNotice_new($customerName, $petName, $shopName, $date, $talkBtnLink);
             }
 
@@ -1096,7 +1096,7 @@ switch($clear['mode']){
         $talk = new Allimtalk();
         $talk->cellphone = $pay[0]['cellphone'];
         //$talkBtnLink = "https://shop.gopet.kr/reserve_pay_management_2?payment_log_seq=".$pay[0]['payment_log_seq'];
-        $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$pay[0]['payment_log_seq'];
+        $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$pay[0]['payment_log_seq'];
         $talkResult = $talk->sendUpdateNotice_new($customerName, $petName, $shopName, $date, $changeDate, $talkBtnLink);
         echo json_encode($json);
     break;
