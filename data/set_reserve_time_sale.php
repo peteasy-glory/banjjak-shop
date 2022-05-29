@@ -48,9 +48,21 @@ $pcnt = 0;
 
 $time_zone = $_SESSION['week_type'];
 
+// mesaage insert
+$msg_que = "
+    insert into tb_partner_message set 
+        msg_type_idx = {$_POST['msg_type_idx']},
+        message = '{$_POST['sel_msg']}',
+        reg_date = NOW(),
+        is_delete = 0
+";
+$msg_res = sql_query($msg_que);
+if ($msg_res) {
+    $msg_id = mysqli_insert_id($connection);
+}
 
 $que = "INSERT INTO tb_sale_free_time_mgr SET ";
-$que .= "msg_idx    = {$_POST['msg_type_idx']}, ";
+$que .= "msg_idx    = {$msg_id}, ";
 $que .= "message    = '{$_POST['sel_msg']}', ";
 $que .= "artist_id  = '{$user_id}',";
 $que .= "sale_kind  = {$_POST['sel_sale']}, ";
@@ -70,12 +82,13 @@ for($ii=0;$ii<count($pr);$ii++) {
 
     if(ctype_alnum($pr[$ii])){
         $sql1  = "INSERT INTO tb_sale_free_time_tmp_customer SET ";
-        $sql1 .= "tmp_seq = '{$pr[$ii]}', ";
+        $sql1 .= "tmp_seq = {$pr[$ii]}, ";
     } else {
         $sql1 = "INSERT INTO tb_sale_free_time_customer SET ";
         $sql1 .= "customer_id = '{$pr[$ii]}', ";
     }
-    $sql1 .= "mgr_idx = {$id} ";
+    $sql1 .= "mgr_idx = {$id}, ";
+    $sql1 .= "send_type = 1, is_delete = 0";
     //echo $sql1."<p>";
     sql_query($sql1);
 }
