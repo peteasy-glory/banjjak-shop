@@ -260,5 +260,17 @@ class Allimtalk{
         return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
     }
 
+    // 빈시간 판매 알림톡
+    public function sendEmptytimeReservation($customerName, $shopName, $date, $btnLink){
+        $templateNo = "20009";
+        $btnName = "예약시간 확인하기";
+        $message =
+            "반려생활의 단짝, 반짝에서 ".$customerName."님께서 예약가능한 시간을 알려드립니다."
+            ."\n\n - 예약펫샵: ".addslashes($shopName)
+            ."\n - 가능시간: ".$date
+            ."\n\n 상세한 예약시간은 반짝에서 확인가능하세요";
+
+        return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
+    }
 
 }

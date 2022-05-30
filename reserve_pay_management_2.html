@@ -168,9 +168,9 @@ $scm = sql_fetch_array($que);
 //가족번호조회
 $que = "SELECT * FROM tb_customer_family WHERE to_cellphone = '{$pay['cellphone']}' AND artist_id = '{$user_id}' AND is_delete = 0";
 //echo $que;
-$arr = sql_fetch_array($que);
-if(count($arr)>0){
-    foreach($arr as $fam){
+$arr_t = sql_fetch_array($que);
+if(count($arr_t)>0){
+    foreach($arr_t as $fam){
         $tel['title'][]     = $fam['from_nickname'];
         $tel['tel'][]       = $fam['from_cellphone'];
         $tel['seq'][]       = $fam['family_seq'];
@@ -256,7 +256,7 @@ if(count($arr)>0){
                                 <div class="flex-table-title"><div class="txt">보조 연락처</div></div>
                                 <div class="flex-table-data">
                                     <div class="flex-table-data-inner">
-                                        <?php for($i=0;$i<count($tel);$i++){ ?>
+                                        <?php for($i=0;$i<count($arr_t);$i++){ ?>
                                             <div class="flex-table-item middle">
                                                 <div class="flex-table-data">
                                                     <div class="flex-table-data-inner">
@@ -264,8 +264,8 @@ if(count($arr)>0){
                                                     </div>
                                                     <div class="flex-table-data-side">
                                                         <div class="btn-ui-group">
-                                                            <button type="button" class="btn-data-tel" href="tel:<?php echo $tel['tel'][$i];?>">전화하기</button>
-                                                            <button type="button" class="btn-data-message" href="sms:<?php echo $tel['tel'][$i];?>">메시지보내기</button>
+                                                            <a href="tel:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                                            <a href="sms:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
                                                         </div>
                                                     </div>
                                                 </div>
