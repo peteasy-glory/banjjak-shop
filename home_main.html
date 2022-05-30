@@ -391,7 +391,11 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 	<div class="page-body">
 	    <div class="common-bottom-ui left" style="position:fixed;bottom:74px; z-index:10">
             <a href="customer_inquiry"><img src="https://image.banjjakpet.com/images/icon-circle-float_search.png" alt="" style="width:64px;"></a>
-        </div>	
+        </div>
+        <div class="reserve-calendar-float-cell" style="position:fixed;right:20px;bottom:74px; z-index:10">
+            <button onclick="location.href='reserve_main_day';" type="button" class="btn-reserve-calendar-today">
+                <span class="icon icon-circle-float-today"></span></button>
+        </div>
 		<div class="user-main-info store">
 			<div class="info-item-wrap">
 				<div class="thumb-data">
