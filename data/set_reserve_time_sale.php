@@ -224,6 +224,30 @@ for ($i = 0; $i < count($work_list); $i++) {//미용사별
 
 $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}'";
 sql_query($que);
+
+// 알림톡발송
+$now = time();
+$year = $_POST['year'];
+$month = $_POST['month'];
+$day = $_POST['day'];
+//$reservationTime = strtotime($_POST['year'].'-'.$_POST['month'].'-'.$_POST['day'].' '.$from_hour.':'.$from_min);
+$reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
+
+
+$talk = new Allimtalk();
+
+$talk->cellphone = $_POST['cellPhone'];
+
+$week_arr = ['일', '월', '화', '수', '목', '금', '토'];
+$talkCustomerName = substr($_POST['cellPhone'], -4);
+//$talkDate = date("Y년 m월 d일 H시 i분", $reservationTime);
+$talkDate = date("Y년 m월 d일", $reservationTime);
+$talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
+$talkDate .= date("H시 i분", $reservationTime);
+$talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$id;
+$talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
+
+
 $_SESSION['empty_reg'] = 'Y';
 ?>
 <script>

@@ -499,7 +499,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 
                         $pl1 = sql_fetch_array($que);
                         foreach($pl1 as $pl1){
-                            $beauty_info = explode("|",$pl1['product']);
+                            //$beauty_info = explode("|",$pl1['product']);
                             $que = "SELECT * FROM tb_artist_list WHERE artist_id = '{$user_id}' AND name = '{$pl1['worker']}' GROUP BY name ";
                             $tal = sql_fetch_array($que);
 
@@ -518,6 +518,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                     //echo $que1;
                     $pl = sql_fetch_array($que1);
                     foreach($pl as $pl){
+                        $beauty_info = explode("|",$pl['product']);
 
                         $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pl['pet_seq']}'";
                         //echo $que;
