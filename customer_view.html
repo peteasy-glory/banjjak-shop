@@ -507,11 +507,11 @@ $another_reserve = 0;
                             <div class="service-selected-wrap" >
                                 <div class="service-selected-group">
                                     <div class="list-title">미용 경험</div>
-                                    <div class="list-data"><?php echo $pet['beauty_exp'];?>회</div>
+                                    <div class="list-data"><?php echo ($pet['beauty_exp'] == 0)? "없음" : $pet['beauty_exp'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">예방 접종</div>
-                                    <div class="list-data"><?php echo $pet['vaccination'];?></div>
+                                    <div class="list-data"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">입질</div>
@@ -540,7 +540,7 @@ $another_reserve = 0;
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">슬개골 탈구</div>
-                                    <div class="list-data"><?php echo $pet['luxation'];?>기</div>
+                                    <div class="list-data"><?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">특이사항</div>
