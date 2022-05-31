@@ -92,6 +92,22 @@ for($ii=0;$ii<count($pr);$ii++) {
     //echo $sql1."<p>";
     sql_query($sql1);
 }
+$phone_array = "";
+for($jj=0;$jj<count($pr);$jj++) {
+
+    if(ctype_alnum($pr[$jj])){
+        $sql_phone  = "select cellphone from tb_tmp_user where  ";
+        $sql_phone .= "tmp_seq = {$pr[$jj]}, ";
+    } else {
+        $sql_phone = "select cellphone from tb_customer where  ";
+        $sql_phone .= "customer_id = '{$pr[$jj]}', ";
+    }
+    //echo $sql1."<p>";
+    $phone_num = sql_fetch_array($sql_phone);
+    $phone_array .= $phone_num[0]['cellphone']."|";
+}
+echo $phone_array;
+
 for ($i = 0; $i < count($work_list); $i++) {//미용사별
     for ($j = 0; $j < count($ed[$work_list[$i]]['date']); $j++) {//일자별
 
@@ -244,12 +260,12 @@ $talkCustomerName = substr($_POST['cellPhone'], -4);
 $talkDate = date("Y년 m월 d일", $reservationTime);
 $talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
 $talkDate .= date("H시 i분", $reservationTime);
-$talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$id;
-$talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
+$talkBtnLink = "https://customer.banjjakpet.com/allim/empty_info?no=".$id;
+//$talkResult = $talk->sendEmptytimeReservation($talkCustomerName, $_POST['shopName'], $talkDate, $talkBtnLink);
 
 
 $_SESSION['empty_reg'] = 'Y';
 ?>
 <script>
-    location.href = '../<?php echo $_SESSION['backurl1'];?>';
+    //location.href = '../<?php echo $_SESSION['backurl1'];?>';
 </script>
