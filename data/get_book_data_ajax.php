@@ -167,7 +167,7 @@ switch($clear['mode']){
                     $html .= '<div class="grid-layout-cell">';
                     $html .= '    <label class="form-toggle-box middle" for="service2">';
                     $html .= '        <input type="radio" name="service" class="service-type" data-time="'.$time_.'" data-time="'.$worktime['time'][$i].'" value="'.$dog_product_seq[$worktime['title'][$i]].'_price">';
-                    $html .= '        <em>'.$worktime['title'][$i]." ".$worktime['time'][$i].'분</em>';
+                    $html .= '        <em>'.$worktime['title'][$i]."<br>".$worktime['time'][$i].'분</em>';
                     $html .= '    </label>';
                     $html .= '</div>';
 
@@ -280,7 +280,7 @@ switch($clear['mode']){
                 $html .= '    <div class="form-toggle-options">';
                 $html .= '        <input type="radio" name="weight" id="weight2" class="weight_plus" value="'.$row['what_over_kgs'].':'.($plus_kgs_price+$row['over_kgs_price']).'">';
                 $html .= '        <div class="form-toggle-options-data">';
-                $html .= '            <div class="options-labels"><span>'.$row['what_over_kgs'].'kg ~</span><strong>kg당 +'.number_format($row['over_kgs_price']).'원</strong></div>';
+                $html .= '            <div class="options-labels"><span>'.$row['what_over_kgs'].'kg~</span><strong>kg당<br>+'.number_format($row['over_kgs_price']).'원</strong></div>';
                 $html .= '            <div class="form-amount-input">';
                 $html .= '                <button type="button" class="btn-form-amount-minus" onclick="weight_change('.$row['what_over_kgs'].','.$row['over_kgs_price'].',\'m\');">감소</button>';
                 $html .= '                <div class="form-amount-info">';

@@ -865,7 +865,7 @@ if(count($arr_t)>0){
                                                     <div class="grid-layout-cell">
                                                         <label class="form-toggle-box middle" for="service2">
                                                             <input type="radio" name="service" class="service-type" data-time="<?php echo strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'].' +'.$worktime['time'][$i].' minute');?>" data-time="<?php echo $worktime['time'][$i];?>" value="<?php echo $dog_product_seq[$worktime['title'][$i]].'_price';?>" <?php echo ($worktime['title'][$i] == $beauty_info[4])?'checked':''; ?>>
-                                                            <em><?php echo $worktime['title'][$i];?> <?php echo $worktime['time'][$i];?>분</em>
+                                                            <em><?php echo $worktime['title'][$i];?><br><?php echo $worktime['time'][$i];?>분</em>
                                                         </label>
                                                     </div>
                                                     <?php }} ?>
@@ -946,7 +946,7 @@ if(count($arr_t)>0){
                                                             <div class="form-toggle-options">
                                                                 <input type="radio" name="weight" id="weight2" class="weight_plus" value="<?php echo (($plus_kgs > $row['what_over_kgs'])? $plus_kgs : $row['what_over_kgs']).':'.$plus_kgs_price;?>" <?php echo ($weight_info[0]>$row['what_over_kgs'])? 'checked' : '';?>>
                                                                 <div class="form-toggle-options-data">
-                                                                    <div class="options-labels"><span><?php echo $row['what_over_kgs'];?>kg ~</span><strong>kg당 +<?php echo number_format($row['over_kgs_price']);?>원</strong></div>
+                                                                    <div class="options-labels"><span><?php echo $row['what_over_kgs'];?>kg~</span><strong>kg당<br>+<?php echo number_format($row['over_kgs_price']);?>원</strong></div>
                                                                     <div class="form-amount-input">
                                                                         <button type="button" class="btn-form-amount-minus" onclick="weight_change(<?php echo ($weight_info[0]>$row['what_over_kgs'])? $weight_info[0] : $row['what_over_kgs'];?>,<?php echo $row['over_kgs_price']; ?>,'m');">감소</button>
                                                                         <div class="form-amount-info">
