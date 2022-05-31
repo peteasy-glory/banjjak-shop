@@ -308,6 +308,13 @@ if(count($arr_t)>0){
                                                 $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
                                             }
                                         }
+
+                                        // 펫정보 입질
+                                        if($pet['bite'] == 0){
+                                            $bite = "안해요";
+                                        }else{
+                                            $bite = "해요";
+                                        }
                                     }
                                     ?>
                                     <img src="<?php echo $img; ?>" alt="" onclick="show_img('<?php echo $img;?>');">
@@ -396,40 +403,43 @@ if(count($arr_t)>0){
                             <div class="service-selected-wrap">
                                 <div class="service-selected-group">
                                     <div class="list-title">미용 경험</div>
-                                    <div class="list-data"><?php echo $pet['beauty_exp'];?></div>
+                                    <div class="list-data"><?php echo ($pet['beauty_exp'] == 0)? "없음" : $pet['beauty_exp'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">예방 접종</div>
-                                    <div class="list-data"><?php echo $pet['vaccination'];?></div>
+                                    <div class="list-data"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">입질</div>
-                                    <div class="list-data"><?php echo $pet['bite'];?></div>
+                                    <div class="list-data"><?php echo $bite;?></div>
                                 </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">싫어하는 부위</div>
-                                    <div class="list-data">
-                                        <?php
-                                        if($pet['nothing']==1){
-                                            //$is_hate = '없음';
-                                        } else {
-                                            if ($pet['dt_eye'] == 1) $hate[] = '눈';
-                                            if ($pet['dt_nose'] == 1) $hate[] = '코';
-                                            if ($pet['dt_mouth'] == 1) $hate[] = '입';
-                                            if ($pet['dt_neck'] == 1) $hate[] = '목';
-                                            if ($pet['dt_body'] == 1) $hate[] = '몸';
-                                            if ($pet['dt_leg'] == 1) $hate[] = '다리';
-                                            if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
-                                            if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
-                                            $is_hate = implode(",",$hate);
-                                        }
-                                        echo $is_hate;
-                                        ?>
+                                <?php
+                                if($pet['nothing']==1){
+                                    //$is_hate = '없음';
+                                } else {
+                                    if ($pet['dt_eye'] == 1) $hate[] = '눈';
+                                    if ($pet['dt_nose'] == 1) $hate[] = '코';
+                                    if ($pet['dt_mouth'] == 1) $hate[] = '입';
+                                    if ($pet['dt_neck'] == 1) $hate[] = '목';
+                                    if ($pet['dt_body'] == 1) $hate[] = '몸';
+                                    if ($pet['dt_leg'] == 1) $hate[] = '다리';
+                                    if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
+                                    if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
+                                    $is_hate = implode(",",$hate);
+                                    ?>
+                                    <div class="service-selected-group">
+                                        <div class="list-title">싫어하는 부위</div>
+                                        <div class="list-data">
+                                            <?php echo $is_hate; ?>
+                                        </div>
                                     </div>
-                                </div>
+                                    <?php
+                                }
+                                //echo $is_hate;
+                                ?>
                                 <div class="service-selected-group">
                                     <div class="list-title">슬개골 탈구</div>
-                                    <div class="list-data"><?php echo $pet['luxation'];?></div>
+                                    <div class="list-data"><?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">특이사항</div>

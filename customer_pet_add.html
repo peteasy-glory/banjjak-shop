@@ -228,9 +228,11 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
                         <div class="form-item-label">미용 경험</div>
                         <div class="form-item-data type-2">
                             <select name="beauty_cnt">
-                                <?php for($i=0;$i<20;$i++){ ?>
-                                <option value="<?php echo $i;?>" <?php echo ($data['pet']['beauty_exp']==$i)?'selected':'';?>><?php echo $i;?>회</option>
-                                <?php } ?>
+                                <option value="">선택</option>
+                                <option value="없음" <?= $data['pet']['beauty_exp'] == '없음' ? "selected" : "" ?>>없음</option>
+                                <option value="1회" <?= $data['pet']['beauty_exp'] == '1회' ? "selected" : "" ?>>1회</option>
+                                <option value="2회" <?= $data['pet']['beauty_exp'] == '2회' ? "selected" : "" ?>>2회</option>
+                                <option value="3회" <?= $data['pet']['beauty_exp'] == '3회' ? "selected" : "" ?>>3회 이상</option>
                             </select>
                         </div>
                     </div>
@@ -240,9 +242,12 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
                         <div class="form-item-label">예방 접종</div>
                         <div class="form-item-data type-2">
                             <select name="vaccination">
-                                <?php for($i=0;$i<20;$i++){ ?>
-                                    <option value="<?php echo $i;?>" <?php echo ($data['pet']['vaccination']==$i)?'selected':'';?>><?php echo $i;?>회</option>
-                                <?php } ?>
+                                <option value="">선택</option>
+                                <option value="2차 이하" <?= $data['pet']['vaccination'] == '2차 이하' ? "selected" : "" ?>>2차 이하</option>
+                                <option value="3차 완료" <?= $data['pet']['vaccination'] == '3차 완료' ? "selected" : "" ?>>3차 완료</option>
+                                <option value="4차 완료" <?= $data['pet']['vaccination'] == '4차 완료' ? "selected" : "" ?>>4차 완료</option>
+                                <option value="5차 완료" <?= $data['pet']['vaccination'] == '5차 완료' ? "selected" : "" ?>>5차 완료</option>
+                                <option value="5차 완료" <?= $data['pet']['vaccination'] == '6차 완료' ? "selected" : "" ?>>6차 완료</option>
                             </select>
                         </div>
                     </div>
@@ -252,8 +257,8 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
                         <div class="form-item-label">입질</div>
                         <div class="form-item-data type-2">
                             <select name="bite">
-                                <option value="0" <?php echo ($data['pet']['bite']==1)?'selected':'';?>>해요</option>
-                                <option value="1" <?php echo ($data['pet']['bite']!=1)?'selected':'';?>>안해요</option>
+                                <option value="1" <?php echo ($data['pet']['bite']==1)?'selected':'';?>>해요</option>
+                                <option value="0" <?php echo ($data['pet']['bite']!=1)?'selected':'';?>>안해요</option>
                             </select>
                         </div>
                     </div>
@@ -263,10 +268,12 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
                         <div class="form-item-label">슬개골 탈구</div>
                         <div class="form-item-data type-2">
                             <select name="luxation">
-                                <option value="0">없음</option>
-                                <?php for($i=1;$i<=4;$i++){ ?>
-                                    <option value="<?php echo $i;?>" <?php echo ($data['pet']['luxation']==$i)?'selected':'';?>><?php echo $i;?>기</option>
-                                <?php } ?>
+                                <option value="">선택</option>
+                                <option value="없음" <?= $data['pet']['luxation'] == '없음' ? "selected" : "" ?>>없음</option>
+                                <option value="1기" <?= $data['pet']['luxation'] == '1기' ? "selected" : "" ?>>1기</option>
+                                <option value="2기" <?= $data['pet']['luxation'] == '2기' ? "selected" : "" ?>>2기</option>
+                                <option value="3기" <?= $data['pet']['luxation'] == '3기' ? "selected" : "" ?>>3기</option>
+                                <option value="4기" <?= $data['pet']['luxation'] == '4기' ? "selected" : "" ?>>4기</option>
                             </select>
                         </div>
                     </div>
