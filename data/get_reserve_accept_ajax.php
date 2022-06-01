@@ -58,7 +58,7 @@ if(count($arr)>0){
                 }
             } else if(empty($row['file_path'])) {
                 $html .= '            <!-- 이미지 있을때 -->';
-                $html .= '            <div class="user-thumb large"><img src="'."https://image.banjjakpet.com".img_link_change($row['file_path']).'" alt=""></div>';
+                $html .= '            <div class="user-thumb large"><img src="'."https://image.banjjakpet.com".img_link_change($row['photo']).'" alt=""></div>';
             } else {
                 $html .= '            <div class="user-thumb large"><img src="'."https://image.banjjakpet.com".img_link_change($row['file_path']).'" alt=""></div>';
             }

@@ -563,7 +563,13 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                 <a href="customer_inquiry"><img src="https://image.banjjakpet.com/images/icon-circle-float_search.png" alt="" style="width:64px;"></a>
             </div>
             <div class="reserve-calendar-wrap">
-                <!--<button type="button" onclick="location.href='reserve_time_sale_step1_3'" class="btn btn-outline-purple btn-middle-size btn-round">빈시간 판매하기</button>-->
+                <?php
+                if($_SESSION['gobeauty_user_id'] == 'itseokbeom@gmail.com' || $_SESSION['gobeauty_user_id'] == 'sally@peteasy.kr' || $_SESSION['gobeauty_user_id'] == 'dew@peteasy.kr'){
+                    ?>
+                    <button type="button" onclick="location.href='reserve_time_sale_step1_2'" class="btn btn-outline-purple btn-middle-size btn-round">빈시간 판매하기</button>
+                    <?php
+                }
+                ?>
                 <!-- 캘린더 정렬 -->
                 <div class="reserve-calendar-sort">
                     <div class="sort-left">
