@@ -1,6 +1,7 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/Allimtalk.class.php");
 
 
 $user_id = $_SESSION['gobeauty_user_id'];
@@ -8,13 +9,19 @@ $user_id = $_SESSION['gobeauty_user_id'];
 
 $fname = $_POST['filename'];
 
-//print_r($_POST);
+
+// 샵 기본 정보
+$query = "SELECT * FROM tb_shop WHERE customer_id = '{$user_id}'";
+$result = mysqli_query($connection,$query);
+$data = mysqli_fetch_object($result);
+$shop_name = $data->name;
 
 $work_list = $work_nick = $empty_date = $empty_time = array();
 
 $que = "SELECT a.empty_date, a.worker, a.empty_datetime, (SELECT nicname FROM tb_artist_list WHERE name = a.worker GROUP BY name) as nicname FROM tb_sale_free_time_temp a WHERE a.artist_id = '{$user_id}'  ORDER BY a.worker ASC, CONCAT(a.empty_date,' ',a.empty_datetime) ASC";
 //echo $que;
 $sftt = sql_fetch_array($que);
+
 if(count($sftt)>0){
     foreach($sftt as $rs){
         $tmp = explode('|',$rs['empty_date']);
@@ -49,6 +56,7 @@ $pcnt = 0;
 $time_zone = $_SESSION['week_type'];
 
 // mesaage insert
+
 $msg_que = "
     insert into tb_partner_message set 
         msg_type_idx = {$_POST['msg_type_idx']},
@@ -97,16 +105,17 @@ for($jj=0;$jj<count($pr);$jj++) {
 
     if(ctype_alnum($pr[$jj])){
         $sql_phone  = "select cellphone from tb_tmp_user where  ";
-        $sql_phone .= "tmp_seq = {$pr[$jj]}, ";
+        $sql_phone .= "tmp_seq = {$pr[$jj]} ";
     } else {
         $sql_phone = "select cellphone from tb_customer where  ";
-        $sql_phone .= "customer_id = '{$pr[$jj]}', ";
+        $sql_phone .= "id = '{$pr[$jj]}' ";
     }
-    //echo $sql1."<p>";
+    //echo $sql_phone."<br>";
     $phone_num = sql_fetch_array($sql_phone);
     $phone_array .= $phone_num[0]['cellphone']."|";
 }
-echo $phone_array;
+$phone_array = substr($phone_array, 0, -1);
+
 
 for ($i = 0; $i < count($work_list); $i++) {//미용사별
     for ($j = 0; $j < count($ed[$work_list[$i]]['date']); $j++) {//일자별
@@ -237,35 +246,38 @@ for ($i = 0; $i < count($work_list); $i++) {//미용사별
     }
 }
 
+$select_temp = "SELECT DATE_FORMAT(empty_date,'%m-%d') date FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}' GROUP BY empty_date";
+$temp_array = sql_fetch_array($select_temp);
+$allim_date = "";
+foreach($temp_array as $index=>$value){
+    if($index == 0){
+        $allim_date .= $value['date'];
+    }else{
+        $allim_date .= " / ".$value['date'];
+    }
+}
 
 $que = "DELETE FROM tb_sale_free_time_temp WHERE artist_id = '{$user_id}'";
 sql_query($que);
 
 // 알림톡발송
-$now = time();
-$year = $_POST['year'];
-$month = $_POST['month'];
-$day = $_POST['day'];
-//$reservationTime = strtotime($_POST['year'].'-'.$_POST['month'].'-'.$_POST['day'].' '.$from_hour.':'.$from_min);
-$reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
-
-
 $talk = new Allimtalk();
 
-$talk->cellphone = $_POST['cellPhone'];
+$allim_talk = explode("|",$phone_array);
 
-$week_arr = ['일', '월', '화', '수', '목', '금', '토'];
-$talkCustomerName = substr($_POST['cellPhone'], -4);
-//$talkDate = date("Y년 m월 d일 H시 i분", $reservationTime);
-$talkDate = date("Y년 m월 d일", $reservationTime);
-$talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
-$talkDate .= date("H시 i분", $reservationTime);
-$talkBtnLink = "https://customer.banjjakpet.com/allim/empty_info?no=".$id;
-//$talkResult = $talk->sendEmptytimeReservation($talkCustomerName, $_POST['shopName'], $talkDate, $talkBtnLink);
+for($ai=0;$ai<count($allim_talk);$ai++) {
+
+    $talk->cellphone = $allim_talk[$ai];
+    $talkCustomerName = substr($allim_talk[$ai], -4);
+    $talkBtnLink = "https://customer.banjjakpet.com/allim/empty_info?no=".$id;
+    $talkResult = $talk->sendEmptytimeReservation($talkCustomerName, $shop_name, $allim_date, $talkBtnLink);
+
+}
+
 
 
 $_SESSION['empty_reg'] = 'Y';
 ?>
 <script>
-    //location.href = '../<?php echo $_SESSION['backurl1'];?>';
+    location.href = '../<?php echo $_SESSION['backurl1'];?>';
 </script>

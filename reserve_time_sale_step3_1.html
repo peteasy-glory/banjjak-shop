@@ -254,23 +254,27 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                         <button type="button" class="btn-page-ui btn-page-close" onclick="popalert.close();"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></button>
                     </div>
                 </div>
+                <?php
+                $photo_que = "SELECT photo_path FROM tb_sale_free_time_mgr WHERE artist_id = '{$user_id}' GROUP BY photo_path";
+                $photo_array = sql_fetch_array($photo_que);
+                ?>
                 <div class="layer-page-body">
                     <div class="layer-page-inner">
                         <div class="msg-load-wrap">
                             <div class="shop-gate-picture-select">
                                 <div class="list-inner">
-                                    <div class="list-cell">
-                                        <!-- picture-thumb-view 클래스에 actived클래스 추가시 활성화 -->
-                                        <div class="picture-thumb-view modify">
-                                            <div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
+                                    <?php
+                                    foreach ($photo_array as $rs){
+                                        ?>
+                                        <div class="list-cell">
+                                            <!-- picture-thumb-view 클래스에 actived클래스 추가시 활성화 -->
+                                            <div class="picture-thumb-view modify">
+                                                <div class="picture-obj"><img src="<?=$rs['photo_path']?>" alt=""></div>
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="list-cell">
-                                        <!-- picture-thumb-view 클래스에 actived클래스 추가시 활성화 -->
-                                        <div class="picture-thumb-view modify">
-                                            <div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
-                                        </div>
-                                    </div>
+                                        <?
+                                    }
+                                    ?>
                                 </div>
                             </div>
                         </div>
@@ -638,7 +642,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                     $('#prev_img_1').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#landing_img').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#prev_img').css('display','block');
-                    $('#filename').val(data);
+                    $('#filename').val('https://image.banjjakpet.com'+data);
                     //location.reload();
                 },
                 error: function(xhr, status, error) {
@@ -706,7 +710,7 @@ if ($working_datas = mysqli_fetch_object($working_result)) {
                     $('#prev_img_1').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#landing_img').prop('src','https://image.banjjakpet.com'+data).css('width','100%');
                     $('#prev_img').css('display','block');
-                    $('#filename').val(data);
+                    $('#filename').val('https://image.banjjakpet.com'+data);
                     //location.reload();
                 },
                 error: function(xhr, status, error) {

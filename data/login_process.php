@@ -133,13 +133,6 @@ function tmsg(msg) {
     	document.cookie = cookies;
     }
 
-	if(getCookie("order_step") == "1"){ // 결제
-		location.href="<?=$item_directory ?>/item_payment.php?no="+getCookie("order_num");
-	}else if(getCookie("order_step") == "2"){ // 조회
-		location.href="../chkodr/?no="+getCookie("order_num");
-	}else if(getCookie("order_step") == "3"){ // 장바구니
-		location.href="<?=$item_directory ?>/item_cart.php?no="+getCookie("order_num");
-	}else{
         //alert("아이디나 비밀번호를 확인 해주세요.");
         //location.href="../login";
 
@@ -163,7 +156,7 @@ function tmsg(msg) {
         }
         ?>
 
-	}
+
 </script>
 
 <?
