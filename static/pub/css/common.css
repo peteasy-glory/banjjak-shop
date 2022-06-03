@@ -126,6 +126,13 @@ html.fix {overflow:hidden;}
 .grid-20 {width:20%; flex:1 0 20%;}
 .grid-10 {width:10%; flex:1 0 10%;}
 
+.grid-col2-row3 {
+
+	display:grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows:repeat(3, 1fr);
+;
+}
 
 .w-px-55 {width:55px;}
 .grid-layout.basic {overflow:hidden;}
@@ -179,7 +186,7 @@ html.fix {overflow:hidden;}
 .basic-data-group.vsmall {margin-top:16px;}
 .basic-data-group.vvsmall {margin-top:8px;}
 .basic-data-group.vvsmall2 {margin-top:10px;}
-.basic-data-group.vvsmall3 {margin-top:20px;}
+.basic-data-group.vvsmall3 {margin-top:20px; margin-bottom:20px;}
 .basic-data-group.vvsmall4 {margin-top:12px;}
 .basic-data-group.line {border-top:1px solid #f4f4f4;}
 .basic-data-group.line.middle {padding-top:32px;}
@@ -762,7 +769,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 .delivery-title.black {color:#fff; background:#666;}
 
 /* 타이틀 그룹 */
-.con-title-group {position:relative; display:flex; align-items:center; justify-content:space-between; min-height:44px; background-color:#fff; box-sizing:border-box;}
+.con-title-group {position:relative; display:flex; align-items:center; justify-content:space-between; min-height:44px; background-color:#f4f4f4; box-sizing:border-box; width:113%; left:-20px; max-width:1040px;}
 .con-title-group.line { padding-bottom:16px; border-bottom:1px solid #f4f4f4;}
 .con-title-group + .single-btns-list {border-top:none;}
 .con-title-group + .form-group {margin-top:24px;}
@@ -779,6 +786,8 @@ h6.con-title {font-size:15px; line-height:20px;}
 .con-title-group + .pay-card-group {margin-top:0; border:none;}
 .con-title-group .btn-side {position:absolute;top:50%;right:0;transform:translate(0% , -50%);}
 .con-title-group .unit {font-size:12px; line-height:16px; font-weight:500;}
+.con-title-group .con-title { padding-left:20px;}
+.con-title-group .btn-bg-yellow{background:#FEE500;padding:0px !important; right:46.5px !important; font-size:14px; width:126px;  }
 .title-need {font-size:13px; line-height:19px;}
 .need {color:#FF4848 !important;}
 
@@ -1093,7 +1102,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 .text-list-wrap.type-3 .text-list-cell + .text-list-cell {margin-top:8px;}
 .text-list-wrap .form-datepicker-group .form-unit {width:auto; margin:0 5px;}
 .text-list-wrap .form-datepicker-group .form-datepicker select {background-position:right 8px center; padding:0 16px 0 10px}
-
+.text-list-wrap-1{ border: 1px solid #EBEBEB; padding: 22px 20px 22px 20px; margin-top:10px; border-radius: 5px}
 /* 텍스트 도트 리스트 */
 .dot-text-list {position:relative;}
 .dot-text-list .list-cell {position:relative; font-size:14px; line-height:20px; padding-left:12px;}
@@ -1390,6 +1399,17 @@ h6.con-title {font-size:15px; line-height:20px;}
 .memo-item.small {padding:13px 14px;}
 .memo-item .note-desc {font-size:14px;line-height:19px; display:flex; align-items:flex-start; text-align:left; font-weight:500;}
 .memo-item .note-desc > em {flex:0 0 auto; margin-right:20px;}
+.memo-item-border{background: none !important; border:1px solid #F4F4F4;}
+.memo-detail{font-size: 14px;color: #666666;position: absolute;right: 30px;bottom: 30px;}
+.memo-detail::after{position: absolute;content: " ";color: #666666;background: url(../images/icon/10-ic-16-upside@2x.png);background-size: contain;display: block;width: 100%;left: 38px;height: 15px;bottom: -20px;background-repeat: no-repeat;transform: rotate(90deg);}
+.memo-item-overflow{
+	max-width:200px;
+	/*text-overflow:ellipsis ;*/
+	/*overflow: hidden;*/
+	/*white-space: nowrap;*/
+
+
+}
 
 /* 메시지 아이템 */
 .msg-item {border:1px solid #ebebeb; padding:20px; border-radius:16px;}
@@ -2516,6 +2536,8 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 
 /* 작업 및 결제 관리 */
 .reserve-pay-management {padding-top:20px;}
+.mg-bt-12{margin-bottom: 12px;}
+
 
 /* 예약하기 > 발송이력조회 */
 .reserve-alarm-inquiry {padding-top:20px;}
@@ -2721,13 +2743,16 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .user-reserve-info {margin-top:20px; font-size:13px; line-height:19px; color:#414141;}
 .user-reserve-info + .user-receipt-list {margin-top:24px;}
 .user-receipt-list .user-receipt-item + .user-receipt-item {margin-top:28px;}
-.user-receipt-item {padding:20px; border:1px solid #ebebeb; border-radius:12px; display:block; box-sizing:border-box; background-color:#fffbed;}
+.user-receipt-item {padding:20px; border:1px solid #ebebeb; border-radius:12px; display:block; box-sizing:border-box; }
 .user-receipt-item.type-2 {padding:24px;}
-.user-receipt-item .con-title-group {height:auto; min-height:0; margin-bottom:10px; background-color:#fffbed;}
+.user-receipt-item .con-title-group {height:auto; min-height:0; margin-bottom:10px;}
 .user-receipt-item .con-title-group .con-title {margin-bottom:0;}
 .user-receipt-item .con-title {margin-bottom:10px;}
 .user-receipt-item .con-title-group + .form-group {margin-top:0;}
 .user-receipt-item .customer-card-item {margin:4px 0 20px 0;}
+
+.user-receipt-wrap{	padding: 20px;	margin-top:12px !important; border: 1px solid #ebebeb;	border-radius: 12px;display: block;box-sizing: border-box;}
+
 .receipt-reserve-option {}
 .receipt-reserve-option + .receipt-reserve-option {margin-top:15px;}
 .receipt-reserve-option .option-cell {display:flex;}
@@ -3286,6 +3311,7 @@ table.customer-table > tbody > tr > td.no-padding {padding-left:0 !important; pa
 .special-note .note-desc {font-size:14px;line-height:20px; display:flex; align-items:flex-start; text-align:left;}
 .special-note .note-desc > em {flex:0 0 auto; margin-right:14px;}
 .special-note + .special-note {margin-top:10px;}
+.special-note-border{background:none !important; border: 1px solid #F4F4F4;}
 .customer-view-pet-group + .customer-view-pet-group {margin-top:28px;}
 .customer-view-pet-group .btn-grid-group {margin-bottom:0px; margin-top:24px;} 
 .customer-view-pet-detail .service-selected-wrap {padding:24px; display:none; margin-top:16px; }
@@ -3326,11 +3352,11 @@ table.customer-table > tbody > tr > td.no-padding {padding-left:0 !important; pa
 .phone-add-item.new .phone-add-item-value .phone-state-icon {display:none;}
 .phone-add-item.new .btn-phone-del > .icon {opacity:0.3;}
 .phone-add-input {width:100%; margin:20px 0 16px 0; text-align:left;}
-.phone-add-input.disabled .form-group .form-item-label {color:#b4b4b4;}
+.phone-add-input.disabled .form-group .form-item-label {color:#b4b4b4;margin-bottom:12px;}
 .phone-add-input .form-group {display:flex; margin:0 -5px;}
 .phone-add-input .form-group-cell {flex:1; margin:0 5px;}
 .phone-add-input .form-group-cell + .form-group-cell {margin-top:0;}
-.phone-add-input .form-input-info {margin-top:8px; padding:0;}
+.phone-add-input .form-input-info {font-size:13px; color:#666666; padding:0;}
 
 .user-sign-wrap {margin-top:10px; height:213px; border:1px solid #ebebeb; border-radius:12px;background:#fff;}
 .customer-view-agree-info {margin-top:10px; font-size:14px; line-height:20px;}
@@ -3569,6 +3595,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 @media screen and (min-width:1025px){
 	.m-block {display:none !important;}
 	.pc-block {display:block !important;}
+	.pc-mg-bt-20{margin-bottom:20px !important;}
 
 	html {overflow-x:hidden; overflow-y:auto;}
 	body {overflow:visible; padding:90px 0 0 275px; box-sizing:border-box;}

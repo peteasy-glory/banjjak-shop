@@ -281,6 +281,22 @@ if(count($arr_t)>0){
                             <a href="javascript:;" class="btn btn-red btn-middle-size btn-round set-noshow">노쇼 등록</a>
                         </div>
                     <?php } ?>
+                    <div class="form-group-cell middle">
+                        <div class="form-group-item">
+                            <div class="form-item-label mg-bt-12">
+                                견주관련 메모
+                                <span class="form-input-info margin">(고객에게는 노출되지 않습니다.)</span>
+                            </div>
+                            <div class="form-item-data">
+                                <textarea name="etc2_memo" id="etc2_memo" cols="30" rows="10"><?php echo $scm[0]['memo'];?></textarea>
+
+                            </div>
+                            <div class="form-item-data type-8">
+                                <button type="button" class="pc-mg-bt-20 btn btn-outline-purple btn-middle-size btn-round save-etc2 ft-size-17" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
                 <!-- //예약자 정보 -->
                 <!-- 예약동물 정보 -->
@@ -337,12 +353,12 @@ if(count($arr_t)>0){
                                         <?php } else { ?>
                                         <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&backurl=reserve_pay_management_2" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 작성</a></div>
                                         <?php } ?>
-                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $pay['pet_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2';">펫 정보 수정</a></div>
+                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $pay['pet_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2';">펫 정보 수정</a></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex-table type-2">
+                        <div class="grid-col2-row3">
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
                                     <div class="flex-table-title"><div class="txt">성별</div></div>
@@ -373,16 +389,16 @@ if(count($arr_t)>0){
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex-table-cell">
-                                <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">생일</div></div>
-                                    <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
-                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+<!--                            <div class="flex-table-cell">-->
+<!--                                <div class="flex-table-item">-->
+<!--                                    <div class="flex-table-title"><div class="txt">생일</div></div>-->
+<!--                                    <div class="flex-table-data">-->
+<!--                                        <div class="flex-table-data-inner">-->
+<!--                                            --><?php //echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
+<!--                                        </div>-->
+<!--                                    </div>-->
+<!--                                </div>-->
+<!--                            </div>-->
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
                                     <div class="flex-table-title"><div class="txt">나이</div></div>
@@ -391,6 +407,30 @@ if(count($arr_t)>0){
                                             <?php
                                             calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
                                             ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">입질</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php
+                                           echo $bite;
+                                            ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title"><div class="txt">슬개골 탈구</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner">
+                                            <?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?>
 
                                         </div>
                                     </div>
@@ -409,10 +449,7 @@ if(count($arr_t)>0){
                                     <div class="list-title">예방 접종</div>
                                     <div class="list-data"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
                                 </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">입질</div>
-                                    <div class="list-data"><?php echo $bite;?></div>
-                                </div>
+
                                 <?php
                                 if($pet['nothing']==1){
                                     //$is_hate = '없음';
@@ -428,21 +465,18 @@ if(count($arr_t)>0){
                                     $is_hate = implode(",",$hate);
                                     ?>
                                     <div class="service-selected-group">
-                                        <div class="list-title">싫어하는 부위</div>
+                                        <div class="list-title">생일</div>
                                         <div class="list-data">
-                                            <?php echo $is_hate; ?>
+                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
                                         </div>
                                     </div>
                                     <?php
                                 }
                                 //echo $is_hate;
                                 ?>
+                                
                                 <div class="service-selected-group">
-                                    <div class="list-title">슬개골 탈구</div>
-                                    <div class="list-data"><?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?></div>
-                                </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">특이사항</div>
+                                        <div class="list-title">특이사항</div>
                                     <div class="list-data">
                                         <?php
 
@@ -467,28 +501,17 @@ if(count($arr_t)>0){
                             <div class="form-group">
                                 <div class="form-group-cell middle">
                                     <div class="form-group-item">
-                                        <div class="form-item-label">특이사항</div>
+                                        <div class="form-item-label mg-bt-12">특이사항<span class="form-input-info">(고객에게는 노출되지 않습니다.)</span></div>
                                         <div class="form-item-data">
                                             <textarea name="etc_memo" id="etc_memo" cols="30" rows="10"><?php echo $pay['etc_memo'];?></textarea>
-                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
+
                                         </div>
                                         <div class="form-item-data type-8">
-                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc1" data-seq="<?php echo $payment_log_seq;?>">저장</button>
+                                            <button type="button" class="pc-mg-bt-20 btn btn-outline-purple btn-middle-size btn-round save-etc1" data-seq="<?php echo $payment_log_seq;?>">저장</button>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group-cell middle">
-                                    <div class="form-group-item">
-                                        <div class="form-item-label">견주관련 메모</div>
-                                        <div class="form-item-data">
-                                            <textarea name="etc2_memo" id="etc2_memo" cols="30" rows="10"><?php echo $scm[0]['memo'];?></textarea>
-                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
-                                        </div>
-                                        <div class="form-item-data type-8">
-                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc2" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
-                                        </div>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
                     </div>
@@ -526,15 +549,15 @@ if(count($arr_t)>0){
                             <?php
                             foreach($arr as $rs){
                                 ?>
-                                <div class="special-note special-cmt" style="display: <?php echo ($ct<5)?'block':'none';?>">
-                                    <div class="note-desc"><em><?php echo $rs['year'].'-'.$rs['month'].'-'.$rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
+                                <div class="special-note special-cmt special-note-border" style="display: <?php echo ($ct<5)?'block':'none';?>">
+                                    <div class="note-desc"><em><?php echo $rs['year'].'.'.$rs['month'].'.'.$rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
                                 </div>
                                 <?php $ct++;} ?>
                         </div>
                         <?php if($ct>5){ ?>
                             <div class="basic-data-group vmiddle">
                                 <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
-                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple view-special-cmt">더보기</button>
+                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple border-1 btn-border-view-special-cmt">더보기</button>
                             </div>
                         <?php } ?>
                     </div>
@@ -567,8 +590,9 @@ if(count($arr_t)>0){
                         $kg = explode(":",$prev_beauty[5]);
 
                         ?>
-                        <div class="memo-item" style="display: <?php echo ($tp_cnt<4)?'block':'none';?>"><?php echo date('Y.m.d',strtotime($date));?> / <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원
-                            <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>"><span style="float: right;text-decoration: underline; text-underline-position:under;">상세보기</span></a>
+                        <div class="memo-item memo-item-border" style="display: <?php echo ($tp_cnt<4)?'block':'none';?>">
+                            <p class="memo-item-overflow" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
+                            <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>"><span class="memo-detail">상세보기</span></a>
                         </div>
                         <?php $tp_cnt++;} ?>
                 </div>
@@ -580,13 +604,14 @@ if(count($arr_t)>0){
             </div>
             <?php } ?>
 
-            <div class="basic-data-group">
-                <div class="user-receipt-item">
+
+                <div class="basic-data-group">
                     <div class="con-title-group">
-                        <h5 class="con-title">예약 내용</h5>
-                        <button type="button" onclick="location.href='reserve_alarm_inquiry?payment_log_seq=<?=$payment_log_seq?>&cellphone=<?=$pay['cellphone']?>&pet_name=<?=$pet['name']?>'" class="btn-side btn btn-outline-purple btn-msmall-size btn-inline btn-border-radius-16">알림톡 발송 이력</button>
+                        <h4 class="con-title">예약 내용</h4>
+                        <button type="button" onclick="location.href='reserve_alarm_inquiry?payment_log_seq=<?=$payment_log_seq?>&cellphone=<?=$pay['cellphone']?>&pet_name=<?=$pet['name']?>'" class="btn-side btn btn-msmall-size btn-inline btn-border-radius-16 btn-bg-yellow">알림톡 발송 이력</button>
+
                     </div>
-                    <div class="text-list-wrap type-2">
+                    <div class="text-list-wrap type-2 text-list-wrap-1">
                         <div class="text-list-cell"><div class="item-title unit">날짜</div><div class="item-data"><?php echo date('Y.m.d',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day']));?></div></div>
                         <div class="text-list-cell"><div class="item-title unit">선생님</div><div class="item-data"><?php echo $ar[0]['nicname'];?></div></div>
                         <div class="text-list-cell">
@@ -648,7 +673,7 @@ if(count($arr_t)>0){
                                             $end_date = ($to_minute)? $workDate.' '.$to_hour.':'.$to_minute : $workDate.' '.$end_time.':00';
                                             $rev_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']);
                                             for($i=strtotime($start_date);$i<=(strtotime($end_date)-1800);$i+=1800){
-                                            ?>
+                                                ?>
                                                 <option value="<?php echo $i;?>" <?php echo ($i == $rev_date)?'selected':''; ?>><?php echo date('H:i',$i);?></option>
                                             <?php } ?>
                                         </select>
@@ -672,13 +697,22 @@ if(count($arr_t)>0){
                                 </div>
                             </div>
                         </div>
+                        <div class="basic-data-group vsmall"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round only-change-time" data-seq="<?php echo $pay['payment_log_seq'];?>">시간만 변경</button></div>
+                        <div class="form-bottom-info" style="font-size:11px !important;">*시간 변경만 하는 경우 시간선택 후 변경을 눌러주세요.</div>
                     </div>
-                    <div class="basic-data-group vsmall"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round only-change-time" data-seq="<?php echo $pay['payment_log_seq'];?>">시간만 변경</button></div>
-                    <div class="form-bottom-info">*시간 변경만 하는 경우 시간선택 후 변경을 눌러주세요.</div>
+
+
+
+
+
+
                 </div>
+
+
+
                 <div class="basic-data-group vmiddle">
                     <div class="grid-layout btn-grid-group">
-                        <div class="grid-layout-inner">
+                        <div class="grid-layout-inner pc-mg-bt-20">
                             <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round change-rev" data-status="<?php echo $pay['status'];?>">날짜/미용사 변경</button></div>
                             <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-purple btn-middle-size btn-round cancel-rev" data-seq="<?php echo $pay['payment_log_seq'];?>" data-status="<?php echo $pay['status'];?>" data-cid="<?php echo $cus['id'];?>" data-tid="<?php echo $cus['tmp_seq'];?>">예약 취소</button></div>
                         </div>
@@ -710,7 +744,7 @@ if(count($arr_t)>0){
                         </div>
                     </div>
                 </div>
-                <div class="form-bottom-info">*시간 선택 후 발송을 누르면 견주에게 즉시알림이 발송됩니다.</div>
+                <div class="form-bottom-info" style="font-size:11px !important;">*시간 선택 후 발송을 누르면 견주에게 즉시알림이 발송됩니다.</div>
                 <div class="basic-data-group vvsmall3">
                     <div class="grid-layout btn-grid-group">
                         <div class="grid-layout-inner">
@@ -1716,7 +1750,7 @@ if(count($arr_t)>0){
 
             <!--변경 버튼 시작 -->
             <div class="basic-data-group middle sticky-bottom">
-                <div class="sticky-bottom-inner">
+                <div class="sticky-bottom-inner pc-mg-bt-20">
                     <a href="javascript:;" class="btn btn-outline-purple btn-round btn-middle-size update-service-btn">변경</a>
                 </div>
             </div>
@@ -1980,7 +2014,7 @@ if(count($arr_t)>0){
                         <div class="receipt-buy-detail result-price">
                             <div class="item-data-list">
                                 <div class="list-cell">
-                                    <div class="list-title font-color-purple"><strong>총 결제 합산 금액</strong></div>
+                                    <div class="list-title font-color-purple"><strong>예상 금액</strong></div>
                                     <div class="list-value font-color-purple"><strong><span id="total_pay_money"><?php echo number_format($sum+$vat);?></span>원</strong></div>
                                 </div>
                             </div>
@@ -2005,78 +2039,81 @@ if(count($arr_t)>0){
                 $cop = sql_fetch_array($que1);
                 if(count($cop)>0){
                 ?>
-                <div class="basic-data-group vvsmall2">
-                        <div class="user-receipt-item">
-                            <div class="con-title-group">
-                                <h5 class="con-title">보유 쿠폰</h5>
-                            </div>
-                            <!-- 20220308 수정 -->
-                            <div class="form-group">
-                                <div class="form-group-cell small">
-                                    <div class="form-group-item">
-                                        <div class="form-item-label">쿠폰 명</div>
-                                        <div class="form-item-data type-2">
-                                            <div class="form-control-btns">
-                                                <select name="coupon_name" id="coupon_name">
-                                                    <option value="">선택안함</option>
-                                                    <?php
-                                                    foreach($cop as $cop){
-                                                        ?>
-                                                        <option value="<?php echo $cop['user_coupon_seq'];?>"><?php echo $cop['name'];?></option>
-                                                        <?php
-                                                    }
-                                                    ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group-cell small">
-                                    <div class="grid-layout basic">
-                                        <div class="grid-layout-inner">
-                                            <div class="grid-layout-cell grid-60">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">보유</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="form-control-btns">
-                                                            <select name="coupon_balance" id="coupon_balance">
-                                                                <option value="">선택</option>
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="grid-layout-cell grid-40">
-                                                <div class="form-group-item">
-                                                    <div class="form-item-label">차감</div>
-                                                    <div class="form-item-data type-2">
-                                                        <div class="form-control-btns">
-                                                            <select name="use_coupon" id="use_coupon">
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group-cell small">
-                                    <button type="button" class="btn btn-outline-gray btn-round use-coupon">적용</button>
-                                    <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 잔액 <span id="remind_coupon">0</span></div>
-                                </div>
-                            </div>
-                            <!-- //20220308 수정 -->
+
+                    <div class="basic-data-group" id="prev_cmt">
+
+                        <div class="con-title-group">
+                            <h4 class="con-title">보유 쿠폰</h4>
                         </div>
+                        <div class="form-group user-receipt-wrap">
+                            <div class="form-group-cell small">
+                                <div class="form-group-item">
+                                    <div class="form-item-label">쿠폰 명</div>
+                                    <div class="form-item-data type-2">
+                                        <div class="form-control-btns">
+                                            <select name="coupon_name" id="coupon_name">
+                                                <option value="">선택안함</option>
+                                                <?php
+                                                foreach($cop as $cop){
+                                                    ?>
+                                                    <option value="<?php echo $cop['user_coupon_seq'];?>"><?php echo $cop['name'];?></option>
+                                                    <?php
+                                                }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell small">
+                                <div class="grid-layout basic">
+                                    <div class="grid-layout-inner">
+                                        <div class="grid-layout-cell grid-60">
+                                            <div class="form-group-item">
+                                                <div class="form-item-label">보유</div>
+                                                <div class="form-item-data type-2">
+                                                    <div class="form-control-btns">
+                                                        <select name="coupon_balance" id="coupon_balance">
+                                                            <option value="">선택</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="grid-layout-cell grid-40">
+                                            <div class="form-group-item">
+                                                <div class="form-item-label">차감</div>
+                                                <div class="form-item-data type-2">
+                                                    <div class="form-control-btns">
+                                                        <select name="use_coupon" id="use_coupon">
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group-cell small">
+                                <button type="button" class="btn btn-outline-purple btn-round use-coupon">적용</button>
+                                <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 잔액 : <span id="remind_coupon">0</span>원</div>
+                            </div>
+                        </div>
+
+
                     </div>
+
                 <?php } ?>
                 <!-- 단골고객할인-->
-                <div class="basic-data-group vvsmall2">
-                    <div class="user-receipt-item">
-                        <div class="con-title-group">
-                            <h5 class="con-title">단골 고객 할인</h5>
-                        </div>
-                        <div class="regular-user-confirm">
-                            <div class="info">*원하시는 할인방법을 선택하신 후 적용을 누르세요.</div>
+
+                <div class="basic-data-group " id="prev_cmt">
+
+                    <div class="con-title-group">
+                        <h4 class="con-title">단골 고객 할인</h4>
+                    </div>
+
+                    <div class="user-receipt-wrap"><div class="regular-user-confirm ">
+                            <div class="info" style="font-size:11px !important;">*원하시는 할인방법을 선택하신 후 적용을 누르세요.</div>
                             <div class="regular-user-confirm-select">
                                 <div class="regular-user-confirm-input">
                                     <div class="item-check"><label class="form-radiobox">
@@ -2121,7 +2158,7 @@ if(count($arr_t)>0){
                             </div>
                         </div>
                         <div class="basic-data-group vsmall">
-                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round set_update_discount_btn" data-seq="<?php echo $payment_log_seq;?>">저장</button>
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round set_update_discount_btn" data-seq="<?php echo $payment_log_seq;?>">저장</button>
                         </div>
                         <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">할인금액 : <span id="discount_price">
                                         <?php
@@ -2132,9 +2169,14 @@ if(count($arr_t)>0){
                                         }
 
                                         ?>
-                                </span>원</div>
-                    </div>
+                                </span>원</div></div>
+
+
+
                 </div>
+
+
+
                 <!--펫샵 적립금-->
                 <?php
                 $que_r = "SELECT * FROM tb_shop_reserve WHERE artist_id = '{$pay['artist_id']}' AND is_use = '1' AND percent != '0'";
@@ -2142,72 +2184,84 @@ if(count($arr_t)>0){
                 $reserve = sql_fetch_array($que_r);
                 if(count($reserve)>0){
                 ?>
-                <div class="basic-data-group vvsmall2">
-                    <div class="user-receipt-item">
+
+                    <div class="basic-data-group " id="prev_cmt">
+
                         <div class="con-title-group">
-                            <h5 class="con-title">펫샵 적립금<button type="button" class="btn-data-helper" onclick="popalert.open('reservePayManagementMsg8');">도움말</button></h5>
+                            <h4 class="con-title">펫샵 적립금<button type="button" class="btn-data-helper" onclick="popalert.open('reservePayManagementMsg8');">도움말</button></h4>
                         </div>
-                        <div class="receipt-buy-detail result-price">
-                            <div class="item-data-list">
-                                <div class="list-cell">
-                                    <div class="list-title"><strong>현 적립금</strong></div>
-                                    <div class="list-value"><strong id="cur_reserve"><?php echo number_format($resrv['reserve']);?>원</strong></div>
+
+                        <div class="user-receipt-wrap">
+                            <div class="receipt-buy-detail result-price">
+                                <div class="item-data-list">
+                                    <div class="list-cell">
+                                        <div class="list-title"><strong>현 적립금</strong></div>
+                                        <div class="list-value"><strong id="cur_reserve"><?php echo number_format($resrv['reserve']);?>원</strong></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="basic-data-group vsmall line">
-                            <div class="form-group">
-                                <div class="form-group-cell">
-                                    <div class="form-group-item">
-                                        <div class="form-item-label">사용적립금</div>
-                                        <div class="form-item-data type-2">
-                                            <div class="form-point-input">
-                                                <input type="text" name="use_reserve" id="use_reserve" value="<?php echo $pay['reserve_point']; ?>" <?php echo ($pay['reserve_point']>0)?'disabled':''; ?> class="" placeholder="">
-                                                <div class="char">원</div>
-                                                <button type="button" class="btn btn-outline-gray btn-round btn-inline all-use-reserve" data-price="<?php echo $resrv['reserve'];?>">전액 사용</button>
+                            <div class="basic-data-group vsmall line">
+                                <div class="form-group">
+                                    <div class="form-group-cell">
+                                        <div class="form-group-item">
+                                            <div class="form-item-label">사용적립금</div>
+                                            <div class="form-item-data type-2">
+                                                <div class="form-point-input">
+                                                    <input type="text" name="use_reserve" id="use_reserve" value="<?php echo $pay['reserve_point']; ?>" <?php echo ($pay['reserve_point']>0)?'disabled':''; ?> class="" placeholder="">
+                                                    <div class="char">원</div>
+                                                    <button type="button" class="btn btn-outline-gray btn-round btn-inline all-use-reserve" data-price="<?php echo $resrv['reserve'];?>">전액 사용</button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="basic-data-group vvsmall3">
-                            <div class="grid-layout btn-grid-group">
-                                <div class="grid-layout-inner">
-                                    <div class="grid-layout-cell grid-2">
-                                        <button type="button" class="btn btn-outline-gray btn-middle-size btn-round reserve-save-cancel"
-                                                data-cid="<?php echo $cus['id'];?>"
-                                                data-tid="<?php echo $cus['tmp_seq'];?>"
-                                                data-phone="<?php echo $pay['cellphone'];?>"
-                                                data-seq="<?php echo $payment_log_seq;?>"
-                                                data-service="B"
-                                                data-aid="<?php echo $pay['artist_id'];?>"
-                                            <?php echo ($pay['reserve_point']>0)?'':'disabled';?>>재설정</button></div>
-                                    <div class="grid-layout-cell grid-2">
-                                        <button type="button" class="btn btn-outline-purple btn-middle-size btn-round  reserve-save-btn"
-                                                data-cid="<?php echo $cus['id'];?>"
-                                                data-tid="<?php echo $cus['tmp_seq'];?>"
-                                                data-phone="<?php echo $pay['cellphone'];?>"
-                                                data-seq="<?php echo $payment_log_seq;?>"
-                                                data-service="B"
-                                                data-aid="<?php echo $pay['artist_id'];?>"
-                                        >적용</button>
+                            <div class="basic-data-group vvsmall3">
+                                <div class="grid-layout btn-grid-group">
+                                    <div class="grid-layout-inner">
+<!--                                        <div class="grid-layout-cell grid-2">-->
+<!--                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round reserve-save-cancel"-->
+<!--                                                    data-cid="--><?php //echo $cus['id'];?><!--"-->
+<!--                                                    data-tid="--><?php //echo $cus['tmp_seq'];?><!--"-->
+<!--                                                    data-phone="--><?php //echo $pay['cellphone'];?><!--"-->
+<!--                                                    data-seq="--><?php //echo $payment_log_seq;?><!--"-->
+<!--                                                    data-service="B"-->
+<!--                                                    data-aid="--><?php //echo $pay['artist_id'];?><!--"-->
+<!--                                                --><?php //echo ($pay['reserve_point']>0)?'':'disabled';?><!--재설정</button></div>-->
+                                        <div class="grid-layout-cell grid-1">
+                                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round  reserve-save-btn"
+                                                    data-cid="<?php echo $cus['id'];?>"
+                                                    data-tid="<?php echo $cus['tmp_seq'];?>"
+                                                    data-phone="<?php echo $pay['cellphone'];?>"
+                                                    data-seq="<?php echo $payment_log_seq;?>"
+                                                    data-service="B"
+                                                    data-aid="<?php echo $pay['artist_id'];?>"
+                                            >적용</button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <!--<div class="basic-data-group vsmall">
-                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round reserve-save-btn"
+                            <!--<div class="basic-data-group vsmall">
+                                <button type="button" class="btn btn-outline-gray btn-middle-size btn-round reserve-save-btn"
 
-                            >적용</button>
-                        </div>-->
-                        <div class="form-bottom-info font-color-purple font-weight-500 ">이 예약 건에 대한 적립금이 아직 지급되지 않았습니다.</div>
+                                >적용</button>
+                            </div>-->
+                            <div class="form-bottom-info font-color-purple font-weight-500 " style="text-align:right; font-size:11px !important;">이 예약 건에 대한 적립금이 아직 지급되지 않았습니다.</div>
+
+
+
+                        </div>
+
+
+
                     </div>
-                </div>
+                    
+
                 <?php } ?>
                 <!--최종결제액-->
-                <div class="basic-data-group vvsmall2">
-                    <div class="user-receipt-item">
+
+                <div class="basic-data-group vvsmall2 " >
+                    <div class="user-receipt-item" style="border: 1px solid #6840B1 !important; margin-top: 32px;">
                         <div class="receipt-buy-detail total-price">
                             <div class="item-data-list">
                                 <div class="list-cell">
@@ -2229,7 +2283,7 @@ if(count($arr_t)>0){
                             <div class="item-data-list">
                                 <div class="list-cell">
                                     <div class="list-title font-color-purple"><strong>최종 결제액</strong></div>
-                                    <div class="list-value font-color-purple"><strong id="total_pay_price_disp">
+                                    <div class="list-value font-color-red"><strong id="total_pay_price_disp">
                                             <?php
                                             $t1 = ($sum+$vat)-str_replace(",","",$discount_price)-$pay['reserve_point'];
                                             echo number_format($t1);
@@ -2264,16 +2318,16 @@ if(count($arr_t)>0){
                         </div>
 
                         <div class="basic-data-group vsmall">
-                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-final-price" data-seq="<?php echo $payment_log_seq;?>">적용</button>
+                            <button type="button" class="btn btn-outline-purple btn-middle-size btn-round save-final-price" data-seq="<?php echo $payment_log_seq;?>">적용</button>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="basic-data-group">
-                <div class="con-title-group">
+                <div class="con-title-group" style="background:none !important;">
                     <h4 class="con-title">결제완료 처리</h4>
-                    <label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" id="pay_confirm" value="1" <?php echo ($pay['is_confirm']==1)?'checked':'';?> data-seq="<?php echo $payment_log_seq;?>"><span class="bar"></span></label>
+                    <label for="switch-toggle" class="form-switch-toggle" style="right:24px"><input type="checkbox" id="pay_confirm" value="1" <?php echo ($pay['is_confirm']==1)?'checked':'';?> data-seq="<?php echo $payment_log_seq;?>"><span class="bar"></span></label>
                 </div>
                 <div>
                     <span id="confirm_dt"><?php echo ($pay['is_confirm']==1)?$pay['confirm_dt']:'';?></span>
