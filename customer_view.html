@@ -185,8 +185,8 @@ if(empty($grade[0]['grade_name'])){
 
 
 //미용동의서
-$que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$pay['artist_id']}' AND pet_id = '{$_GET['pet_seq']}'";
-//echo $que;
+$que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$shop_id}' AND pet_id = '{$_GET['pet_seq']}'";
+//echo $que;cus
 $bag = sql_fetch_array($que);
 
 $que = "SELECT COUNT(*) AS noshow_cnt FROM tb_payment_log WHERE artist_id = '{$user_id}' AND pet_seq = '{$pet_seq}' AND is_no_show = 1";

@@ -142,8 +142,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					marking = '".$r_marking."',
 					mounting = '".$r_mounting."',
 					etc_for_owner = '".$r_etc_for_owner."'
-				WHERE pet_seq = '".$s_pet_id."'
-					AND tmp_yn = '".$r_tmp_yn."'
+				WHERE pet_seq = '".$s_pet_id."'				
 			";
 			if($r_tmp_yn == "N"){ // 정회원
 				$sql .= " AND customer_id = '".$r_customer_id."' ";
