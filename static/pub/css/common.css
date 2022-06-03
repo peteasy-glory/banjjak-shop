@@ -543,7 +543,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 .btn-page-chat {position:relative;display:inline-flex; width:64px; height:52px; align-items:center; justify-content:center;}
 .btn-page-chat.actived:before {content:'';position:absolute;top:50%;left:50%;display:block;width:9px;height:9px;background:#ff4848;border:2px solid #fff; box-sizing:border-box; z-index:5; border-radius:50%; transform:translate(3px , -9px);}
 
-.btn-detail-toggle {display:flex; width:100%; height:44px; align-items:center; justify-content:center; font-size:14px;line-height:20px;}
+.btn-detail-toggle {display:flex; width:100%; height:44px; color:#666; align-items:center; justify-content:center; font-size:14px;line-height:20px;}
 .btn-detail-toggle:after {content:'';display:block;width:10px;height:10px; margin-left:4px; background:url(../images/icon/btn-info-spread@2x.png) center center no-repeat;background-size:10px auto;}
 .btn-detail-toggle.actived:after {transform:rotate(180deg);}
 
@@ -654,7 +654,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 .wide-tab-inner .tab-cell .btn-tab-item.press {background-color:#f0f0f0;}
 .wide-tab.card .wide-tab-inner .tab-cell .btn-tab-item.press {background-color:#f0f0f0;}
 .wide-tab.card .wide-tab-inner .tab-cell.actived .btn-tab-item.press {background-color:#5931a2;}
-
+.receipt-wide-tab{width:113%; left:-20px; position: relative; background: #fff;}
 /* 라벨 */
 .label {display:inline-block; height:19px; padding:0 6px; font-size:10px; line-height:19px; font-weight:500; border-radius:10px; color:#000; border:1px solid #000; box-sizing:border-box;text-align:center; white-space:nowrap;}
 .label > em {font-weight:500;}
@@ -787,7 +787,11 @@ h6.con-title {font-size:15px; line-height:20px;}
 .con-title-group .btn-side {position:absolute;top:50%;right:0;transform:translate(0% , -50%);}
 .con-title-group .unit {font-size:12px; line-height:16px; font-weight:500;}
 .con-title-group .con-title { padding-left:20px;}
+<<<<<<< HEAD
 .con-title-group .btn-bg-yellow{background:#FEE500;padding:0px !important; right:46.5px !important; font-size:14px; width:126px;  }
+=======
+.con-title-group .btn-bg-yellow{background:#FEE500;padding:0px !important; right:22px; font-size:14px; width:126px;  }
+>>>>>>> 9cfe9d59656b11e88c7689f2e83ccaae0657f877
 .title-need {font-size:13px; line-height:19px;}
 .need {color:#FF4848 !important;}
 
