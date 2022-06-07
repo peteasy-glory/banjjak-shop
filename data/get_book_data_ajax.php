@@ -889,11 +889,11 @@ switch($clear['mode']){
     case 'setShopGrade':
         $json['flag'] = true;
 
-        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g1']}' WHERE grade_ord = 1 AND artist_id = '{$_SESSION['gobeauty_user_id']}'";
+        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g1']}' WHERE grade_ord = 1 AND artist_id = '{$user_id}'";
         sql_query($que);
-        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g2']}' WHERE grade_ord = 2 AND artist_id = '{$_SESSION['gobeauty_user_id']}'";
+        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g2']}' WHERE grade_ord = 2 AND artist_id = '{$user_id}'";
         sql_query($que);
-        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g3']}' WHERE grade_ord = 3 AND artist_id = '{$_SESSION['gobeauty_user_id']}'";
+        $que = "UPDATE tb_grade_of_shop SET grade_name = '{$_POST['g3']}' WHERE grade_ord = 3 AND artist_id = '{$user_id}'";
         sql_query($que);
 
 
@@ -1316,7 +1316,8 @@ switch($clear['mode']){
         if($row[0]['cnt']>0) {
             $que = "UPDATE tb_grade_of_customer SET grade_idx = '{$_POST['grade']}' WHERE customer_id = '{$_POST['id']}' AND grade_idx = '{$_POST['org_grade']}'";
         } else {
-            $que = "INSERT INTO tb_grade_of_customer SET grade_idx = '{$_POST['grade']}',  customer_id = '{$_POST['id']}'";
+            //$que = "INSERT INTO tb_grade_of_customer SET grade_idx = '{$_POST['grade']}',  customer_id = '{$_POST['id']}'";
+            $que = "INSERT INTO `tb_grade_of_customer` (`grade_idx`, `customer_id`, `is_delete`) VALUES ('{$_POST['grade']}', '{$_POST['id']}', 0);";
         }
         //echo $que;
         $res = sql_query($que);
