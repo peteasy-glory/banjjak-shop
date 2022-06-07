@@ -536,7 +536,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 .btn-page-chat {position:relative;display:inline-flex; width:64px; height:52px; align-items:center; justify-content:center;}
 .btn-page-chat.actived:before {content:'';position:absolute;top:50%;left:50%;display:block;width:9px;height:9px;background:#ff4848;border:2px solid #fff; box-sizing:border-box; z-index:5; border-radius:50%; transform:translate(3px , -9px);}
 
-.btn-detail-toggle {display:flex; width:100%; height:44px; align-items:center; justify-content:center; font-size:14px;line-height:20px;}
+.btn-detail-toggle {display:flex; color: #202020; width:100%; height:44px; align-items:center; justify-content:center; font-size:14px;line-height:20px;}
 .btn-detail-toggle:after {content:'';display:block;width:10px;height:10px; margin-left:4px; background:url(../images/icon/btn-info-spread@2x.png) center center no-repeat;background-size:10px auto;}
 .btn-detail-toggle.actived:after {transform:rotate(180deg);}
 
@@ -3579,6 +3579,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .btn-bg-yellow{background:#FEE500; color:#202020;width:126px !important; padding:0 !important; right:20px !important;}
 .text-list-wrap-add{ border-radius:12px; padding:22px 24px 22px 24px; border: 1px solid #EBEBEB; margin-top:10px; }
 
+.flex-table-title-add > .txt {font-size:14px !important;}
 /* 홈 드랍다운 ios safari 파란글씨 수정*/
 .btn-gnb-toggle-menu-add{color:#202020;}
 
@@ -3588,6 +3589,16 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .receipt-wide-tab-inner{width:calc(100vw - 40px); position: relative;  }
 .user-receipt-item-add{background: #fff !important;}
 .user-receipt-wrap{border-radius: 12px; margin-top:12px !important;border:1px solid #EBEBEB; padding:23px 24px 23px 24px;}
+
+
+.sticky-remove{
+	display:block !important;
+	position:relative !important;
+}
+
+
+
+
 
 /*========================================
 @ PC버전

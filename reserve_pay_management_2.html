@@ -767,8 +767,8 @@ if(count($arr_t)>0){
                 <input type="hidden" name="artist_id" value="<?php echo $pay['artist_id'];?>">
                 <input type="hidden" name="customer_id" value="<?php echo $cus['id'];?>">
                 <input type="hidden" name="tmp_seq" value="<?php echo $cus['tmp_seq'];?>">
-                <div class="basic-data-group">
-                    <div class="sticky-tab-group">
+                <div class="basic-data-group" id="basic-data-group-target">
+                    <div class="sticky-tab-group" id="sticky-tab-group-target">
                         <div class="con-title-group con-title-group-add " >
                             <h4 class="con-title">결제정보</h4>
                         </div>
@@ -777,7 +777,7 @@ if(count($arr_t)>0){
                                 <div class="wide-tab-inner receipt-wide-tab-inner">
                                     <!-- 활성화시 actived클래스 추가 -->
                                     <!-- 변경사항 있을 경우 hit클래스 추가 -->
-                                    <div class="tab-cell hit actived"><button type="button" class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></div>
+                                    <div class="tab-cell hit actived"><button type="button" class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></a></div>
                                     <div class="tab-cell "><button type="button" class="btn-tab-item" id="tab2"><span>추가</span></button></div>
                                     <div class="tab-cell"><button type="button" class="btn-tab-item" id="tab3"><span>쿠폰상품</span></button></div>
                                     <div class="tab-cell"><button type="button" class="btn-tab-item" id="tab4"><span>제품</span></button></div>
@@ -1758,8 +1758,8 @@ if(count($arr_t)>0){
             </form>
 
             <!--변경 버튼 시작 -->
-            <div class="basic-data-group middle sticky-bottom">
-                <div class="sticky-bottom-inner pc-mg-bt-20">
+            <div class="basic-data-group middle sticky-bottom" id="sticky-bottom">
+                <div class="sticky-bottom-inner pc-mg-bt-20" >
                     <a href="javascript:;" class="btn btn-outline-purple btn-round btn-middle-size update-service-btn">변경</a>
                 </div>
             </div>
@@ -3718,11 +3718,11 @@ if(count($arr_t)>0){
                     $('.kg_'+(index-1)).css('display','block');
                 }
             });
-            <?php if($_SESSION['anchor']=='Y'){ ?>
-            //서비스 변경시 등록위치로 이동시키기
-            var target = $("#tab1").offset().top;
-            $("div").scrollTop(target);
-            <?php } unset($_SESSION['anchor']); ?>
+<!--            --><?php //if($_SESSION['anchor']=='Y'){ ?>
+//            //서비스 변경시 등록위치로 이동시키기
+//            var target = $("#tab1").offset().top;
+//            $("div").scrollTop(target);
+//            <?php //} unset($_SESSION['anchor']); ?>
 
             var total_price = parseInt($('#total_pay_money').text().replace(",",""));
             //change_total(total_price)
@@ -3734,6 +3734,45 @@ if(count($arr_t)>0){
             $('.cat-weight').css('display','none');
             $('.kg_'+g).css('display','block');
         }
+
+
+
+        //wide-tab 클릭시 #basic-data-group-target으로 이동
+        $(document).on("click",".tab-cell button",function(e){
+            const move_target= document.querySelector("#basic-data-group-target");
+            const move_targetY= pageYOffset + move_target.getBoundingClientRect().top -80
+
+            $("body,html").stop().animate(
+                {
+                    scrollTop: move_targetY,
+                },
+               500
+            );
+        })
+
+
+
+
+
+        //#sticky-bottom 지나가면 sticky 해제
+        $(window).scroll(function(){
+            const sticky_target = document.querySelector("#sticky-tab-group-target");
+            const classes = sticky_target.classList;
+            const st_bt_target = pageYOffset + document.querySelector("#sticky-bottom").getBoundingClientRect().top;
+
+
+            if(window.scrollY >= st_bt_target -100){
+                if(!classes.contains("sticky-remove")){
+                    sticky_target.classList.add("sticky-remove");
+                }
+            }else{
+                sticky_target.classList.remove("sticky-remove")
+            }
+        })
+
+
+
+
     </script>
 
 <?php
