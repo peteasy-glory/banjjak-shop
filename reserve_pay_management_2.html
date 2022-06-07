@@ -361,7 +361,7 @@ if(count($arr_t)>0){
                         <div class="grid-col2-row3">
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">성별</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">성별</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php echo $pet['gender'];?>
@@ -371,7 +371,7 @@ if(count($arr_t)>0){
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">중성화</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">중성화</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php echo ($pet['neutral']==1)?'O':'X';?>
@@ -381,7 +381,7 @@ if(count($arr_t)>0){
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">무게</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">무게</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php echo $pet['weight'];?>Kg
@@ -401,7 +401,7 @@ if(count($arr_t)>0){
                             <!--                            </div>-->
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">나이</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">나이</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php
@@ -414,7 +414,7 @@ if(count($arr_t)>0){
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">입질</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">입질</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php
@@ -427,7 +427,7 @@ if(count($arr_t)>0){
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">슬개골 탈구</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">슬개골 탈구</div></div>
                                     <div class="flex-table-data">
                                         <div class="flex-table-data-inner">
                                             <?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?>
@@ -3739,38 +3739,46 @@ if(count($arr_t)>0){
 
 
 
-        //wide-tab 클릭시 #basic-data-group-target으로 이동
-        $(document).on("click",".tab-cell button",function(e){
-            const move_target= document.querySelector("#basic-data-group-target");
-            const move_targetY= pageYOffset + move_target.getBoundingClientRect().top -80
-
-            $("body,html").stop().animate(
-                {
-                    scrollTop: move_targetY,
-                },
-               500
-            );
-        })
 
 
 
 
-
-        //#sticky-bottom 지나가면 sticky 해제
-        $(window).scroll(function(){
-            const sticky_target = document.querySelector("#sticky-tab-group-target");
-            const classes = sticky_target.classList;
-            const st_bt_target = pageYOffset + document.querySelector("#sticky-bottom").getBoundingClientRect().top;
-
-
-            if(window.scrollY >= st_bt_target -100){
-                if(!classes.contains("sticky-remove")){
-                    sticky_target.classList.add("sticky-remove");
-                }
-            }else{
-                sticky_target.classList.remove("sticky-remove")
+        
+            //wide-tab 클릭시 #basic-data-group-target으로 이동
+            $(document).on("touchend", ".tab-cell button", tabClick);
+            $(document).on("click", ".tab-cell button", tabClick);
+            function tabClick(){
+                const move_target= document.querySelector("#basic-data-group-target");
+                const move_targetY= pageYOffset + move_target.getBoundingClientRect().top -80
+                $("body,html").stop().animate(
+                    {
+                        scrollTop: move_targetY,
+                    },
+                    500
+                );
             }
-        })
+
+            //#sticky-bottom 지나가면 sticky 해제
+            $(document.body).on("touchmove", onScroll);
+            $(window).on("scroll",onScroll);
+            function onScroll(){
+
+                const sticky_target = document.querySelector("#sticky-tab-group-target");
+                const classes = sticky_target.classList;
+                const st_bt_target = pageYOffset + document.querySelector("#sticky-bottom").getBoundingClientRect().top;
+                if(window.scrollY >= st_bt_target -100){
+                    if(!classes.contains("sticky-remove")){
+                        sticky_target.classList.add("sticky-remove");
+                    }
+                }else{
+                    sticky_target.classList.remove("sticky-remove")
+                }
+            }
+
+        
+
+
+
 
 
 
