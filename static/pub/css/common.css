@@ -3580,6 +3580,8 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .text-list-wrap-add{ border-radius:12px; padding:22px 24px 22px 24px; border: 1px solid #EBEBEB; margin-top:10px; }
 
 .flex-table-title-add > .txt {font-size:14px !important;}
+.flex-table-data-inner-add {font-size:13px !important;}
+.list-data-add{color:#666666 !important;}
 /* 홈 드랍다운 ios safari 파란글씨 수정*/
 .btn-gnb-toggle-menu-add{color:#202020;}
 
