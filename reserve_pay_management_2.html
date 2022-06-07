@@ -3461,8 +3461,8 @@ if(count($arr_t)>0){
                     alert('Error');
                 },
                 success: function(json) {
-                    popalert.open('confirmOnlyOkNoLink',json.error);
-                    
+                    popalert.open('confirmOnlyOkReload',json.error);
+                    location.reload();
                 }
             });
         });
