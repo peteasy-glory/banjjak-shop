@@ -3561,6 +3561,28 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 
 /*========================================
+@ 2022.06.07 작업/결제관리 페이지 css 수정
+========================================*/
+
+.mg-bt-12{margin-bottom:12px;}
+.grid-col2-row3{display:grid; grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr)}
+.con-title-group-add{background: #F4F4F4; width:100vw; position: relative; left:-20px;}
+.con-title-group-add > h4 {position: relative; left:20px;}
+.special-note-add{background: #fff !important; border:1px solid #F4F4F4;}
+.memo-item-add{background: #fff !important; border:1px solid #F4F4F4;}
+.memo-item-add2{display:flex !important; justify-content: space-between;}
+.memo-detail-wrap{display:flex; justify-content: center; align-items: center;}
+.memo-detail-arrow{width:4px;height: 8px;left:8px; position: relative}
+.btn-bg-yellow{background:#FEE500; width:126px !important; padding:0 !important; right:26px !important;}
+.text-list-wrap-add{ border-radius:12px; padding:22px 24px 22px 24px; border: 1px solid #EBEBEB; margin-top:10px; }
+
+.receipt-wide-tab{width:100vw; border:none !important; position: relative;  left:-20px; background: #fff;}
+.receipt-wide-tab-wrap{   height:42px; border-bottom: 2px solid #ebebeb;	width: calc(100vw - 40px);position: relative;left: 20px;}
+.receipt-wide-tab-inner{width:calc(100vw - 40px); position: relative;  }
+.user-receipt-item-add{background: #fff !important;}
+.user-receipt-wrap{border-radius: 12px; margin-top:12px !important;border:1px solid #EBEBEB; padding:23px 24px 23px 24px;}
+
+/*========================================
 @ PC버전
 ========================================*/
 .pc-header {display:none;}
