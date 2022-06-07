@@ -87,11 +87,11 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 <html lang="ko" class="">
 <head>
 	<meta charset="utf-8">
-	<!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+<!--	<meta name="viewport" content="width=device-width, initial-scale=1">-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0 , maximum-scale=1.0, user-scalable=no" />
     <link rel="shortcut icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.ico">
     <link rel="icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.png">
-    <!--<meta name="viewport" content="user-scalable=no" />-->
+<!--    <meta name="viewport" content="user-scalable=no" />-->
 	<title>반짝</title>
 	<meta name="format-detection" content="telephone=no">
 	<link href="/static/pub/css/reset.css?time=<?=$cssVersion?>" rel="stylesheet"/>

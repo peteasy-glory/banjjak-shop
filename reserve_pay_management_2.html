@@ -363,7 +363,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">성별</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo $pet['gender'];?>
                                         </div>
                                     </div>
@@ -373,7 +373,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">중성화</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo ($pet['neutral']==1)?'O':'X';?>
                                         </div>
                                     </div>
@@ -383,7 +383,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">무게</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo $pet['weight'];?>Kg
                                         </div>
                                     </div>
@@ -403,7 +403,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">나이</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php
                                             calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
                                             ?>
@@ -416,7 +416,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">입질</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php
                                             echo $bite;
                                             ?>
@@ -429,7 +429,7 @@ if(count($arr_t)>0){
                                 <div class="flex-table-item">
                                     <div class="flex-table-title flex-table-title-add"><div class="txt">슬개골 탈구</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?>
 
                                         </div>
@@ -443,11 +443,11 @@ if(count($arr_t)>0){
                             <div class="service-selected-wrap">
                                 <div class="service-selected-group">
                                     <div class="list-title">미용 경험</div>
-                                    <div class="list-data"><?php echo ($pet['beauty_exp'] == 0)? "없음" : $pet['beauty_exp'];?></div>
+                                    <div class="list-data list-data-add" ><?php echo ($pet['beauty_exp'] == 0)? "없음" : $pet['beauty_exp'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">예방 접종</div>
-                                    <div class="list-data"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
+                                    <div class="list-data list-data-add"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
                                 </div>
 
                                 <?php
@@ -466,7 +466,7 @@ if(count($arr_t)>0){
                                     ?>
                                     <div class="service-selected-group">
                                         <div class="list-title">생일</div>
-                                        <div class="list-data">
+                                        <div class="list-data list-data-add">
                                             <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
                                         </div>
                                     </div>
@@ -477,7 +477,7 @@ if(count($arr_t)>0){
 
                                 <div class="service-selected-group">
                                     <div class="list-title">특이사항</div>
-                                    <div class="list-data">
+                                    <div class="list-data list-data-add">
                                         <?php
 
                                         if ($pet['dermatosis'] == 1) $dis[] = '피부병';
@@ -493,7 +493,7 @@ if(count($arr_t)>0){
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">기타</div>
-                                    <div class="list-data"><?php echo $pet['etc'];?></div>
+                                    <div class="list-data list-data-add"><?php echo $pet['etc'];?></div>
                                 </div>
                             </div>
                         </div>
@@ -777,10 +777,10 @@ if(count($arr_t)>0){
                                 <div class="wide-tab-inner receipt-wide-tab-inner">
                                     <!-- 활성화시 actived클래스 추가 -->
                                     <!-- 변경사항 있을 경우 hit클래스 추가 -->
-                                    <div class="tab-cell hit actived"><button type="button" class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></a></div>
-                                    <div class="tab-cell "><button type="button" class="btn-tab-item" id="tab2"><span>추가</span></button></div>
-                                    <div class="tab-cell"><button type="button" class="btn-tab-item" id="tab3"><span>쿠폰상품</span></button></div>
-                                    <div class="tab-cell"><button type="button" class="btn-tab-item" id="tab4"><span>제품</span></button></div>
+                                    <div class="tab-cell hit actived" ><a href="#basic-data-group-target"><button type="button"  class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></a></div>
+                                    <div class="tab-cell "><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab2"><span>추가</span></button></a></div>
+                                    <div class="tab-cell" ><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab3"><span>쿠폰상품</span></button></a></div>
+                                    <div class="tab-cell" ><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab4"><span>제품</span></button></a></div>
                                 </div>
                             </div>
 
@@ -1713,6 +1713,7 @@ if(count($arr_t)>0){
                                         <div class="form-group-item">
                                             <div class="form-item-label01">기타</div>
                                             <div class="form-item-data type-2">
+
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner flex-dir">
                                                         <?php
@@ -3182,16 +3183,22 @@ if(count($arr_t)>0){
             var checked = false;
             var value = '';
             $('.btn-tab-item').each(function(index){
-                $(this).parent().removeClass('actived').removeClass('hit');
+                $(this).parent().parent().removeClass('actived').removeClass('hit');
             });
-            $(this).parent().addClass('actived').addClass('hit');
+            $(this).parent().parent().addClass('actived').addClass('hit');
             $('.tab-data-cell').css('display','none');
             $('.btn-tab-item').each(function(index){
-                if($(this).parent().hasClass('actived') == true){
+                if($(this).parent().parent().hasClass('actived') == true){
                     $('.tab-data-cell:eq('+index+')').css('display','block');
                 }
             });
+
+
+
+
         });
+
+
 
         //서비스 정보 업데이트
         $(document).on('click','.update-service-btn',function(){
@@ -3745,18 +3752,56 @@ if(count($arr_t)>0){
 
         
             //wide-tab 클릭시 #basic-data-group-target으로 이동
-            $(document).on("touchend", ".tab-cell button", tabClick);
-            $(document).on("click", ".tab-cell button", tabClick);
-            function tabClick(){
-                const move_target= document.querySelector("#basic-data-group-target");
-                const move_targetY= pageYOffset + move_target.getBoundingClientRect().top -80
-                $("body,html").stop().animate(
+
+
+
+            // $(document.body).on("touchstart", ".tab-cell button", tabTouch);
+            // $(document).on("click", ".tab-cell button", tabClick);
+            //
+            // function tabClick(){
+            //     const click_target= document.querySelector("#basic-data-group-target");
+            //     const click_targetY= pageYOffset + click_target.getBoundingClientRect().top -80
+            //     console.log("click");
+            //     $("body,html").stop().animate(
+            //         {
+            //             scrollTop: click_targetY,
+            //         },
+            //         500
+            //     );
+            // }
+            //
+            // function tabTouch(){
+            //     const touch_target= document.querySelector("#basic-data-group-target");
+            //     const touch_targetY= pageYOffset + touch_target.getBoundingClientRect().top -80
+            //     console.log("touch");
+            //
+            //     $("body,html").stop().animate(
+            //         {
+            //             scrollTop: touch_targetY,
+            //         },
+            //         500
+            //     );
+            // }
+
+
+
+           $(document).on("click", ".tab-cell a", function (event) {
+
+
+
+
+
+            $("body,html").stop().animate(
                     {
-                        scrollTop: move_targetY,
+                        scrollTop: $(this.hash).offset().top - 80
                     },
                     500
                 );
-            }
+
+
+        });
+
+
 
             //#sticky-bottom 지나가면 sticky 해제
             $(document.body).on("touchmove", onScroll);

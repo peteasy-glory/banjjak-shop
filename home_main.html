@@ -335,7 +335,8 @@ $review_sql =
 	"SELECT count(review_seq) AS review_count
 		FROM tb_usage_reviews
 		WHERE artist_reply is null
-		AND is_delete = 0
+		AN
+		D is_delete = 0
 		AND artist_id = '{$user_id}'";
 $review_result = mysqli_query($connection, $review_sql);
 // error_log('----- $review_sql : ' . $review_sql);
