@@ -591,8 +591,13 @@ if(count($arr_t)>0){
 
                                 ?>
                                 <div class="memo-item memo-item-border memo-item-add memo-item-add2" style="display: <?php echo ($tp_cnt<4)?'block':'none';?>">
-                                    <p class="memo-item-overflow" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
-                                    <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>" class="memo-detail-wrap"><span class="memo-detail">상세보기</span><img class="memo-detail-arrow" src="images/btn/next0.png" alt="arrow"/></a>
+                                    <p class="memo-item-overflow" style="max-width:250px;" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
+                                    <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>" class="memo-detail-wrap">
+                                        <span class="memo-detail">상세보기</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="5.207" height="9.414" viewBox="0 0 5.207 9.414">
+                                            <path data-name="Path" d="m-4 8 4-4-4-4" transform="translate(4.707 .707)" style="fill:none;stroke:#202020;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/>
+                                        </svg>
+                                    </a>
                                 </div>
                                 <?php $tp_cnt++;} ?>
                         </div>
