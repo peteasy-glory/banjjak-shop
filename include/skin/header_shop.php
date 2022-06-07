@@ -213,14 +213,14 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 				<!-- 20220117 수정 : 홈버튼 추가 -->
 				<div class="basic-data-group" id="home_main" >
 					<div class="con-title-group">
-						<a href="home_main" class="btn-gnb-toggle-menu"><span class="icons"><span class="icon icon-size-24 icon-gnb-menu-home-black off"></span><span class="icon icon-size-24 icon-gnb-menu-home-black-fill on"></span></span>홈</a>
+						<a href="home_main" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add"><span class="icons"><span class="icon icon-size-24 icon-gnb-menu-home-black off"></span><span class="icon icon-size-24 icon-gnb-menu-home-black-fill on"></span></span>홈</a>
 					</div>
 				</div>
 				<!-- //20220117 수정 -->
 				<div class="basic-data-group">
 					<div class="con-title-group">
 						<!-- 20220117 수정 : button 태그로 변경 및 컨텐츠 수정 -->
-						<button type="button" class="btn-gnb-toggle-menu" onClick="location.href='reserve_main_month';"><span class="icons"><span class="icon icon-size-24 icon-calendar-black off"></span><span class="icon icon-size-24 icon-calendar-black-fill on"></span></span>예약 관리</button>
+						<button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add" onClick="location.href='reserve_main_month';"><span class="icons"><span class="icon icon-size-24 icon-calendar-black off"></span><span class="icon icon-size-24 icon-calendar-black-fill on"></span></span>예약 관리</button>
 						<!-- //20220117 수정 -->
 					</div>
 					<div class="single-btns-list">
@@ -233,7 +233,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 				<div class="basic-data-group">
 					<div class="con-title-group">
 						<!-- 20220117 수정 : button 태그로 변경 및 컨텐츠 수정 -->
-						<button type="button" class="btn-gnb-toggle-menu" onClick="location.href='customer_inquiry';"><span class="icons"><span class="icon icon-size-24 icon-dubble-user-black off"></span><span class="icon icon-size-24 icon-dubble-user-black-fill on"></span></span>고객 관리</button>
+						<button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add" onClick="location.href='customer_inquiry';"><span class="icons"><span class="icon icon-size-24 icon-dubble-user-black off"></span><span class="icon icon-size-24 icon-dubble-user-black-fill on"></span></span>고객 관리</button>
 						<!-- //20220117 수정 -->
 					</div>
 					<div class="single-btns-list">
@@ -246,7 +246,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
                 <?php if($_SESSION['artist_flag'] !== true){ ?>
 				<div class="basic-data-group">
 					<div class="con-title-group">
-						<button type="button" class="btn-gnb-toggle-menu" onClick="location.href='shop_main';"><span class="icons"><span class="icon icon-size-24 icon-shop-black off"></span><span class="icon icon-size-24 icon-shop-black-fill on"></span></span>샵 관리</button>
+						<button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add" onClick="location.href='shop_main';"><span class="icons"><span class="icon icon-size-24 icon-shop-black off"></span><span class="icon icon-size-24 icon-shop-black-fill on"></span></span>샵 관리</button>
 					</div>
 					<div class="single-btns-list">
 						<div id="hiddenShop" style="display:none;"></div>
@@ -259,7 +259,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 				</div>
 				<div class="basic-data-group">
 					<div class="con-title-group">
-						<button type="button" class="btn-gnb-toggle-menu" onClick="location.href='set_main';"><span class="icons"><span class="icon icon-size-24 icon-set-black off"></span><span class="icon icon-size-24 icon-set-black-fill on"></span></span>상세 설정</button>
+						<button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add" onClick="location.href='set_main';"><span class="icons"><span class="icon icon-size-24 icon-set-black off"></span><span class="icon icon-size-24 icon-set-black-fill on"></span></span>상세 설정</button>
 					</div>
 					<div class="single-btns-list">
 						<div id="hiddenSet" style="display:none;"></div>
@@ -273,7 +273,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 				</div>
 				<div class="basic-data-group">
 					<div class="con-title-group">
-						<button type="button" class="btn-gnb-toggle-menu"><span class="icons"><span class="icon icon-size-24 icon-money-black off"></span><span class="icon icon-size-24 icon-money-black-fill on"></span></span>판매 실적</button>
+						<button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add"><span class="icons"><span class="icon icon-size-24 icon-money-black off"></span><span class="icon icon-size-24 icon-money-black-fill on"></span></span>판매 실적</button>
 					</div>
 					<div class="single-btns-list">
 						<div class="list-cell" id="stats_sale" ><a href="stats_sale" class="btn-single-item arrow"><div class="txt">판매실적 조회</div></a></div>
@@ -283,7 +283,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
                 <?php } ?>
                 <div class="basic-data-group">
                     <div class="con-title-group">
-                        <button type="button" class="btn-gnb-toggle-menu"><span class="icons"><span class="icon icon-size-24 icon-other off"></span><span class="icon icon-size-24 icon-other-fill on"></span></span>기타</button>
+                        <button type="button" class="btn-gnb-toggle-menu btn-gnb-toggle-menu-add"><span class="icons"><span class="icon icon-size-24 icon-other off"></span><span class="icon icon-size-24 icon-other-fill on"></span></span>기타</button>
 <!--                        <div class="con-title"><div class="icon icon-size-24 icon-set-black"></div>기타</div>-->
                     </div>
                     <div class="single-btns-list">

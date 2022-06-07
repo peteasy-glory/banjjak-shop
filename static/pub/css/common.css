@@ -3573,8 +3573,11 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .memo-item-add2{display:flex !important; justify-content: space-between;}
 .memo-detail-wrap{display:flex; justify-content: center; align-items: center;}
 .memo-detail-arrow{width:4px;height: 8px;left:8px; position: relative}
-.btn-bg-yellow{background:#FEE500; width:126px !important; padding:0 !important; right:26px !important;}
+.btn-bg-yellow{background:#FEE500; color:#202020;width:126px !important; padding:0 !important; right:26px !important;}
 .text-list-wrap-add{ border-radius:12px; padding:22px 24px 22px 24px; border: 1px solid #EBEBEB; margin-top:10px; }
+
+.btn-gnb-toggle-menu-add{color:#202020;}
+
 
 .receipt-wide-tab{width:100vw; border:none !important; position: relative;  left:-20px; background: #fff;}
 .receipt-wide-tab-wrap{   height:42px; border-bottom: 2px solid #ebebeb;	width: calc(100vw - 40px);position: relative;left: 20px;}
