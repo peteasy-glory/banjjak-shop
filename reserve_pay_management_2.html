@@ -2295,7 +2295,8 @@ if(count($arr_t)>0){
                                     <div class="list-value font-color-red"><strong id="total_pay_price_disp">
                                             <?php
                                             $t1 = ($sum+$vat)-str_replace(",","",$discount_price)-$pay['reserve_point'];
-                                            echo number_format($t1);
+                                            //echo number_format($t1);
+                                            echo number_format($pay['local_price']+$pay['local_price_cash']);
                                             ?>
                                             원</strong></div>
                                     <input type="hidden" name="total_pay_price" id="total_pay_price" value="<?php echo $t1;?>" size="3">
@@ -3461,6 +3462,7 @@ if(count($arr_t)>0){
                 },
                 success: function(json) {
                     popalert.open('confirmOnlyOkNoLink',json.error);
+                    
                 }
             });
         });
