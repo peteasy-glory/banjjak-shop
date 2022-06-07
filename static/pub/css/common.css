@@ -3572,8 +3572,9 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .memo-item-add{background: #fff !important; border:1px solid #F4F4F4;}
 .memo-item-add2{display:flex !important; justify-content: space-between;}
 .memo-detail-wrap{display:flex; justify-content: center; align-items: baseline;}
-
 .memo-detail-wrap > svg{ position:relative; left:4px;}
+
+.btn-detail-toggle-add{color:#202020;}
 
 .btn-bg-yellow{background:#FEE500; color:#202020;width:126px !important; padding:0 !important; right:20px !important;}
 .text-list-wrap-add{ border-radius:12px; padding:22px 24px 22px 24px; border: 1px solid #EBEBEB; margin-top:10px; }
