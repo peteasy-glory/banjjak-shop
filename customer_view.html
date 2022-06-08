@@ -43,6 +43,9 @@ $res = mysqli_query($connection,$que);
 $pay = mysqli_fetch_assoc($res);
 $beauty_info = explode("|",$pay['product']);
 
+$tmp_sql = "select * from tb_tmp_user where cellphone = '{$phone}'";
+$tmp_res = mysqli_query($connection,$tmp_sql);
+$tmp_pay = mysqli_fetch_assoc($tmp_res);
 // 등급 회원 구하기
 if($pay['customer_id'] != '' && strpos($pay['customer_id'], '신규') !== true){
     $grade_id = $pay['customer_id'];
@@ -183,14 +186,18 @@ $enc_phone = $crypto->encode($phone, $access_key, $secret_key);
 $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
 $gd = sql_fetch_array($que);
 
-$que = "SELECT 
-            *
-        FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$grade_id}'  ORDER BY b.grade_ord ASC";
+$que = "
+    SELECT * FROM tb_grade_of_customer a 
+    LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx 
+    WHERE a.customer_id = '{$grade_id}'
+    AND b.artist_id = '{$user_id}'
+";
 
 $grade = sql_fetch_array($que);
 
 if(empty($grade[0]['grade_name'])){
     $grade[0]['grade_name'] = $gd[0]['grade_name']; // 값 없을때 vip로 보이게
+    $grade[0]['grade_ord'] = $gd[0]['grade_ord']; // 값 없을때 1(vip)로 주기
 }
 
 
@@ -281,7 +288,16 @@ $another_reserve = 0;
 							<div class="flex-table-data">
 								<div class="flex-table-data-inner">
 									<div class="user-grade-item">
-										<div class="icon icon-grade-vip"></div>
+
+                                        <?php
+                                            if($grade[0]['grade_ord'] == 1){
+                                                echo '<div class="icon icon-grade-vip"></div>';
+                                            }else if($grade[0]['grade_ord'] == 2){
+                                                echo '<div class="icon icon-grade-normal"></div>';
+                                            }else{
+                                                echo '<div class="icon icon-grade-normalb"></div>';
+                                            }
+                                        ?>
 										<div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
 									</div>
 									<!--
@@ -295,7 +311,7 @@ $another_reserve = 0;
 									</div>
 									-->
 								</div>
-								<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
+								<!--<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>-->
 							</div>
 						</div>
 					</div>
@@ -679,6 +695,7 @@ $another_reserve = 0;
                                                 $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$arr['pet_seq']}'";
                                                 //echo $que;
                                                 $pet = sql_fetch_array($que);
+                                                $pet_name = $pet[0]['name'];
                                             ?>
 											<tr class="customer-table-cell">
 												<td>
@@ -939,7 +956,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                         <h4 class="con-title">회원등급 부여</h4>
                     </div>
                     <div class="pop-body">
-                        <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                        <div class="msg-txt">현재 <?php echo $pet_name;?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
                         <div class="form-group">
                             <div class="form-group-item">
                                 <select name="member_grade" id="member_grade">
