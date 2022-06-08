@@ -32,6 +32,9 @@ $notice_yn = "Y";
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_pay_management_2?payment_log_seq='.$_GET['payment_log_seq'];
 
+// 이전미용 상세보기시 뒤로가기 버튼
+$history_back = (isset($_GET['history_back']) && $_GET['history_back']) ? $_GET['history_back'] : 0;
+
 
 $customer_user_id = $user_id;	// 사진 변경용 정회원번호
 $customer_tmp_seq = "";			// 사진 변경용 가회원번호
@@ -599,7 +602,7 @@ if(count($arr_t)>0){
                                 <div class="memo-item memo-item-border memo-item-add memo-item-add2" style="display: <?php echo ($tp_cnt<5)?'block':'none !important';?>">
 
                                     <p class="memo-item-overflow" style="max-width:250px;" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
-                                    <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>" class="memo-detail-wrap">
+                                    <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>&history_back=1" class="memo-detail-wrap">
                                         <span class="memo-detail">상세보기</span>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="5.207" height="9.414" viewBox="0 0 5.207 9.414">
                                             <path data-name="Path" d="m-4 8 4-4-4-4" transform="translate(4.707 .707)" style="fill:none;stroke:#202020;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/>
@@ -3729,8 +3732,16 @@ if(count($arr_t)>0){
                 $(this).text('더보기');
             }
         });
+
+        // 이전미용 상세보기 뒤로가기
+        var history_back = '<?=$history_back?>';
         $(document).ready(function(){
-            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
+            if(history_back > 0){
+                $('#btn_page_prev').prop('href','javascript:history.back();');
+            }else{
+                $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
+            }
+
             $('input[name="cat_weight"]').each(function(index){
                 if($(this).is(':checked')==true){
                     $('.kg_'+(index-1)).css('display','block');
