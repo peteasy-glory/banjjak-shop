@@ -1328,6 +1328,26 @@ switch($clear['mode']){
         }
         echo json_encode($json);
         break;
+
+        // 전체등급변경시 번호 가져오기
+    case 'getAllGrade':
+        $json['flag'] = true;
+        $que = "SELECT cellphone FROM tb_payment_log WHERE artist_id = '{$_POST['id']}' GROUP BY cellphone";
+        //echo $que;
+        $row = sql_fetch_array($que);
+
+        if(!$row){
+            $json['flag'] = false;
+            $json['sql'] = $que;
+            echo json_encode($json);
+            break;
+        }else{
+            $json['sql'] = $row;
+            echo json_encode($json);
+            break;
+        }
+
+        break;
     case 'noshowReset':
         $json['flag'] = true;
         $que = "UPDATE tb_payment_log SET is_no_show = '0' WHERE artist_id = '{$user_id}' AND pet_seq = '{$_POST['pet_seq']}'";

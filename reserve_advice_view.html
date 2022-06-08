@@ -459,9 +459,10 @@ if ($pet_datas = mysqli_fetch_object($pet_result)) {
 <script src="/static/pub/js/imagesloaded.pkgd.min.js"></script>
 <script>
 	var img_list = [];
-	img_list = ('<?=$photo_counseling ?>' != "")? JSON.parse('<?=json_encode($photo_counseling) ?>').split(',') : [];
+    img_list = ('<?=trim($photo_counseling) ?>' != "")? JSON.parse('<?=json_encode(trim($photo_counseling)) ?>').split(',') : [];
 
-	$(document).ready(function() {
+
+    $(document).ready(function() {
 		get_file_list(img_list); // call photo_counseling image
             $('#btn_page_prev').prop('href','reserve_advice_list_1');
 	});
