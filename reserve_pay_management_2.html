@@ -3810,24 +3810,34 @@ if(count($arr_t)>0){
 
 
 
-            //#sticky-bottom 지나가면 sticky 해제
-            $(document.body).on("touchmove", onScroll);
-            $(window).on("scroll",onScroll);
-            function onScroll(){
+       //#sticky-bottom 지나가면 sticky 해제
 
-                const sticky_target = document.querySelector("#sticky-tab-group-target");
-                const classes = sticky_target.classList;
-                const st_bt_target = pageYOffset + document.querySelector("#sticky-bottom").getBoundingClientRect().top;
-                if(window.scrollY >= st_bt_target -100){
-                    if(!classes.contains("sticky-remove")){
-                        sticky_target.classList.add("sticky-remove");
-                    }
-                }else{
-                    sticky_target.classList.remove("sticky-remove")
+        function onScroll(e){
+            const sticky_target = document.querySelector("#sticky-tab-group-target");
+            const classes = sticky_target.classList;
+            const st_bt_target = pageYOffset + document.querySelector("#sticky-bottom").getBoundingClientRect().top;
+
+            if(window.scrollY >= st_bt_target -100){
+                            if(!classes.contains("sticky-remove")) {
+                                sticky_target.classList.add("sticky-remove")
+
+                            }
+                    }else{
+                            sticky_target.classList.remove("sticky-remove")
                 }
-            }
+        }
+        //모멘텀 스크롤 최적화
+        function timeoutScroll(){
+            setTimeout(onScroll,250);
+        }
 
-        
+        document.addEventListener("scroll",onScroll);
+        document.addEventListener("touchmove",timeoutScroll)
+
+
+
+
+
 
 
 
