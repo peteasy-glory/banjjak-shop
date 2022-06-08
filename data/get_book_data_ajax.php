@@ -1329,25 +1329,66 @@ switch($clear['mode']){
         echo json_encode($json);
         break;
 
-        // 전체등급변경시 번호 가져오기
+        // 전체등급변경시 customer_id 및 tmp_seq 가져오기
     case 'getAllGrade':
         $json['flag'] = true;
         $que = "SELECT cellphone FROM tb_payment_log WHERE artist_id = '{$_POST['id']}' GROUP BY cellphone";
         //echo $que;
         $row = sql_fetch_array($que);
 
+        foreach($row as $rs){
+            // 정회원 여부
+            $cus_sql = "select * from tb_customer where cellphone = '{$rs['cellphone']}'";
+            $cus_res = mysqli_query($connection,$cus_sql);
+            $cus_pay = mysqli_fetch_assoc($cus_res);
+
+            if($cus_pay['id'] != ''){ // 정회원일시
+                $grade_id[] = $cus_pay['id'];
+            }else{ //정회원 아이디가 없으면 가회원으로 취급
+                $tmp_sql = "select * from tb_tmp_user where cellphone = '{$rs['cellphone']}'";
+                $tmp_res = mysqli_query($connection,$tmp_sql);
+                $tmp_pay = mysqli_fetch_assoc($tmp_res);
+                $grade_id[] = $tmp_pay['tmp_seq'];
+            }
+        }
         if(!$row){
             $json['flag'] = false;
             $json['sql'] = $que;
             echo json_encode($json);
             break;
         }else{
-            $json['sql'] = $row;
+            $json['sql'] = $grade_id;
             echo json_encode($json);
             break;
         }
 
+    case 'gradeChangeAll':
+
+        $json['flag'] = true;
+        $que = "
+            SELECT * FROM tb_grade_of_customer a
+            INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
+            WHERE a.customer_id = '{$_POST['grade_id']}'
+            AND b.artist_id = '{$_POST['shop_id']}'
+        ";
+        //echo $que;
+        $row = sql_fetch_array($que);
+        if(count($row[0]['grade_idx'])>0) {
+            $que = "UPDATE tb_grade_of_customer SET grade_idx = '{$_POST['grade']}' WHERE customer_id = '{$_POST['grade_id']}' AND grade_idx = '{$row[0]['grade_idx']}'";
+        } else {
+            //$que = "INSERT INTO tb_grade_of_customer SET grade_idx = '{$_POST['grade']}',  customer_id = '{$_POST['id']}'";
+            $que = "INSERT INTO `tb_grade_of_customer` (`grade_idx`, `customer_id`, `is_delete`) VALUES ('{$_POST['grade']}', '{$_POST['grade_id']}', 0);";
+        }
+        //echo $que;
+        $res = sql_query($que);
+        if(!$res){
+            $json['flag'] = false;
+            echo json_encode($json);
+            break;
+        }
+        echo json_encode($json);
         break;
+
     case 'noshowReset':
         $json['flag'] = true;
         $que = "UPDATE tb_payment_log SET is_no_show = '0' WHERE artist_id = '{$user_id}' AND pet_seq = '{$_POST['pet_seq']}'";
