@@ -549,7 +549,7 @@ if(count($arr_t)>0){
                             <?php
                             foreach($arr as $rs){
                                 ?>
-                                <div class="special-note special-cmt special-note-border special-note-add" style="display: <?php echo ($ct<5)?'block':'none';?>">
+                                <div class="special-note special-cmt special-note-border special-note-add" style="display: <?php echo ($ct<4)?'block':'none';?>">
                                     <div class="note-desc"><em><?php echo $rs['year'].'.'.$rs['month'].'.'.$rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
                                 </div>
                                 <?php $ct++;} ?>
@@ -557,7 +557,7 @@ if(count($arr_t)>0){
                         <?php if($ct>5){ ?>
                             <div class="basic-data-group vmiddle">
                                 <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
-                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple border-1 btn-border-view-special-cmt">더보기</button>
+                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple border-1 view-special-cmt btn-border-view-special-cmt">더보기</button>
                             </div>
                         <?php } ?>
                     </div>
@@ -582,15 +582,22 @@ if(count($arr_t)>0){
                             <h4 class="con-title">이전 미용</h4>
                         </div>
                         <div class="memo-item-list">
+
+
                             <?php
                             $tp_cnt = 0;
                             for($k=0;$k<count($data["total_payment"]);$k++){
                                 $date = $data["total_payment"][$k]['year'].'-'.$data["total_payment"][$k]['month'].'-'.$data["total_payment"][$k]['day'];
                                 $prev_beauty = explode("|",$data["total_payment"][$k]['product']);
                                 $kg = explode(":",$prev_beauty[5]);
+                                $tp_cnt++;
+
+
+
 
                                 ?>
-                                <div class="memo-item memo-item-border memo-item-add memo-item-add2" style="display: <?php echo ($tp_cnt<4)?'block':'none';?>">
+                                <div class="memo-item memo-item-border memo-item-add memo-item-add2" style="display: <?php echo ($tp_cnt<5)?'block':'none !important';?>">
+
                                     <p class="memo-item-overflow" style="max-width:250px;" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
                                     <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>" class="memo-detail-wrap">
                                         <span class="memo-detail">상세보기</span>
@@ -599,7 +606,7 @@ if(count($arr_t)>0){
                                         </svg>
                                     </a>
                                 </div>
-                                <?php $tp_cnt++;} ?>
+                                <?php }?>
                         </div>
                         <?php if($tp_cnt>5){ ?>
                             <div class="basic-data-group vmiddle">
@@ -3714,9 +3721,11 @@ if(count($arr_t)>0){
             } else {
                 $('.memo-item').each(function(index){
                     if(index>3){
-                        $('.memo-item').eq(index).css('display','none');
+                        $('.memo-item').eq(index).attr('style','display: none !important');
                     }
+
                 })
+                console.log("1")
                 $(this).text('더보기');
             }
         });
@@ -3786,8 +3795,6 @@ if(count($arr_t)>0){
 
 
            $(document).on("click", ".tab-cell a", function (event) {
-
-
 
 
 
