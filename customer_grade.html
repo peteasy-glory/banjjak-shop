@@ -48,7 +48,7 @@ if(count($arr)>0){
 					<div class="card-header">
 						<div class="user-grade-item">
 							<div class="icon icon-grade-normal"></div>
-							<div class="icon-grade-label">Normal</div>
+							<div class="icon-grade-label">GOLD</div>
 						</div>
 					</div>
 					<div class="card-body">
@@ -63,7 +63,7 @@ if(count($arr)>0){
 					<div class="card-header">
 						<div class="user-grade-item">
 							<div class="icon icon-grade-normalb"></div>
-							<div class="icon-grade-label">Normal_B</div>
+							<div class="icon-grade-label">NORMAL </div>
 						</div>
 					</div>
 					<div class="card-body">
@@ -97,7 +97,7 @@ if(count($arr)>0){
         var grade3 = $('input[name="grade3"]').val();
         $.ajax({
             type : 'post',
-            url : './data/get_book_data_ajax',
+            url : './data/get_book_data_ajax.php',
             data : {'mode':'setShopGrade','g1':grade1,'g2':grade2,'g3':grade3},
             dataType : 'json',
             success : function(data){

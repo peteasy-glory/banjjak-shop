@@ -43,6 +43,16 @@ $res = mysqli_query($connection,$que);
 $pay = mysqli_fetch_assoc($res);
 $beauty_info = explode("|",$pay['product']);
 
+// 등급 회원 구하기
+if($pay['customer_id'] != '' && strpos($pay['customer_id'], '신규') !== true){
+    $grade_id = $pay['customer_id'];
+}else{
+    $tmp_sql = "select * from tb_tmp_user where cellphone = '{$phone}'";
+    $tmp_res = mysqli_query($connection,$tmp_sql);
+    $tmp_pay = mysqli_fetch_assoc($tmp_res);
+    $grade_id = $tmp_pay['tmp_seq'];
+}
+//echo "<br><br><br>".$grade_id;
 
 $crypto = new Crypto();
 //회원정보
@@ -175,12 +185,12 @@ $gd = sql_fetch_array($que);
 
 $que = "SELECT 
             *
-        FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$pay['customer_id']}'  ORDER BY b.grade_ord ASC";
-//echo $que;
+        FROM tb_grade_of_customer a LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx WHERE a.customer_id = '{$grade_id}'  ORDER BY b.grade_ord ASC";
+
 $grade = sql_fetch_array($que);
 
 if(empty($grade[0]['grade_name'])){
-    $grade[0]['grade_name'] = $gd[0]['grade_name'];
+    $grade[0]['grade_name'] = $gd[0]['grade_name']; // 값 없을때 vip로 보이게
 }
 
 
@@ -265,15 +275,15 @@ $another_reserve = 0;
 						</div>
 					</div>
                     <?php } ?>
-					<!--<div class="flex-table-cell">
+					<div class="flex-table-cell">
 						<div class="flex-table-item">
 							<div class="flex-table-title"><div class="txt">등급</div></div>
 							<div class="flex-table-data">
 								<div class="flex-table-data-inner">
 									<div class="user-grade-item">
 										<div class="icon icon-grade-vip"></div>
-										<div class="icon-grade-label"><?php //echo $grade[0]['grade_name'];?></div>
-									</div>-->
+										<div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
+									</div>
 									<!--
 									<div class="user-grade-item">
 										<div class="icon icon-grade-normal"></div>
@@ -284,11 +294,11 @@ $another_reserve = 0;
 										<div class="icon-grade-label">Normal_B</div>
 									</div>
 									-->
-								<!--</div>
+								</div>
 								<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
 							</div>
 						</div>
-					</div>-->
+					</div>
 					<div class="flex-table-cell">
 						<div class="flex-table-item">
 							<div class="flex-table-title"><div class="txt">연락처</div></div>
@@ -1183,10 +1193,10 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
         function set_grade(){
             var grade = $('#member_grade option:selected').val();
             var org_grade = '<?php echo $grade[0]['grade_idx'];?>';
-            var id = '<?php echo $pay['customer_id'];?>';
+            var id = '<?php echo $grade_id;?>';
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'gradeChange','grade':grade, 'id':id, 'org_grade':org_grade},
                 dataType : 'json',
                 success : function(json){
