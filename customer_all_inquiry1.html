@@ -76,9 +76,9 @@ while($row = mysqli_fetch_assoc($result)){
                             <div class="tab-cell"><a href="#" class="btn-tab-item"><strong>동물</strong> (<span class="pet_count"></span>)</a></div>
                         </div>
                         <!-- 20220310 수정 -->
-                        <!--<div class="right-items">
+                        <div class="right-items">
                             <button type="button" onclick="javascript:pop.open('allMemberGradeAddPop');" class="btn btn-outline-gray btn-round btn-inline btn-small-size">전체회원 등급부여</button>
-                        </div>-->
+                        </div>
                         <!-- //20220310 수정 -->
                     </div>
                     <!-- tab-data-cell 클래스에 actived클래스 추가시 활성화 -->
@@ -173,16 +173,16 @@ while($row = mysqli_fetch_assoc($result)){
                             <div class="msg-txt">모든 고객님의 등급을<br>하나의 등급으로 반영합니다.</div>
                             <div class="form-group">
                                 <div class="form-group-item">
-                                    <select>
+                                    <select name="member_grade_all" id="member_grade_all">
                                         <?php
                                         $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
-                                        echo $que;
+                                        //echo $que;
                                         $tgos = sql_fetch_array($que);
                                         if(count($tgos)){
                                             foreach($tgos as $tgos){
                                                 //echo $tgos['grade_name'].':'.$grade[0]['name'];
                                                 ?>
-                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                                <option value="<?php echo $tgos['idx'];?>" ><?php echo $tgos['grade_name'];?></option>
                                             <?php }}?>
                                     </select>
                                     <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
@@ -199,6 +199,21 @@ while($row = mysqli_fetch_assoc($result)){
             </div>
         </article>
         <!-- //전체등급부여 -->
+
+        <article id="memberGradeComPop1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
     </section>
 
 
@@ -230,7 +245,7 @@ while($row = mysqli_fetch_assoc($result)){
             get_customer_pet_count(artist_id);
         });
 
-        $(document).change('#search_tab',function(){
+        $('#search_tab').change(function(){
             console.log($('#search_tab option:selected').val())
             search_btn = $('#search_tab option:selected').val();
             history.pushState(null, null, window.location.pathname+"?q="+search_btn);
@@ -702,19 +717,44 @@ while($row = mysqli_fetch_assoc($result)){
 
         // 전체 고객 등급 변경
         function set_grade_all(){
-            var grade = $('#member_grade option:selected').val(); // 바꿀 grade_idx
-            var org_grade = '<?php echo $grade[0]['grade_idx'];?>'; // 있다면, 기존의 grad_idx
-            var id = '<?php echo $user_id; ?>'; // 샵 계정
+
+            var grade = $('#member_grade_all option:selected').val(); // 바꿀 grade_idx
+            var shop_id = '<?php echo $user_id; ?>'; // 샵 계정
+
+            // customer_id, tmp_seq 가져오기
             $.ajax({
                 type : 'post',
                 url : './data/get_book_data_ajax.php',
-                data : {'mode':'getAllGrade','id':id},
+                data : {'mode':'getAllGrade','id':shop_id},
                 dataType : 'json',
+                beforeSend: function(){
+                    $("#loading").addClass("actived");
+                },
                 success : function(json){
                     if(json.flag == true){
                         console.log(json);
+                        //console.log(json.sql.length);
                         $.each(json.sql, function(i, v){
-                           console.log(v.cellphone);
+                           //console.log(v);
+
+                           // 등급설정하기
+                            $.ajax({
+                                type : 'post',
+                                url : './data/get_book_data_ajax.php',
+                                data : {'mode':'gradeChangeAll', 'grade':grade, 'shop_id':shop_id, 'grade_id':v},
+                                dataType : 'json',
+                                beforeSend: function(){
+                                    $("#loading").addClass("actived");
+                                },
+                                success : function(data){
+                                    if((i+1) == json.sql.length){
+                                        $("#loading").removeClass("actived");
+                                        pop.close();
+                                        popalert.open('memberGradeComPop1','등급이 변경되었습니다.');
+                                    }
+                                }
+                            });
+
                         });
                     }
                 }

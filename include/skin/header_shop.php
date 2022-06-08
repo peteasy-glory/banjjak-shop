@@ -240,7 +240,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
 						<div id="hiddenCustomer" style="display:none;"></div>
 						<div class="list-cell" id="customer_all_inquiry1"><a href="customer_all_inquiry1" class="btn-single-item arrow"><div class="txt">전체 고객 조회</div></a></div>
 						<div class="list-cell" id="customer_pet_new" ><a href="customer_pet_new" class="btn-single-item arrow"><div class="txt">신규 등록</div></a></div>
-						<!--<div class="list-cell" id="customer_grade"><a href="customer_grade" class="btn-single-item arrow"><div class="txt">회원 등급 설정</div></a></div>-->
+						<div class="list-cell" id="customer_grade"><a href="customer_grade" class="btn-single-item arrow"><div class="txt">회원 등급 설정</div></a></div>
 					</div>
 				</div>
                 <?php if($_SESSION['artist_flag'] !== true){ ?>

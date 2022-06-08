@@ -180,6 +180,37 @@ if(count($arr_t)>0){
     }
 }
 
+// 등급 회원 구하기
+// 정회원 여부
+$cus_sql = "select * from tb_customer where cellphone = '{$pay['cellphone']}'";
+$cus_res = mysqli_query($connection,$cus_sql);
+$cus_pay = mysqli_fetch_assoc($cus_res);
+
+if($cus_pay['id'] != ''){ // 정회원일시
+    $grade_id = $cus_pay['id'];
+}else{ //정회원 아이디가 없으면 가회원으로 취급
+    $tmp_sql = "select * from tb_tmp_user where cellphone = '{$pay['cellphone']}'";
+    $tmp_res = mysqli_query($connection,$tmp_sql);
+    $tmp_pay = mysqli_fetch_assoc($tmp_res);
+    $grade_id = $tmp_pay['tmp_seq'];
+}
+
+$que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
+$gd = sql_fetch_array($que);
+
+$que = "
+    SELECT * FROM tb_grade_of_customer a 
+    LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx 
+    WHERE a.customer_id = '{$grade_id}'
+    AND b.artist_id = '{$user_id}'
+";
+$grade = sql_fetch_array($que);
+
+if(empty($grade[0]['grade_name'])){
+    $grade[0]['grade_name'] = $gd[0]['grade_name']; // 값 없을때 vip로 보이게
+    $grade[0]['grade_ord'] = $gd[0]['grade_ord']; // 값 없을때 1(vip)로 주기
+}
+
 ?>
 
     <!-- container -->
@@ -221,8 +252,16 @@ if(count($arr_t)>0){
                                 <div class="flex-table-data">
                                     <div class="flex-table-data-inner">
                                         <div class="user-grade-item">
-                                            <div class="icon icon-grade-vip"></div>
-                                            <div class="icon-grade-label">VIP</div>
+                                            <?php
+                                            if($grade[0]['grade_ord'] == 1){
+                                                echo '<div class="icon icon-grade-vip"></div>';
+                                            }else if($grade[0]['grade_ord'] == 2){
+                                                echo '<div class="icon icon-grade-normal"></div>';
+                                            }else{
+                                                echo '<div class="icon icon-grade-normalb"></div>';
+                                            }
+                                            ?>
+                                            <div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
                                         </div>
                                         <!--
                                         <div class="user-grade-item">
@@ -235,6 +274,7 @@ if(count($arr_t)>0){
                                         </div>
                                         -->
                                     </div>
+                                    <div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
                                 </div>
                             </div>
                         </div>
@@ -2620,6 +2660,58 @@ if(count($arr_t)>0){
             </div>
         </article>
 
+        <article id="memberGradeAddPop" class="layer-pop-wrap " style="z-index: 100000;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-header">
+                            <h4 class="con-title">회원등급 부여</h4>
+                        </div>
+                        <div class="pop-body">
+                            <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($pay['cellphone']);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                            <div class="form-group">
+                                <div class="form-group-item">
+                                    <select name="member_grade" id="member_grade">
+                                        <?php
+                                        $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
+                                        echo $que;
+                                        $tgos = sql_fetch_array($que);
+                                        if(count($tgos)){
+                                            foreach($tgos as $tgos){
+                                                //echo $tgos['grade_name'].':'.$grade[0]['name'];
+                                                ?>
+                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                            <?php }}?>
+                                    </select>
+                                    <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="set_grade();">저장</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article id="memberGradeComPop1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+
     </section>
     <!-- //container -->
     <iframe src="" name="hiddenFrame" style="display:none;" frameborder="0"></iframe>
@@ -3758,6 +3850,31 @@ if(count($arr_t)>0){
 
 
         });
+
+        // 등급 수정
+        $('.set-grade').on('click',function(){
+            popalert.open('memberGradeAddPop');
+        });
+
+        // 등급 저장
+        function set_grade(){
+            var grade = $('#member_grade option:selected').val();
+            var org_grade = '<?php echo $grade[0]['grade_idx'];?>';
+            var id = '<?php echo $grade_id;?>';
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax.php',
+                data : {'mode':'gradeChange','grade':grade, 'id':id, 'org_grade':org_grade},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.open('memberGradeComPop1','등급이 변경되었습니다.');
+                    }
+                }
+            });
+        }
+
+
         //고양이 미용 선택시
         function cat_show_view(g){
             $('.cat-weight').css('display','none');

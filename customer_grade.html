@@ -102,8 +102,13 @@ if(count($arr)>0){
             dataType : 'json',
             success : function(data){
                 alert('저장되었습니다.');
+                location.reload();
             }
         });
+    });
+
+    $(document).ready(function(){
+        $('#btn_page_prev').prop('href','home_main');
     });
 
 </script>

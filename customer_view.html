@@ -43,13 +43,15 @@ $res = mysqli_query($connection,$que);
 $pay = mysqli_fetch_assoc($res);
 $beauty_info = explode("|",$pay['product']);
 
-$tmp_sql = "select * from tb_tmp_user where cellphone = '{$phone}'";
-$tmp_res = mysqli_query($connection,$tmp_sql);
-$tmp_pay = mysqli_fetch_assoc($tmp_res);
 // 등급 회원 구하기
-if($pay['customer_id'] != '' && strpos($pay['customer_id'], '신규') !== true){
-    $grade_id = $pay['customer_id'];
-}else{
+// 정회원 여부
+$cus_sql = "select * from tb_customer where cellphone = '{$phone}'";
+$cus_res = mysqli_query($connection,$cus_sql);
+$cus_pay = mysqli_fetch_assoc($cus_res);
+
+if($cus_pay['id'] != ''){ // 정회원일시
+    $grade_id = $cus_pay['id'];
+}else{ //정회원 아이디가 없으면 가회원으로 취급
     $tmp_sql = "select * from tb_tmp_user where cellphone = '{$phone}'";
     $tmp_res = mysqli_query($connection,$tmp_sql);
     $tmp_pay = mysqli_fetch_assoc($tmp_res);
@@ -311,7 +313,7 @@ $another_reserve = 0;
 									</div>
 									-->
 								</div>
-								<!--<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>-->
+								<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
 							</div>
 						</div>
 					</div>
