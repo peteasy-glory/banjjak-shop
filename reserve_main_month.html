@@ -459,10 +459,14 @@ foreach($daterange as $date1){
 }
 
 //예약승인대기 건수
-$que = "SELECT COUNT(*) AS cnt FROM tb_grade_reserve_approval_mgr WHERE is_approve = '0'";
+$que = "SELECT count(*) cnt FROM tb_grade_reserve_approval_mgr a
+        INNER JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq
+        WHERE b.artist_id = '{$user_id}'
+        AND a.is_approve = 0";
 //echo $que;
 $gram = sql_fetch_array($que);
 $await_cnt = $gram[0]['cnt'];
+//$await_cnt = 0;
 
 $artist_query = "SELECT GROUP_CONCAT(DISTINCT name ORDER BY name ASC) as worker FROM tb_artist_list WHERE artist_id = '{$user_id}' AND is_out = 2 AND is_view = '2' GROUP BY artist_id";
 //echo $artist_query;

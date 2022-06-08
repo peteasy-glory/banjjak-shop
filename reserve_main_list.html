@@ -20,6 +20,7 @@ $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
 
 $shop_title	= "예약관리";
+
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
@@ -501,7 +502,10 @@ $rows = mysqli_fetch_object($result);
 $data["time_schedule"]["is_time_type"] = $rows->is_time_type;
 
 //예약승인대기 건수
-$que = "SELECT COUNT(*) AS cnt FROM tb_grade_reserve_approval_mgr WHERE is_approve = '0'";
+$que = "SELECT count(*) cnt FROM tb_grade_reserve_approval_mgr a
+        INNER JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq
+        WHERE b.artist_id = '{$artist_id}'
+        AND a.is_approve = 0";
 $gram = sql_fetch_array($que);
 $await_cnt = $gram[0]['cnt'];
 ?>
@@ -725,7 +729,7 @@ $await_cnt = $gram[0]['cnt'];
 	function get_artist_list(){
 		return new Promise(function(resolve, reject) {
 			$.ajax({
-				url: 'data/manage_sell_info_ajax',
+				url: 'data/manage_sell_info_ajax.php',
 				data: {
 					mode: "get_artist_list",
 					artist_id: artist_id
@@ -759,7 +763,7 @@ $await_cnt = $gram[0]['cnt'];
 			$manage_sell_info_list.find(".manage_sell_info_list_wrap").remove();
 
 			$.ajax({
-				url: 'data/manage_sell_info_ajax',
+				url: 'data/manage_sell_info_ajax.php',
 				data: {
 					mode: "get_beauty_payment_log",
 					year: yy,
@@ -908,7 +912,7 @@ $await_cnt = $gram[0]['cnt'];
 	function get_pet_type(_payment_log_seq, _pet_seq, _pet_name){
 		return new Promise(function(resolve, reject) {
 			$.ajax({
-				url: 'data/manage_sell_info_ajax',
+				url: 'data/manage_sell_info_ajax.php',
 				data: {
 					mode: "get_pet_type",
 					pet_seq: _pet_seq
