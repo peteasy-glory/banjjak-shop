@@ -911,6 +911,16 @@ switch($clear['mode']){
 
         $que = "UPDATE tb_grade_reserve_approval_mgr SET is_approve = '{$_POST['type']}' WHERE idx = {$_POST['no']} ";
         $res = sql_query($que);
+        if($_POST['type'] == '3'){
+            $que = "
+                UPDATE tb_payment_log SET
+                is_cancel = 1
+                WHERE payment_log_seq IN (
+                    SELECT payment_log_seq FROM tb_grade_reserve_approval_mgr WHERE idx = {$_POST['no']}
+                )
+            ";
+            $res = sql_query($que);
+        }
         if(!$res){
             $json['flag'] = false;
             $json['error'] = '업데이트시 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';

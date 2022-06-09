@@ -19,12 +19,17 @@ $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
 
 
-$shop_title	= "작업/결제관리";
+$shop_title	= "예약 승인";
 $header_right	= '
 	
 ';
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+//돌아갈 url을 세션에 저장한다.
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = 'reserve_pay_management_1?reserve_approval_idx='.$_GET['reserve_approval_idx'];
+
 
 $notice_yn = "Y";
 
@@ -136,41 +141,29 @@ $scm = sql_fetch_array($que);
         <!-- page-body -->
         <div class="page-body">
             <div class="reserve-pay-management">
+
                 <!-- 예약자 정보 -->
-                <div class="basic-data-group">
-                    <div class="con-title-group">
+                <div class="basic-data-group" style="margin-top:15px;">
+                    <div class="con-title-group con-title-group-add">
                         <h4 class="con-title">예약자 정보</h4>
                     </div>
                     <div class="flex-table type-2">
-                        <!--<div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">아이디</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php /*echo (!empty($cus['id']))?$cus['id']:$cus['tmp_seq'];*/?>
-                                    </div>
-                                    <?php /*if($pay['is_no_show']>0){ */?>
-                                        <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php /*echo $pay['is_no_show'];*/?>회</div></div>
-                                    <?php /*} */?>
-                                </div>
-                            </div>
-                        </div>-->
                         <div class="flex-table-cell">
                             <div class="flex-table-item">
                                 <div class="flex-table-title"><div class="txt">등급</div></div>
                                 <div class="flex-table-data">
                                     <div class="flex-table-data-inner">
                                         <div class="user-grade-item">
-                                            <div class="icon icon-grade-vip"></div>
-                                            <div class="icon-grade-label">
-                                                <?php
-                                                    if(!$cus['grade_idx']){
-                                                        echo 'VIP';
-                                                    } else {
-
-                                                    }
-                                                ?>
-                                            </div>
+                                            <?php
+                                            if($grade[0]['grade_ord'] == 1){
+                                                echo '<div class="icon icon-grade-vip"></div>';
+                                            }else if($grade[0]['grade_ord'] == 2){
+                                                echo '<div class="icon icon-grade-normal"></div>';
+                                            }else{
+                                                echo '<div class="icon icon-grade-normalb"></div>';
+                                            }
+                                            ?>
+                                            <div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
                                         </div>
                                         <!--
                                         <div class="user-grade-item">
@@ -183,6 +176,7 @@ $scm = sql_fetch_array($que);
                                         </div>
                                         -->
                                     </div>
+                                    <!--<div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>-->
                                 </div>
                             </div>
                         </div>
@@ -207,7 +201,7 @@ $scm = sql_fetch_array($que);
                                 <div class="flex-table-title"><div class="txt">보조 연락처</div></div>
                                 <div class="flex-table-data">
                                     <div class="flex-table-data-inner">
-                                        <?php for($i=0;$i<count($tel);$i++){ ?>
+                                        <?php for($i=0;$i<count($arr_t);$i++){ ?>
                                             <div class="flex-table-item middle">
                                                 <div class="flex-table-data">
                                                     <div class="flex-table-data-inner">
@@ -215,8 +209,8 @@ $scm = sql_fetch_array($que);
                                                     </div>
                                                     <div class="flex-table-data-side">
                                                         <div class="btn-ui-group">
-                                                            <button type="button" class="btn-data-tel" href="tel:<?php echo $tel['tel'][$i];?>">전화하기</button>
-                                                            <button type="button" class="btn-data-message" href="sms:<?php echo $tel['tel'][$i];?>">메시지보내기</button>
+                                                            <a href="tel:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                                            <a href="sms:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -227,12 +221,27 @@ $scm = sql_fetch_array($que);
                             </div>
                         </div>
                     </div>
+                    <div class="form-group-cell middle">
+                        <div class="form-group-item">
+                            <div class="form-item-label mg-bt-12">
+                                견주관련 메모
+                                <span class="form-input-info margin">(고객에게는 노출되지 않습니다.)</span>
+                            </div>
+                            <div class="form-item-data">
+                                <textarea name="etc2_memo" id="etc2_memo" cols="30" rows="10"><?php echo $scm[0]['memo'];?></textarea>
+
+                            </div>
+                            <div class="form-item-data type-8">
+                                <button type="button" class="pc-mg-bt-20 btn btn-outline-purple btn-middle-size btn-round save-etc2 ft-size-17" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
+                            </div>
+                        </div>
+                    </div>
 
                 </div>
                 <!-- //예약자 정보 -->
                 <!-- 예약동물 정보 -->
                 <div class="basic-data-group">
-                    <div class="con-title-group">
+                    <div class="con-title-group con-title-group-add">
                         <h4 class="con-title">예약동물 정보</h4>
                     </div>
                     <div class="customer-view-pet-group">
@@ -242,18 +251,25 @@ $scm = sql_fetch_array($que);
                                     <?php
 
                                     if(!empty($pet['photo'])){
-                                        $img = $pet['photo'];
+                                        $img = "https://image.banjjakpet.com".img_link_change($pet['photo']);
                                     } else {
-                                        $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet['pet_seq']}' ORDER BY upload_dt DESC LIMIT 1";
+                                        $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet['pet_seq']}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
                                         $rw = sql_fetch_array($sql);
                                         if(!empty($rw[0]['file_path'])){
-                                            $img = $rw[0]['file_path'];
+                                            $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);
                                         } else {
                                             if ($pet['type'] == 'dog') {
                                                 $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
                                             } else {
                                                 $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
                                             }
+                                        }
+
+                                        // 펫정보 입질
+                                        if($pet['bite'] == 0){
+                                            $bite = "안해요";
+                                        }else{
+                                            $bite = "해요";
                                         }
                                     }
                                     ?>
@@ -269,25 +285,25 @@ $scm = sql_fetch_array($que);
                             <div class="item-action">
                                 <div class="grid-layout btn-grid-group">
                                     <div class="grid-layout-inner">
-                                        <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./reserve_beauty_gallery';">미용 갤러리</a></div>
+                                        <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./reserve_beauty_gallery?aid=<?php echo $pay['artist_id'];?>&seq=<?php echo $pay['payment_log_seq'];?>&pet=<?php echo $pay['pet_seq'];?>';">미용 갤러리</a></div>
                                         <?php
                                         if($bag[0]['is_agree']==1){
                                             ?>
-                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree_view?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&ba_seq=<?php echo $bag[0]['ba_seq'];?>" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 보기</a></div>
+                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree_view?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&ba_seq=<?php echo $bag[0]['ba_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 보기</a></div>
                                         <?php } else { ?>
-                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 작성</a></div>
+                                            <div class="grid-layout-cell grid-2"><a href="./customer_beauty_agree?aid=<?php echo $pay['artist_id'];?>&uid=<?php echo $pay['cellphone'];?>&pid=<?php echo $pay['pet_seq'];?>&backurl=reserve_pay_management_2" class="btn btn-outline-gray btn-middle-size btn-round" >미용동의서 작성</a></div>
                                         <?php } ?>
-                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $pay['pet_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2';">펫 정보 수정</a></div>
+                                        <div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='./customer_pet_add?pet_seq=<?php echo $pay['pet_seq'];?>&payment_seq=<?php echo $payment_log_seq;?>&backurl=reserve_pay_management_2';">펫 정보 수정</a></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="flex-table type-2">
+                        <div class="grid-col2-row3">
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">성별</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">성별</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo $pet['gender'];?>
                                         </div>
                                     </div>
@@ -295,9 +311,9 @@ $scm = sql_fetch_array($que);
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">중성화</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">중성화</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo ($pet['neutral']==1)?'O':'X';?>
                                         </div>
                                     </div>
@@ -305,29 +321,29 @@ $scm = sql_fetch_array($que);
                             </div>
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">무게</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">무게</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php echo $pet['weight'];?>Kg
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            <!--                            <div class="flex-table-cell">-->
+                            <!--                                <div class="flex-table-item">-->
+                            <!--                                    <div class="flex-table-title"><div class="txt">생일</div></div>-->
+                            <!--                                    <div class="flex-table-data">-->
+                            <!--                                        <div class="flex-table-data-inner">-->
+                            <!--                                            --><?php //echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
+                            <!--                                        </div>-->
+                            <!--                                    </div>-->
+                            <!--                                </div>-->
+                            <!--                            </div>-->
                             <div class="flex-table-cell">
                                 <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">생일</div></div>
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">나이</div></div>
                                     <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
-                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="flex-table-cell">
-                                <div class="flex-table-item">
-                                    <div class="flex-table-title"><div class="txt">나이</div></div>
-                                    <div class="flex-table-data">
-                                        <div class="flex-table-data-inner">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
                                             <?php
                                             calc_passed_year($pet['year'].'-'.$pet['month'].'-'.$pet['day'], date('Y-m-d'));
                                             ?>
@@ -336,51 +352,72 @@ $scm = sql_fetch_array($que);
                                     </div>
                                 </div>
                             </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">입질</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
+                                            <?php
+                                            echo $bite;
+                                            ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex-table-cell">
+                                <div class="flex-table-item">
+                                    <div class="flex-table-title flex-table-title-add"><div class="txt">슬개골 탈구</div></div>
+                                    <div class="flex-table-data">
+                                        <div class="flex-table-data-inner flex-table-data-inner-add">
+                                            <?php echo ($pet['luxation'] == 0)? "없음" : $pet['luxation'];?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <!-- customer-view-pet-detail 클래스에 actived클래스 추가시 활성화 -->
                         <div class="customer-view-pet-detail">
-                            <button type="button" class="btn-detail-toggle" id="pet-info-view">펫 정보 자세히 보기</button>
+                            <button type="button" class="btn-detail-toggle btn-detail-toggle-add" id="pet-info-view">펫 정보 자세히 보기</button>
                             <div class="service-selected-wrap">
                                 <div class="service-selected-group">
                                     <div class="list-title">미용 경험</div>
-                                    <div class="list-data"><?php echo $pet['beauty_exp'];?></div>
+                                    <div class="list-data list-data-add" ><?php echo ($pet['beauty_exp'] == 0)? "없음" : $pet['beauty_exp'];?></div>
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">예방 접종</div>
-                                    <div class="list-data"><?php echo $pet['vaccination'];?></div>
+                                    <div class="list-data list-data-add"><?php echo ($pet['vaccination'] == 0)? "2차 이하" : $pet['vaccination'];?></div>
                                 </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">입질</div>
-                                    <div class="list-data"><?php echo $pet['bite'];?></div>
-                                </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">싫어하는 부위</div>
-                                    <div class="list-data">
-                                        <?php
-                                        if($pet['nothing']==1){
-                                            //$is_hate = '없음';
-                                        } else {
-                                            if ($pet['dt_eye'] == 1) $hate[] = '눈';
-                                            if ($pet['dt_nose'] == 1) $hate[] = '코';
-                                            if ($pet['dt_mouth'] == 1) $hate[] = '입';
-                                            if ($pet['dt_neck'] == 1) $hate[] = '목';
-                                            if ($pet['dt_body'] == 1) $hate[] = '몸';
-                                            if ($pet['dt_leg'] == 1) $hate[] = '다리';
-                                            if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
-                                            if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
-                                            $is_hate = implode(",",$hate);
-                                        }
-                                        echo $is_hate;
-                                        ?>
+
+                                <?php
+                                if($pet['nothing']==1){
+                                    //$is_hate = '없음';
+                                } else {
+                                    if ($pet['dt_eye'] == 1) $hate[] = '눈';
+                                    if ($pet['dt_nose'] == 1) $hate[] = '코';
+                                    if ($pet['dt_mouth'] == 1) $hate[] = '입';
+                                    if ($pet['dt_neck'] == 1) $hate[] = '목';
+                                    if ($pet['dt_body'] == 1) $hate[] = '몸';
+                                    if ($pet['dt_leg'] == 1) $hate[] = '다리';
+                                    if ($pet['dt_tail'] == 1) $hate[] = '꼬리';
+                                    if ($pet['dt_genitalia'] == 1) $hate[] = '생식기';
+                                    $is_hate = implode(",",$hate);
+                                    ?>
+                                    <div class="service-selected-group">
+                                        <div class="list-title">생일</div>
+                                        <div class="list-data list-data-add">
+                                            <?php echo $pet['year'].'.'.$pet['month'].'.'.$pet['day'];?>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="service-selected-group">
-                                    <div class="list-title">슬개골 탈구</div>
-                                    <div class="list-data"><?php echo $pet['luxation'];?></div>
-                                </div>
+                                    <?php
+                                }
+                                //echo $is_hate;
+                                ?>
+
                                 <div class="service-selected-group">
                                     <div class="list-title">특이사항</div>
-                                    <div class="list-data">
+                                    <div class="list-data list-data-add">
                                         <?php
 
                                         if ($pet['dermatosis'] == 1) $dis[] = '피부병';
@@ -396,84 +433,54 @@ $scm = sql_fetch_array($que);
                                 </div>
                                 <div class="service-selected-group">
                                     <div class="list-title">기타</div>
-                                    <div class="list-data"><?php echo $pet['etc'];?></div>
+                                    <div class="list-data list-data-add"><?php echo $pet['etc'];?></div>
                                 </div>
-                            </div>
-                        </div>
-                        <div class="basic-data-group vmiddle">
-                            <div class="form-group">
-                                <div class="form-group-cell middle">
-                                    <div class="form-group-item">
-                                        <div class="form-item-label">특이사항</div>
-                                        <div class="form-item-data">
-                                            <input type="text" name="etc_memo" id="etc_memo" class="form-control" placeholder="입력" value="<?php echo $pay['etc_memo'];?>">
-                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
-                                        </div>
-                                        <div class="form-item-data type-8">
-                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc1" data-seq="<?php echo $payment_log_seq;?>">저장</button>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group-cell middle">
-                                    <div class="form-group-item">
-                                        <div class="form-item-label">견주관련 메모</div>
-                                        <div class="form-item-data">
-                                            <input type="text" name="etc2_memo" id="etc2_memo" value="<?php echo $scm[0]['memo'];?>" class="form-control" placeholder="입력">
-                                            <div class="form-input-info">(고객에게는 노출되지 않습니다.)</div>
-                                        </div>
-                                        <div class="form-item-data type-8">
-                                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round save-etc2" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- //예약동물 정보 -->
 
-                <!-- 이전 특이 사항 -->
+                <!--이전 특이사항 -->
                 <?php
-
+                $this_time = date('Y-m-d',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day']));
+                $ct = 0;
                 $sql = "
-                            SELECT *
-                            FROM tb_payment_log 
-                            WHERE artist_id = '" . $artist_id . "' 
-                                AND is_no_show = 0 
-                                AND is_cancel = 0 
-                                AND is_cancel = 0
-                                AND approval = 1
-                                AND etc_comment = ''
-                                AND pet_seq = {$pet['pet_seq']}                                
-                        ";
+                                    SELECT *
+                                    FROM tb_payment_log 
+                                    WHERE artist_id = '" . $user_id . "' 
+                                        AND is_no_show = 0 
+                                        AND is_cancel = 0 
+                                        AND is_cancel = 0
+                                        AND approval = 1
+                                        AND etc_memo != ''
+                                        AND pet_seq = '{$pay["pet_seq"]}'   
+                                        AND DATE_FORMAT(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT('".$this_time."','%Y-%m-%d') 
+                                        ORDER BY  CONCAT(year,'-',month,'-',day) DESC
+                                ";
                 //echo $sql;
                 $arr = sql_fetch_array($sql);
                 if(count($arr)>0){
                     ?>
+
                     <div class="basic-data-group" id="prev_cmt">
-                        <?php
-                        foreach($arr as $rs){
-                            ?>
-                            <div class="con-title-group">
-                                <h4 class="con-title">이전 특이사항</h4>
-                            </div>
-                            <div class="special-note-list">
-                                <?php
-                                $tp_cnt = 0;
-                                for($k=0;$k<count($rs);$k++){
-                                    $date = $rs['year'].'-'.$rs['month'].'-'.$rs['day'];
-                                    $prev_beauty = explode("|",$rs['product']);
-                                    $kg = explode(":",$prev_beauty[5]);
-                                    ?>
-                                    <div class="special-note">
-                                        <div class="note-desc"><em><?php echo date('Y.m.d',strtotime($date));?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
-                                    </div>
-                                    <?php $tp_cnt++;} ?>
-                            </div>
+
+                        <div class="con-title-group con-title-group-add">
+                            <h4 class="con-title">이전 특이사항</h4>
+                        </div>
+                        <div class="special-note-list">
+                            <?php
+                            foreach($arr as $rs){
+                                ?>
+                                <div class="special-note special-cmt special-note-border special-note-add" style="display: <?php echo ($ct<4)?'block':'none';?>">
+                                    <div class="note-desc"><em><?php echo $rs['year'].'.'.$rs['month'].'.'.$rs['day'];?></em><div class="txt"><?php echo $rs['etc_memo'];?></div></div>
+                                </div>
+                                <?php $ct++;} ?>
+                        </div>
+                        <?php if($ct>5){ ?>
                             <div class="basic-data-group vmiddle">
                                 <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
-                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple">더보기</button>
+                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple border-1 view-special-cmt btn-border-view-special-cmt">더보기</button>
                             </div>
                         <?php } ?>
                     </div>
@@ -481,8 +488,8 @@ $scm = sql_fetch_array($que);
 
                 <!-- 이전 미용 -->
                 <?php
-                $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$pay['pet_seq']} AND artist_id = '{$artist_id}' AND cellphone = '{$pay['cellphone']}' AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 ";
                 //echo $que;
+                $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$pay['pet_seq']} AND artist_id = '{$artist_id}' AND cellphone = '{$pay['cellphone']}' AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 AND approval = 1 AND DATE_FORMAT(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT('".$this_time."','%Y-%m-%d') ORDER BY  CONCAT(year,'-',month,'-',day) DESC  ";
                 $arr = sql_fetch_array($que);
                 if(count($arr)>0) {
                     foreach ($arr as $arr) {
@@ -493,46 +500,331 @@ $scm = sql_fetch_array($que);
                 if (count($data["total_payment"]) > 0) {
                     ?>
 
-                    <div class="basic-data-group" id="prev_beauty_info" style="display:none">
-                        <div class="con-title-group">
+                    <div class="basic-data-group">
+                        <div class="con-title-group con-title-group-add">
                             <h4 class="con-title">이전 미용</h4>
                         </div>
-                        <?php
-
-                        $before_date = "";
-                        ?>
                         <div class="memo-item-list">
+
+
                             <?php
                             $tp_cnt = 0;
                             for($k=0;$k<count($data["total_payment"]);$k++){
-                                if($data["total_payment"][$k]['is_cancel']==0 && $data["total_payment"][$k]['is_no_show'] == 0 && $data["total_payment"][$k]['data_delete']==0 &&  $data["total_payment"][$k]['approval']!=1 ){
-                                    $date = $data["total_payment"][$k]['year'].'-'.$data["total_payment"][$k]['month'].'-'.$data["total_payment"][$k]['day'];
-                                    $prev_beauty = explode("|",$data["total_payment"][$k]['product']);
-                                    $kg = explode(":",$prev_beauty[5]);
-                                    ?>
-                                    <div class="memo-item"><?php echo date('Y.m.d',strtotime($date));?> / <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($kg[1]);?>원</div>
-                                    <?php $tp_cnt++;}} ?>
+                                $date = $data["total_payment"][$k]['year'].'-'.$data["total_payment"][$k]['month'].'-'.$data["total_payment"][$k]['day'];
+                                $prev_beauty = explode("|",$data["total_payment"][$k]['product']);
+                                $kg = explode(":",$prev_beauty[5]);
+                                $tp_cnt++;
+
+
+
+
+                                ?>
+                                <div class="memo-item memo-item-border memo-item-add memo-item-add2" style="display: <?php echo ($tp_cnt<5)?'block':'none !important';?>">
+
+                                    <p class="memo-item-overflow" style="max-width:250px;" ><?php echo date('Y.m.d',strtotime($date));?>  <?php echo $data["pet"]["name"];?>  / <?php echo $prev_beauty[4];?> / <?php echo $kg[0];?>Kg / <?php echo number_format($data["total_payment"][$k]['local_price'] + $data["total_payment"][$k]['local_price_cash']);?>원</p>
+                                    <a href="reserve_pay_management_2?payment_log_seq=<?php echo $data["total_payment"][$k]['payment_log_seq']?>&history_back=1" class="memo-detail-wrap">
+                                        <span class="memo-detail">상세보기</span>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="5.207" height="9.414" viewBox="0 0 5.207 9.414">
+                                            <path data-name="Path" d="m-4 8 4-4-4-4" transform="translate(4.707 .707)" style="fill:none;stroke:#202020;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            <?php }?>
                         </div>
-                        <div class="basic-data-group vmiddle">
-                            <!-- 더보기 활성화시 닫기로 텍스트 변경 필요 -->
-                            <button type="button" class="btn btn-middle-size btn-round btn-outline-purple"><?php echo ($tp_cnt>5)?'더보기':'닫기';?></button>
-                        </div>
+                        <?php if($tp_cnt>5){ ?>
+                            <div class="basic-data-group vmiddle">
+                                <button type="button" class="btn btn-middle-size btn-round btn-outline-purple view-prev-beauty">더보기</button>
+                            </div>
+                        <?php } ?>
                     </div>
                 <?php } ?>
 
-                <div class="basic-data-group">
+
+
+
+                <div class="basic-data-group vmiddle">
+                    <div class="user-receipt-item">
+                        <div class="con-title-group">
+                            <h5 class="con-title">예약 서비스 내역</h5>
+                        </div>
+                        <div class="receipt-buy-detail">
+                            <div class="item-data-list">
+                                <?php if($pet['type']=='dog'){ ?>
+                                <div class="list-cell">
+                                    <div class="list-title">
+                                        <?php
+                                        $sum = 0;
+                                        $kg = explode(':',$beauty_info[5]);
+                                        $face = explode(':',$beauty_info[6]);
+                                        $hair_length = explode(':',$beauty_info[7]);
+                                        $bath_array = explode(',',$beauty_info[8]);
+                                        ?>
+                                        <?php
+                                        if(!empty($beauty_info[3])){
+                                            $beauty_first[] = $beauty_info[3];
+                                        }
+                                        if(!empty($beauty_info[4])){
+                                            $beauty_first[] = $beauty_info[4];
+                                        }
+                                        if(!empty($kg[0]) && $kg[0] != 'on'){
+                                            $beauty_first[] = '~'.$kg[0].'Kg';
+                                        }
+                                        $bf = implode(' / ',$beauty_first);
+                                        ?>
+                                        <?php echo $bf;?>
+                                    </div>
+                                    <div class="list-value"><?php $sum+=$kg[1]; echo number_format($kg[1]);?>원</div>
+                                </div>
+                                <?php if(!empty($face[0])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title"><?php echo $face[0];?></div>
+                                        <div class="list-value"><?php $sum+=$face[1]; echo number_format($face[1]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(!empty($hair_length[0])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title"><?php echo $hair_length[0];?>mm</div>
+                                        <div class="list-value"><?php $sum+=$hair_length[1];echo number_format($hair_length[1]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(count($bath_array)>0){
+                                    for($i=0;$i<count($bath_array);$i++){
+                                        $bath = explode(':',$bath_array[$i]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $bath[0];?></div>
+                                            <div class="list-value"><?php $sum+=$bath[1]; echo number_format($bath[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <?php if(!empty($beauty_info[9])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">발톱</div>
+                                        <div class="list-value"><?php $sum+=$beauty_info[9];echo number_format($beauty_info[9]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(!empty($beauty_info[10])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">장화</div>
+                                        <div class="list-value"><?php $sum+=$beauty_info[10];echo number_format($beauty_info[10]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(!empty($beauty_info[11])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">방울</div>
+                                        <div class="list-value"><?php $sum+=$beauty_info[11];echo number_format($beauty_info[11]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php
+                                $s = 15;
+                                if($beauty_info[14]>0){
+                                    for($i=0;$i<$beauty_info[14];$i++){
+                                        $tmp = explode(':',$beauty_info[(15+$i)]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!--스파-->
+                                <?php
+                                unset($tmp);
+                                $spa_start = 14+($beauty_info[14]+1);
+                                if($beauty_info[$spa_start]>0){
+                                    for($i=1;$i<=$beauty_info[$spa_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($spa_start+$i)]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!-- 염색 -->
+                                <?php
+                                unset($tmp);
+                                $color_start = $spa_start+($beauty_info[$spa_start]+1);
+                                if($beauty_info[$color_start]>0){
+                                    for($i=1;$i<=$beauty_info[$color_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($color_start+$i)]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!-- 기타 -->
+                                <?php
+                                unset($tmp);
+                                $etc_start = $color_start+($beauty_info[$color_start]+1);
+                                if($beauty_info[$etc_start]>0){
+                                    for($i=1;$i<=$beauty_info[$etc_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($etc_start+$i)]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+
+
+                                <!--제품구매내역-->
+                                <?php
+                                unset($tmp);
+                                $goods_start = $cp_start+($beauty_info[$cp_start]+1);
+                                if($beauty_info[$goods_start]>0){
+                                    for($i=1;$i<=$beauty_info[$goods_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($goods_start+$i)]);
+
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[1];?>[<?php echo number_format($tmp[2]);?>원X<?php echo number_format($tmp[3]);?>개]</div>
+                                            <div class="list-value"><?php $sum+=$tmp[2]*$tmp[3]; echo number_format($tmp[2]*$tmp[3]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!--쿠폰구매내역-->
+                                <?php
+                                unset($tmp);
+                                $coupon_start = $etc_start+($beauty_info[$etc_start]+1);
+                                if($beauty_info[$coupon_start]>0){
+                                    for($i=1;$i<=$beauty_info[$coupon_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($coupon_start+$i)]);
+//                                                    print_r($tmp);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title">쿠폰 : <?php echo $tmp[1];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[2]; echo number_format($tmp[2]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+
+                            </div>
+                            <?php } else { ?>
+                                <div class="list-cell">
+                                    <?php
+                                    $sum = 0;
+                                    $kg = explode(':',$beauty_info[3]);
+                                    $hair = explode(':',$beauty_info[4]);
+                                    $bath = $beauty_info[6];
+                                    $toenail = $beauty_info[5];
+                                    /*$face = explode(':',$beauty_info[6]);
+                                    $hair_length = explode(':',$beauty_info[7]);
+                                    $bath = explode(':',$beauty_info[8]);*/
+                                    ?>
+                                </div>
+                                <?php if(!empty($kg[0])){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">미용 : ~<?php echo $kg[0];?>kg</div>
+                                        <div class="list-value"><?php $sum+=$hair[1]; echo number_format($hair[1]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(!empty($bath)){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">목욕  </div>
+                                        <div class="list-value"><?php $sum+=$bath; echo number_format($bath);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php if(!empty($toenail)){ ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">발톱  </div>
+                                        <div class="list-value"><?php $sum+=$toenail; echo number_format($toenail);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php
+                                if($beauty_info[7]>0){
+                                    for($i=0;$i<$beauty_info[7];$i++){
+                                        $tmp = explode(':',$beauty_info[(8+$i)]);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!--제품구매내역-->
+                                <?php
+
+                                unset($tmp);
+                                $etc_start = 7;
+                                $cp_start = $etc_start + ($beauty_info[$etc_start] + 1);
+                                $goods_start = $etc_start+($beauty_info[$etc_start]+1);
+                                if($beauty_info[$goods_start]>0){
+                                    for($i=1;$i<=$beauty_info[$goods_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($goods_start+$i)]);
+
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title"><?php echo $tmp[1];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[2]; echo number_format($tmp[2]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                                <!--쿠폰구매내역-->
+                                <?php
+                                unset($tmp);
+                                $coupon_start = $goods_start+($beauty_info[$goods_start]+1);
+                                if($beauty_info[$coupon_start]>0){
+                                    for($i=1;$i<=$beauty_info[$coupon_start];$i++){
+                                        $tmp = explode(':',$beauty_info[($coupon_start+$i)]);
+//                                                    print_r($tmp);
+                                        ?>
+                                        <div class="list-cell">
+                                            <div class="list-title">쿠폰 : <?php echo $tmp[1];?></div>
+                                            <div class="list-value"><?php $sum+=$tmp[2]; echo number_format($tmp[2]);?>원</div>
+                                        </div>
+                                    <?php }} ?>
+                            <?php } ?>
+
+                        </div>
+
+                        <div class="receipt-buy-detail total-price">
+                            <div class="item-data-list">
+                                <div class="list-cell">
+                                    <div class="list-title"><strong>합산 금액</strong></div>
+                                    <div class="list-value"><strong><?php echo number_format($sum);?>원</strong></div>
+                                </div>
+                                <div class="list-cell">
+                                    <div class="list-title"><strong>부가세 10%</strong></div>
+                                    <div class="list-value"><strong>
+                                            <?php
+
+                                            if($sh[0]['is_vat']==1){
+                                                $vat = ($sum*0.1);
+                                                echo number_format($vat);;
+                                            } else {
+                                                echo '0';
+                                            }
+
+                                            ?>
+                                            원</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="receipt-buy-detail result-price">
+                            <div class="item-data-list">
+                                <div class="list-cell">
+                                    <div class="list-title font-color-purple"><strong>총 결제 합산 금액</strong></div>
+                                    <div class="list-value font-color-purple"><strong><?php echo number_format($sum+$vat);?>원</strong></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="basic-data-group vvsmall2">
                     <div class="user-receipt-item">
                         <div class="con-title-group">
                             <h5 class="con-title">예약 내용</h5>
-                            <button type="button" class="btn-side btn btn-outline-purple btn-msmall-size btn-inline btn-border-radius-16">알림톡 발송 이력</button>
+                            <!--<button type="button" class="btn-side btn btn-outline-purple btn-msmall-size btn-inline btn-border-radius-16">알림톡 발송 이력</button>-->
                         </div>
                         <div class="text-list-wrap type-2">
                             <div class="text-list-cell"><div class="item-title unit">날짜</div><div class="item-data"><?php echo date('Y.m.d',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day']));?></div></div>
                             <div class="text-list-cell"><div class="item-title unit">선생님</div><div class="item-data"><?php echo $ar[0]['nicname'];?></div></div>
-                            <div class="text-list-cell"><div class="item-title unit">시간</div><div class="item-data"><?php echo $rev_date = date('H:i',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'])); ?> ~ <?php echo $rev_date = date('H:i',strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['to_hour'].':'.$pay['to_minute'])); ?></div></div>
+                            <?php
+
+                            $st_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']);
+                            $fi_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['to_hour'].':'.$pay['to_minute']);
+                            ?>
+                            <div class="text-list-cell"><div class="item-title unit">시간</div><div class="item-data"><?=date('H:i',$st_date) ?> ~ <?=date('H:i',$fi_date) ?></div></div>
                         </div>
                     </div>
                 </div>
+
+
 
 
             </div>
@@ -720,6 +1012,23 @@ $scm = sql_fetch_array($que);
                 </div>
             </div>
         </article>
+
+        <article id="bigImg" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt"></div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
     </section>
     <!-- //container -->
 
@@ -731,6 +1040,11 @@ $scm = sql_fetch_array($que);
                 return false;
             });
         });
+
+        function show_img(img){
+            $('#bigImg .msg-txt').html('<img src="'+img+'">')
+            popalert.open('bigImg');
+        }
 
 
         $(document).on('click','.service-type',function(){
@@ -1537,7 +1851,7 @@ $scm = sql_fetch_array($que);
             var gubun = $(this).data('type');
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'reserveStatusChange','no':idx,'type':gubun},
                 dataType : 'json',
                 success : function(json){
@@ -1552,7 +1866,7 @@ $scm = sql_fetch_array($que);
         });
 
         function go_url(){
-            location.href = '<?php echo $_SESSION['backurl'];?>?payment_log_seq=<?php echo $payment_log_seq;?>';
+            location.href = '<?php echo $_SESSION['backurl1'];?>';
         }
         $.numberWithCommas = function (x) {
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');

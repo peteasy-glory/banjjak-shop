@@ -63,7 +63,7 @@ $menuId = getMenuId($uri[1]);
 function getMenuId($url) {
 	$subUrl = Array(
 		"set_beauty_management_time" => "set_beauty_management",
-		"reserve_main_month" => "hiddenReserve",
+		"reserve_main_week" => "hiddenReserve",
 		"reserve_accept_input" => "reserve_accept",
 		"customer_inquiry" => "hiddenCustomer",
 		"shop_main" => "hiddenShop",

@@ -233,19 +233,16 @@ if(empty($grade[0]['grade_name'])){
                         <h4 class="con-title">예약자 정보</h4>
                     </div>
                     <div class="flex-table type-2">
-                        <!--<div class="flex-table-cell">
+                        <?php if($pay['is_no_show']>0){ ?>
+                        <div class="flex-table-cell">
                             <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">아이디</div></div>
+                                <div class="flex-table-title"><div class="txt"></div></div>
                                 <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php /*echo (!empty($cus['id']))?$cus['id']:$cus['tmp_seq'];*/?>
-                                    </div>
-                                    <?php /*if($pay['is_no_show']>0){ */?>
-                                        <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php /*echo $pay['is_no_show'];*/?>회</div></div>
-                                    <?php /*} */?>
+                                    <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php echo $pay['is_no_show'];?>회</div></div>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
+                        <?php } ?>
                         <div class="flex-table-cell">
                             <div class="flex-table-item">
                                 <div class="flex-table-title"><div class="txt">등급</div></div>
@@ -2046,9 +2043,7 @@ if(empty($grade[0]['grade_name'])){
 
                         </div>
                         <!--합계금액 부가세표시 기본결제금액-->
-                        <div class="receipt-buy-detail total-price" style="border-top: 1px solid #f4f4f4;
-    margin-top: 12px;
-    padding-top: 12px;">
+                        <div class="receipt-buy-detail total-price" style="border-top: 1px solid #f4f4f4; margin-top: 12px; padding-top: 12px;">
                             <div class="item-data-list">
                                 <div class="list-cell">
                                     <div class="list-title"><strong>합산 금액</strong></div>
@@ -2085,11 +2080,16 @@ if(empty($grade[0]['grade_name'])){
                 <!--보유쿠폰-->
                 <?php
                 //$que1 = "SELECT * FROM tb_user_coupon a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.customer_id = '{$cus['id']}' AND a.artist_id = '{$pay['artist_id']}' AND a.tmp_seq = '{$cus['tmp_seq']}'";
+                if($cus['id'] != ''){
+                    $where_id = "a.customer_id = '{$cus['id']}'";
+                }else{
+                    $where_id = "a.tmp_seq = '{$cus['tmp_seq']}'";
+                }
                 $que1 = "
                     SELECT * FROM (
                         SELECT a.*, b.name FROM tb_user_coupon a
                         LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq
-                        WHERE (a.customer_id = '{$cus['id']}' OR a.tmp_seq = '{$cus['tmp_seq']}')
+                        WHERE {$where_id}
                         AND a.artist_id = '{$pay['artist_id']}'
                         ORDER BY a.user_coupon_seq desc
                     ) s
@@ -2114,9 +2114,9 @@ if(empty($grade[0]['grade_name'])){
                                             <select name="coupon_name" id="coupon_name">
                                                 <option value="">선택안함</option>
                                                 <?php
-                                                foreach($cop as $cop){
+                                                foreach($cop as $ii => $cop_v){
                                                     ?>
-                                                    <option value="<?php echo $cop['user_coupon_seq'];?>"><?php echo $cop['name'];?></option>
+                                                    <option value="<?php echo $cop_v['user_coupon_seq'];?>"><?php echo $cop_v['name'];?></option>
                                                     <?php
                                                 }
                                                 ?>
@@ -2156,7 +2156,7 @@ if(empty($grade[0]['grade_name'])){
                             </div>
                             <div class="form-group-cell small">
                                 <button type="button" class="btn btn-outline-purple btn-round use-coupon">적용</button>
-                                <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 잔액 : <span id="remind_coupon">0</span>원</div>
+                                <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 남은 쿠폰 : <span id="remind_coupon">0</span></div>
                             </div>
                         </div>
 
@@ -3023,7 +3023,7 @@ if(empty($grade[0]['grade_name'])){
             console.log(cusid)
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCoupon','cid':cusid},
                 dataType : 'json',
                 success : function(json){
@@ -3049,7 +3049,7 @@ if(empty($grade[0]['grade_name'])){
             var cid = $(this).val();
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCouponBalance','cid':cid},
                 dataType : 'json',
                 success : function(json){
@@ -3085,7 +3085,7 @@ if(empty($grade[0]['grade_name'])){
                             //var cid = json.cid;
                             $.ajax({
                                 type : 'post',
-                                url : './data/get_book_data_ajax',
+                                url : './data/get_book_data_ajax.php',
                                 data : {'mode':'getCouponBalance','cid':cid},
                                 dataType : 'json',
                                 success : function(json){
@@ -3116,10 +3116,10 @@ if(empty($grade[0]['grade_name'])){
                 success : function(json){
                     console.log(json);
                     if(json.flag == true){
-                        $('#coupon_name').val(json.user_coupon_seq).prop("selected", true);
-                        $('#coupon_balance').empty().append(json.select_name);
-                        $('#use_coupon').empty().append(json.select_use);
-                        $('#remind_coupon').text($('#coupon_balance option:selected').val());
+                        // $('#coupon_name').val(json.user_coupon_seq).prop("selected", true);
+                        // $('#coupon_balance').empty().append(json.select_name);
+                        // $('#use_coupon').empty().append(json.select_use);
+                        // $('#remind_coupon').text($('#coupon_balance option:selected').val());
 
                     }
                 }, error : function(xhr, error){
