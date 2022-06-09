@@ -910,6 +910,7 @@ function data_etc_memo($tmp){
                             </div>
                             <!-- calendar 시작 -->
                             <div class="calendar-week-body" id="week_body_start">
+                                <div class="calendar-week-current-time" style="display: block;" id="time_schedule_<?php echo $thisTime;?>" data-curTime="<?php echo $thisTime;?>" data-nowTime="<?php echo date('H:i');?>"><div class="bar"></div><div class="value"><?php echo date('h:i');?></div></div>
                                 <?php
                                 $time_count = 0;
                                 $curr_time = (int)(microtime(TRUE) * 1000);
@@ -929,9 +930,9 @@ function data_etc_memo($tmp){
                                         $startTime = $h;
                                         $thisTimeEnd = date('H:i',strtotime($thisTime.' +30 minute'));
                                         ?>
-                                        <?php if($thisTime <= date('H:i') && $thisTimeEnd > date('H:i') ){ ?>
-                                            <div class="calendar-week-current-time" style="display: none;" id="time_schedule_<?php echo $thisTime;?>" data-curTime="<?php echo $thisTime;?>" data-nowTime="<?php echo date('H:i');?>"><div class="bar"></div><div class="value"><?php echo date('h:i');?></div></div>
-                                        <?php } ?>
+<!--                                        --><?php //if($thisTime <= date('H:i') && $thisTimeEnd > date('H:i') ){ ?>
+
+<!--                                        --><?php //} ?>
                                         <div class="calendar-week-body-row">
                                             <div class="calendar-week-body-col time">
                                                 <?php if($thisTime == sprintf('%02d',$tws[0]['working_start']).':00' && $thisTime < '12:00'){ ?>
@@ -944,6 +945,7 @@ function data_etc_memo($tmp){
                                                     <div class="day-division-label"></div>
                                                 <?php } ?>
                                                 <div class="time-label"><div class="time-start-label"><?=date('h:i',strtotime($thisTime))?></div><div class="time-end-label"></div></div>
+
                                             </div>
 
                                             <?php
@@ -1803,13 +1805,13 @@ function data_etc_memo($tmp){
         var now_m = now_date.getMinutes();
 
 
-        var line_hieght = ((now_hours-9)*60+now_m)*2.07;
-        //console.log((((18-9)*100+now_m)/100));
-        if(line_hieght>0 && line_hieght<1240){
-            $(".calendar-day-current-time").css("top",line_hieght+"px");
-        }else{
-            $(".calendar-day-current-time").hide();
-        }
+        // var line_hieght = ((now_hours-9)*60+now_m)*2.07;
+        // //console.log((((18-9)*100+now_m)/100));
+        // if(line_hieght>0 && line_hieght<1240){
+        //     $(".calendar-day-current-time").css("top",line_hieght+"px");
+        // }else{
+        //     $(".calendar-day-current-time").hide();
+        // }
 
 
         var obj_dialog_time_form = $("#reserveCalendarPop3");
@@ -1894,19 +1896,19 @@ function data_etc_memo($tmp){
 
         });
 
-        var now_date = new Date();
-        var now_hours = now_date.getHours();
-        var now_m = now_date.getMinutes();
-
-
-        var line_hieght = ((now_hours-9)*60+now_m)*2.07;
-        //console.log((((18-9)*100+now_m)/100));
-
-        if(line_hieght>0 && line_hieght<1240){
-            $(".calendar-day-current-time").css("top",line_hieght+"px");
-        }else{
-            $(".calendar-day-current-time").hide();
-        }
+        // var now_date = new Date();
+        // var now_hours = now_date.getHours();
+        // var now_m = now_date.getMinutes();
+        //
+        //
+        // var line_hieght = ((now_hours-9)*60+now_m)*2.07;
+        // //console.log((((18-9)*100+now_m)/100));
+        //
+        // if(line_hieght>0 && line_hieght<1240){
+        //     $(".calendar-day-current-time").css("top",line_hieght+"px");
+        // }else{
+        //     $(".calendar-day-current-time").hide();
+        // }
 
 
         var obj_dialog_time_form = $("#reserveCalendarPop3");
@@ -2162,22 +2164,7 @@ function data_etc_memo($tmp){
 
         });
 
-        console.log($(".calendar-week-body").height());
 
-        var now_date = new Date();
-        var now_hours = now_date.getHours();
-        var now_m = now_date.getMinutes();
-        var workTimeStart = '<?php echo $tws[0]['working_start'];?>';
-        var workTimeEnd = '<?php echo $tws[0]['working_end'];?>';
-
-        var line_hieght = ((now_hours-workTimeStart)*60+now_m)*1.35;
-        var end_time = ((workTimeEnd-workTimeStart)*60)*1.35;
-        console.log(line_hieght, end_time);
-        if(line_hieght>0 && line_hieght<end_time){
-            $(".calendar-week-current-time").css("top",line_hieght+"px");
-        }else{
-            $(".calendar-week-current-time").hide();
-        }
 
         $(document).on('click','.go-payment',function(){
             var seq = $(this).data('pay_seq');
@@ -2219,4 +2206,32 @@ function data_etc_memo($tmp){
     $(document).ready(function(){
         $('#header_bell').css('display','none');
     });
+
+
+
+    let now_date = new Date();
+    let now_hours = now_date.getHours();
+    let now_m = now_date.getMinutes();
+    let workTimeStart = '<?php echo $tws[0]['working_start'];?>';
+    let workTimeEnd = '<?php echo $tws[0]['working_end'];?>';
+    let timeBodyHeight = $(".calendar-week-body").height();
+
+    let workTime = (workTimeEnd-workTimeStart)*60;
+    let division = timeBodyHeight / workTime;
+    let div_height = (((now_hours-workTimeStart)*60)+now_m)*division;
+
+    let startLabelHeight = $(".time-start-label").height();
+
+
+
+    if(now_hours > workTimeEnd || now_hours < workTimeStart){
+        $(".calendar-week-current-time").hide();
+
+    }else{
+        $(".calendar-week-current-time").css("top",div_height+"px");
+        $(".calendar-week-current-time").css("height", startLabelHeight+"px");
+
+    }
+
+
 </script>

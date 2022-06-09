@@ -927,7 +927,7 @@ function data_etc_memo($tmp){
                                          <?php } ?>
                                     </div>
                                             <?php //echo $thisTimeTo;?>
-                                            <div class="calendar-day-current-time" style="top:15%; display: block;">
+                                            <div class="calendar-day-current-time" style="top:15%; display: block; height:0 !important;">
                                                 <div class="bar"></div>
                                                 <div class="value"><?php echo date('h:i');?></div>
                                             </div>
@@ -1671,21 +1671,33 @@ $(function(){
         
     });
 
-    console.log($(".calendar-day-body").height());
+    // console.log($(".calendar-day-body").height());
 
-    var now_date = new Date();
-    var now_hours = now_date.getHours();
-    var now_m = now_date.getMinutes();
-    var workTimeStart = '<?php echo $tws[0]['working_start'];?>';
-    var workTimeEnd = '<?php echo $tws[0]['working_end'];?>';
 
-    var line_hieght = ((now_hours-workTimeStart)*60+now_m)*1.23;
-    var end_time = ((workTimeEnd-workTimeStart)*60)*1.23;
-    console.log(line_hieght, end_time);
-    if(line_hieght>0 && line_hieght<end_time){
-        $(".calendar-day-current-time").css("top",line_hieght+"px");
-    }else{
+    //시간 표시
+
+    let now_date = new Date();
+    let now_hours = now_date.getHours();
+    let now_m = now_date.getMinutes();
+    let workTimeStart = '<?php echo $tws[0]['working_start'];?>';
+    let workTimeEnd = '<?php echo $tws[0]['working_end'];?>';
+    let timeBodyHeight = $(".calendar-day-body").height();
+
+    let workTime = (workTimeEnd-workTimeStart)*60;
+    let division = timeBodyHeight / workTime;
+    let div_height = (((now_hours-workTimeStart)*60)+now_m)*division;
+
+    let startLabelHeight = $(".time-start-label").height();
+
+
+
+    if(now_hours > workTimeEnd || now_hours < workTimeStart){
         $(".calendar-day-current-time").hide();
+
+    }else{
+        $(".calendar-day-current-time").css("top",div_height+"px");
+        $(".calendar-day-current-time").css("height", startLabelHeight+"px");
+
     }
 
 
