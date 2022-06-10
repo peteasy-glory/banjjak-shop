@@ -134,6 +134,38 @@ $bag = sql_fetch_array($que);
 $que = "SELECT * FROM tb_shop_customer_memo WHERE customer_id = '{$cus['id']}' AND tmp_seq = '{$cus['tmp_seq']}' AND cellphone = '{$pay['cellphone']}' AND artist_id = '{$pay['artist_id']}'";
 //echo $que;
 $scm = sql_fetch_array($que);
+
+// 등급 회원 구하기
+// 정회원 여부
+$cus_sql = "select * from tb_customer where cellphone = '{$pay['cellphone']}'";
+$cus_res = mysqli_query($connection,$cus_sql);
+$cus_pay = mysqli_fetch_assoc($cus_res);
+
+if($cus_pay['id'] != ''){ // 정회원일시
+    $grade_id = $cus_pay['id'];
+}else { //정회원 아이디가 없으면 가회원으로 취급
+    $tmp_sql = "select * from tb_tmp_user where cellphone = '{$pay['cellphone']}'";
+    $tmp_res = mysqli_query($connection, $tmp_sql);
+    $tmp_pay = mysqli_fetch_assoc($tmp_res);
+    $grade_id = $tmp_pay['tmp_seq'];
+}
+
+$que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
+$gd = sql_fetch_array($que);
+
+$que = "
+    SELECT * FROM tb_grade_of_customer a 
+    LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx 
+    WHERE a.customer_id = '{$grade_id}'
+    AND b.artist_id = '{$user_id}'
+";
+
+$grade = sql_fetch_array($que);
+
+if(empty($grade[0]['grade_name'])){
+    $grade[0]['grade_name'] = $gd[2]['grade_name']; // 값 없을때 vip로 보이게
+    $grade[0]['grade_ord'] = $gd[2]['grade_ord']; // 값 없을때 1(vip)로 주기
+}
 ?>
 
     <!-- container -->
