@@ -1702,12 +1702,14 @@ $(function(){
 
 
 
-    if(now_hours > workTimeEnd || now_hours < workTimeStart){
+    console.log(now_hours,workTimeEnd);
+
+    if(now_hours >= workTimeEnd || now_hours <= workTimeStart){
         $(".calendar-day-current-time").hide();
 
     }else{
         $(".calendar-day-current-time").css("top",div_height+"px");
-        $(".calendar-day-current-time").css("height", startLabelHeight+"px");
+        // $(".calendar-day-current-time").css("height", startLabelHeight+"px");
 
     }
 
