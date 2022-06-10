@@ -529,6 +529,17 @@ function data_etc_memo($tmp){
     return $tmp;
 }
 
+//예약승인대기 건수
+$que = "SELECT count(*) cnt FROM tb_grade_reserve_approval_mgr a
+        INNER JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq
+        WHERE b.artist_id = '{$user_id}'
+        AND b.is_cancel = 0
+        AND a.is_approve = 0";
+//echo $que;
+$gram = sql_fetch_array($que);
+$await_cnt = $gram[0]['cnt'];
+
+
 ?>
 <!-- container -->
 <section id="container"> 
@@ -1737,12 +1748,21 @@ $(function(){
     
     
 });
+
 function show_alert(obj){
     if(obj == 'hotel' || obj == 'playroom'){
         popalert.open('reserveCalendarPop1','준비중입니다.');
     }
 }
 $(document).ready(function(){
+    var await_cnt = '<?php echo $await_cnt;?>'; // 예약승인
+    var counselor_cnt = '<?php echo $wait_count;?>'; // 상담
+
+    if(await_cnt>0 && counselor_cnt > 0){
+        $('#bothMsg #a1_cnt').text(await_cnt);
+        $('#bothMsg #c1_cnt').text(counselor_cnt);
+        popalert.open('bothMsg');
+    }
     $('#header_bell').css('display','none');
     $('#btn_page_prev').prop('href','home_main')
 })

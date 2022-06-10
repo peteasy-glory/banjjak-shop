@@ -1034,12 +1034,6 @@ $scm = sql_fetch_array($que);
 
     <script>
 
-        $(document).ready(function(){
-            $(".btn-page-prev").click(function(){
-                history.back();
-                return false;
-            });
-        });
 
         function show_img(img){
             $('#bigImg .msg-txt').html('<img src="'+img+'">')
@@ -1872,7 +1866,7 @@ $scm = sql_fetch_array($que);
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
         $(document).ready(function(){
-            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
+            $('#btn_page_prev').prop('href','reserve_waiting');
         });
 
     </script>
