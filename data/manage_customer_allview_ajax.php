@@ -113,13 +113,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = pl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						(
-							SELECT a.idx FROM tb_grade_of_shop a
-							INNER JOIN tb_grade_of_customer b ON a.idx = b.grade_idx
-								WHERE a.artist_id = '".$r_artist_id."'
-								AND b.customer_id = IFNULL(pl.customer_id, mp.tmp_seq)
-						) as grade
+						) as user_reserve
 					FROM tb_payment_log AS pl
 						LEFT OUTER JOIN tb_artist_customer_list AS acl ON pl.pet_seq = acl.pet_seq
 						LEFT OUTER JOIN tb_mypet AS mp ON pl.pet_seq = mp.pet_seq
@@ -212,13 +206,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = hpl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						(
-							SELECT a.idx FROM tb_grade_of_shop a
-							INNER JOIN tb_grade_of_customer b ON a.idx = b.grade_idx
-								WHERE a.artist_id = '".$r_artist_id."'
-								AND b.customer_id = IFNULL(hpl.customer_id, mp.tmp_seq)
-						) as grade
+						) as user_reserve
 					FROM tb_hotel_payment_log AS hpl
 						INNER JOIN tb_mypet AS mp ON hpl.pet_seq = mp.pet_seq
 					WHERE hpl.artist_id = '".$r_artist_id."'
@@ -309,13 +297,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = ppl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						(
-							SELECT a.idx FROM tb_grade_of_shop a
-							INNER JOIN tb_grade_of_customer b ON a.idx = b.grade_idx
-								WHERE a.artist_id = '".$r_artist_id."'
-								AND b.customer_id = IFNULL(ppl.customer_id, mp.tmp_seq)
-						) as grade
+						) as user_reserve
 					FROM tb_playroom_payment_log AS ppl
 						INNER JOIN tb_mypet AS mp ON ppl.pet_seq = mp.pet_seq
 					WHERE ppl.artist_id = '".$r_artist_id."'

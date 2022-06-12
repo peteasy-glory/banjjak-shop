@@ -20,10 +20,10 @@ if ($shop_info_rows = mysqli_fetch_object($shop_info_result)) {
 }
 
 if ($get_tc_id != null && $get_tc_id != "") {
-    //$message = "[".$artist_name."] 펫샵의 사정으로 예약을 진행할 수 없습니다. 다른 샵을 선택해 보시는 게 어떨까요?";
-    //$path = "http://gopet.kr/pet/mainpage/";
-    //$image = "http://gopet.kr/pet/images/app_logo.png";
-    //a_push($get_tc_id, "반짝, 상담 신청 결과 알림", $message, $path, $image);
+    $message = "[".$artist_name."] 펫샵의 사정으로 예약을 진행할 수 없습니다. 다른 샵을 선택해 보시는 게 어떨까요?";
+    $path = "https://customer.banjjakpet.com/";
+    $image = "http://gopet.kr/pet/images/app_logo.png";
+    a_push($get_tc_id, "반짝, 상담 신청 결과 알림", $message, $path, $image, "customer");
 }
 ?>
 

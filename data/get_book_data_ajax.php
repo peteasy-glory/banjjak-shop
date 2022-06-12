@@ -906,7 +906,7 @@ switch($clear['mode']){
         if($_POST['type'] == 2){
             $json['error'] = '예약이 확정되었습니다.';
         } else if($_POST['type']==3){
-            $json['error'] = '예약이 취소되었습니다.';
+            $json['error'] = '예약신청이 취소되었습니다.';
         }
 
         $que = "UPDATE tb_grade_reserve_approval_mgr SET is_approve = '{$_POST['type']}' WHERE idx = {$_POST['no']} ";

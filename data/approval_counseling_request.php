@@ -21,10 +21,10 @@ if ($shop_info_rows = mysqli_fetch_object($shop_info_result)) {
 }
 
 if ($get_tc_id != null && $get_tc_id != "") {
-    //$message = "이제 [".$artist_name."]에서 원하시는 시간에 예약하실 수 있습니다.";
-    //$path = "http://gopet.kr/pet/artist/?artist_name=".urlencode($artist_name);
-    //$image = "http://gopet.kr/pet/images/app_logo.png";
-    //a_push($get_tc_id, "반짝, 상담 신청 결과 알림", $message, $path, $image);
+    $message = "이제 [".$artist_name."]에서 원하시는 시간에 예약하실 수 있습니다.";
+    $path = "https://customer.banjjakpet.com/reserve_view?artist_id=".$user_id;
+    $image = "http://gopet.kr/pet/images/app_logo.png";
+    a_push($get_tc_id, "반짝, 상담 신청 결과 알림", $message, $path, $image, "customer");
 }
 ?>
 
