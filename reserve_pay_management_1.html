@@ -136,19 +136,6 @@ $que = "SELECT * FROM tb_shop_customer_memo WHERE customer_id = '{$cus['id']}' A
 $scm = sql_fetch_array($que);
 
 // 등급 회원 구하기
-// 정회원 여부
-$cus_sql = "select * from tb_customer where cellphone = '{$pay['cellphone']}'";
-$cus_res = mysqli_query($connection,$cus_sql);
-$cus_pay = mysqli_fetch_assoc($cus_res);
-
-if($cus_pay['id'] != ''){ // 정회원일시
-    $grade_id = $cus_pay['id'];
-}else { //정회원 아이디가 없으면 가회원으로 취급
-    $tmp_sql = "select * from tb_tmp_user where cellphone = '{$pay['cellphone']}'";
-    $tmp_res = mysqli_query($connection, $tmp_sql);
-    $tmp_pay = mysqli_fetch_assoc($tmp_res);
-    $grade_id = $tmp_pay['tmp_seq'];
-}
 
 $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
 $gd = sql_fetch_array($que);
@@ -156,7 +143,7 @@ $gd = sql_fetch_array($que);
 $que = "
     SELECT * FROM tb_grade_of_customer a 
     LEFT JOIN tb_grade_of_shop b ON a.grade_idx = b.idx 
-    WHERE a.customer_id = '{$grade_id}'
+    WHERE a.customer_id = '{$pay["customer_id"]}'
     AND b.artist_id = '{$user_id}'
 ";
 
@@ -1875,10 +1862,11 @@ if(empty($grade[0]['grade_name'])){
         $(document).on('click','.apporval-reserve',function(){
             var idx = $(this).data('mgr');
             var gubun = $(this).data('type');
+            var customer_id = "<?=$pay["customer_id"]?>";
             $.ajax({
                 type : 'post',
                 url : './data/get_book_data_ajax.php',
-                data : {'mode':'reserveStatusChange','no':idx,'type':gubun},
+                data : {'mode':'reserveStatusChange','no':idx,'type':gubun,'customer_id':customer_id},
                 dataType : 'json',
                 success : function(json){
                     if(json.flag == true){
