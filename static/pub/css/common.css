@@ -650,6 +650,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 
 /* 라벨 */
 .label {display:inline-block; height:19px; padding:0 6px; font-size:10px; line-height:19px; font-weight:500; border-radius:10px; color:#000; border:1px solid #000; box-sizing:border-box;text-align:center; white-space:nowrap;}
+.label-add-purple {display:inline-block; height:25px; padding:0 9px; font-size:12px; line-height:25px; font-weight:700; border-radius:15px; color:#fff; border:1px solid #6840b1; box-sizing:border-box;text-align:center; white-space:nowrap; background-color:#6840b1;}
 .label > em {font-weight:500;}
 .label.middle {padding:0 9px; height:21px; line-height:21px; font-weight:500}
 .label.vmiddle {padding:0 9px; height:26px; font-size:14px; line-height:26px; font-weight:500;border-radius:5px;}
