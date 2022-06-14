@@ -338,7 +338,7 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
         if($pos !== false) {
             echo '<div class="header-right">
                     <div class="label-group">
-                        <div class="label label-outline-purple middle"><em>승인대기</em></div>
+                        <div class="label-add-purple"><em>승인대기</em></div>
                     </div>
                 </div>';
         }
