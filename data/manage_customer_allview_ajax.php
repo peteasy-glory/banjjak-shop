@@ -28,8 +28,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 				}
 			}
 
-			$limit_st = ($_POST["limit_st"] && $_POST["limit_st"] != "")? $_POST["limit_st"] : 0;
-			$limit_fi = ($_POST["limit_fi"] && $_POST["limit_fi"] != "")? $_POST["limit_fi"] : 0;
+			//$limit_st = ($_POST["limit_st"] && $_POST["limit_st"] != "")? $_POST["limit_st"] : 0;
+			//$limit_fi = ($_POST["limit_fi"] && $_POST["limit_fi"] != "")? $_POST["limit_fi"] : 0;
 
 			$sql = "
 				SELECT *
@@ -347,7 +347,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					GROUP BY ppl.cellphone
 				) AS a
 				".$order_qy."
-				LIMIT ".$limit_st.", ".$limit_st." 
+				
 			";
 
 			$result = mysqli_query($connection, $sql);
