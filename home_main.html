@@ -685,10 +685,15 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 <div class="swiper-container_front">
                     <div class="swiper-wrapper">
                         <div class="swiper-slide">
-                            <a href="javascript:;">
-                                <img src="/images/banner/sent_cell.jpg" />
+                            <a href="javascript:location.href='mypage_notice_view?notice_seq=19';">
+                                <img src="/images/banner/grade_banner.jpg" />
                             </a>
                         </div>
+<!--                        <div class="swiper-slide">-->
+<!--                            <a href="javascript:;">-->
+<!--                                <img src="/images/banner/sent_cell.jpg" />-->
+<!--                            </a>-->
+<!--                        </div>-->
                     </div>
                     <!-- Add Arrows -->
                     <div class="next"><i class="fas fa-chevron-left"></i></div>
@@ -698,6 +703,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
             </div>
         </div>
     </div>
+
 
 </section>
 <!-- //container -->
@@ -726,7 +732,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
     }
 
     $(document).ready(function(){
-        if (getCookie_popup('guide_beauty_shop') != 'Y') {
+        //if (getCookie_popup('guide_beauty_shop') != 'Y') {
             $("#popup_wrap").dialog({
                 modal: true,
                 title: "",
@@ -745,7 +751,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                         $(this).dialog("close");
                     },
                     "자세히 보기": function() {
-                        location.href = "mypage_notice_view?notice_seq=17";
+                        location.href = "mypage_notice_view?notice_seq=19";
                             //setCookie_popup('guide_beauty_shop', 'Y', 1);
                         $(this).dialog("close");
                     }
@@ -761,7 +767,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 close: function() {
                 }
             });
-        }
+        //}
     });
 
 	var artist_id = '<?=$artist_id ?>';
