@@ -48,7 +48,7 @@ class TReserveSql extends TSql{
                                                     SELECT  CONCAT(year,'-',LPAD(month, '2','0'),'-',LPAD(day, '2','0'),' ',LPAD(hour, '2','0'),':',LPAD(minute, '2','0')
                                                                 , '<br>', etc_memo, '<br>') AS grpMemo
                                                     FROM tb_payment_log 
-                                                    WHERE cellphone = '%s'
+                                                    WHERE cellphone = '%s' AND artist_id = '%s'
                                                         AND CONCAT(year,LPAD(month, '2','0'),LPAD(day, '2','0'),LPAD(hour, '2','0'),LPAD(minute, '2','0')) <= '%s'
                                                         AND TRIM(etc_memo) != ''
                                                     ORDER BY year DESC , month DESC , day DESC, hour DESC, minute DESC LIMIT 3
@@ -100,8 +100,8 @@ class TReserveSql extends TSql{
     }
 
 
-    public function qry_get_reservation_chk_memo($cellphone, $lastDate){
-        $this->sql = sprintf($this->SQL_GET_RESERVATION_CHK_MEMO, $cellphone, $lastDate);
+    public function qry_get_reservation_chk_memo($cellphone, $artist_id, $lastDate){
+        $this->sql = sprintf($this->SQL_GET_RESERVATION_CHK_MEMO, $cellphone, $artist_id, $lastDate);
         return $this->sql_fetch_array();
     }
 

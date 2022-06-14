@@ -44,6 +44,32 @@ $shop_cnt = mysqli_num_rows($result);
 while($row = mysqli_fetch_assoc($result)){
     $data["shop"] = $row;
 }
+
+$sql = "
+    SELECT a.cellphone, COUNT(*) AS cnt
+    FROM (
+        SELECT pl.cellphone, COUNT(*) AS cnt
+        FROM tb_payment_log AS pl
+        WHERE pl.artist_id = '".$artist_id."'
+            #AND pl.product_type = 'B'
+            AND pl.data_delete = 0 
+            AND pl.cellphone != ''
+            AND (pl.pet_seq != '' OR pl.pet_seq != '0')
+        GROUP BY pl.cellphone
+
+        UNION ALL
+
+        SELECT hpl.cellphone, COUNT(*) AS cnt
+        FROM tb_hotel_payment_log AS hpl
+        WHERE hpl.artist_id = '".$artist_id."'
+            AND hpl.cellphone != ''
+            AND (hpl.pet_seq != '' OR hpl.pet_seq != '0')
+        GROUP BY hpl.cellphone
+    ) AS a
+    GROUP BY a.cellphone
+";
+$result = mysqli_query($connection, $sql);
+$cus_cnt = mysqli_num_rows($result);
 ?>
 
     <!-- container -->
@@ -59,7 +85,7 @@ while($row = mysqli_fetch_assoc($result)){
                         <option value="2">가나다순</option>
                         <option value="3">이용횟수별</option>
                         <option value="4">견종별</option>
-                        <!--<option value="">등급별</option>-->
+                        <option value="5">등급별</option>
                     </select>
                 </div>
                 <!--<div class="customer-state-graph doughnut-graph">
@@ -132,7 +158,7 @@ while($row = mysqli_fetch_assoc($result)){
                             <h4 class="con-title">회원등급 부여</h4>
                         </div>
                         <div class="pop-body">
-                            <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                            <div class="msg-txt"></div>
                             <div class="form-group">
                                 <div class="form-group-item">
                                     <select name="member_grade" id="member_grade">
@@ -144,7 +170,7 @@ while($row = mysqli_fetch_assoc($result)){
                                             foreach($tgos as $tgos){
                                                 //echo $tgos['grade_name'].':'.$grade[0]['name'];
                                                 ?>
-                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                                <option value="<?php echo $tgos['idx'];?>"><?php echo $tgos['grade_name'];?></option>
                                             <?php }}?>
                                     </select>
                                     <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
@@ -225,7 +251,11 @@ while($row = mysqli_fetch_assoc($result)){
         var hangul_arr = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'];
         var hangul_code_arr = [];
 
+        // 총 고객수 구하기
+        var total_cnt = <?=$cus_cnt ?>;
+
         $(document).ready(function(){
+            $("#manage_customer_view_pc .customer_count").text(total_cnt.format());
             $(".customer-table").on("click", ".customer-table-toggle", function(){
                 $(".customer-table-view").hide();
                 $(this).parents(".customer-table-cell").next().show();
@@ -240,9 +270,10 @@ while($row = mysqli_fetch_assoc($result)){
                 hangul_code_arr.push(String(tmp_str).charCodeAt(0));
             }
 
-            get_customer_list(artist_id, search_btn);
-            get_customer_count(artist_id);
+            //get_customer_list(artist_id, search_btn);
+            //get_customer_count(artist_id);
             get_customer_pet_count(artist_id);
+            get_customer_list(artist_id, search_btn);
         });
 
         $('#search_tab').change(function(){
@@ -259,143 +290,158 @@ while($row = mysqli_fetch_assoc($result)){
 
         function get_customer_list(artist_id, search_btn){
             //$("#loading").css("display", "flex");
+            console.log("get_customer_list_start"+total_cnt);
 
-            console.log(artist_id+':'+search_btn)
-            $.ajax({
-                url: 'data/manage_customer_allview_ajax.php',
-                data: {
-                    mode: "get_customer_list",
-                    artist_id: artist_id,
-                    search_btn: search_btn
-                },
-                type: 'POST',
-                dataType: 'JSON',
-                beforeSend: function(){
-                    $("#loading").addClass("actived");
-                    $("#manage_customer_view_pc .customer_list_wrap").html("");
-                },
-                success: function(data) {
-                    if(data.code == "000000"){
-                        $("#loading").removeClass("actived");
-                        //console.log(data.data);
-                        var html = '';
-                        var code_cnt = 0;
-                        var this_code = 0;
-                        var no_data = 0;
-                        var this_type = "";
-                        var chk_end = 0;
-                        var pay_type_count1	= 0;
-                        var pay_type_count2	= 0;
-                        var pay_type_count3	= 0;
-                        $.each(data.data, function(i, v){
-                            console.log(v);
-                            var pet_name = (v.pet_name == "" || v.pet_name == null)? "[이름없음]" : v.pet_name;
-                            var pet_type = (v.pet_type == "" || v.pet_type == null)? "[미기입]" : v.pet_type;
-                            var service = (v.service == "" || v.service == null)? "" : v.service;
-                            var service2 = (v.service2 == "" || v.service2 == ":0" || v.service2 == "all:0" || v.service2 == null)? "" : ((v.type == "dog")? v.service2 : "");
-                            var ba_seq = (v.ba_seq && v.ba_seq != "")? '<a href="<?=$shop_directory ?>/beauty_sign_view.php?ba_seq='+v.ba_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>"><i class="far fa-circle"></i></a>' : '';
-                            var is_cancel = (v.is_cancel == "1")? ' class="is_cancel" ' : '';
-                            var user_reserve = (v.user_reserve && v.user_reserve != "")? v.user_reserve : '0';
-                            var border_color = '';
-                            if(v.payment_type == 'beauty'){ border_color = '#daebff'; }
-                            if(v.payment_type == 'hotel'){ border_color = '#ffdae3'; }
-                            if(v.payment_type == 'playroom'){ border_color = '#fef9e9'; }
+            for(var i=0;i<total_cnt;i+=20){
+                var limit_st = i;
+                var limit_fi = i+20;
 
-                            if(search_btn == "2"){ // 가나다순
-                                code_cnt = String(pet_name).charAt(0).charCodeAt(0);
-                                if(hangul_code_arr[0] < code_cnt){
-                                    $.each(hangul_code_arr, function(i, v2){
-                                        if(v2 > code_cnt){
-                                            if(this_code != v2){
-                                                this_code = v2;
-                                                html += '<tr>';
-                                                html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[i-1]+'</td>';
-                                                html += '</tr>';
-                                            }
-                                            return false;
-                                        }else{
-                                            if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt && chk_end == 0){
-                                                html += '<tr>';
-                                                html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
-                                                html += '</tr>';
-                                                chk_end++;
+                $.ajax({
+                    url: 'data/manage_customer_allview_ajax.php',
+                    data: {
+                        mode: "get_customer_list",
+                        artist_id: artist_id,
+                        search_btn: search_btn,
+                        limit_st: limit_st,
+                        limit_fi: limit_fi
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    beforeSend: function(){
+                        $("#loading").addClass("actived");
+                        $("#manage_customer_view_pc .customer_list_wrap").html("");
+                    },
+                    success: function(data) {
+                        if(data.code == "000000"){
+                            $("#loading").removeClass("actived");
+                            //console.log(data.data);
+                            var html = '';
+                            var code_cnt = 0;
+                            var this_code = 0;
+                            var no_data = 0;
+                            var this_type = "";
+                            var chk_end = 0;
+                            var pay_type_count1	= 0;
+                            var pay_type_count2	= 0;
+                            var pay_type_count3	= 0;
+                            $.each(data.data, function(i, v){
+                                console.log(v);
+                                var pet_name = (v.pet_name == "" || v.pet_name == null)? "[이름없음]" : v.pet_name;
+                                var pet_type = (v.pet_type == "" || v.pet_type == null)? "[미기입]" : v.pet_type;
+                                var service = (v.service == "" || v.service == null)? "" : v.service;
+                                var service2 = (v.service2 == "" || v.service2 == ":0" || v.service2 == "all:0" || v.service2 == null)? "" : ((v.type == "dog")? v.service2 : "");
+                                var ba_seq = (v.ba_seq && v.ba_seq != "")? '<a href="<?=$shop_directory ?>/beauty_sign_view.php?ba_seq='+v.ba_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>"><i class="far fa-circle"></i></a>' : '';
+                                var is_cancel = (v.is_cancel == "1")? ' class="is_cancel" ' : '';
+                                var user_reserve = (v.user_reserve && v.user_reserve != "")? v.user_reserve : '0';
+                                var border_color = '';
+                                if(v.payment_type == 'beauty'){ border_color = '#daebff'; }
+                                if(v.payment_type == 'hotel'){ border_color = '#ffdae3'; }
+                                if(v.payment_type == 'playroom'){ border_color = '#fef9e9'; }
+
+                                if(search_btn == "2"){ // 가나다순
+                                    code_cnt = String(pet_name).charAt(0).charCodeAt(0);
+                                    if(hangul_code_arr[0] < code_cnt){
+                                        $.each(hangul_code_arr, function(i, v2){
+                                            if(v2 > code_cnt){
+                                                if(this_code != v2){
+                                                    this_code = v2;
+                                                    html += '<tr>';
+                                                    html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[i-1]+'</td>';
+                                                    html += '</tr>';
+                                                }
                                                 return false;
+                                            }else{
+                                                if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt && chk_end == 0){
+                                                    html += '<tr>';
+                                                    html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
+                                                    html += '</tr>';
+                                                    chk_end++;
+                                                    return false;
+                                                }
                                             }
+                                        });
+                                    }else{
+                                        if(no_data == 0){
+                                            html += '<tr>';
+                                            html += '	<td colspan="10" class="lft sub_line">[이름없음]</td>';
+                                            html += '</tr>';
+                                            no_data++;
                                         }
-                                    });
-                                }else{
-                                    if(no_data == 0){
-                                        html += '<tr>';
-                                        html += '	<td colspan="10" class="lft sub_line">[이름없음]</td>';
-                                        html += '</tr>';
-                                        no_data++;
+                                    }
+                                }else if(search_btn == "4"){ // 견종별
+                                    code_cnt = String(pet_type).charAt(0).charCodeAt(0);
+                                    if(hangul_code_arr[0] < code_cnt){
+                                        $.each(hangul_code_arr, function(i, v2){
+                                            if(v2 > code_cnt){
+                                                if(this_code != v2){
+                                                    this_code = v2;
+                                                    html += '<tr>';
+                                                    html += '	<td colspan="10" class="lft sub_line">'+pet_type_arr[v.type]+' - '+hangul_arr[i-1]+'</td>';
+                                                    html += '</tr>';
+                                                }
+                                                return false;
+                                            }else{
+                                                if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt){
+                                                    html += '<tr>';
+                                                    html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
+                                                    html += '</tr>';
+                                                    return false;
+                                                }
+                                            }
+                                            if(this_type != v.type){
+                                                this_type = v.type;
+                                            }
+                                        });
+                                    }else{
+                                        if(no_data == 0){
+                                            html += '<tr>';
+                                            html += '	<td colspan="10" class="lft sub_line">[미기입]</td>';
+                                            html += '</tr>';
+                                            no_data++;
+                                        }
                                     }
                                 }
-                            }else if(search_btn == "4"){ // 견종별
-                                code_cnt = String(pet_type).charAt(0).charCodeAt(0);
-                                if(hangul_code_arr[0] < code_cnt){
-                                    $.each(hangul_code_arr, function(i, v2){
-                                        if(v2 > code_cnt){
-                                            if(this_code != v2){
-                                                this_code = v2;
-                                                html += '<tr>';
-                                                html += '	<td colspan="10" class="lft sub_line">'+pet_type_arr[v.type]+' - '+hangul_arr[i-1]+'</td>';
-                                                html += '</tr>';
-                                            }
-                                            return false;
-                                        }else{
-                                            if(hangul_code_arr[hangul_code_arr.length - 1] <= code_cnt){
-                                                html += '<tr>';
-                                                html += '	<td colspan="10" class="lft sub_line">'+hangul_arr[hangul_code_arr.length - 1]+'</td>';
-                                                html += '</tr>';
-                                                return false;
-                                            }
-                                        }
-                                        if(this_type != v.type){
-                                            this_type = v.type;
-                                        }
-                                    });
-                                }else{
-                                    if(no_data == 0){
-                                        html += '<tr>';
-                                        html += '	<td colspan="10" class="lft sub_line">[미기입]</td>';
-                                        html += '</tr>';
-                                        no_data++;
-                                    }
+
+                                if(v.payment_type == "beauty"){
+                                    pay_type_text	= "미용";
+                                    //console.log(parseInt(v.cnt.format()));
+
+                                    pay_type_count1	+= parseInt(v.cnt.format());
+
+
+                                    //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_payment_customer_info_pc.php?payment_log_seq='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
+                                }else if(v.payment_type == "hotel"){
+                                    pay_type_text	= "호텔";
+                                    pay_type_count2	+= v.cnt.format();
+                                    //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_hotel_payment_customer_info_pc.php?order_num='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
+                                }else if(v.payment_type == "playroom"){
+                                    pay_type_text	= "유치원";
+                                    pay_type_count3	+= v.cnt.format();
+                                    //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_playroom_payment_customer_info_pc.php?order_num='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
                                 }
-                            }
 
-                            if(v.payment_type == "beauty"){
-                                pay_type_text	= "미용";
-                                //console.log(parseInt(v.cnt.format()));
+                                var start_txt = '';
+                                var reserve_info = '';
+                                if(v.cnt == '0'){
+                                    start_txt = "신규등록일시";
+                                    service = "[신규등록]";
+                                    service2 = "[신규등록]";
+                                }else{
+                                    start_txt = "최근이용일시";
+                                    reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a>';
+                                }
 
-                                pay_type_count1	+= parseInt(v.cnt.format());
+                                // 등급 아이콘
+                                if(v.grade_ord == 1){
+                                    var grade_icon = '<div class="icon icon-grade-vip"></div>';
+                                }else if(v.grade_ord == 2){
+                                    var grade_icon = '<div class="icon icon-grade-normal"></div>';
+                                }else{
+                                    var grade_icon = '<div class="icon icon-grade-normalb"></div>';
+                                }
 
-
-                                //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_payment_customer_info_pc.php?payment_log_seq='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
-                            }else if(v.payment_type == "hotel"){
-                                pay_type_text	= "호텔";
-                                pay_type_count2	+= v.cnt.format();
-                                //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_hotel_payment_customer_info_pc.php?order_num='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
-                            }else if(v.payment_type == "playroom"){
-                                pay_type_text	= "유치원";
-                                pay_type_count3	+= v.cnt.format();
-                                //html += '		<a class="view_payment_btn" href="<?=$shop_directory ?>/view_playroom_payment_customer_info_pc.php?order_num='+v.payment_log_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+v.update_time2+'</a>';
-                            }
-
-                            var start_txt = '';
-                            var reserve_info = '';
-                            if(v.cnt == '0'){
-                                start_txt = "신규등록일시";
-                                service = "[신규등록]";
-                                service2 = "[신규등록]";
-                            }else{
-                                start_txt = "최근이용일시";
-                                reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a>';
-                            }
-
-                            var type = (pet_type_arr[v.type])? pet_type_arr[v.type] : "알수없음";
-                            html2	= `
+                                var type = (pet_type_arr[v.type])? pet_type_arr[v.type] : "알수없음";
+                                html2	= `
 							<!-- 하나의 아이템 -->
 							<tr class="customer-table-cell">
 								<td>
@@ -491,7 +537,7 @@ while($row = mysqli_fetch_assoc($result)){
 												</div>
 											</div>
 										</div>
-										<!--<div class="flex-table-cell">
+										<div class="flex-table-cell">
 											<div class="flex-table-item">
 												<div class="flex-table-title"><div class="txt">등급</div></div>
 												<div class="flex-table-data">
@@ -500,38 +546,28 @@ while($row = mysqli_fetch_assoc($result)){
 															<div class="grid-layout-inner">
 																<div class="grid-layout-cell grid-2">
 																	<div class="user-grade-item">
-																		<div class="icon icon-grade-vip"></div>
-																		<div class="icon-grade-label">VIP${v.grade}</div>
+																		${grade_icon}
+																		<div class="icon-grade-label">${v.grade_name}</div>
 																	</div>
-																	&lt;!&ndash;
-																	<div class="user-grade-item">
-																		<div class="icon icon-grade-normal"></div>
-																		<div class="icon-grade-label">Normal</div>
-																	</div>
-																	<div class="user-grade-item">
-																		<div class="icon icon-grade-normalb"></div>
-																		<div class="icon-grade-label">Normal_B</div>
-																	</div>
-																	&ndash;&gt;
 																</div>
-																<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-small-size btn-round set-grade" data-id="" data-grade="">등급부여하기</a></div>
+																<!--<div class="grid-layout-cell grid-2"><a href="javascript:open_grade('${pet_name}','${v.cellphone}','${v.grade_name}','${v.grade_ord}');" class="btn btn-outline-gray btn-small-size btn-round set-grade" data-id="" data-grade="">등급부여하기</a></div>-->
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>-->
+										</div>
 									</div>
 								</td>
 							</tr>
 							<!-- //하나의 아이템 -->
 						`;
-                            //console.log(html2);
-                            $(".customer_list_wrap").append(html2);
-                            /*
-                            html += '<tr>';
-                            html += '	<td data-no="'+(i+1)+'" style="border-left: 5px solid '+border_color+'; white-space: nowrap;">';
-                            html += '		<a href="<?=$shop_directory ?>/manage_customer_view_pc.php?customer_cellphone='+v.cellphone+'&customer_pet_seq='+v.pet_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+pet_name+'</a>';
+                                //console.log(html2);
+                                $(".customer_list_wrap").append(html2);
+                                /*
+                                html += '<tr>';
+                                html += '	<td data-no="'+(i+1)+'" style="border-left: 5px solid '+border_color+'; white-space: nowrap;">';
+                                html += '		<a href="<?=$shop_directory ?>/manage_customer_view_pc.php?customer_cellphone='+v.cellphone+'&customer_pet_seq='+v.pet_seq+'&backurl=<?php echo urlencode($_SERVER["REQUEST_URI"]); ?>">'+pet_name+'</a>';
 						html += '	</td>';
 						html += '	<td>'+pet_type_arr[v.type]+'<br/>'+pet_type+'</td>';
 						html += '	<td>'+v.cellphone+'<br/><div style="text-align: right;">'+user_reserve.format()+' 원</div></td>';
@@ -552,82 +588,86 @@ while($row = mysqli_fetch_assoc($result)){
 						html += '	<td>'+ba_seq+'</td>';
 						html += '</tr>';
 						*/
-                        });
-                        //console.log(html);
+                            });
+                            //console.log(html);
 
-                        //$("#manage_customer_view_pc .customer_list_wrap").html("").html(html);
-                    }else{
-                        $("#loading").removeClass("actived");
-                        alert(data.data+"("+data.code+")");
-                        console.log(data.data);
-                    }
+                            //$("#manage_customer_view_pc .customer_list_wrap").html("").html(html);
+                        }else{
+                            $("#loading").removeClass("actived");
+                            alert(data.data+"("+data.code+")");
+                            console.log(data.data);
+                        }
 
-                    console.log(pay_type_count1);
-                    console.log(pay_type_count2);
-                    console.log(pay_type_count3);
-                    /*var  doughnutData = {
-                        labels: [
-                            '미용',
-                            '호텔',
-                            '유치원'
-                        ],
-                        datasets: [{
-                            data: [pay_type_count1, pay_type_count2, pay_type_count3],
-                            backgroundColor: [
-                                'rgb(253, 217, 78)',
-                                'rgb(255, 72, 72)',
-                                'rgb(104, 64, 177)'
+                        console.log(pay_type_count1);
+                        console.log(pay_type_count2);
+                        console.log(pay_type_count3);
+                        /*var  doughnutData = {
+                            labels: [
+                                '미용',
+                                '호텔',
+                                '유치원'
                             ],
-                            hoverBackgroundColor : [
-                                'rgb(253, 217, 78)',
-                                'rgb(255, 72, 72)',
-                                'rgb(104, 64, 177)'
-                            ],
-                            borderWidth:0,
-                            hoverOffset: 0,
-                            datalabels : {
-                                anchor : 'center'
-                            }
-                        }]
-                    };
+                            datasets: [{
+                                data: [pay_type_count1, pay_type_count2, pay_type_count3],
+                                backgroundColor: [
+                                    'rgb(253, 217, 78)',
+                                    'rgb(255, 72, 72)',
+                                    'rgb(104, 64, 177)'
+                                ],
+                                hoverBackgroundColor : [
+                                    'rgb(253, 217, 78)',
+                                    'rgb(255, 72, 72)',
+                                    'rgb(104, 64, 177)'
+                                ],
+                                borderWidth:0,
+                                hoverOffset: 0,
+                                datalabels : {
+                                    anchor : 'center'
+                                }
+                            }]
+                        };
 
-                    var doughnutConfig = {
-                        //plugins:[ChartDataLabels],
-                        type: 'doughnut',
-                        data: doughnutData,
-                        options:{
-                            reponsive : true,
-                            maintainAspectRatio : false,
-                            cutoutPercentage :50,
-                            title : {
-                                display:false
-                            },
-                            legend : {
-                                display:true
-                            },
-                            animation : false,
-                            plugins:{
-                                labels : {
-                                    render : 'value',
-                                    fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
-                                    fontSize : 14,
-                                    fontColor : '#fff'
+                        var doughnutConfig = {
+                            //plugins:[ChartDataLabels],
+                            type: 'doughnut',
+                            data: doughnutData,
+                            options:{
+                                reponsive : true,
+                                maintainAspectRatio : false,
+                                cutoutPercentage :50,
+                                title : {
+                                    display:false
+                                },
+                                legend : {
+                                    display:true
+                                },
+                                animation : false,
+                                plugins:{
+                                    labels : {
+                                        render : 'value',
+                                        fontFamily:"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol'",
+                                        fontSize : 14,
+                                        fontColor : '#fff'
+                                    }
                                 }
                             }
-                        }
-                    };
+                        };
 
-                    var doughnutCtx = document.getElementById('doughnut');
-                    var doughnut = new Chart(doughnutCtx , doughnutConfig);
-                    */
-                },
-                error: function(xhr, status, error) {
-                    //alert(error + "네트워크에러");
-                    if(xhr.status != 0){
-                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                        var doughnutCtx = document.getElementById('doughnut');
+                        var doughnut = new Chart(doughnutCtx , doughnutConfig);
+                        */
+                    },
+                    error: function(xhr, status, error) {
+                        //alert(error + "네트워크에러");
+                        if(xhr.status != 0){
+                            alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                        }
                     }
-                }
-            });
+                });
+            }
+
+            console.log(artist_id+':'+search_btn)
+
         }
 
         function get_customer_count(artist_id){
@@ -643,6 +683,7 @@ while($row = mysqli_fetch_assoc($result)){
                     if(data.code == "000000"){
                         //console.log(data.data);
                         $("#manage_customer_view_pc .customer_count").text(data.data.format());
+                        console.log(total_cnt);
                     }else{
                         alert(data.data+"("+data.code+")");
                         console.log(data.data);
@@ -705,15 +746,36 @@ while($row = mysqli_fetch_assoc($result)){
         };
 
         $(document).ready(function(){
-            //등급수정
-            $('.set-grade').on('click',function(){
-                popalert.open('memberGradeAddPop');
-            });
 
             $('#header_bell').css('display','none');
             $('#btn_page_prev').prop('href','customer_inquiry');
 
         });
+
+        // 개별 등급 수정 창
+        function open_grade(pet_name, cellphone, grade_name, grade_ord){
+            $('#memberGradeAddPop').find('.msg-txt').text('현재 '+pet_name+' ('+cellphone+')고객님의 등급은 '+grade_name+' 입니다.');
+            $('#member_grade').val(grade_ord).prop("selected",true);
+            popalert.open('memberGradeAddPop');
+        }
+
+        // 개별 등급 수정
+        function set_grade(){
+            var grade = $('#member_grade option:selected').val(); // 바꿀 등급
+            var org_grade = '<?php echo $grade[0]['grade_idx'];?>'; // 기존 등급
+            var id = '<?php echo $grade_id;?>';
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax.php',
+                data : {'mode':'gradeChange','grade':grade, 'id':id, 'org_grade':org_grade},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.open('memberGradeComPop1','등급이 변경되었습니다.');
+                    }
+                }
+            });
+        }
 
         // 전체 고객 등급 변경
         function set_grade_all(){
