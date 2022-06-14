@@ -350,9 +350,6 @@ if(empty($grade[0]['grade_name'])){
                                 <div class="user-thumb large">
                                     <?php
 
-                                    if(!empty($pet['photo'])){
-                                        $img = "https://image.banjjakpet.com".img_link_change($pet['photo']);
-                                    } else {
                                         $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet['pet_seq']}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
                                         $rw = sql_fetch_array($sql);
                                         if(!empty($rw[0]['file_path'])){
@@ -371,7 +368,7 @@ if(empty($grade[0]['grade_name'])){
                                         }else{
                                             $bite = "해요";
                                         }
-                                    }
+
                                     ?>
                                     <img src="<?php echo $img; ?>" alt="" onclick="show_img('<?php echo $img;?>');">
                                 </div>
@@ -840,8 +837,8 @@ if(empty($grade[0]['grade_name'])){
                         <?php if($pet['type']=='dog'){ ?>
                             <div class="tab-data-cell actived">
                                 <div class="basic-data-group vmiddle">
-                                    <div class="form-group">
-                                        <div class="form-group-cell middle grid-5-add">
+                                    <div class="form-group form-group-add">
+                                        <div class="form-group-cell middle grid-5-add-2">
                                             <div class="form-group-item">
                                                 <div class="form-item-label01"  id="service_tab">크기</div>
                                                 <div class="form-item-data type-2">
@@ -883,7 +880,7 @@ if(empty($grade[0]['grade_name'])){
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group-cell middle grid-5-add">
+                                        <div class="form-group-cell middle grid-5-add-2">
                                             <div class="form-group-item">
                                                 <div class="form-item-label01">서비스</div>
                                                 <div class="form-item-data type-2">
@@ -974,7 +971,7 @@ if(empty($grade[0]['grade_name'])){
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group-cell middle is-dog grid-5-add">
+                                        <div class="form-group-cell middle is-dog grid-5-add-2">
                                             <div class="form-group-item">
                                                 <div class="form-item-label01">무게</div>
                                                 <div class="form-item-data type-2">
@@ -1101,7 +1098,7 @@ if(empty($grade[0]['grade_name'])){
                                             }
 
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">털특징</div>
                                                     <div class="form-item-data type-2">
@@ -1153,7 +1150,7 @@ if(empty($grade[0]['grade_name'])){
                                         if($data["product_dog_common"][0]['beauty_length_1']>0 || $data["product_dog_common"][0]['beauty_length_2']>0 || $data["product_dog_common"][0]['beauty_length_3']>0 || $data["product_dog_common"][0]['beauty_length_4']>0 || $data["product_dog_common"][0]['beauty_length_5']>0){
                                             $hair1 = explode(":",$beauty_info[7]);
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">털길이</div>
                                                     <div class="form-item-data type-2">
@@ -1201,13 +1198,13 @@ if(empty($grade[0]['grade_name'])){
                             <!-- 추가 -->
                             <div class="tab-data-cell">
                                 <div class="accordion-content">
-                                    <div class="form-group">
+                                    <div class="form-group form-group-add">
                                         <?php
                                         if($data["product_dog_common"][0]['basic_face_price'] > 0 || $data["product_dog_common"][0]['broccoli_price'] > 0 || $data["product_dog_common"][0]['highba_price'] > 0 || $data["product_dog_common"][0]['bear_price'] > 0 ) {
 
                                             $hair = explode(":",$beauty_info[6]);
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">얼굴컷</div>
                                                     <div class="form-item-data type-2">
@@ -1244,7 +1241,7 @@ if(empty($grade[0]['grade_name'])){
 
                                         ?>
 
-                                        <div class="form-group-cell middle grid-5-add">
+                                        <div class="form-group-cell middle grid-5-add-2">
                                             <?php
                                             $face = split_text($data["product_dog_common"][0]['addition_option_product']);
                                             if((count($face)>0 && !empty($face['name'][0])) || $data["product_dog_common"][0]['toenail_price'] != '' || $data["product_dog_common"][0]['trumpet_etc_price'] != '' || $data["product_dog_common"][0]['bell_price'] != ''){
@@ -1296,7 +1293,7 @@ if(empty($grade[0]['grade_name'])){
                                         if(count($face)>0 && !empty($face['name'][0])){
 
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">스파</div>
                                                     <div class="form-item-data type-2">
@@ -1328,7 +1325,7 @@ if(empty($grade[0]['grade_name'])){
                                         $face = split_text($data["product_dog_common"][0]['dyeing_option_product']);
                                         if(count($face)>0 && !empty($face['name'][0])){
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">염색</div>
                                                     <div class="form-item-data type-2">
@@ -1358,7 +1355,7 @@ if(empty($grade[0]['grade_name'])){
                                         $face = split_text($data["product_dog_common"][0]['etc_option_product']);
                                         if(count($face)>0 && !empty($face['name'][0])){
                                             ?>
-                                            <div class="form-group-cell middle grid-5-add">
+                                            <div class="form-group-cell middle grid-5-add-2">
                                                 <div class="form-group-item">
                                                     <div class="form-item-label01">기타</div>
                                                     <div class="form-item-data type-2">
@@ -2751,7 +2748,7 @@ if(empty($grade[0]['grade_name'])){
         function go_anc(){
             setTimeout(function(){
                 location.reload();
-            },1000);
+            },500);
         }
 
         $(document).on('click','.service-type',function(){

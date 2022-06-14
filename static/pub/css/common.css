@@ -113,6 +113,7 @@ html.fix {overflow:hidden;}
 .grid-4-add {width:24%; display: inline-block; margin-top: 0 !important;}
 .grid-5 {width:20%;}
 .grid-5-add {width:19%; display: inline-block; margin-top: 0 !important;}
+.grid-5-add-2 {width:100%; display: flex; margin-top: 0 !important; flex-direction: column; margin-top:0 !important;}
 
 .grid-100 {width:100%; flex:1 0 100%;}
 .grid-90 {width:90%; flex:1 0 90%;}
@@ -3566,7 +3567,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 .mg-bt-12{margin-bottom:12px;}
 .grid-col2-row3{display:grid; grid-template-columns: repeat(2,1fr); grid-template-rows: repeat(3,1fr)}
-.con-title-group-add{background: #F4F4F4; width:100vw; position: relative; left:-20px;}
+.con-title-group-add{background: #F4F4F4; width:100vw; max-width:1020px; position: relative; left:-20px;}
 .con-title-group-add > h4 {position: relative; left:20px;}
 .special-note-add{background: #fff !important; border:1px solid #F4F4F4;}
 .memo-item-add{background: #fff !important; border:1px solid #F4F4F4;}
@@ -3782,7 +3783,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	.calendar-month-body-col:first-child {margin-left:0;}
 	.calendar-month-body-col:last-child {margin-right:0;}
 
+
+	.con-title-group-add{background: #F4F4F4; width:100%; max-width:1020px; position: relative; left:0; margin-top:20px;}
+	.receipt-wide-tab{width:100%; border:none !important; position: relative; left:0; background: #fff;}
+	.receipt-wide-tab-wrap{   height:42px; border-bottom: 2px solid #ebebeb;	width: 100%;position: relative;left: 0px;}
+	.receipt-wide-tab-inner{width:100%; position: relative;  }
+
+
 }
+
 @media screen and (min-width:1375px){
 	#header {position:relative; width:auto; margin:0 auto; padding:0;}
 	#container {margin:0 auto;}

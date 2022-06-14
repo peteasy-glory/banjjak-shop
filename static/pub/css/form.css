@@ -216,6 +216,7 @@ textarea.form-control:focus{border-bottom-color:#6840b1;}
 
 /* 입력박스 그룹 */
 .form-group {}
+.form-group-add{    display: grid;grid-template-columns: repeat(5,1fr); column-gap: 5px;}
 .form-group-cell + .form-group-cell {margin-top:32px;}
 .form-group-cell.middle + .form-group-cell.middle {margin-top:28px;}
 .form-group-cell.small + .form-group-cell.small {margin-top:20px;}
