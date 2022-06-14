@@ -198,8 +198,8 @@ $que = "
 $grade = sql_fetch_array($que);
 
 if(empty($grade[0]['grade_name'])){
-    $grade[0]['grade_name'] = $gd[0]['grade_name']; // 값 없을때 vip로 보이게
-    $grade[0]['grade_ord'] = $gd[0]['grade_ord']; // 값 없을때 1(vip)로 주기
+    $grade[0]['grade_name'] = $gd[1]['grade_name']; // 값 없을때 vip로 보이게
+    $grade[0]['grade_ord'] = $gd[1]['grade_ord']; // 값 없을때 1(vip)로 주기
 }
 
 

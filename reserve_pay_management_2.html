@@ -207,8 +207,8 @@ $que = "
 $grade = sql_fetch_array($que);
 
 if(empty($grade[0]['grade_name'])){
-    $grade[0]['grade_name'] = $gd[0]['grade_name']; // 값 없을때 vip로 보이게
-    $grade[0]['grade_ord'] = $gd[0]['grade_ord']; // 값 없을때 1(vip)로 주기
+    $grade[0]['grade_name'] = $gd[1]['grade_name']; // 값 없을때 vip로 보이게
+    $grade[0]['grade_ord'] = $gd[1]['grade_ord']; // 값 없을때 1(vip)로 주기
 }
 
 ?>
@@ -233,19 +233,16 @@ if(empty($grade[0]['grade_name'])){
                         <h4 class="con-title">예약자 정보</h4>
                     </div>
                     <div class="flex-table type-2">
-                        <!--<div class="flex-table-cell">
+                        <?php if($pay['is_no_show']>0){ ?>
+                        <div class="flex-table-cell">
                             <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">아이디</div></div>
+                                <div class="flex-table-title"><div class="txt"></div></div>
                                 <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php /*echo (!empty($cus['id']))?$cus['id']:$cus['tmp_seq'];*/?>
-                                    </div>
-                                    <?php /*if($pay['is_no_show']>0){ */?>
-                                        <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php /*echo $pay['is_no_show'];*/?>회</div></div>
-                                    <?php /*} */?>
+                                    <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php echo $pay['is_no_show'];?>회</div></div>
                                 </div>
                             </div>
-                        </div>-->
+                        </div>
+                        <?php } ?>
                         <div class="flex-table-cell">
                             <div class="flex-table-item">
                                 <div class="flex-table-title"><div class="txt">등급</div></div>
@@ -1970,12 +1967,12 @@ if(empty($grade[0]['grade_name'])){
                                     <?php }} ?>
 
                             </div>
-                            <?php } else { ?>
+                            <?php } else { // 고양이 ?>
                                 <div class="list-cell">
                                     <?php
                                     $sum = 0;
                                     $kg = explode(':',$beauty_info[3]);
-                                    $hair = explode(':',$beauty_info[4]);
+                                    $hair = explode(':',$beauty_info[5]);
                                     $bath = $beauty_info[6];
                                     $toenail = $beauty_info[5];
                                     /*$face = explode(':',$beauty_info[6]);
@@ -1985,7 +1982,7 @@ if(empty($grade[0]['grade_name'])){
                                 </div>
                                 <?php if(!empty($kg[0])){ ?>
                                     <div class="list-cell">
-                                        <div class="list-title">미용 : ~<?php echo $kg[0];?>kg</div>
+                                        <div class="list-title">미용 : <?php echo $hair[0];?></div>
                                         <div class="list-value"><?php $sum+=$hair[1]; echo number_format($hair[1]);?>원</div>
                                     </div>
                                 <?php } ?>
@@ -2003,14 +2000,20 @@ if(empty($grade[0]['grade_name'])){
                                 <?php } ?>
                                 <?php
                                 if($beauty_info[7]>0){
-                                    for($i=0;$i<$beauty_info[7];$i++){
-                                        $tmp = explode(':',$beauty_info[(8+$i)]);
-                                        ?>
-                                        <div class="list-cell">
-                                            <div class="list-title"><?php echo $tmp[0];?></div>
-                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
-                                        </div>
-                                    <?php }} ?>
+                                    ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">단모 목욕</div>
+                                        <div class="list-value"><?php $sum+=$beauty_info[7]; echo number_format($beauty_info[7]);?>원</div>
+                                    </div>
+                                <?php } ?>
+                                <?php
+                                if($beauty_info[8]>0){
+                                    ?>
+                                    <div class="list-cell">
+                                        <div class="list-title">장모 목욕</div>
+                                        <div class="list-value"><?php $sum+=$beauty_info[8]; echo number_format($beauty_info[8]);?>원</div>
+                                    </div>
+                                <?php } ?>
                                 <!--제품구매내역-->
                                 <?php
 
@@ -2046,9 +2049,7 @@ if(empty($grade[0]['grade_name'])){
 
                         </div>
                         <!--합계금액 부가세표시 기본결제금액-->
-                        <div class="receipt-buy-detail total-price" style="border-top: 1px solid #f4f4f4;
-    margin-top: 12px;
-    padding-top: 12px;">
+                        <div class="receipt-buy-detail total-price" style="border-top: 1px solid #f4f4f4; margin-top: 12px; padding-top: 12px;">
                             <div class="item-data-list">
                                 <div class="list-cell">
                                     <div class="list-title"><strong>합산 금액</strong></div>
@@ -2085,11 +2086,16 @@ if(empty($grade[0]['grade_name'])){
                 <!--보유쿠폰-->
                 <?php
                 //$que1 = "SELECT * FROM tb_user_coupon a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.customer_id = '{$cus['id']}' AND a.artist_id = '{$pay['artist_id']}' AND a.tmp_seq = '{$cus['tmp_seq']}'";
+                if($cus['id'] != ''){
+                    $where_id = "a.customer_id = '{$cus['id']}'";
+                }else{
+                    $where_id = "a.tmp_seq = '{$cus['tmp_seq']}'";
+                }
                 $que1 = "
                     SELECT * FROM (
                         SELECT a.*, b.name FROM tb_user_coupon a
                         LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq
-                        WHERE (a.customer_id = '{$cus['id']}' OR a.tmp_seq = '{$cus['tmp_seq']}')
+                        WHERE {$where_id}
                         AND a.artist_id = '{$pay['artist_id']}'
                         ORDER BY a.user_coupon_seq desc
                     ) s
@@ -2114,9 +2120,9 @@ if(empty($grade[0]['grade_name'])){
                                             <select name="coupon_name" id="coupon_name">
                                                 <option value="">선택안함</option>
                                                 <?php
-                                                foreach($cop as $cop){
+                                                foreach($cop as $ii => $cop_v){
                                                     ?>
-                                                    <option value="<?php echo $cop['user_coupon_seq'];?>"><?php echo $cop['name'];?></option>
+                                                    <option value="<?php echo $cop_v['user_coupon_seq'];?>"><?php echo $cop_v['name'];?></option>
                                                     <?php
                                                 }
                                                 ?>
@@ -2156,7 +2162,7 @@ if(empty($grade[0]['grade_name'])){
                             </div>
                             <div class="form-group-cell small">
                                 <button type="button" class="btn btn-outline-purple btn-round use-coupon">적용</button>
-                                <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 잔액 : <span id="remind_coupon">0</span>원</div>
+                                <div class="form-bottom-info font-color-purple font-weight-500 text-align-right">적용 후 남은 쿠폰 : <span id="remind_coupon">0</span></div>
                             </div>
                         </div>
 
@@ -3023,7 +3029,7 @@ if(empty($grade[0]['grade_name'])){
             console.log(cusid)
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCoupon','cid':cusid},
                 dataType : 'json',
                 success : function(json){
@@ -3049,7 +3055,7 @@ if(empty($grade[0]['grade_name'])){
             var cid = $(this).val();
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getCouponBalance','cid':cid},
                 dataType : 'json',
                 success : function(json){
@@ -3085,7 +3091,7 @@ if(empty($grade[0]['grade_name'])){
                             //var cid = json.cid;
                             $.ajax({
                                 type : 'post',
-                                url : './data/get_book_data_ajax',
+                                url : './data/get_book_data_ajax.php',
                                 data : {'mode':'getCouponBalance','cid':cid},
                                 dataType : 'json',
                                 success : function(json){
@@ -3116,10 +3122,10 @@ if(empty($grade[0]['grade_name'])){
                 success : function(json){
                     console.log(json);
                     if(json.flag == true){
-                        $('#coupon_name').val(json.user_coupon_seq).prop("selected", true);
-                        $('#coupon_balance').empty().append(json.select_name);
-                        $('#use_coupon').empty().append(json.select_use);
-                        $('#remind_coupon').text($('#coupon_balance option:selected').val());
+                        // $('#coupon_name').val(json.user_coupon_seq).prop("selected", true);
+                        // $('#coupon_balance').empty().append(json.select_name);
+                        // $('#use_coupon').empty().append(json.select_use);
+                        // $('#remind_coupon').text($('#coupon_balance option:selected').val());
 
                     }
                 }, error : function(xhr, error){

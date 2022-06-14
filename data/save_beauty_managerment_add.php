@@ -87,18 +87,21 @@ print_r($counselor_array);*/
 
 //echo "aaa->".$part_price;
 //이미 등록된 데이터가 있는지 확인한다.
-$que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}'";
-//echo $que."<p>";
-$res = mysqli_query($connection, $que);
-$row = mysqli_fetch_assoc($res);
-//echo $row['cnt'];
 $direct_title = '';
 if($_POST['product_second_type'] == '직접입력'){
     $direct_title = $_POST['product_second_type2'];
     $second_type = '직접입력';
+    $que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}' AND direct_title = '{$_POST['product_second_type2']}'";
 } else {
     $second_type = $_POST['product_second_type'];
+    $que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}'";
 }
+
+//echo $que."<p>";
+$res = mysqli_query($connection, $que);
+$row = mysqli_fetch_assoc($res);
+//echo $row['cnt'];
+
 if($row['cnt']>0){//있으면 업데이트 한다.
     $sql  = "UPDATE tb_product_dog_static SET ";
     $sql .= "first_type                 = '{$is_dog}', ";
@@ -141,7 +144,12 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "over_kgs_price             = '{$_POST['set_price']}', ";
     $sql .= "add_comment                = '".$emoji->emojiStrToDB($_POST['add_comment'])."', ";
     $sql .= "update_time                = NOW() ";
-    $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}' ";
+    if($second_type == '직접입력'){
+        $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}' AND direct_title = '{$_POST['product_second_type2']}' ";
+    }else{
+        $sql .= "WHERE customer_id          = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type']}' ";
+    }
+
     //echo $sql."<br>";
     mysqli_query($connection,$sql) or die(mysqli_error());
 } else {

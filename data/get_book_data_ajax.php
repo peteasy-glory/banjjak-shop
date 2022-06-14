@@ -906,16 +906,61 @@ switch($clear['mode']){
         if($_POST['type'] == 2){
             $json['error'] = '예약이 확정되었습니다.';
         } else if($_POST['type']==3){
-            $json['error'] = '예약이 취소되었습니다.';
+            $json['error'] = '예약신청이 취소되었습니다.';
         }
 
         $que = "UPDATE tb_grade_reserve_approval_mgr SET is_approve = '{$_POST['type']}' WHERE idx = {$_POST['no']} ";
         $res = sql_query($que);
+        if($_POST['type'] == '3'){
+            $que = "
+                UPDATE tb_payment_log SET
+                is_cancel = 1,
+                cancel_time = NOW()
+                WHERE payment_log_seq IN (
+                    SELECT payment_log_seq FROM tb_grade_reserve_approval_mgr WHERE idx = {$_POST['no']}
+                )
+            ";
+            $res = sql_query($que);
+        }
         if(!$res){
             $json['flag'] = false;
             $json['error'] = '업데이트시 오류가 발생했습니다. 잠시 후 다시 시도해주세요.';
             echo json_encode($json);
             break;
+        }
+
+        $select_sql = "
+            SELECT d.name pet_name, c.name shop_name, b.artist_id, b.cellphone from tb_grade_reserve_approval_mgr a
+            LEFT JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq
+            LEFT JOIN tb_shop c ON b.artist_id = c.customer_id
+            LEFT JOIN tb_mypet d ON b.pet_seq = d.pet_seq
+            WHERE a.idx = {$_POST['no']}
+        ";
+        $select_result = mysqli_query($connection,$select_sql);
+        $select_datas = mysqli_fetch_object($select_result);
+        $pet_name = $select_datas->pet_name;
+        $shop_name = $select_datas->shop_name;
+        $artist_id = $select_datas->artist_id;
+        $cellphone = $select_datas->cellphone;
+
+        if($_POST['type'] == 2){
+            $message = "예약 승인요청이 확정되었습니다. 지금 확인하시려면 눌러주세요.";
+            $path = "https://customer.banjjakpet.com/mypage_reserve_list";
+            $image = "http://gopet.kr/pet/images/app_logo.png";
+            a_push($_POST['customer_id'], "[반짝][예약 확정]", $message, $path, $image, "customer");
+
+            //관리자 푸시
+            $admin_message = "(".$shop_name.")(".$artist_id.")이 ".$cellphone."님(".$pet_name.")이 한 예약 승인확정";
+            a_push("pickmon@pickmon.com", "예약승인확정", $admin_message, "", $image, "customer");
+        } else if($_POST['type']==3){
+            $message = "예약이 샵의 사정으로 확정되지 않았습니다. 다른 시간을 선택해 보세요.";
+            $path = "https://customer.banjjakpet.com/mypage_reserve_list?type=cancel";
+            $image = "http://gopet.kr/pet/images/app_logo.png";
+            a_push($_POST['customer_id'], "[반짝][예약 승인취소]", $message, $path, $image, "customer");
+
+            // 관리자 푸시
+            $admin_message = "(".$shop_name.")(".$artist_id.")이 ".$cellphone."님(".$pet_name.")이 한 예약 승인취소";
+            a_push("pickmon@pickmon.com", "예약승인취소", $admin_message, "", $image, "customer");
         }
 
         echo json_encode($json);

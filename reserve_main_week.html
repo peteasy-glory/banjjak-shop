@@ -782,6 +782,16 @@ function data_etc_memo($tmp){
      return $tmp;
 }
 
+//예약승인대기 건수
+$que = "SELECT count(*) cnt FROM tb_grade_reserve_approval_mgr a
+        INNER JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq
+        WHERE b.artist_id = '{$user_id}'
+        AND b.is_cancel = 0
+        AND a.is_approve = 0";
+//echo $que;
+$gram = sql_fetch_array($que);
+$await_cnt = $gram[0]['cnt'];
+
 ?>
 
 <!-- container -->
@@ -858,7 +868,7 @@ function data_etc_memo($tmp){
             </div>
             <!-- 캘린더 라벨 -->
             <div class="reserve-calendar-label">
-                <div class="reserve-calendar-label-info">* 접수는 빈칸 클릭!</div>
+                <!--<div class="reserve-calendar-label-info">* 접수는 빈칸 클릭!</div>-->
                 <div class="grid-layout reserve-calendar-label-group">
                     <div class="grid-layout-inner">
                         <div class="grid-layout-cell"><div class="reserve-calendar-label-items"><div class="reserve-calendar-label-state yellow"></div>앱-선결제</div></div>
@@ -2196,6 +2206,32 @@ function data_etc_memo($tmp){
 
         }
     }
+
+    //승인대기중인 예약건수
+    $(document).ready(function(){
+        var await_cnt = '<?php echo $await_cnt;?>'; // 예약승인
+        var counselor_cnt = '<?php echo $wait_count;?>'; // 상담
+
+        if(await_cnt>0 && counselor_cnt > 0){
+            $('#bothMsg #a1_cnt').text(await_cnt);
+            $('#bothMsg #c1_cnt').text(counselor_cnt);
+            popalert.open('bothMsg');
+        }
+        $('#header_bell').css('display','none');
+
+        console.log(counselor_cnt)
+        if(await_cnt>0 && counselor_cnt == 0){
+            $('#approveOnly #a_cnt').text(await_cnt);
+            popalert.open('approveOnly');
+        }
+        if(counselor_cnt>0 && await_cnt == 0){ // 첫이용상담
+            $('#counselorOnly #c_cnt').text(counselor_cnt);
+            popalert.open('counselorOnly');
+        }
+
+        $('#btn_page_prev').prop('href','home_main');
+
+    });
 
     function show_alert(obj){
         if(obj == 'hotel' || obj == 'playroom'){

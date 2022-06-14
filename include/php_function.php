@@ -48,17 +48,19 @@ function check_bad_word($word) {
 		return 0; // 미포함
 	}
 }
-function app_push($arr_userapikey,$title,$memo,$path,$image){
+function app_push($arr_userapikey,$title,$memo,$path,$image, $is_partner){
 		$result =[];
  		global $connection;
         //$API_ACCESS_KEY= 'AAAAKR8K-yk:APA91bFGTYpY4e0uOZw1IfOmyMc9dQQlDfsXCWKUAkoJBMPudzEdXYuXJVHgkZrmXp8ikj0qKrtb8rV63-jcgCMsEiZaCdwc1bCUyiSrCsayIdcEkFhS29Ok5zK559Bh8c9rYrA-T5cY'; // 기존 키값
 
         $user_agent = $_SERVER['HTTP_USER_AGENT'];
-        if(strpos($user_agent, "app_gopet_partner_and_one_store") > 0){
+        if(strpos($user_agent, "app_gopet_partner_and_one_store") > 0){ // 발신견주 앱
             $API_ACCESS_KEY= 'AAAAk71B8O8:APA91bG73bS1yk41VOeiOMmPdRCnPXA6Ar3dcfSYm0dDpbq6XB6TiTgAbht9dne6WtLzCBwZifKwsJ4JCMbs5XkShuyuEKGoGY_MqfW4OEXznrRbHElyzt59e74lwjQQqhpDVwxqMoqK';
-        }else{
-            $API_ACCESS_KEY= 'AAAAexOuErg:APA91bGIHbSkZlt46HZaPelJtBMNPskBVkJ0w9z944k-UkppzuasuiWhpeexSkgnsM3TC7XVExCmkKgbQSk_48-CX54rZmSgtzeLWOjgPbVSdTFJ13No_Hm2kQnH7LxW37fLiS6-_VUE';
-        }
+        }else if($is_partner == "partner"){ // 파트너앱
+			$API_ACCESS_KEY= 'AAAAexOuErg:APA91bGIHbSkZlt46HZaPelJtBMNPskBVkJ0w9z944k-UkppzuasuiWhpeexSkgnsM3TC7XVExCmkKgbQSk_48-CX54rZmSgtzeLWOjgPbVSdTFJ13No_Hm2kQnH7LxW37fLiS6-_VUE';
+        }else{ // 견주앱
+			$API_ACCESS_KEY= 'AAAAKR8K-yk:APA91bFGTYpY4e0uOZw1IfOmyMc9dQQlDfsXCWKUAkoJBMPudzEdXYuXJVHgkZrmXp8ikj0qKrtb8rV63-jcgCMsEiZaCdwc1bCUyiSrCsayIdcEkFhS29Ok5zK559Bh8c9rYrA-T5cY';
+		}
 
 		
  		$path = str_replace("http://" , "https://" , $path);
@@ -168,26 +170,23 @@ function app_push_iOS($receiver, $title, $memo, $path)
 
 }
 
-function a_push ($customer_id, $title, $memo, $path, $image) 
+function a_push ($customer_id, $title, $memo, $path, $image, $is_partner)
 {
 	global $connection;
 	
-	$sql = "select token, is_android from tb_customer where id = '".$customer_id."';";
+	$sql = "select token, partner_token from tb_customer where id = '".$customer_id."';";
     $result = mysqli_query($connection, $sql);
     if($rs = mysqli_fetch_object($result)) 
     {
-        if ($rs->token != null && $rs->token != "") 
-        {	  
-			// 20201012 ulmo IOS push 발송 firebase로 통합발송처리
-	        //if ($rs->is_android == 1)
-	        //{
-		        return app_push($rs->token, $title, $memo, $path, $image);
-	        //}				
-			//else if ($rs->is_android == 2)
-			//{
-			//	return app_push_iOS($rs->token, $title, $memo, $path);
-			//}				
-        }
+//        if ($rs->token != null && $rs->token != "")
+//        {
+			if($is_partner == 'partner'){
+				return app_push($rs->partner_token, $title, $memo, $path, $image, $is_partner);
+			}else{
+				return app_push($rs->token, $title, $memo, $path, $image, $is_partner);
+			}
+
+//        }
     }
     
     return null;

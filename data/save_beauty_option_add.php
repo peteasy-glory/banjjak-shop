@@ -110,6 +110,7 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "spa_option_product         = '{$etc2}', ";
     $sql .= "dyeing_option_product      = '{$etc3}', ";
     $sql .= "etc_option_product         = '{$etc4}', ";
+    $sql .= $hair_length_array;
     $sql .= "hair_length_product        = '{$addition_hair}', ";
     $sql .= "add_comment                = '{$_POST['add_comment']}', ";
     $sql .= "update_time                = NOW() ";
@@ -139,6 +140,7 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "spa_option_product         = '{$etc2}', ";
     $sql .= "dyeing_option_product      = '{$etc3}', ";
     $sql .= "etc_option_product         = '{$etc4}', ";
+    $sql .= $hair_length_array;
     $sql .= "hair_length_product        = '{$addition_hair}', ";
     $sql .= "add_comment                = '{$_POST['add_comment']}', ";
     $sql .= "update_time                = NOW() ";

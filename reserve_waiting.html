@@ -1,12 +1,23 @@
 <?php
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
-$artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
 
 
 $shop_title	= "예약 승인 대기";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
 
 ?>
 
@@ -20,7 +31,14 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
             $cnt = 0;
             $date_same = array();
             $artist_same = array();
-            $que = "SELECT * FROM tb_grade_reserve_approval_mgr a LEFT JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq LEFT JOIN tb_mypet c ON b.pet_seq = c.pet_seq WHERE is_approve = '0'";
+            $que = "
+                SELECT a.idx, b.*, c.name, c.pet_type, DATE_FORMAT(CONCAT(b.year,'-',b.month,'-',b.day),'%Y-%m-%d') reg_date FROM tb_grade_reserve_approval_mgr a 
+                LEFT JOIN tb_payment_log b ON a.payment_log_seq = b.payment_log_seq 
+                LEFT JOIN tb_mypet c ON b.pet_seq = c.pet_seq 
+                WHERE is_approve = '0'
+                AND b.artist_id = '".$artist_id."'
+                ORDER BY DATE_FORMAT(CONCAT(b.year,'-',b.month,'-',b.day),'%Y-%m-%d')
+            ";
             //echo $que;
             $arr = sql_fetch_array($que);
             if(count($arr)>0){
@@ -29,7 +47,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
             $beauty = explode("|",$rs['product']);
 
             ?>
-            <div class="reserve-wating-group" onclick="location.href='./reserve_pay_management_1?reserve_approval_idx=<?php echo $rs['idx'];?>';">
+            <div class="reserve-wating-group">
                 <?php
                 if($cnt == 0){
                     $date_same[0] = date('ymd',strtotime($rs['reg_date']));
@@ -61,7 +79,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
                         <div class="reserve-calendar-list-data">
 
-                            <div class="reserve-calendar-list-items gray">
+                            <div class="reserve-calendar-list-items gray" onclick="location.href='./reserve_pay_management_1?reserve_approval_idx=<?php echo $rs['idx'];?>';">
                                 <div class="item-time">
                                     <div class="item-time-start"><em><?php echo ($rs['hour']<12)?'오전':'오후';?></em><strong><?php echo $rs['hour'];?>:<?php echo sprintf('%02d',$rs['minute']);?></strong></div>
                                     <div class="item-time-unit">~</div>
@@ -95,10 +113,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 <script>
     $(document).ready(function(){
         $('#header_bell').css('display','none');
-        $('#btn_page_prev').prop('href','javascript:;');
-        $('#btn_page_prev').on('click',function(){
-            location.href = 'reserve_main_month';
-        });
+        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
     });
 </script>
 </body>
