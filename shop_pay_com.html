@@ -1,0 +1,89 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+
+if($order_num != ""){
+    $sql = "
+		SELECT * 
+		FROM tb_item_payment_log
+		WHERE order_num = '".$order_num."'
+	";
+    $result = mysqli_query($connection,$sql);
+    $row = mysqli_fetch_array($result);
+    $expire_dt = ($row["expire_dt"] != "")? DATE("Y년 m월 d일 H시 i분", STRTOTIME($row["expire_dt"])) : "";
+    $name = explode(',', $row['guest_info'])[0];
+    $ip_cnt = mysqli_num_rows($result);
+    if($ip_cnt <= 0){
+        ?>
+        <script>
+            alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+            location.href = "/";
+        </script>
+        <?php
+        return false;
+    }
+}else{
+    ?>
+    <script>
+        alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+        location.href = "/";
+    </script>
+    <?php
+    return false;
+}
+?>
+<!-- header -->
+<header id="header">	
+	<div class="page-title">결제완료</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body"> 
+		<div class="order-complete-wrap">
+			<div class="order-complete">
+				<div class="item-visual"><img src="/static/pub/images/icon/img-illust-2@2x.png" alt="" width="203"></div>
+				<div class="item-info">주문이 완료되었습니다.</div>
+				<div class="item-value">주문하신 상품의 주문번호는<br><em><?=$order_num ?></em> 입니다.</div>
+			</div>
+            <?php if($row["pay_type"] == "2"){ ?>
+			<div class="order-bank-card">
+				<div class="order-bank-title">입금정보</div>
+				<div class="order-bank-info">계좌이체시 반드시 입력하신 이름으로 입금 부탁드립니다.</div>
+				<div class="order-bank-data-list">
+					<div class="order-bank-data-item"><em>계좌번호</em><p>기업은행 054–143076–01–013<br>[주식회사 펫이지]</p></div>
+					<div class="order-bank-data-item"><em>입금기한</em><p><?=$expire_dt?></p></div>
+				</div>
+				<div class="order-bank-point">입금기한이 지나면 주문이 <strong class="font-color-red">자동 취소</strong>되니 유의해 주시기 바랍니다</div>
+			</div>
+            <?php } ?>
+			<div class="order-complete-ui">
+				<p>* 비회원으로 주문시 주문번호로만 주문조회가 가능합니다</p>
+				<a href="#" class="btn btn-purple btn-round btn-middle-size content_ok"><strong>구매상품 확인</strong></a>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+<script>
+    var pay_type = "<?=$row["pay_type"]?>";
+    $(document).on("click", "#container .content_ok", function(){
+        if(pay_type != "2"){
+            location.href = "shop_pay_view?no=<?=$order_num?>";
+        }else{
+            location.href = "shop_pay_other?no=<?=$order_num?>&name=<?=$name?>";
+        }
+    });
+</script>
+	
+</body>
+</html>
