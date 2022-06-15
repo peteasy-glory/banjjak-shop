@@ -220,7 +220,7 @@ if(empty($grade[0]['grade_name'])){
         <!-- page-body -->
         <div class="page-body" id="page-body">
             <div class="shortcut-wrap" id="shortcutWrap">
-                <img src="/images/icon-page-top.png" alt="" onclick="common.pageMove(0);">
+                <img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();">
                 <img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();">
                 <img src="/images/icon-pay.png" alt="" onclick="scrollMove3();">
 
@@ -3976,32 +3976,17 @@ if(empty($grade[0]['grade_name'])){
 
         //short-cut
 
+        $.fn.scrollStopped = function(callback) {
+            var _this = this, $this = $(_this);
+            $this.scroll(function(event) {
+                clearTimeout($this.data('scrollTimeout'));
+                $this.data('scrollTimeout', setTimeout(callback.bind(_this), 250, event));
+            });
+        };
+
+
+
         let shortCutFlag = true;
-        function shortcut_appear(){
-                if(shortCutFlag){
-                    $("#shortcutWrap").css("display","flex");
-                    $("#shortcutWrap").stop().animate({'opacity':1},300);
-                    shortCutFlag=false;
-                    setTimeout(shortcut_disappear,3000);
-                }
-         }
-        function shortcut_disappear(){
-                if(!shortCutFlag){
-                    $("#shortcutWrap").stop().animate({'opacity':0},300);
-                    setTimeout(disappear,600);
-                    shortCutFlag=true;
-                }
-        }
-        function disappear(){
-            if(shortCutFlag){
-                $("#shortcutWrap").stop().css("display","none");
-                shourtCutFlag=false;
-            }
-        }
-
-        $(document).on("touchmove", shortcut_appear);
-
-
 
         let pageTitle = document.querySelector(".page-title").clientHeight;
 
@@ -4009,18 +3994,60 @@ if(empty($grade[0]['grade_name'])){
 
         let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
 
-        console.log(pageTitle);
+        let pageBodyRectTop = document.querySelector("#page-body").getBoundingClientRect().top;
+
+        // let pageBodyScrollTop = $("#page-body").scrollTop();
+
+        let shortcut = $("#shortcutWrap");
+
+        $(window).on("touchmove",function(){
+
+
+
+            if($("#page-body").scrollTop() === 0) {
+                shortcut.css("display","flex");
+                shortcut.stop().animate({"opacity":1},300);
+
+
+            }else{
+                shortcut.css("display","flex");
+                shortcut.stop().animate({"opacity":1},300);
+
+            }
+
+
+
+
+        })
+
+        $("#page-body").scrollStopped(function(){
+            if($("#page-body").scrollTop() === 0){
+
+                return;
+            }
+            shortcut.stop().animate({"opacity":0},1000,function(){
+                shortcut.css("display","none");
+            });
+
+        })
+
+
+
+        function scrollMove1(){
+
+            $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
+            shortcut.stop().animate({"opacity":1},50);
+        }
         function scrollMove2(){
 
-            $('.page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
+            $('#page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
         }
 
         function scrollMove3(){
 
-            $('.page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
-
-
-
+            $('#page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
+            shortcut.stop().animate({"opacity":0},50,function(){
+                shortcut.css("display","none");});
         }
 
 
