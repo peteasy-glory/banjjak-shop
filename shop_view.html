@@ -1,688 +1,1708 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>반짝</title>
-	<meta name="format-detection" content="telephone=no">
-	<link href="/static/pub/css/style.css" rel="stylesheet">
-	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
-	<script src="/static/pub/js/jquery-ui.min.js"></script>    
-	<script src="/static/pub/js/swiper.min.js"></script>
-	<script src="/static/pub/js/common.js"></script>
-</head>
-<body>        
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "ETCB-HYPONIC-A18";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+if($product_no == ""){
+    ?>
+    <script>
+        // $.MessageBox({
+        //     buttonDone: "확인",
+        //     message: "잘못된 접근입니다. 메인페이지로 이동합니다."
+        // }).done(function() {
+        //     location.href = "<?= $mainpage_directory ?>/index.php";
+        // });
+        alert("잘못된 접근입니다.");
+        window.history.back();
+    </script>
+    <?
+}
+
+// 상품 정보
+$product_sql = "
+    SELECT * FROM tb_item_list a
+    LEFT JOIN (
+      SELECT product_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
+      FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' AND is_blind = '2' GROUP BY product_no
+    ) b ON b.product_no = a.product_no
+    WHERE a.product_no = '".$product_no."'
+    AND a.is_shop = '1' AND a.is_delete = '1'
+";
+$product_result = sql_query($product_sql);
+$product_row = sql_fetch($product_result);
+
+// 옵션 정보 확인하기
+if($product_row['is_use_option'] == '1' && $product_row['is_use_group_option'] == '2'){
+    // 옵션상품
+    $is_option = 'option';
+}else if($product_row['is_use_option'] == '2' && $product_row['is_use_group_option'] == '1'){
+    // 그룹옵션상품
+    $is_option = 'group';
+}else{
+    $is_option = 'common';
+}
+
+//할인율 구하기
+$percent = ($product_row['product_price'] == 0 || $product_row['sale_price'] == 0)? 0 : 100 - ($product_row['sale_price'] / $product_row['product_price'] * 100);
+
+// 메인사진 구하기
+$img_sql = "SELECT * FROM tb_file WHERE f_seq IN (".$product_row['product_img'].") AND is_delete ='1'";
+$img_array = sql_fetch_array($img_sql);
+
+// 리뷰 정보
+$review_sql = "
+    SELECT a.*, b.photo, b.nickname FROM tb_item_review a
+    LEFT JOIN tb_customer b ON a.customer_id = b.id
+    WHERE a.product_no = '".$product_no."'
+    AND a.is_delete = '2' AND a.is_blind = '2' ORDER BY a.reg_dt DESC
+";
+$review_array = sql_fetch_array($review_sql);
+
+//돌아갈 url을 세션에 저장한다.
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
+
+
+
+?>
+
 
 <!-- header -->
-<header id="header">	
-	<div class="header-left">
-		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
-	</div>
-	<div class="page-title">펫샵 상세보기</div>
+<header id="header">
+    <div class="header-left">
+        <a href="<?=$_SESSION['backurl_shop']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+    </div>
+    <div class="page-title">상품보기</div>
 </header>
 <!-- //header -->
 
 <!-- container -->
-<section id="container"> 
-	<!-- page-body -->    
-	<div class="page-body">
-		<!-- 대표미이지 -->
-		<div class="product-view-group product-view-gallery">
-			<div class="label-group">
-				<div class="label-group-inner">
-					<div class="label label-yellow middle">호텔</div>
-					<div class="label label-yellow middle">미용</div>
-				</div>
-			</div>
-			<div class="gallery-list">
-				<div class="swiper-container">
-					<div class="swiper-wrapper">
-						<div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_1.png" alt=""/></a></div></div>
-						<div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_1.png" alt=""/></a></div></div>
-						<div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_1.png" alt=""/></a></div></div>
-						<div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_1.png" alt=""/></a></div></div>
-					</div>
-				</div>
-			</div>
-			<div class="swiper-page"></div>
-		</div>
-		<!-- //대표미이지 -->
-		<!-- 상품 정보 -->
-		<div class="product-view-group product-info-data">
-			<div class="item-name">소망애견 미용실</div>
-			<div class="item-grade">
-				<div class="icon-star-group">
-					<div class="icon icon-size-16 icon-star-yellow"></div>
-					<div class="icon icon-size-16 icon-star-yellow"></div>
-					<div class="icon icon-size-16 icon-star-yellow"></div>
-					<div class="icon icon-size-16 icon-star-yellow"></div>
-					<div class="icon icon-size-16 icon-star-yellow"></div>
-					<!--<div class="icon icon-size-16 icon-star-gray"></div>-->
-				</div>
-				<em>5.0</em>(126)
-			</div>
-			<div class="item-desc">해가든 상가에 위치한 미용전문, 호텔입니다.</div>
-			<div class="item-btns">
-				<ul>
-					<!--
-					//	btn-view-like 클래스의 버튼에 actived클래스 추가시 활성화
-					-->
-					<li><a href="#" class="btn-item-nav btn-view-like actived"><div class="txt">1023</div></a></li>
-					<!-- 20211223 수정 -->
-					<li><a href="#" class="btn-item-nav"><div class="icon icon-size-36 icon-location"></div><div class="txt">위치</div></a></li>
-					<li><a href="#" class="btn-item-nav"><div class="icon icon-size-36 icon-tel"></div><div class="txt">전화</div></a></li>
-					<!-- //20211223 수정 -->
-					<li><a href="#" class="btn-item-nav"><div class="icon icon-size-36 icon-share"></div><div class="txt">공유</div></a></li>
-				</ul>
-			</div>
-		</div>
-		<!-- //상품 정보-->
-		<!-- 매장 정보 -->
-		<div class="product-view-group product-view-store">
-			<div class="con-title-group">
-				<div class="con-title">매장 정보</div>
-			</div>
-			<div class="text-list-wrap">
-				<div class="text-list-cell"><div class="item-title">영업시간</div><div class="item-data">10:00~20:00 / 정기휴일 없음</div></div>
-				<div class="text-list-cell"><div class="item-title">주소</div><div class="item-data">서울시 마포구 상암동 월드컵북로 21, 301호</div></div>
-				<div class="text-list-cell"><div class="item-title">종류</div><div class="item-data">소형견, 중형견, 특수견, 고양이</div></div>
-			</div>
-		</div>
-		<!-- //매장 정보-->
-		<!--포트폴리오 -->
-		<div class="product-view-group product-view-portfolio">
-			<div class="con-title-group">
-				<div class="con-title">포트폴리오</div>
-				<a href="#" class="btn-content-more">전체보기</a>
-			</div>
-			<div class="portfolio-list-wrap">
-				<div class="list-inner">
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-					<div class="list-cell"><a href="#" class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></a></div>
-				</div>
-			</div>
-		</div>
-		<!-- //포트폴리오-->
-		<!-- 서비스 가격 -->
-		<div class="product-view-group product-view-service">
-			<div class="con-title-group">
-				<div class="con-title">서비스 가격</div>
-			</div>
-			<div class="con-title-info">추가 옵션별 요금은 [예약화면]에서 확인 가능합니다.</div>
-			<ul class="accordion-list">
-				<li class="accordion-cell">			
-					<button type="button" class="btn-accordion-menu">
-						<span class="accordion-menu-subject">소형견</span>
-					</button>
-					<div class="accordion-content">
-						<div class="accordion-detail">
-							<div class="read-table">
-								<table>
-									<colgroup>
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-									</colgroup>
-									<thead>
-										<tr>
-											<th></th>
-											<th>목욕</th>
-											<th>부분<br>미용</th>
-											<th>부분<br>+목욕</th>
-											<th>전체<br>미용</th>
-											<th>스포팅</th>
-											<th>가위컷</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<th>~3kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~5kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~7kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~9kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>9kg~</th>
-											<td colspan="6">kg당 5,000원 추가</td>
-										</tr>
-									</tbody>
-								</table>
-								<div class="read-table-info">(단위, 천원)</div>
-							</div>
-						</div>
-					</div>			
-				</li>    
-				<li class="accordion-cell">			
-					<button type="button" class="btn-accordion-menu">
-						<span class="accordion-menu-subject">중형견</span>
-					</button>
-					<div class="accordion-content">
-						<div class="accordion-detail">
-							<div class="read-table">
-								<table>
-									<colgroup>
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-									</colgroup>
-									<thead>
-										<tr>
-											<th></th>
-											<th>목욕</th>
-											<th>부분<br>미용</th>
-											<th>부분<br>+목욕</th>
-											<th>전체<br>미용</th>
-											<th>스포팅</th>
-											<th>가위컷</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<th>~3kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~5kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~7kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~9kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>9kg~</th>
-											<td colspan="6">kg당 5,000원 추가</td>
-										</tr>
-									</tbody>
-								</table>
-								<div class="read-table-info">(단위, 천원)</div>
-							</div>
-						</div>
-					</div>			
-				</li>   
-				<li class="accordion-cell">			
-					<button type="button" class="btn-accordion-menu">
-						<span class="accordion-menu-subject">대형견</span>
-					</button>
-					<div class="accordion-content">
-						<div class="accordion-detail">
-							<div class="read-table">
-								<table>
-									<colgroup>
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-										<col style="width:auto;">
-									</colgroup>
-									<thead>
-										<tr>
-											<th></th>
-											<th>목욕</th>
-											<th>부분<br>미용</th>
-											<th>부분<br>+목욕</th>
-											<th>전체<br>미용</th>
-											<th>스포팅</th>
-											<th>가위컷</th>
-										</tr>
-									</thead>
-									<tbody>
-										<tr>
-											<th>~3kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~5kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~7kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>~9kg</th>
-											<td>15</td>
-											<td>10</td>
-											<td>25</td>
-											<td>35</td>
-											<td>60</td>
-											<td>90</td>
-										</tr>
-										<tr>
-											<th>9kg~</th>
-											<td colspan="6">kg당 5,000원 추가</td>
-										</tr>
-									</tbody>
-								</table>
-								<div class="read-table-info">(단위, 천원)</div>
-							</div>
-						</div>
-					</div>			
-				</li>    
-			</ul>
-		</div>
-		<!-- //서비스 가격 -->
-		<!-- 이용후기 -->
-		<div class="product-view-group product-view-review">
-			<div class="con-title-group">
-				<div class="con-title">이용 후기 121개</div>
-				<a href="#" class="btn-content-more">전체보기</a>
-			</div>
-			<div class="comment-list-wrap">
-				<div class="comment-cell">
-					<div class="comment-item">
-						<div class="item-user-info">
-							<div class="user-thumb-wrap">
-								<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""/></div>
-							</div>
-							<div class="user-data">
-								<div class="data-inner">
-									<div class="user-name">승우누나</div>
-									<div class="user-grade">
-										<!--
-										<div class="icon-star-group">
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-										</div>
-										-->
-										<div class="time">5시간 전</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="item-detail">항상 세련되면서도 깔끔하게 미용해주셔서 감사드려요~ 미용 마친 후 사진까지 담아주셔서 사진보고 가족들이 넘 좋아했답니다. 다음 미용 때도 잘 부탁드릴게요!</div>
-						<div class="item-ui"><button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button></div>
-						
-					</div>
-				</div>
-				<div class="comment-cell">
-					<div class="comment-item">
-						<div class="item-user-info">
-							<div class="user-thumb-wrap">
-								<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""/></div>
-							</div>
-							<div class="user-data">
-								<div class="data-inner">
-									<div class="user-name">승우누나</div>
-									<div class="user-grade">
-										<div class="icon-star-group">
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-										</div>
-										<div class="time">5시간 전</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="item-gallery">
-							<div class="portfolio-list-wrap">
-								<div class="list-inner">
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-								</div>
-							</div>
-						</div>
-						<div class="item-detail">항상 세련되면서도 깔끔하게 미용해주셔서 감사드려요~ 미용 마친 후 사진까지 담아주셔서 사진보고 가족들이 넘 좋아했답니다. 다음 미용 때도 잘 부탁드릴게요!</div>
-						<div class="item-ui"><button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button></div>
-						
-					</div>
-				</div>
-				<div class="comment-cell">
-					<div class="comment-item">
-						<div class="item-user-info">
-							<div class="user-thumb-wrap">
-								<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""/></div>
-							</div>
-							<div class="user-data">
-								<div class="data-inner">
-									<div class="user-name">승우누나</div>
-									<div class="user-grade">
-										<div class="icon-star-group">
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-yellow"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-											<div class="icon icon-size-16 icon-star-gray"></div>
-										</div>
-										<div class="time">5시간 전</div>
-									</div>
-								</div>
-							</div>
-						</div>
-						<div class="item-gallery">
-							<div class="portfolio-list-wrap">
-								<div class="list-inner">
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-									<div class="list-cell"><div class="btn-portfolio-item"><img src="/static/pub/images/portfolio_thumb_1.png" alt=""/></div></div>
-								</div>
-							</div>
-						</div>
-						<div class="item-detail">항상 세련되면서도 깔끔하게 미용해주셔서 감사드려요~ 미용 마친 후 사진까지 담아주셔서 사진보고 가족들이 넘 좋아했답니다. 다음 미용 때도 잘 부탁드릴게요!</div>
-						<div class="item-ui"><button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button></div>
-					</div>
-					<div class="recomment-list">
-						<div class="recomment-cell">
-							<div class="recomment-item">
-								<div class="user-thumb-wrap">
-									<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""/></div>
-								</div>		
-								<div class="recomment-data">
-									<div class="item-name">소망애견 미용실<span class="date">1일 전</span></div>
-									<div class="item-detail">좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다.</div>
-								</div>
-							</div>
-						</div>
-						<div class="recomment-cell">
-							<div class="recomment-item">
-								<div class="user-thumb-wrap">
-									<div class="user-thumb"><img src="/static/pub/images/user_thumb.png" alt=""/></div>
-								</div>		
-								<div class="recomment-data">
-									<div class="item-name">소망애견 미용실<span class="date">1일 전</span></div>
-									<div class="item-detail">좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다. 좋으셨다니 너무 감사합니다.</div>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- //이용후기-->
-		<!-- 블로그 리뷰 -->
-		<div class="product-view-group product-view-blog">
-			<div class="con-title-group">
-				<div class="con-title">블로그 리뷰 15개</div>
-				<a href="#" class="btn-content-more">전체보기</a>
-			</div>
-			<div class="vertical-list-wrap line">
-				<div class="list-inner">
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다. 타이틀 입니다. 타이틀 입니다. 타이틀 입니다. 타이틀 입니다. 타이틀 입니다. </div>
-								<div class="item-desc">내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. 내용입니다. </div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명 블로그명 블로그명 블로그명 블로그명 블로그명 블로그명 블로그명 블로그명 블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-					<div class="list-cell">
-						<a href="#" class="basic-list-item blog">
-							<div class="thumb">
-								<img src="/static/pub/images/vertical_list_thumb_1.png" alt="">
-							</div>
-							<div class="info-wrap">
-								<div class="item-name">타이틀 입니다.</div>
-								<div class="item-desc">내용입니다.</div>
-								<div class="item-blog-option">
-									<div class="name"><div class="ellipsis">블로그명</div></div>
-									<div class="date">2020.11.20</div>
-								</div>
-							</div>
-						</a>
-					</div>
-				</div>
-			</div>
-		</div>
-		<!-- //블로그 리뷰-->
-	</div>
-	<!-- //page-body -->	
-	<!-- page-bottom -->
-	<div class="page-bottom">
-		<a href="#" class="btn-reserve">예약하기</a>
-	</div>
-	<!-- //page-bottom -->
+<section id="container">
+    <!-- 토스트 팝업 -->
+    <div id="walkSave" class="toast-pop-wrap">
+        <div class="toast-pop-data"><div>URL을 복사했습니다.</div></div>
+    </div>
+    <!-- //토스트 팝업 -->
+    <!-- page-body -->
+    <div class="page-body fix-bottom-page">
+        <div class="shop-view-wrap">
+            <!-- 대표미이지 -->
+            <div class="shop-view-gallery">
+                <div class="gallery-list">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <?php
+                            if(count($img_array)>0){
+                                foreach($img_array as $rs){
+                                    ?>
+                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($rs['file_path'])?>" alt=""/></a></div></div>
+                                    <?php
+                                }
+                            }else{
+                                ?>
+                                <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="<?=$product_row['goodsRepImage']?>" alt=""/></a></div></div>
+                                <?php
+                            }
+                            ?>
+                            <!-- <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_2.png" alt=""/></a></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_2.png" alt=""/></a></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_2.png" alt=""/></a></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/view_thumb_2.png" alt=""/></a></div></div> -->
+                        </div>
+                    </div>
+                </div>
+                <div class="swiper-pagination"></div>
+            </div>
+            <!-- //대표미이지 -->
+            <!-- 상품상세 정보 -->
+            <div class="shop-info-wrap">
+                <div class="shop-info-name"><?=$product_row['product_name']?></div>
+                <div class="shop-info-price-group">
+                    <div class="shop-info-price">
+                        <div class="price-sale"><?=round($percent)?>%</div>
+                        <div class="price-value" id="id-product"><?=number_format($product_row['sale_price'])?>원</div>
+                        <div class="price-value" id="id-sale"><del><?=number_format($product_row['product_price'])?>원</del></div>
+                    </div>
+                    <button type="button" onclick="javascript:paste_url();" class="btn-shop-share"><span class="icon icon-share-gray"></span></button>
+                </div>
+                <script>
+                    // 공유하기(페이지 주소 복사)
+                    function paste_url(){
+                        let currentUrl = window.document.location.href;
+
+                        let t = document.createElement("textarea");
+                        document.body.appendChild(t);
+                        t.value = currentUrl;
+                        t.select();
+                        document.execCommand('copy');
+                        document.body.removeChild(t);
+
+                        common.toastPopOpen('walkSave');
+                    }
+                </script>
+                <div class="shop-info-delivery-group">
+                    <div class="shop-info-delivery"><em>배송비</em><strong><span class="shipping_price">-</span></strong></div>
+                    <div class="shop-info-grade">
+                        <a href="#review_move">
+                            <button type="button" class="item-grade">
+                                <span class="icon icon-size-16 icon-star-yellow"></span><em><?=round($product_row['rating_avg'])?></em>(<?=$product_row['rating_cnt']?>)
+                                <span class="icon icon-arrow-right-small"></span>
+                            </button>
+                        </a>
+                    </div>
+                </div>
+                <div class="product-option-wrap">
+                    <!-- 타이틀과 선택 있을 경우 안의 태그 노출 -->
+                    <?php
+                    if($is_option == 'option'){
+                        ?>
+                        <div class="product-option-title">옵션</div>
+                        <div class="product-option-select">
+                            <select id="item_option">
+                            </select>
+                            <!--                            <button type="button" class="btn btn-outline-gray btn-middle-size btn-round btn-inline">옵션선택</button>-->
+                        </div>
+                        <div class="product-option-list"></div>
+                        <?php
+                    }else if($is_option == 'group'){
+                        ?>
+
+                        <?php
+                    }else{
+                        ?>
+                        <!-- //타이틀과 선택 있을 경우 안의 태그 노출 -->
+                        <div class="product-option-list">
+                            <div class="product-option-items">
+                                <div class="product-option-items-name"><?=$product_row['product_name']?></div>
+                                <div class="product-option-amount">
+                                    <button type="button" class="btn-product-option-minus" onclick="cnt_change('common','m')">감소</button>
+                                    <input type="number" value="1" id="item_cnt" readonly/>
+                                    <button type="button" class="btn-product-option-plus" onclick="cnt_change('common','p')">증가</button>
+                                </div>
+                                <!--                                <button type="button" class="btn-product-option-del"><span class="icon icon-size-16 icon-close-small-gray"></span></button>-->
+                            </div>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+                <div class="shop-price-total">
+                    <em>총 합계</em>
+                    <strong id="result_price"><?php echo ($is_option == 'common')? number_format($product_row['sale_price']) : 0;?>원</strong>
+                    <input type="hidden" id="total_price" name="total_price" value="<?php echo ($is_option == 'common')? $product_row['sale_price'] : 0;?>" />
+                    <input type="hidden" name="is_special_mall" value="2" />
+
+                </div>
+                <div class="grid-layout btn-grid-group">
+                    <div class="grid-layout-inner">
+                        <div class="grid-layout-cell grid-2"><a href="javascript:buy_product('cart');" class="btn btn-purple btn-middle-size btn-round">장바구니 담기</a></div>
+                        <div class="grid-layout-cell grid-2"><a href="javascript:buy_product('direct');" class="btn btn-outline-purple btn-middle-size btn-round">바로 구매</a></div>
+                    </div>
+                </div>
+            </div>
+            <!-- //상품상세 정보 -->
+            <!-- 상품상세 -->
+            <div class="shop-view-detail-wrap">
+                <div class="basic-data-group">
+                    <div class="con-title-group">
+                        <h4 class="con-title">상세정보</h4>
+                    </div>
+                    <div class="shop-view-detail-data">
+                        <?php
+                        echo nl2br($product_row['product_detail']);
+                        //                        echo strpos($product_row['product_detail'],'src');
+                        ?>
+                    </div>
+                    <!-- 20220211 수정 : 구조 수정 -->
+                    <div class="basic-data-group large">
+                        <ul class="accordion-list first-none-line last-none-line small">
+                            <li class="accordion-cell">
+                                <button type="button" class="btn-accordion-menu">
+                                    <h5 class="con-title">교환 / 반품</h5>
+                                </button>
+                                <div class="accordion-content">
+                                    <?php if($product_no == 'CN-BANJJAK-A01'){
+                                        ?>
+                                        <div class="shop-view-detail-info">
+                                            <h6 class="title">* 본 상품은 구매 수량 개당 배송비가 부과됩니다.</h6>
+                                            <div class="detail">
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">주문 취소</h6>
+                                        <div class="detail">
+                                            · 구매하신 상품이 '상품 준비 중' 상태일 경우에는 취소가 가능합니다.<br>
+                                            · 구매하신 상품이 '배송 준비 중' 상태일 경우 변경 및 취소를 원하시면 1 : 1 문의 글이나 고객센터(1661-9956)로 연락 주시길 바랍니다.
+                                        </div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">교환 / 반품</h6>
+                                        <div class="detail">
+                                            · 교환/반품은 배송 완료된 날로부터 7일 이내 가능합니다.<br>
+                                            - 교환은 기존 구매한 상품을 수거하고 상품 검수 후에 교환 상품을 발송해 드립니다.<br>
+                                            - 반품은 상품 회수 후에 상품 검수 시 문제가 없을경우(사용 흔적, 파손, 등) 환불해드립니다.<br>
+                                            - 쿠폰 및 포인트 사용 여부에 따라 취소/반품 신청하신 상품의 판매가 보다 환불 금액이 적을 수 있습니다.
+                                        </div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">교환 / 반품이 불가능한 경우</h6>
+                                        <div class="detail">
+                                            · 교환/반품 요청 기간이 지난 경우 (배송 완료로부터 7일 이내)<br>
+                                            · 박스를 <?php echo ($product_no == 'CN-BANJJAK-A01')? "포함한" : "제외한" ?> 상품 포장(비닐) 훼손, 또는 개봉하여 사용 및 설치 완료되어 상품의 가치가 현저히 감소한 경우<br>
+                                            · 구성품을 분실하였거나 고객님의 취급 부주의로 인한 파손/고장/오염으로 재판매를 할 수 없는 경우
+                                        </div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">교환 / 반품 배송비</h6>
+                                        <div class="detail">
+                                            · 단순 변심으로 인한 교환/반품은 고객님께서 배송비를 부담하셔야 합니다.<br>
+                                            · 업체 배송 상품은 업체에 따라 교환/반품 배송비가 다를 수 있으므로 1 : 1 문의 글을 남겨주시면 빠른 시일 내에 답변드리겠습니다.<br>
+                                            · 도서/산간 지역의 경우, 추가 배송비가 발생할 수 있습니다.
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <!--<li class="accordion-cell">
+                                <button type="button" class="btn-accordion-menu">
+                                    <h5 class="con-title">교환 / 반품</h5>
+                                </button>
+                                <div class="accordion-content">
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">반품배송비</h6>
+                                        <div class="detail">+ 2,500원 (최초 배송비가 무료인 경우 5,000원 부과)<br>※ 반품접수 ➞ 상품 회수 및 검수 ➞ 반품 택배비를 제외한 상품 금액 환불</div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">교환배송비</h6>
+                                        <div class="detail">+ 5,000원<br>※ 교환접수 진행 ➞ 상품 회수 및 검수 ➞ 교환상품 배송</div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">반품 / 교환 사유에 따른 요청 가능 시간</h6>
+                                        <div class="detail">반품 시 먼저 판매자와 연락하셔서 반품사유, 택배사, 배송비, 반품지 주소 등을 협의하신 후 반품상품을 발송해 주시기 바랍니다.<br>1. 상품 수령 후 상품하자의 경우 또는 표시 / 광고와 다른 사실을 안 날로부터 30일 이내. 둘 중 하나 경과 시 반품 / 교환 불가(판매자 반품배송비 부담)<br>2. 구매자 단순 변심은 상품 수령 후 7일 이냐(구매자 반품배송비 부담)</div>
+                                    </div>
+                                    <div class="shop-view-detail-info">
+                                        <h6 class="title">반품 / 교환 불가능 사유</h6>
+                                        <div class="detail">아래와 같은 경우 반품 / 교환이 불가능합니다.<br>1. 반품 요청 기간이 지난 경우<br>2. 구매자의 책임있는 사유로 상품 등이 멸실 또는 훼손된 경우(단, 상품의 내용을 확인하기 위하여 포장 등을 훼손한 경우는 제외)<br>3. 포장을 개봉하였으나 포장이 훼손되어 상품가치가 현저히 상실된 경우<br>4. 구매자의 사용 또는 일부 소비에 의하여 상품의 가치가 현저히 감소한 경우<br>5. 시간의 경과에 의하여 재판매가 곤란할 정도로 상품 등의 가치가 현저히 감소한 경우</div>
+                                    </div>
+                                </div>
+                            </li>-->
+                            <!--<li class="accordion-cell">
+                                <button type="button" class="btn-accordion-menu">
+                                    <h5 class="con-title">배송</h5>
+                                </button>
+                                <div class="accordion-content">
+                                    <div class="shop-view-detail-info">
+                                        <div class="detail">
+                                            택배사 : 일반택배(한진 / 롯데 / CJ대한통운)<br>
+                                            배송지역 : 전국<br>
+                                            배송비용 : 2,500원<br>
+                                            -[직배송] 3만원 이상 무료배송<br>
+                                            -[업체배송] 10만원 이상 무료배송<br>
+                                            배송기간 : 7일 이내<br>
+                                            배송안내 :<br>
+                                            - 택배사 일부지역 파업으로 읺내 배송이 지연될 수 있습니다.<br>
+                                            - 도서 / 산간 / 오지 / 일부지역은 추가배송비가 발생합니다.<br>
+                                            ※ 제주도 : + 3,000원, 기타 도서산간지역 : +5,000원<br>
+                                            - 계좌이체로 결제하신 경우, 입금 확인 후 배송이 이루어집니다.<br>
+                                            - 주문건 상태가 '결제완료'인 경우 취소가 가능합니다.<br>
+                                            다만 '상품 준비 준'으로 넘어간 경우, 출고 여부에 따라 사전 취소가 어려울 수 있습니다. <br>
+                                            추고된 이후 주문 취소를 원하시는 경우에는 환불 절차를 따라주셔야 합니다.
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>-->
+                        </ul>
+                    </div>
+                    <!-- //20220211 수정 -->
+
+                </div>
+                <?php
+                if(count($review_array)>0){
+                ?>
+                <div class="basic-data-group" id="review_move">
+                    <div class="con-title-group">
+                        <h4 class="con-title">상품리뷰</h4>
+                        <?php
+                        if(count($review_array) > 5){
+                            ?>
+                            <a href="shop_view_recoment?product_no=<?=$product_no?>" class="btn-content-more">전체보기</a>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                    <div class="comment-list-wrap">
+                        <?php
+                        $cnt = (count($review_array) > 5)? 5 : count($review_array);
+                        for($i=0;$i<$cnt;$i++){
+                            // 리뷰작성자 프로필 사진
+                            $user_photo = ($review_array[$i]['photo'])? "https://image.banjjakpet.com".img_link_change($review_array[$i]['photo']) : "";
+
+                            // 아이디 가리기
+                            $nickname = ($review_array[$i]['name'] && $review_array[$i]['name'] != "")? $review_array[$i]['name'] : $review_array[$i]['nickname'];
+                            $seq_cnt = ($review_array[$i]['ir_seq'] % 5) + 1; // *처리시 ir_seq 기준으로 고정 * 갯수
+                            $blur_cnt = strlen($nickname) - 5;
+                            $blur_text = "**";
+                            $nick_cnt = 0;
+                            while($nick_cnt < $seq_cnt){
+                                $blur_text .="*";
+                                $nick_cnt++;
+                            }
+                            if(strlen($nickname) < 6 && $nickname != ""){
+                                $nickname = substr($nickname, 0,strlen($nickname) - 2) . "***";
+                            }else{
+                                if($seq_cnt >= 3){
+                                    $nickname = substr($nickname, 0,4) . $blur_text;
+                                }else if($seq_cnt < 3){
+                                    $nickname = substr($nickname, 0,3) . $blur_text . "*";
+                                }
+                            }
+                            ?>
+                            <div class="comment-cell">
+                                <div class="comment-item">
+                                    <div class="item-user-info">
+                                        <div class="user-thumb-wrap">
+                                            <div class="user-thumb">
+                                                <?php if($user_photo){ ?>
+                                                    <img src="<?=$user_photo?>" alt=""/>
+                                                <?php } ?>
+                                            </div>
+                                        </div>
+                                        <div class="user-data">
+                                            <div class="data-inner">
+                                                <div class="user-name"><?=$nickname ?></div>
+                                                <div class="user-grade">
+                                                    <div class="icon-star-group">
+                                                        <?php
+                                                        for($j=1;$j<=5;$j++){
+                                                            if($review_array[$i]['rating'] >= $j){
+                                                                ?>
+                                                                <div class="icon icon-size-16 icon-star-yellow"></div>
+                                                                <?php
+                                                            }else{
+                                                                ?>
+                                                                <div class="icon icon-size-16 icon-star-gray"></div>
+                                                                <?php
+                                                            }
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                    <div class="time"><?=explode(' ',$review_array[$i]['reg_dt'])[0] ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                    if($review_array[$i]['review_image']!=''){
+                                        if($review_array[$i]['is_blind']!= '1'){
+                                            // 리뷰 포토 불러오기
+                                            $review_photo_sql = "SELECT * FROM tb_file WHERE f_seq IN (".$review_array[$i]['review_image'].") AND is_delete ='1'";
+                                            $review_photo_array = sql_fetch_array($review_photo_sql);
+                                            ?>
+                                            <div class="item-gallery">
+                                                <div class="portfolio-list-wrap">
+                                                    <div class="list-inner">
+                                                        <?php
+                                                        $img_review = "";
+                                                        for ($l = 0; $l < count($review_photo_array); $l++) {
+                                                            $img_review .= img_link_change($review_photo_array[$l]['file_path']).'|';
+                                                        }
+                                                        $img_review = substr($img_review, 0,-1);
+                                                        for ($k = 0; $k < count($review_photo_array); $k++) {
+                                                            $img = "https://image.banjjakpet.com".img_link_change($review_photo_array[$k]['file_path']);
+                                                            ?>
+                                                            <div class="list-cell"><div class="btn-portfolio-item" onclick="showReviewGallery('<?= $k ?>', '<? echo $img_review ?>');">
+                                                                    <img src="<?=$img?>" alt=""/>
+                                                                </div></div>
+                                                            <?php
+                                                        }
+                                                        ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <?php
+                                        }
+                                    }
+                                    if($review_array[$i]['is_blind']!= '1'){
+                                        ?>
+                                        <div class="item-detail"><?=$review_array[$i]['review']?></div>
+                                        <!--                                    <div class="item-ui">-->
+                                        <!--                                        <button type="button" class="btn-comment-set"><span class="icon icon-size-16 icon-dot-more"></span></button>-->
+                                        <!--                                    </div>-->
+                                        <div class="basic-item basic-item-ui">
+                                            <button type="button" class="btn-basic-item-ui-nav"><span class="icon icon-size-16 icon-dot-more"></span></button>
+                                            <div class="basic-item-ui-list">
+                                                <a href="#" class="btn-basic-item-ui-item report_review" data-id="<?=$review_array[$i]['ir_seq']?>" data-report="<?=$review_array[$i]['is_blind']?>">신고하기</a>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }else{
+                                        ?>
+                                        <div class="blind item-detail"><i class="fas fa-lock"></i>신고되어 비공개된 글입니다.</div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                                <?php
+                                if($review_array[$i]['is_reply'] == '1' && $review_array[$i]['is_blind']!= '1'){
+                                    ?>
+                                    <div class="recomment-list">
+                                        <div class="recomment-cell">
+                                            <div class="recomment-item">
+                                                <div class="user-thumb-wrap">
+                                                    <div class="user-thumb"><img src="/static/pub/images/icon/icon-logo.png" alt=""/></div>
+                                                </div>
+                                                <div class="recomment-data">
+                                                    <div class="item-name">반짝<span class="date"><?=$review_array[$i]['reply_dt']?></span></div>
+                                                    <div class="item-detail"><?=$review_array[$i]['reply']?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                                ?>
+                            </div>
+                            <?php
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+            <?php
+            }
+            ?>
+            <!-- //상품상세 -->
+        </div>
+    </div>
+    <!-- //page-body -->
+    <div class="common-bottom-ui left">
+        <a href="shop_cart" class="btn-page-cart"><em>0</em></a>
+    </div>
+    <div class="common-bottom-ui right">
+        <button type="button" id="btnPageTop" class="btn-page-top" onclick="common.pageMove(0);">상단 바로가기</button>
+    </div>
+
+    <!--  장바구니 담기 완료 -->
+    <article id="shopCartMsg" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">장바구니에 잘 담았습니다. <br>지금 이동하시겠어요?</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="location.href='shop_cart'">확인</button>
+                        <button type="button" class="btn btn-confirm" onclick="pop.close();">취소</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
+    <!-- //장바구니 담기 완료 -->
+    <!--  갤러리 -->
+    <div class="gallery-pop-wrap">
+        <div class="gallery-pop-inner">
+            <div class="gallery-pop-data">
+                <div class="gallery-pop-slider">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide">
+                                <div class="slider-item">
+                                    <span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>
+                                    <img src="/static/pub/images/gate_picture.jpg" alt=""/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="swiper-page"></div>
+                    <button type="button" class="btn-swiper-slider-prev"></button>
+                    <button type="button" class="btn-swiper-slider-next"></button>
+                </div>
+                <div class="gallery-pop-ui">
+                    <button type="button" class="btn-gallery-pop-nav btn-gallery-mode" onclick="gallery.viewModeChange(this);">
+                        <span class="icon icon-size-24 icon-viewall-white off"></span>
+                        <span class="icon icon-size-24 icon-viewmax-white on"></span>
+                    </button>
+                    <button type="button" class="btn-gallery-pop-nav" onclick="gallery.close();"><span class="icon icon-size-24 icon-close-white"></span></button>
+                </div>
+            </div>
+            <div class="gallery-thumb-data">
+                <div class="gallery-thumb-list">
+                    <button type="button" class="btn-gallery-thumb-nav">
+                        <span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>
+                        <img src="/static/pub/images/user_thumb.png" alt="">
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //갤러리 -->
 </section>
 <!-- //container -->
+<script src="/static/pub/js/imagesloaded.pkgd.min.js"></script>
+<script>
+    var customer_id = "<?=$user_id?>";
+    var product_no = "<?=$product_no?>"; // 상품코드
+    var product_name = "<?=$product_row['product_name']?>"; // 상품이름
+    var il_seq = "<?=$product_row['il_seq']?>" // 상품 seq
+    var ip_seq = "<?=$product_row['ip_seq']?>"; // 위탁업체 seq
+    var is_supply = "<?=$product_row['is_supply']?>" // 2: 반짝 자체, 1: 그 외 모두
+    var supplier = "<?=$product_row['supplier']?>" // 공급사
+    var goodsNo = "<?=$product_row['goodsNo']?>" // 정글북 상품코드
+    var is_free_shipping = "<?=$product_row['is_free_shipping']?>" // 1:무료배송 2:배송비발생
+    var is_option = "<?=$is_option?>"; // 옵션 여부 common:일반, option:옵션, group:그룹옵션
+    var is_shop = "<?=$product_row['is_shop']?>";
+    var product_price = $("#total_price").val(); // 상품가격
+    var cart = []; // 상품 정보 담을 배열
+    var group_option = []; // 그룹옵션 배열
+    var shipping_price = ["",3500, 3000, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 배송비
 
-</body>
-</html>
+    $(document).ready(function(){
+
+        // 장바구니 개수
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: "get_cart_cnt",
+                customer_id: "<?=$user_id ?>"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $(".btn-page-cart em").text(data.data);
+            }
+        });
+
+        // 상품이 옵션일때 함수 실행
+        if(is_option == 'option'){ // 일반 옵션
+            item_option(il_seq, is_supply, supplier, goodsNo, is_free_shipping);
+        }else if(is_option == 'group'){ // 그룹 옵션
+            item_group_option();
+        }else{ // 일반 상품
+            // 바로 하나를 카트에 담기
+            cart.push({"seq" : il_seq, "value" : product_price, "amount" : 1, "is_free_shipping" : is_free_shipping, "txt" : product_name, "il_seq" : il_seq, "is_supply" : is_supply, "supplier" : supplier, "goodsNo" : goodsNo});
+            console.log(cart);
+        }
+
+        console.log(cart);
+        // 이미지, 동영상 경로 리세팅
+        var img_cnt = $('.shop-view-detail-data').children('img').length;
+        var video_cnt = $('.shop-view-detail-data p').children('video').length;
+
+        // 이미지
+        for(var i=0;i<img_cnt;i++){
+            var past_img = $('.shop-view-detail-data').children('img:eq('+i+')').attr("src");
+            // console.log(past_img.slice(2,past_img.length));
+            if(past_img.slice(0,2) == '..'){
+                $('.shop-view-detail-data').children('img:eq('+i+')').attr("src","https://image.banjjakpet.com"+past_img.slice(2,past_img.length));
+            }
+        }
+        // 동영상
+        for(var i=0;i<video_cnt;i++){
+            var past_video = $('.shop-view-detail-data p').children('video:eq('+i+')').attr("src");
+            // console.log(past_video.slice(2,past_video.length));
+            if(past_video.slice(0,2) == '..'){
+                $('.shop-view-detail-data p').children('video:eq('+i+')').attr("src","https://image.banjjakpet.com"+past_video.slice(2,past_video.length));
+            }
+        }
+        // console.log($('.shop-view-detail-data p').children('video:eq(0)').attr("src"));
+        // console.log($('.shop-view-detail-data p').children('video').length);
+
+        get_cart_list().then(shipping);
+    });
+
+    // 장바구니 수 체크하기
+    function get_cart_cnt(){
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: './data/item_ajax.php',
+                data: {
+                    mode: "get_cart",
+                    is_session: "1",
+                    customer_id: customer_id
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+
+                        var cart_cnt = 0;
+                        if(data.data && data.data.length > 0){
+                            cart_cnt = data.data.length;
+                        }
+                        $(document).find('#bj_item_cart .cart_cnt').text(cart_cnt);
+
+                        resolve();
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 배송비 배열 구하기
+    function get_partner_list(){
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: 'data/item_ajax.php',
+                data: {
+                    mode: "get_partner_list"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        $.each(data.data[0], function(i, v){
+                            shipping_price.push(v.shipping_price); // 배송비
+                        });
+                        $item_cart.find('.special_product').prepend(html);
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 배송비 노출
+    function shipping(){
+        return new Promise(function(resolve, reject) {
+            $.each(shipping_price, function(i,v){
+                if(is_free_shipping != 1) {
+                    if (v.ip_seq > 0) {
+                        if (i == ip_seq) {
+                            $(".shipping_price").text(v.format()+'원');
+                        }
+                    } else {
+                        if (i == is_supply) {
+                            if(product_no == 'CN-BANJJAK-A01'){ // 소파 배송비 4000
+                                $(".shipping_price").text('4,000원');
+                            }else{
+                                $(".shipping_price").text(v.format()+'원');
+                            }
+                        }
+                    }
+                }else{
+                    $(".shipping_price").text('무료배송');
+                }
+                resolve();
+            });
+        });
+    }
+
+    ////////////////////////// 옵션 상품 시작 ////////////////////////////////////////
+    // 그룹옵션 최초 리스트 뿌려주기
+    function item_group_option(){
+        console.log("item_group_option");
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode : "get_item_group_option_list",
+                product_no : product_no
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    var length = data.data['group'].length;
+                    console.log(data.data['group'].length);
+                    var html = '';
+
+                    if(data.data['group'] && data.data['group'].length > 0){
+                        group_option = []; // 그룹옵션 배열
+                        $.each(data.data['group'], function(i, v){
+                            // 그룹옵션 담기
+                            group_option.push({
+                                igod_seq: "",
+                                option_name: "",
+                                sale_price: 0
+                            });
+
+                            html += '<div class="product-option-title">'+v.group_name+'</div>';
+                            html += '<div class="product-option-select">';
+                            html += '    <select class="group_option"  data-option_no="'+i+'">';
+
+                            html += '			<option value="">선택</option>';
+                            $.each(data.data['detail'][i], function(_i, _v){
+                                var _math_symbol = (_v.plus_price && _v.plus_price > 0)? '+' : '-';
+                                var _plus_price = (_v.plus_price && _v.plus_price > 0)? '['+_math_symbol+''+_v.plus_price.format()+'원]' : '';
+                                html += '			<option value="'+_v.igod_seq+'" data-text="'+_v.option_name+'" data-price="'+_v.plus_price+'" data-soldout="'+_v.is_soldout+'">'+_v.option_name+' '+_plus_price+'</option>';
+                            });
+
+                            // html += '        <option value="">올리브</option>';
+                            // html += '        <option value="">올리브</option>';
+                            // html += '        <option value="">올리브</option>';
+
+                            html += '    </select>';
+                            html += '</div>';
+                            html += '<br>';
+                        });
+
+                        html += '<div class="product-option-select">';
+                        html += '    <button type="button" id="group_choice" class="btn btn-outline-gray btn-middle-size btn-round" data-il_seq="'+il_seq+'" data-product_name="'+product_name+'" data-is_supply="'+is_supply+'" data-supplier="'+supplier+'" data-goodsNo="'+goodsNo+'" data-is_free_shipping="'+is_free_shipping+'" data-length="'+length+'">옵션선택</button>';
+                        html += '</div>';
+                        html += '    <div class="product-option-list"></div>';
+                    }
+                    $(".product-option-wrap").html(html);
+
+                    // if(data.data && data.data.length > 0){
+                    //     group_option = [];
+                    //     $.each(data.data, function(i, v){
+                    //         item_group_option_detail(v.igo_seq, v.kind, i);
+                    //         group_option.push({
+                    //             igod_seq: "",
+                    //             option_name: "",
+                    //             sale_price: 0
+                    //         });
+                    //     });
+                    // }
+
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error + "네트워크에러");
+            }
+        });
+    }
+
+    // 그룹옵션 select 선택했을 때
+    $(document).on("change", ".group_option", function(){
+        var _this = $(this);
+        var option_no = _this.data('option_no');
+
+        if(_this.children("option:selected").data("soldout") == "2"){
+            alert("해당 상품은 품절입니다.");
+            $(".group_option option:eq(0)").prop("selected", true);
+        }
+        console.log(_this.children("option:selected").data("soldout"));
+        group_option[option_no].igod_seq = _this.val();
+        group_option[option_no].option_name = _this.children("option:selected").data("text");
+        group_option[option_no].plus_price = _this.children("option:selected").data("price");
+        console.log(group_option);
+    });
+
+    // 그룹옵션 선택 클릭시
+    $(document).on("click", "#group_choice", function(){
+        var _this = $(this);
+        var html = '';
+        var price = <?=$product_row['sale_price']?>;
+        var amount = 1;
+        var is_free_shipping = _this.data('is_free_shipping');
+        var il_seq = _this.data('il_seq');
+        var product_name = _this.data('product_name');
+        var is_supply = _this.data('is_supply');
+        var supplier =_this.data('supplier');
+        var goodsNo = _this.data('goodsNo');
+        var length = _this.data('length');
+        var igod_seq = '';
+        var igod_seq_arr = [];
+        var igod_name_arr = [];
+        var total_price = 0;
+        var flag = true;
+
+        $.each(group_option, function(i, v){
+            if(v.igod_seq == ""){
+                alert("필수 옵션을 선택해주세요.");
+                flag = false;
+                return false;
+            }
+            price += parseInt(v.plus_price);
+            igod_name_arr.push(v.option_name);
+            igod_seq_arr.push(v.igod_seq);
+        });
+        igod_seq = igod_seq_arr.join(',');
+        product_name += (igod_name_arr.length > 0)? ' ('+igod_name_arr.join('/')+')' : '';
+
+        var is_duplicate = 0;
+        $.each(cart, function(i, v){
+            if(v.igod_seq == igod_seq){
+                is_duplicate = 1;
+            }
+        });
+
+        if(flag == true){
+            if(is_duplicate == 0){
+                cart.push({"seq" : "", "value" : price, "amount" : amount, "is_free_shipping" : is_free_shipping, "txt" : product_name, "il_seq" : il_seq, "is_supply" : is_supply, "supplier" : supplier, "goodsNo" : goodsNo, "igod_seq" : igod_seq });
+                console.log(cart);
+
+                html = '';
+                $.each(cart, function(i, v){
+
+                    html += '<div class="product-option-items" data-no="'+(i+1)+'">';
+                    html += '    <div class="product-option-items-name">'+v.txt+'</div>';
+                    html += '    <div class="product-option-amount">';
+                    html += '        <button type="button" class="btn-product-option-minus" onclick="cnt_change(\'option\',\'m\','+(i+1)+')">감소</button>';
+                    html += '        <input type="number" value="'+v.amount+'" id="item_cnt_'+(i+1)+'" readonly/>';
+                    html += '        <button type="button" class="btn-product-option-plus" onclick="cnt_change(\'option\',\'p\','+(i+1)+')">증가</button>';
+                    html += '    </div>';
+                    html += '    <button type="button" class="btn-product-option-del delete_btn"><span class="icon icon-size-16 icon-close-small-gray"></span></button>';
+                    html += '</div>';
+                    total_price += parseInt(v.value) * parseInt(v.amount);
+                });
+                $(".product-option-list").html(html);
+
+                $('#result_price').text(total_price.format()+"원");
+                $("#total_price").val(parseInt(total_price));
+
+                // select 박스 초기화
+                $("select").find('option:first').prop("selected", true);
+                group_option = [];
+                for(var i=0;i<length;i++){
+                    // 그룹옵션 초기화
+                    group_option.push({
+                        igod_seq: "",
+                        option_name: "",
+                        sale_price: 0
+                    });
+                }
+                console.log(group_option);
+            }else{
+                alert("이미 입력한 옵션입니다.");
+            }
+        }
+    });
+
+    // 일반옵션 최초 리스트 뿌려주기
+    function item_option(il_seq, is_supply, supplier, goodsNo){
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode : "get_item_option",
+                il_seq: il_seq
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    var html = '<option value="">선택</option>';
+                    $.each(data.data[0], function(i, v){
+                        var price_val = (v.is_soldout == "2")? "soldout" : v.sale_price;
+                        var price_txt = (v.is_soldout == "2")? "품절" : v.sale_price.format()+"원";
+                        var free_shippping_txt = (v.is_free_shipping == "1")? "[무료배송]" : "";
+
+                        html += '<option value="'+price_val+'" data-option_seq="'+v.io_seq+'" data-free_shipping="'+v.is_free_shipping+'" data-option_txt="'+v.option_name+'" data-is_supply="'+is_supply+'" data-supplier="'+supplier+'" data-goodsNo="'+goodsNo+'">'+free_shippping_txt+''+v.option_name+' '+price_txt+'</option>';
+                    });
+                    $("#item_option").html(html);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    // 일반옵션 선택시
+    $(document).on("change", "#item_option", function(){
+        var value = $(this).children("option:selected").val();
+        var seq = $(this).children("option:selected").data("option_seq");
+        var txt = $(this).children("option:selected").data("option_txt");
+        var html = '';
+
+        var keepgoing = "0"; // 중복선택 방지
+        $.each(cart, function(i, v){
+            if(seq == v.seq){
+                alert("이미 선택하신 옵션입니다.");
+                keepgoing = "1";
+            }
+        });
+
+        if(value == "soldout" || value == ""){ // 품절 선택시
+            alert("품절 상품입니다. 다른 상품을 선택해주세요.");
+            $(this).val('');
+        }else if(keepgoing == "1"){ // 중복 선택시
+            $(this).val('');
+        }else{
+
+            cart.push({"seq" : seq, "value" : value, "amount" : 1, "is_free_shipping" : is_free_shipping, "txt" : txt, "il_seq" : il_seq, "is_supply" : is_supply, "supplier" : supplier, "goodsNo" : goodsNo});
+            console.log(cart);
+
+            html += '<div class="product-option-items" data-no="'+cart.length+'">';
+            html += '    <div class="product-option-items-name">'+txt+'</div>';
+            html += '    <div class="product-option-amount">';
+            html += '        <button type="button" class="btn-product-option-minus" onclick="cnt_change(\'option\',\'m\','+cart.length+')">감소</button>';
+            html += '        <input type="number" value="1" id="item_cnt_'+cart.length+'" readonly/>';
+            html += '        <button type="button" class="btn-product-option-plus" onclick="cnt_change(\'option\',\'p\','+cart.length+')">증가</button>';
+            html += '    </div>';
+            html += '    <button type="button" class="btn-product-option-del delete_btn"><span class="icon icon-size-16 icon-close-small-gray"></span></button>';
+            html += '</div>';
+
+            $(".product-option-list").append(html);
+            $(this).val('');
+
+            $('#result_price').text((parseInt($("#total_price").val()) + parseInt(value)).format()+"원");
+            $("#total_price").val(parseInt($("#total_price").val()) + parseInt(value));
+        }
+
+    });
+
+    // 옵션 상품 리스트 삭제시
+    $(document).on('click', '.delete_btn', function(){
+        console.log("click");
+        var cart_no = $(this).parent().data("no");
+        var html = '';
+        $.each(cart, function(i, v){
+            if(i == (cart_no - 1)){
+                cart.splice(i, 1);
+            }
+        });
+        console.log(cart);
+
+        var total_price = 0;
+
+        $.each(cart, function(i, v){
+            html += '<div class="product-option-items" data-no="'+(i+1)+'">';
+            html += '    <div class="product-option-items-name">'+v.txt+'</div>';
+            html += '    <div class="product-option-amount">';
+            html += '        <button type="button" class="btn-product-option-minus" onclick="cnt_change(\'option\',\'m\','+(i+1)+')">감소</button>';
+            html += '        <input type="number" value="'+v.amount+'" id="item_cnt_'+(i+1)+'" readonly/>';
+            html += '        <button type="button" class="btn-product-option-plus" onclick="cnt_change(\'option\',\'p\','+(i+1)+')">증가</button>';
+            html += '    </div>';
+            html += '    <button type="button" class="btn-product-option-del delete_btn"><span class="icon icon-size-16 icon-close-small-gray"></span></button>';
+            html += '</div>';
+
+            total_price += parseInt(v.value * v.amount);
+        });
+        $(".product-option-list").html("").append(html);
+
+
+        $('#result_price').text(total_price.format()+"원");
+        $("#total_price").val(parseInt(total_price));
+    })
+
+    ////////////////////////// 옵션 상품 끝 ////////////////////////////////////////
+
+    // 상품 개수 변경
+    function cnt_change(option,type,data_no){
+
+        // 일반상품일때
+        if(option == 'common'){
+            var name = $('#item_cnt');
+            var org_cnt = parseInt($('#item_cnt').val());
+            if(type == 'm'){ // 감소
+                if(name.val() > 1){
+                    name.val(org_cnt-1);
+                    $("#total_price").val(product_price*(org_cnt-1));
+                    $('#result_price').text((product_price*(org_cnt-1)).format()+"원");
+                    cart[0].amount = (org_cnt-1);
+                }
+            } else { // 증가
+                if(name.val() < 100){
+                    name.val(org_cnt+1);
+                    $("#total_price").val(product_price*(org_cnt+1));
+                    $('#result_price').text((product_price*(org_cnt+1)).format()+"원");
+                    cart[0].amount = (org_cnt+1);
+                }
+            }
+            console.log(cart);
+            // 옵션, 그룹옵션 상품일때
+        }else if(option = 'option'){
+            var cart_no = parseInt(data_no);
+            var amount = parseInt($("#item_cnt_"+data_no).val());
+
+            if(type == 'm'){ // 감소
+                amount -= 1;
+                if(amount <= 0){
+                    amount = 1;
+                }
+            } else { // 증가
+                amount += 1;
+                if(amount > 99){
+                    amount = 99;
+                }
+            }
+            $("#item_cnt_"+data_no).val(amount);
+            cart[cart_no - 1].amount = amount;
+
+            var total_price = 0;
+            $.each(cart, function(i, v){
+                total_price += parseInt(v.value * v.amount);
+            });
+
+            $('#result_price').text(total_price.format()+"원");
+            $("#total_price").val(parseInt(total_price));
+        }
+    }
+
+    ////////////////////////// 구매 시작 ////////////////////////////////////////
+    // 바로구매 direct, 장바구니 cart
+    function buy_product(type){
+        // 구매한 정보(cart)를 세션에 담는다
+        if(cart.length <= 0){
+            alert("상품을 선택해주세요.");
+        }else{
+            // 장바구니
+            if(type == 'cart'){
+                get_cart_list()
+                    .then(get_special_mall_chk)
+                    .then(get_cart_item_duplicate_chk);
+
+                // 바로구매
+            }else{
+                $.ajax({
+                    url: 'data/item_ajax.php',
+                    data: {
+                        mode : "set_insert_cart",
+                        total_price: product_price,
+                        user_id: customer_id,
+                        product_no: product_no,
+                        is_shop: is_shop,
+                        ip_seq: ip_seq,
+                        is_supply: is_supply,
+                        supplier: supplier,
+                        direct_chk: "1",
+                        cart_data: JSON.stringify(cart)
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        if(data.code == "000000"){
+                            console.log(data.data);
+                            // setCookie("order_num", data.data, 1440);
+                            // setCookie("order_step", "1", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
+
+                            if(customer_id != ""){
+                                location.href = "shop_pay_input?no="+data.data+"&direct_chk=1";
+                            }else{
+                                location.href = "login_1?no="+data.data+"&direct_chk=1";
+                            }
+                        }else{
+                            alert(data.data+"("+data.code+")");
+                            console.log(data.data);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        //alert(error + "네트워크에러");
+                        if(xhr.status != 0){
+                            alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                        }
+                    }
+                });
+            }
+        }
+    }
+    ////////////////////////// 구매 끝 ///////////////////////////////////////
+
+    ////////////////////////// 장바구니 시작 ////////////////////////////////////////
+    // 내 장바구니 리스트 불러오기
+    function get_cart_list(){
+        return new Promise(function(resolve, reject) {
+            console.log("장바구니 리스트 불러오기");
+            $.ajax({ // (1)
+                url: './data/item_ajax.php',
+                data: {
+                    mode : "get_cart",
+                    direct_chk: "0",
+                    customer_id : customer_id,
+                    is_session: "1"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data[0]);
+
+                        var returnData = {cart_list_data: data.data[0]};
+                        resolve(returnData);
+                    }else{
+                        alert(data.data[0]+"("+data.code+")");
+                        console.log(data.data[0]);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 전문몰인지 확인할건데 일단 옵션상품인지 확인하기??
+    function get_special_mall_chk(param){
+        return new Promise(function(resolve, reject) {
+            console.log("전문몰 확인 전 옵션상품인지 체크" , param);
+
+            // (2)
+            if(param.cart_list_data && param.cart_list_data.length > 0){
+                var p = $.when();
+                var c = 0;
+                $.each(param.cart_list_data, function(i, v){
+                    p = p.then(function(){
+                        var cart_data = JSON.parse(v.cart_data);
+                        $.each(cart_data, function(i2, v2){
+                            if(v2.seq != ""){ // 단일/옵션상품 여부
+                                // item_option > item_list > is_shop
+                                console.log("optn---------------------------");
+                                var returnData = {io_seq: v2.seq, cart_list_data: param.cart_list_data};
+                                return get_item_option(returnData)
+                                    .then(get_item_list)
+                                    .then(set_delete_item_cart);
+                            }else{
+                                // item_list > is_shop
+                                console.log("dan1---------------------------");
+                                var returnData = {il_seq: v2.il_seq, product_no: '', cart_list_data: param.cart_list_data};
+                                return get_item_list(returnData)
+                                    .then(set_delete_item_cart);
+                            }
+                        });
+
+                        c++;
+                    }).done(function(){
+                        console.log("### done");
+                        if(c == Object.keys(param.cart_list_data).length){
+                            console.log("### done - end");
+                            resolve(param);
+                        }
+                    });
+                });
+
+            }else{
+                // 장바구니 비어있음
+                // => 장바구니 추가 (3)에서 추가하므로 중복 제거
+                //set_insert_cart(total_price, user_id);
+                resolve(param);
+            }
+        });
+    }
+
+    // 옵션 상품이라면 옵션 불러오기??
+    function get_item_option(param){
+        return new Promise(function(resolve, reject) {
+            console.log("옵션상품일 경우 옵션 불러오기" , param);
+            $.ajax({ // (1)
+                url: './data/item_ajax.php',
+                data: {
+                    mode : "get_item_option",
+                    io_seq: param.io_seq
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data[0]);
+                        var product_no = "";
+
+                        $.each(data.data[0], function(i, v){
+                            product_no = v.product_no;
+                        });
+
+                        var returnData = {il_seq: '', product_no: product_no, cart_list_data: param.cart_list_data};
+                        resolve(returnData);
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 상품 불러오기??
+    function get_item_list(param){
+        return new Promise(function(resolve, reject) {
+            console.log("상품정보 불러오기" , param);
+            $.ajax({ // (1)
+                url: './data/item_ajax.php',
+                data: {
+                    mode : "get_item",
+                    il_seq: param.il_seq,
+                    product_no: param.product_no
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data['item']);
+
+                        var returnData = {item_data: data.data['item'], cart_list_data: param.cart_list_data};
+                        resolve(returnData);
+                    }else{
+                        // alert(data.data+"("+data.code+")");
+                        // console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 반짝몰, 전문몰 충돌 삭제??
+    function set_delete_item_cart(param){
+        return new Promise(function(resolve, reject) {
+            console.log("전문몰이랑 충돌일때 삭제하기" , param);
+            var is_special_mall = is_shop;
+            var user_id = "<?=$user_id ?>";
+
+            $.each(param.item_data, function(i, v){
+                console.log(v.is_shop, is_special_mall);
+                if(v.is_shop != is_special_mall){ // (2-1)
+                    console.log(v, param.cart_list_data);
+                    $.each(param.cart_list_data, function(i2, v2){
+                        $.ajax({ // (2-1)
+                            url: './data/item_ajax.php',
+                            data: {
+                                mode : "set_delete_item_cart",
+                                ic_seq: v2.ic_seq,
+                                user_id: user_id,
+                                delete_txt: "반짝몰or전문몰 상품 충돌 삭제"
+                            },
+                            type: 'POST',
+                            dataType: 'JSON',
+                            success: function(data) {
+                                if(data.code == "000000"){
+                                    console.log(data.data);
+
+                                    var returnData = {cart_list_data: {}};
+                                    resolve(returnData);
+                                }else{
+                                    alert(data.data+"("+data.code+")");
+                                    console.log(data.data);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                //alert(error + "네트워크에러");
+                                if(xhr.status != 0){
+                                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                }
+                            }
+                        });
+                    });
+                }else{
+                    var returnData = {cart_list_data: param.cart_list_data};
+                    resolve(returnData);
+                }
+            });
+
+        });
+    }
+
+    // 장바구니에 담긴 제품인지 확인
+    function get_cart_item_duplicate_chk(param){ // (3)
+        return new Promise(function(resolve, reject) {
+            console.log("장바구니 수량추가인지 등록인지 체크" , param);
+            var total_price = $("#total_price").val();
+            var is_special_mall = is_shop;
+            var user_id = "<?=$user_id ?>";
+
+            $.ajax({
+                url: './data/item_ajax.php',
+                data: {
+                    mode : "get_cart",
+                    direct_chk: "0",
+                    customer_id: customer_id,
+                    is_session: "1"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data[0]);
+                        // console.log(data.data[0].length);
+
+                        if(data.data[0] && data.data[0].length > 0){
+                            // 장바구니 호출
+                            $.each(data.data[0], function(i, v){
+                                var cart_data = JSON.parse(v.cart_data);
+                                var cart_flag = 0;
+                                $.each(cart_data, function(i2, v2){
+                                    // 리스트 호출
+                                    console.log(v2.il_seq, v2.amount);
+                                    $.each(cart, function(i3, v3){
+                                        console.log(v3.il_seq, v3.il_seq);
+                                        if(v2.il_seq == v3.il_seq && v3.il_seq != ''){
+                                            // 중복상품
+                                            console.log("중복상품이여서");
+                                            //console.log(cart_data[i2]);
+                                            cart_data[i2].amount += v3.amount; // 수량증가
+                                            cart.splice(i3, 1);// 카트에서 제외
+                                            cart_flag++;
+                                        }else{
+                                            // 중복상품 아님
+                                            console.log("중복아님");
+                                        }
+                                    });
+                                });
+                                console.log(cart_data);
+                                console.log(v.ic_seq);
+
+                                if(cart_flag > 0){
+                                    console.log("수량추가하기");
+                                    set_update_cart_amount(v.ic_seq, cart_data);
+                                }
+                            });
+                            if(Object.keys(cart).length > 0){
+                                // 남은 제품 장바구니 제품 추가
+                                console.log("제품추가");
+                                console.log(cart);
+
+                                set_insert_cart(total_price, user_id, is_special_mall);
+                            }else{
+                                // 중복상품이여서 수량 추가한 후 완료 처리
+                                // 처리완료 메시지
+                                setCookie("order_num", data.data, 1440);
+                                setCookie("order_step", "3", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
+                                if(is_shop == "1"){ // 펫샵일경우 ( 추후 분리예정 )
+                                    setCookie("is_shop", "1", 1440);
+                                }
+//							if(user_id != ""){ // 비회원 구매하도록 풀기
+//                                 get_cart_cnt(); // cart_count
+                                // 장바구니 팝업
+                                pop.open('shopCartMsg');
+//							}else{
+//								location.href = "/pet/login/";
+//							}
+                            }
+                        }else{
+                            // 장바구니 제품 추가
+                            console.log("장바구니 첫 제품 추가");
+                            console.log(cart);
+
+                            set_insert_cart(total_price, user_id, is_special_mall);
+                        }
+                        resolve();
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 장바구니에 있는 제품 수량 추가하기
+    function set_update_cart_amount(ic_seq, cart_data){
+        // 수량 추가
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode : "set_update_cart",
+                is_session : "1",
+                customer_id : customer_id,
+                ic_seq : ic_seq,
+                cart_data : JSON.stringify(cart_data)
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    // 장바구니에 제품 등록하기
+    function set_insert_cart(total_price, user_id, is_special_mall){
+
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode : "set_insert_cart",
+                total_price: total_price,
+                user_id: user_id,
+                product_no: product_no,
+                is_shop: is_special_mall,
+                ip_seq: ip_seq,
+                is_supply: is_supply,
+                supplier: supplier,
+                direct_chk: '0',
+                cart_data: JSON.stringify(cart)
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+
+                    setCookie("order_num", data.data, 1440);
+                    setCookie("order_step", "3", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
+                    if(is_shop == "1"){ // 펫샵일경우 ( 추후 분리예정 )
+                        setCookie("is_shop", "1", 1440);
+                    }
+//				if(user_id != ""){
+//                     get_cart_cnt(); // cart_count
+                    // 장바구니 팝업
+                    pop.open('shopCartMsg');
+//				}else{
+//					location.href = "/pet/login/";
+//				}
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    ////////////////////////// 장바구니 끝 ////////////////////////////////////////
+
+    // 리뷰 신고하기
+    $(".report_review").click(function(){
+        var ir_seq = $(this).data('id');
+        var report = $(this).data('report');
+        console.log(ir_seq);
+        if(customer_id == '') {
+            $('#firstRequestMsg1').find('.msg-txt').text('로그인 후 이용 가능합니다.');
+            pop.open('firstRequestMsg1');
+        }else if(report == '1'){
+            $('#firstRequestMsg1').find('.msg-txt').text('이미 신고접수가 된 후기입니다.');
+            pop.open('firstRequestMsg1');
+        }else{
+            alert('신고하기 후 해당 글은 비공개 처리 됩니다.');
+            location.replace('shop_review_report?ir_seq='+ir_seq+'&product_no='+product_no);
+        }
+    });
+
+    // 리뷰 사진보기
+    var gallery = {
+
+        element : null,
+        swiper : null,
+        swiperCur : 0,
+        swiperLen : -1,
+
+        init : function(){
+            gallery.element = $('.gallery-pop-wrap');
+            gallery.swiperLen = gallery.element.find('.swiper-slide').length;
+            gallery.swiper = new Swiper( gallery.element.find('.swiper-container')[0] , {
+                loop : false,
+                slidesPerView : 1 ,
+                spaceBetween : 0,
+                simulateTouch : true,
+                speed : 450,
+                navigation: {
+                    nextEl: gallery.element.find('.btn-swiper-slider-next')[0],
+                    prevEl: gallery.element.find('.btn-swiper-slider-prev')[0]
+                }
+            });
+            gallery.swiper.on('slideChange' , function(){
+                gallery.swiperCur = this.realIndex;
+                gallery.pageSort();
+            });
+            gallery.pageSort();
+
+            $(document).on('click' , '.btn-gallery-thumb-nav' , function(){
+                var $index = $(this).index();
+                gallery.swiper.slideTo($index , 450);
+            });
+        },
+        pageSort : function(){
+            var _value = '<em>' + String((gallery.swiperCur + 1) + '</em> / ' + gallery.swiperLen);
+            gallery.element.find('.swiper-page').html(_value);
+            gallery.element.find('.gallery-thumb-list > .btn-gallery-thumb-nav').eq(gallery.swiperCur).addClass('actived').siblings().removeClass('actived');
+        },
+
+        dataSet : function(imgList){
+            //샘플링 데이타
+            // -> <div class="swiper-slide"><div class="slider-item"><img src="/static/pub/images/gate_picture.jpg" alt=""/></div></div>
+            var i = 0;
+            var len = Math.floor(Math.random() * (14 - 1)) + 1;
+            var result = '';
+            var resultThumb = '';
+            for(i = 0; i < imgList.length; i++){
+                result += '<div class="swiper-slide"><div class="slider-item hide">';
+                result += '<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>	';
+                result += '<img src="https://image.banjjakpet.com'+imgList[i]+'" alt="" />';
+                result += '</div></div>';
+
+                resultThumb += '<button type="button" class="btn-gallery-thumb-nav hide">';
+                resultThumb += '<span class="loading-bar"><span class="sk-fading-circle"><span class="sk-circle1 sk-circle"></span><span class="sk-circle2 sk-circle"></span><span class="sk-circle3 sk-circle"></span><span class="sk-circle4 sk-circle"></span><span class="sk-circle5 sk-circle"></span><span class="sk-circle6 sk-circle"></span><span class="sk-circle7 sk-circle"></span><span class="sk-circle8 sk-circle"></span><span class="sk-circle9 sk-circle"></span><span class="sk-circle10 sk-circle"></span><span class="sk-circle11 sk-circle"></span><span class="sk-circle12 sk-circle"></span></span></span>';
+                resultThumb += '<img src="https://image.banjjakpet.com'+imgList[i]+'" alt="" >';
+                resultThumb += '</button>';
+            };
+
+            //데이타 삽입
+            gallery.element.find('.swiper-wrapper').html(result);
+            gallery.element.find('.gallery-thumb-list').html(resultThumb);
+
+            gallery.element.find('.swiper-wrapper .slider-item').each(function(){
+                $(this).imagesLoaded().always(function(instance){
+                    //console.log('model image loaded');
+                }).done(function(instance){
+                    $(instance.elements).removeClass('hide');
+                }).fail( function(){
+                    //alert('프로필 이미지가 없습니다.');
+                }).progress(function(instance,image){
+
+                });
+            });
+
+            gallery.element.find('.gallery-thumb-list .btn-gallery-thumb-nav').each(function(){
+                $(this).imagesLoaded().always(function(instance){
+                    //console.log('model image loaded');
+                }).done(function(instance){
+                    $(instance.elements).removeClass('hide');
+                }).fail( function(){
+                    //alert('프로필 이미지가 없습니다.');
+                }).progress(function(instance,image){
+
+                });
+            });
+
+            /*
+            $('#heroModel').imagesLoaded().always(function(instance){
+                //console.log('model image loaded');
+            }).done(function(instance){
+                $('#heroModel').removeClass('loading');
+            }).fail( function(){
+                //alert('프로필 이미지가 없습니다.');
+            }).progress(function(instance,image){
+
+            });
+            */
+
+            //데이타 삽입 후 재설정
+            gallery.swiperCur = 0;
+            gallery.swiperLen = i;
+
+            //데이타 삽입 후 재정렬
+            gallery.viewUpdate();
+            gallery.pageSort();
+        },
+
+        open : function(startIndex){
+            gallery.element.addClass('actived');
+            gallery.viewUpdate();
+            gallery.swiper.slideTo(startIndex,0);
+        },
+        close : function(){
+            gallery.element.removeClass('actived');
+        },
+        viewModeChange : function(obj){
+            if($(obj).hasClass('actived')){
+                //리스트 비활성화
+                $(obj).removeClass('actived');
+                gallery.element.removeClass('thumb');
+            }else{
+                //리스트 활성화
+                $(obj).addClass('actived')
+                gallery.element.addClass('thumb');
+            }
+
+            setTimeout(function(){
+                if(gallery.swiper) gallery.viewUpdate();
+            } , 300);
+        },
+        viewUpdate : function(){
+            gallery.swiper.update();
+            gallery.swiper.updateSize();
+            gallery.swiper.updateSlides();
+            gallery.swiper.updateProgress();
+        }
+    };
+
+    function showReviewGallery(startIndex, img_list){
+        var imgs	= img_list.split('|');
+        imgs.forEach(element => {
+            element = img_link_change(element);
+        });
+        console.log(imgs);
+        gallery.dataSet(imgs);
+        gallery.open(startIndex);
+    };
+
+    $(function(){
+        gallery.init();
+    });
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+
+    // 쿠키 생성
+    function setCookie(cName, cValue, cDay){
+        var expire = new Date();
+        expire.setMinutes(expire.getMinutes() + cDay);
+        cookies = cName + '=' + escape(cValue) + '; path=/ '; // 한글 깨짐을 막기위해 escape(cValue)를 합니다.
+        if(typeof cDay != 'undefined') cookies += ';expires=' + expire.toGMTString() + '; SameSite=None; Secure=true; ';
+        document.cookie = cookies;
+    }
+
+</script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer.php");
+?>
