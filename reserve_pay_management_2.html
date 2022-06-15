@@ -787,7 +787,7 @@ if(empty($grade[0]['grade_name'])){
                 <input type="hidden" name="discount_num" value="<?=$discount_num ?>" />
                 <input type="hidden" name="discount_type" value="<?=$discount_type ?>" />
                 <div class="basic-data-group">
-                    <div class="con-title-group con-title-group-add">
+                    <div class="con-title-group con-title-group-add" id="shortCutTarget4">
                         <h4 class="con-title">미용 종료 알림 발송</h4>
                     </div>
                     <div class="basic-data-group vvsmall">
@@ -3994,6 +3994,8 @@ if(empty($grade[0]['grade_name'])){
 
         let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
 
+        let shortCutTarget4 = document.querySelector("#shortCutTarget4").getBoundingClientRect().top;
+
         let pageBodyRectTop = document.querySelector("#page-body").getBoundingClientRect().top;
 
         // let pageBodyScrollTop = $("#page-body").scrollTop();
@@ -4001,34 +4003,42 @@ if(empty($grade[0]['grade_name'])){
         let shortcut = $("#shortcutWrap");
 
         $(window).on("touchmove",function(){
-
-
-
-            if($("#page-body").scrollTop() === 0) {
-                shortcut.css("display","flex");
+                shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
+            })
 
-
-            }else{
-                shortcut.css("display","flex");
+        $(window).on("scroll",function(){
+                console.log("스크롤");
+                shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
-
-            }
-
-
-
-
-        })
+            })
 
         $("#page-body").scrollStopped(function(){
             if($("#page-body").scrollTop() === 0){
 
-                return;
-            }
-            shortcut.stop().animate({"opacity":0},1000,function(){
-                shortcut.css("display","none");
-            });
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},50);
 
+            }else{
+                shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
+                    shortcut.css("display","none");
+                });
+
+            }
+        })
+
+        $(window).scrollStopped(function(){
+            if($("#page-body").scrollTop() === 0){
+
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},50);
+
+            }else{
+                shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
+                    shortcut.css("display","none");
+                });
+
+            }
         })
 
 
@@ -4036,7 +4046,6 @@ if(empty($grade[0]['grade_name'])){
         function scrollMove1(){
 
             $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
-            shortcut.stop().animate({"opacity":1},50);
         }
         function scrollMove2(){
 
@@ -4046,8 +4055,9 @@ if(empty($grade[0]['grade_name'])){
         function scrollMove3(){
 
             $('#page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
-            shortcut.stop().animate({"opacity":0},50,function(){
-                shortcut.css("display","none");});
+            shortcut.stop().animate({"opacity":0},150,function(){
+                shortcut.css("display","none");
+            })
         }
 
 
