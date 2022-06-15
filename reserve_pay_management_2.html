@@ -3978,30 +3978,28 @@ if(empty($grade[0]['grade_name'])){
 
         let shortCutFlag = true;
         function shortcut_appear(){
-
-
                 if(shortCutFlag){
+                    $("#shortcutWrap").css("display","flex");
                     $("#shortcutWrap").stop().animate({'opacity':1},300);
-
                     shortCutFlag=false;
-
                     setTimeout(shortcut_disappear,3000);
                 }
-
-
-
-            }
-
+         }
         function shortcut_disappear(){
-
                 if(!shortCutFlag){
                     $("#shortcutWrap").stop().animate({'opacity':0},300);
+                    setTimeout(disappear,600);
                     shortCutFlag=true;
                 }
-
+        }
+        function disappear(){
+            if(shortCutFlag){
+                $("#shortcutWrap").stop().css("display","none");
+                shourtCutFlag=false;
+            }
         }
 
-        $(document).on("touchstart", shortcut_appear);
+        $(document).on("touchmove", shortcut_appear);
 
 
 
