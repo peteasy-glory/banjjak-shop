@@ -215,8 +215,16 @@ if(empty($grade[0]['grade_name'])){
 
     <!-- container -->
     <section id="container">
+
+
         <!-- page-body -->
-        <div class="page-body">
+        <div class="page-body" id="page-body">
+            <div class="shortcut-wrap" id="shortcutWrap">
+                <img src="/images/icon-page-top.png" alt="" onclick="common.pageMove(0);">
+                <img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();">
+                <img src="/images/icon-pay.png" alt="" onclick="scrollMove3();">
+
+            </div>
             <div class="reserve-pay-management">
                 <?php
                 if($pay['status'] == 'R1' && $pay['total_price'] > 0){
@@ -654,7 +662,7 @@ if(empty($grade[0]['grade_name'])){
                 <?php } ?>
 
 
-                <div class="basic-data-group">
+                <div class="basic-data-group" id="shortCutTarget2" >
                     <div class="con-title-group con-title-group-add">
                         <h4 class="con-title">예약 내용</h4>
                         <button type="button" onclick="location.href='reserve_alarm_inquiry?payment_log_seq=<?=$payment_log_seq?>&cellphone=<?=$pay['cellphone']?>&pet_name=<?=$pet['name']?>'" class="btn-side btn btn-msmall-size btn-inline btn-border-radius-16 btn-bg-yellow">알림톡 발송 이력</button>
@@ -811,7 +819,7 @@ if(empty($grade[0]['grade_name'])){
                 <input type="hidden" name="artist_id" value="<?php echo $pay['artist_id'];?>">
                 <input type="hidden" name="customer_id" value="<?php echo $cus['id'];?>">
                 <input type="hidden" name="tmp_seq" value="<?php echo $cus['tmp_seq'];?>">
-                <div class="basic-data-group" id="basic-data-group-target">
+                <div class="basic-data-group" id="shortCutTarget3">
                     <div class="sticky-tab-group" id="sticky-tab-group-target">
                         <div class="con-title-group con-title-group-add " >
                             <h4 class="con-title">결제정보</h4>
@@ -821,10 +829,10 @@ if(empty($grade[0]['grade_name'])){
                                 <div class="wide-tab-inner receipt-wide-tab-inner">
                                     <!-- 활성화시 actived클래스 추가 -->
                                     <!-- 변경사항 있을 경우 hit클래스 추가 -->
-                                    <div class="tab-cell hit actived" ><a href="#basic-data-group-target"><button type="button"  class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></a></div>
-                                    <div class="tab-cell "><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab2"><span>추가</span></button></a></div>
-                                    <div class="tab-cell" ><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab3"><span>쿠폰상품</span></button></a></div>
-                                    <div class="tab-cell" ><a href="#basic-data-group-target"><button type="button" class="btn-tab-item" id="tab4"><span>제품</span></button></a></div>
+                                    <div class="tab-cell hit actived" ><a href="#shortCutTarget3"><button type="button"  class="btn-tab-item" id="tab1"><span>기본 서비스</span></button></a></div>
+                                    <div class="tab-cell "><a href="#shortCutTarget3"><button type="button" class="btn-tab-item" id="tab2"><span>추가</span></button></a></div>
+                                    <div class="tab-cell" ><a href="#shortCutTarget3"><button type="button" class="btn-tab-item" id="tab3"><span>쿠폰상품</span></button></a></div>
+                                    <div class="tab-cell" ><a href="#shortCutTarget3"><button type="button" class="btn-tab-item" id="tab4"><span>제품</span></button></a></div>
                                 </div>
                             </div>
 
@@ -3964,6 +3972,61 @@ if(empty($grade[0]['grade_name'])){
 
         document.addEventListener("scroll",onScroll);
         document.addEventListener("touchmove",timeoutScroll)
+
+
+        //short-cut
+
+        let shortCutFlag = true;
+        function shortcut_appear(){
+
+
+                if(shortCutFlag){
+                    $("#shortcutWrap").stop().animate({'opacity':1},300);
+
+                    shortCutFlag=false;
+
+                    setTimeout(shortcut_disappear,3000);
+                }
+
+
+
+            }
+
+        function shortcut_disappear(){
+
+                if(!shortCutFlag){
+                    $("#shortcutWrap").stop().animate({'opacity':0},300);
+                    shortCutFlag=true;
+                }
+
+        }
+
+        $(document).on("touchstart", shortcut_appear);
+
+
+
+        let pageTitle = document.querySelector(".page-title").clientHeight;
+
+        let shortCutTarget2 = document.querySelector("#shortCutTarget2").getBoundingClientRect().top
+
+        let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
+
+        console.log(pageTitle);
+        function scrollMove2(){
+
+            $('.page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
+        }
+
+        function scrollMove3(){
+
+            $('.page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
+
+
+
+        }
+
+
+
 
 
 
