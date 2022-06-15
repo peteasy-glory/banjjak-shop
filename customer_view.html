@@ -422,20 +422,17 @@ $another_reserve = 0;
                                     //echo $que;
                                     $res = sql_query($que);
                                     $pet = sql_fetch($res);
-                                        if(!empty($pet['photo'])){
-                                            $img = "https://image.banjjakpet.com".img_link_change($pet['photo']);
+
+                                    $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet_seq}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
+                                    $rw = sql_fetch_array($sql);
+                                    if(!empty($rw[0]['file_path'])){
+                                        $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);
+                                    } else {
+                                        if ($pet['type'] == 'dog') {
+                                            $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
                                         } else {
-                                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pet_seq}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
-                                            $rw = sql_fetch_array($sql);
-                                            if(!empty($rw[0]['file_path'])){
-                                                $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);
-                                            } else {
-                                                if ($pet['type'] == 'dog') {
-                                                    $img = '/images/dog/dog_90x90/dog_90x90@3x.png';
-                                                } else {
-                                                    $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
-                                             }
-                                        }
+                                            $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
+                                     }
                                     }
                                     ?>
                                     <img src="<?=$img?>" onclick="showImage('<?=$img?>');" alt="">

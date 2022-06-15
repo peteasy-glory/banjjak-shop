@@ -82,6 +82,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 //페이지 url 확인
 $pars_url = $_SERVER['REQUEST_URI'];
 $pos = strpos($pars_url, 'reserve_pay_management_1');
+$pos1 = strpos($pars_url, 'reserve_waiting');
 ?>
 <!DOCTYPE html>
 <html lang="ko" class="">
@@ -332,23 +333,31 @@ $pos = strpos($pars_url, 'reserve_pay_management_1');
         <div class="bar" style="width:33.33%"></div>
     </div>
 	<?php
-    if(isset($header_right)){
-		
-		echo $header_right;
-        if($pos !== false) {
+    if(isset($header_right)) {
+
+        echo $header_right;
+        if ($pos !== false) {
             echo '<div class="header-right">
                     <div class="label-group">
-                        <div class="label label-outline-purple middle"><em>승인대기</em></div>
+                        <div class="label-add-purple"><em>승인대기</em></div>
                     </div>
                 </div>';
         }
-		} else {
+    }else if(isset($reserve_waiting)){
+        if ($pos1 !== false) {
+            echo '<div class="header-right">
+                    <div class="label-group">
+                        <a href="https://partner.banjjakpet.com/mypage_notice_view?notice_seq=20"><div class="label-add-pink"><em>회원등급제란?</em></div></a>
+                    </div>
+                </div>';
+        }
+    } else {
 			
 		?>
 <!--		<div class="header-right" id="header_bell">
 			<a href="#" class="btn-page-ui btn-page-alarm"><div class="icon icon-size-24 icon-page-alarm">알람</div></a>
 		</div> -->
-	<?php }	?>
+<?php }	?>
 </header>
 <?php } ?>
 <script>

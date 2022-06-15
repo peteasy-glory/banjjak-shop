@@ -524,10 +524,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                         //echo $que;
                         $tm = sql_fetch_array($que);
 
-                        if(!empty($tm[0]['photo'])){
-                            $img = "https://image.banjjakpet.com".img_link_change($tm[0]['photo']);   
-                        } else {
-                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pl['pet_seq']}' ORDER BY upload_dt DESC LIMIT 1";
+                            $sql = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$pl['pet_seq']}' AND artist_id = '{$user_id}' ORDER BY upload_dt DESC LIMIT 1";
                             $rw = sql_fetch_array($sql);
                             if(!empty($rw[0]['file_path'])){
                                 $img = "https://image.banjjakpet.com".img_link_change($rw[0]['file_path']);     
@@ -538,7 +535,6 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                     $img = '/images/cat/cat_90x90/cat_90x90@3x.png';
                                 }
                             }
-                        }
                         $yellow_type = $tm[0]['pet_type'];
                         if($tm[0]['pet_type'] == '기타'){
                             $yellow_type = $tm[0]['pet_type2'];
@@ -732,7 +728,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
     }
 
     $(document).ready(function(){
-        //if (getCookie_popup('guide_beauty_shop') != 'Y') {
+        if (getCookie_popup('guide_beauty_shop') != 'Y') {
             $("#popup_wrap").dialog({
                 modal: true,
                 title: "",
@@ -746,7 +742,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 resizable: false,
                 draggable: false,
                 buttons: {
-                    '오늘 그만보기': function() {
+                    '닫기': function() {
                         setCookie_popup('guide_beauty_shop', 'Y', 1);
                         $(this).dialog("close");
                     },
@@ -767,7 +763,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 close: function() {
                 }
             });
-        //}
+        }
     });
 
 	var artist_id = '<?=$artist_id ?>';

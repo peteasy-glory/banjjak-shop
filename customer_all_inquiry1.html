@@ -59,7 +59,7 @@ while($row = mysqli_fetch_assoc($result)){
                         <option value="2">가나다순</option>
                         <option value="3">이용횟수별</option>
                         <option value="4">견종별</option>
-                        <!--<option value="">등급별</option>-->
+                        <option value="5">등급별</option>
                     </select>
                 </div>
                 <!--<div class="customer-state-graph doughnut-graph">
@@ -132,7 +132,7 @@ while($row = mysqli_fetch_assoc($result)){
                             <h4 class="con-title">회원등급 부여</h4>
                         </div>
                         <div class="pop-body">
-                            <div class="msg-txt">현재 <?php echo $pet['name'];?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                            <div class="msg-txt"></div>
                             <div class="form-group">
                                 <div class="form-group-item">
                                     <select name="member_grade" id="member_grade">
@@ -144,7 +144,7 @@ while($row = mysqli_fetch_assoc($result)){
                                             foreach($tgos as $tgos){
                                                 //echo $tgos['grade_name'].':'.$grade[0]['name'];
                                                 ?>
-                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                                <option value="<?php echo $tgos['idx'];?>"><?php echo $tgos['grade_name'];?></option>
                                             <?php }}?>
                                     </select>
                                     <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
@@ -394,6 +394,15 @@ while($row = mysqli_fetch_assoc($result)){
                                 reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a>';
                             }
 
+                            // 등급 아이콘
+                            if(v.grade_ord == 1){
+                                var grade_icon = '<div class="icon icon-grade-vip"></div>';
+                            }else if(v.grade_ord == 2){
+                                var grade_icon = '<div class="icon icon-grade-normal"></div>';
+                            }else{
+                                var grade_icon = '<div class="icon icon-grade-normalb"></div>';
+                            }
+
                             var type = (pet_type_arr[v.type])? pet_type_arr[v.type] : "알수없음";
                             html2	= `
 							<!-- 하나의 아이템 -->
@@ -491,7 +500,7 @@ while($row = mysqli_fetch_assoc($result)){
 												</div>
 											</div>
 										</div>
-										<!--<div class="flex-table-cell">
+										<div class="flex-table-cell">
 											<div class="flex-table-item">
 												<div class="flex-table-title"><div class="txt">등급</div></div>
 												<div class="flex-table-data">
@@ -500,27 +509,17 @@ while($row = mysqli_fetch_assoc($result)){
 															<div class="grid-layout-inner">
 																<div class="grid-layout-cell grid-2">
 																	<div class="user-grade-item">
-																		<div class="icon icon-grade-vip"></div>
-																		<div class="icon-grade-label">VIP${v.grade}</div>
+																		${grade_icon}
+																		<div class="icon-grade-label">${v.grade_name}</div>
 																	</div>
-																	&lt;!&ndash;
-																	<div class="user-grade-item">
-																		<div class="icon icon-grade-normal"></div>
-																		<div class="icon-grade-label">Normal</div>
-																	</div>
-																	<div class="user-grade-item">
-																		<div class="icon icon-grade-normalb"></div>
-																		<div class="icon-grade-label">Normal_B</div>
-																	</div>
-																	&ndash;&gt;
 																</div>
-																<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-small-size btn-round set-grade" data-id="" data-grade="">등급부여하기</a></div>
+																<!--<div class="grid-layout-cell grid-2"><a href="javascript:open_grade('${pet_name}','${v.cellphone}','${v.grade_name}','${v.grade_ord}');" class="btn btn-outline-gray btn-small-size btn-round set-grade" data-id="" data-grade="">등급부여하기</a></div>-->
 															</div>
 														</div>
 													</div>
 												</div>
 											</div>
-										</div>-->
+										</div>
 									</div>
 								</td>
 							</tr>
@@ -705,15 +704,36 @@ while($row = mysqli_fetch_assoc($result)){
         };
 
         $(document).ready(function(){
-            //등급수정
-            $('.set-grade').on('click',function(){
-                popalert.open('memberGradeAddPop');
-            });
 
             $('#header_bell').css('display','none');
             $('#btn_page_prev').prop('href','customer_inquiry');
 
         });
+
+        // 개별 등급 수정 창
+        function open_grade(pet_name, cellphone, grade_name, grade_ord){
+            $('#memberGradeAddPop').find('.msg-txt').text('현재 '+pet_name+' ('+cellphone+')고객님의 등급은 '+grade_name+' 입니다.');
+            $('#member_grade').val(grade_ord).prop("selected",true);
+            popalert.open('memberGradeAddPop');
+        }
+
+        // 개별 등급 수정
+        function set_grade(){
+            var grade = $('#member_grade option:selected').val(); // 바꿀 등급
+            var org_grade = '<?php echo $grade[0]['grade_idx'];?>'; // 기존 등급
+            var id = '<?php echo $grade_id;?>';
+            $.ajax({
+                type : 'post',
+                url : './data/get_book_data_ajax.php',
+                data : {'mode':'gradeChange','grade':grade, 'id':id, 'org_grade':org_grade},
+                dataType : 'json',
+                success : function(json){
+                    if(json.flag == true){
+                        popalert.open('memberGradeComPop1','등급이 변경되었습니다.');
+                    }
+                }
+            });
+        }
 
         // 전체 고객 등급 변경
         function set_grade_all(){
