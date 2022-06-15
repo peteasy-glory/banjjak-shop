@@ -1,6 +1,6 @@
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
-include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 $obj = new module();
 $product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
 $user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
@@ -1556,84 +1556,84 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
         _this.prop("disabled", true);
         if($("#container input[name='customer_name']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("주문자 성명을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='customer_name']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='cellphone']").val() == "010" || $("#container input[name='cellphone']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("주문자 연락처를 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='cellphone']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='customer_email']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("주문자 이메일을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='customer_email']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='customer_email_suffix']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("주문자 이메일을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='customer_email_suffix']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='shipping_name']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("배송 받으시는 분의 성명을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='shipping_name']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='shipping_cellphone']").val() == "010" || $("#container input[name='shipping_cellphone']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("배송 받으시는 분의 연락처를 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='shipping_cellphone']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='zipcode']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("배송 받으실 주소를 검색해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='zipcode']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='addr4']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("배송 받으실 상세주소를 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='addr4']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container textarea[name='shipping_memo']").val() == ""){
             $('#firstRequestMsg1').find('.msg-txt').text("택배 요청사항을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container textarea[name='shipping_memo']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='bank_name']").val() == "" && $("#container input:radio[name='pay_type']:checked").val() == "2"){
             $('#firstRequestMsg1').find('.msg-txt').text("입금자명을 입력해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             $("#container input[name='bank_name']").focus();
             _this.prop("disabled", false);
             return false;
         }
         if($("#chk_ag").is(":checked") == false){
             $('#firstRequestMsg1').find('.msg-txt').text("구매진행에 동의해주세요.");
-            pop.open("firstRequestMsg1");
+            popalert.open("firstRequestMsg1");
             _this.prop("disabled", false);
             return false;
         }
         if($("#container input[name='customer_id']").val() == ""){
             if($("#chk_ag2").is(":checked") == false){
                 $('#firstRequestMsg1').find('.msg-txt').text("비회원 주문에 대한 개인정보 활용에 동의해주세요.");
-                pop.open("firstRequestMsg1");
+                popalert.open("firstRequestMsg1");
                 _this.prop("disabled", false);
                 return false;
             }
@@ -1648,7 +1648,7 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
             direct_buy_cancel = false; // 결제시에는 바로구매 카트 삭제 안하게
             $.ajax({
                 type: 'post',
-                url: "item/item_list_ajax.php",
+                url: "data/item_list_ajax.php",
                 data: {
                     mode: "get_item_payment_log_chk",
                     order_num: order_num
@@ -1690,7 +1690,7 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
 
                                             $.ajax({
                                                 type: 'post',
-                                                url: "item/item_list_ajax.php",
+                                                url: "data/item_list_ajax.php",
                                                 data: post_data,
                                                 dataType: 'json',
                                                 beforeSend: function() {
@@ -1734,7 +1734,7 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
                             }else{ // 정글북 아니면 바로 결제처리
                                 $.ajax({
                                     type: 'post',
-                                    url: "item/item_list_ajax.php",
+                                    url: "data/item_list_ajax.php",
                                     data: post_data,
                                     dataType: 'json',
                                     beforeSend: function() {
@@ -1786,7 +1786,7 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
                                     // 재결제 루틴 필요
                                     $.ajax({
                                         type: 'post',
-                                        url: "item/item_list_ajax.php",
+                                        url: "data/item_list_ajax.php",
                                         data: {
                                             mode: "set_update_item_payment_retry",
                                             pay_type: pay_type,
@@ -1937,9 +1937,10 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
 
     function set_update_item_payment_log_price_zero(){
         // 회원만 포인트로 가격을 0 만들 수 있으므로 정회원 기준으로 작업
+        console.log('set_zero까지 들어옴');
         $.ajax({
             type: 'post',
-            url: "item/item_list_ajax.php",
+            url: "data/item_list_ajax.php",
             data: {
                 mode: "set_update_item_payment_log_price_zero",
                 order_num: order_num,

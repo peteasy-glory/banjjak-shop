@@ -220,9 +220,19 @@ if(empty($grade[0]['grade_name'])){
         <!-- page-body -->
         <div class="page-body" id="page-body">
             <div class="shortcut-wrap" id="shortcutWrap">
+<<<<<<< HEAD
                 <img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();">
+=======
+<<<<<<< Updated upstream
+                <img src="/images/icon-page-top.png" alt="" onclick="common.pageMove(0);">
+>>>>>>> 8c33158eb5f0f065dfb0bb6f01e2029afac43dbc
                 <img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();">
                 <img src="/images/icon-pay.png" alt="" onclick="scrollMove3();">
+=======
+                <a href="#header"><img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();"></a>
+                <a href="#shortCutTarget2"><img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();"></a>
+                <a href="#shortCutTarget3"><img src="/images/icon-pay.png" alt="" onclick="scrollMove3();"></a>
+>>>>>>> Stashed changes
 
             </div>
             <div class="reserve-pay-management">
@@ -3886,6 +3896,7 @@ if(empty($grade[0]['grade_name'])){
 
 
 
+<<<<<<< HEAD
 
             //wide-tab 클릭시 #basic-data-group-target으로 이동
 
@@ -3922,8 +3933,13 @@ if(empty($grade[0]['grade_name'])){
 
 
            $(document).on("click", ".tab-cell a", function (event) {
+=======
+>>>>>>> 999dfa0aaf62c4394c90a8b9f47f7b5b5f92384c
 
+        //wide-tab
+        $(document).on("click", ".tab-cell a", function (event) {
 
+            event.preventDefault();
 
             $("body,html").stop().animate(
                     {
@@ -3934,6 +3950,7 @@ if(empty($grade[0]['grade_name'])){
 
 
         });
+
 
 
 
@@ -3977,11 +3994,12 @@ if(empty($grade[0]['grade_name'])){
         let shortCutFlag = true;
 
         let pageTitle = document.querySelector(".page-title").clientHeight;
-
-        let shortCutTarget2 = document.querySelector("#shortCutTarget2").getBoundingClientRect().top
+        let pageTitle_pc = document.querySelector(".pc-header").clientHeight;
+        let shortCutTarget2 = document.querySelector("#shortCutTarget2").getBoundingClientRect().top;
 
         let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
 
+<<<<<<< HEAD
         let shortCutTarget4 = document.querySelector("#shortCutTarget4").getBoundingClientRect().top;
 
         let pageBodyRectTop = document.querySelector("#page-body").getBoundingClientRect().top;
@@ -4020,6 +4038,94 @@ if(empty($grade[0]['grade_name'])){
 
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},50);
+=======
+<<<<<<< Updated upstream
+        console.log(pageTitle);
+        function scrollMove2(){
+
+            $('.page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
+=======
+
+        let shortcut = $("#shortcutWrap");
+
+        let mql = window.matchMedia("screen and (min-width: 1025px)");
+
+
+        $(window).on("touchmove",function(){
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},300);
+            })
+
+        $(window).on("scroll",function(){
+                console.log("스크롤");
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},300);
+            })
+
+        $("#page-body").scrollStopped(function(){
+            if($("#page-body").scrollTop() === 0){
+
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},50);
+
+            }else{
+                shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
+                    shortcut.css("display","none");
+                });
+
+            }
+        })
+
+        $(window).scrollStopped(function(){
+            if(!mql.matches){
+                if($(window).scrollTop() === 0){
+
+                    shortcut.stop().css("display","flex");
+                    shortcut.stop().animate({"opacity":1},50);
+
+                }else{
+                    shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
+                        shortcut.css("display","none");
+                    });
+
+                }
+            }
+        })
+
+
+
+        function scrollMove1(){
+                    $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
+        }
+        function scrollMove2(){
+                $('#page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
+>>>>>>> Stashed changes
+        }
+
+
+        function scrollMove3(){
+                $('#page-body').stop().animate({'scrollTop': shortCutTarget3-pageTitle}, {
+                    queue: false,
+                    duration: 350
+                });
+                shortcut.stop().animate({"opacity": 0}, 150, function () {
+                    shortcut.css("display", "none");
+                })
+        }
+
+
+
+            $(document).on("click","#shortcutWrap a", function (event){
+
+                event.preventDefault();
+
+                $("body,html").stop().animate({
+                    scrollTop:$(this.hash).offset().top - 80
+                },500);
+
+<<<<<<< Updated upstream
+            $('.page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
+>>>>>>> 8c33158eb5f0f065dfb0bb6f01e2029afac43dbc
 
             }else{
                 shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
@@ -4047,6 +4153,11 @@ if(empty($grade[0]['grade_name'])){
                 shortcut.css("display","none");
             })
         }
+=======
+            })
+
+
+>>>>>>> Stashed changes
 
 
 
