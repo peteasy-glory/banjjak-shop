@@ -3965,9 +3965,14 @@ if(empty($grade[0]['grade_name'])){
             })
             $("#page-body").on("scroll",function(){
 
+                console.log($(window).scrollTop())
+                console.log($("#page-body").scrollTop())
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
+
+
+
 
             $("#page-body").scrollStopped(function(){
                 if($("#page-body").scrollTop() === 0){
@@ -3991,7 +3996,7 @@ if(empty($grade[0]['grade_name'])){
 
             $(window).scrollStopped(function(){
                 if(!mql.matches){
-                    if($(window).scrollTop() === 0){
+                    if($("#page-body").scrollTop() === 0){
 
                         shortcut.stop().css("display","flex");
                         shortcut.stop().animate({"opacity":1},50);
