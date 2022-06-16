@@ -724,7 +724,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
     function setCookie_popup(name, value, expiredays) {
         var todayDate = new Date();
         todayDate.setDate(todayDate.getDate() + expiredays);
-        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure ';
+        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Sequre';
     }
 
     $(document).ready(function(){
