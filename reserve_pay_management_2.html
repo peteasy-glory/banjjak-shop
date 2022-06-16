@@ -3959,7 +3959,12 @@ if(empty($grade[0]['grade_name'])){
             })
 
             $(window).on("scroll",function(){
-                console.log("스크롤");
+
+                shortcut.stop().css("display","flex");
+                shortcut.stop().animate({"opacity":1},300);
+            })
+            $("#page-body").on("scroll",function(){
+
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
@@ -3970,7 +3975,13 @@ if(empty($grade[0]['grade_name'])){
                     shortcut.stop().css("display","flex");
                     shortcut.stop().animate({"opacity":1},50);
 
+                }else if($("#page-body").scrollTop() <= shortCutTarget3-pageTitle && $("#page-body").scrollTop() >= shortCutTarget3-pageTitle-1){
+
+                    shortcut.stop().animate({"opacity": 0}, 50, function () {
+                        shortcut.css("display", "none");
+                    })
                 }else{
+
                     shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
                         shortcut.css("display","none");
                     });
@@ -4009,9 +4020,6 @@ if(empty($grade[0]['grade_name'])){
                     queue: false,
                     duration: 350
                 });
-                shortcut.stop().animate({"opacity": 0}, 150, function () {
-                    shortcut.css("display", "none");
-                })
             }
 
 
