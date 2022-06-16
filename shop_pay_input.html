@@ -1,0 +1,1999 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+$obj = new module();
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : "";
+
+// 사용자 정보
+if($user_id != ""){
+    $sql = "
+		SELECT *
+		FROM tb_customer
+		WHERE id = '".$user_id."'
+	";
+    $result = mysqli_query($connection,$sql);
+    $user_row = mysqli_fetch_assoc($result);
+
+    $cellphone = $user_row['cellphone'];
+
+    if(strpos($user_id, '@') !== false) {
+        $user_email = explode('@', $user_id);
+    }
+}
+
+// 위탁업체 리스트
+$partner_sql = "
+    SELECT * FROM tb_item_partner WHERE is_delete = '1' and not ip_seq = '3'
+";
+$partner_array = sql_fetch_array($partner_sql);
+// price_calculator 함수에서 배송비 초기화할때 사용
+$company_cnt = ["",0,0,0,];
+foreach($partner_array as $rs){
+    array_push($company_cnt, 0);
+}
+
+// 앱 구별하기
+$user_agent = $_SERVER['HTTP_USER_AGENT'];
+$is_ios = 0;
+$is_android = 0;
+if ($user_agent) {
+    $token_index = strpos($user_agent, "APP_GOBEAUTY_AND");
+    if ($token_index > 0) {
+        $is_android = 1;
+    }
+    $token_index = strpos($user_agent, "APP_GOBEAUTY_iOS");
+    if ($token_index > 0) {
+        $is_ios = 1;
+        $is_android = 1; //is_android 속성을 많이 사용하고 있어서 일단 Android앱으로 판단후 iOS로 구분한다.
+    }
+}
+
+
+// Mobile
+//$INI_shopNumber = ""; // 발급ID - 실거래
+$INI_shopNumber = "banjjak001"; // 발급ID - 테스트
+$INI_host = "mobile.inicis.com";
+$INI_url = array(
+    "card"		=> "https://".$INI_host."/smart/payment/",	// 신용카드
+    "bank"		=> "https://".$INI_host."/smart/payment/",	// 계좌이체
+    "vbank"		=> "https://".$INI_host."/smart/payment/",	// 가상계좌
+    "moblie"	=> "https://".$INI_host."/smart/payment/",	// 휴대폰
+    "culture"	=> "https://".$INI_host."/smart/culture/",	// 문화상품권
+    "hpmn"		=> "https://".$INI_host."/smart/hpmn/",		// 해피머니상품권
+    "dgcl"		=> "https://".$INI_host."/smart/dgcl/"		// 스마트문상
+);
+
+
+$siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
+
+
+?>
+
+
+<!-- 상용 JS(가맹점 MID 변경 시 주석 해제, 테스트용 JS 주석 처리 필수!) -->
+<script language="javascript" type="text/javascript" src="https://stdpay.inicis.com/stdjs/INIStdPay.js" charset="UTF-8"></script>
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="javascript:go_back();" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">결제정보</div>
+</header>
+<!-- //header -->
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- order-wrap -->  
+		<form id="item_payment" class="order-wrap">
+            <input type="hidden" name="order_num" value="<?=$order_num ?>" />
+            <input type="hidden" name="customer_id" value="<?=$user_id ?>" />
+            <input type="hidden" name="product_price" value="0" />
+            <input type="hidden" name="shipping_price" value="0" />
+            <input type="hidden" name="point_score" value="0" />
+            <input type="hidden" name="total_price" value="0" />
+            <input type="hidden" name="product_name" value="" />
+            <input type="hidden" name="is_shop" value="1" />
+            <input type="hidden" id="receipt_id" name="receipt_id" value="-">
+            <input type="hidden" id="is_use_point" value="2" />
+			<div class="con-title-group">
+				<h3 class="con-title">주문서 작성</h3>
+			</div>
+			<!-- 주문 상품 -->
+			<div class="basic-data-group vvsmall2">
+				<div class="con-title-group">
+					<h4 class="con-title item_cnt">주문상품 (4건)</h4>
+				</div>
+				<div class="order-product-wrap">
+					<!-- 직배송 -->
+					<div class="basic-data-group middle in_product" style="display: none">
+						<h3 class="delivery-title purple">직배송</h3>
+						<div class="shop-cart-list">
+						</div>
+					</div>
+					<!-- //직배송 -->					
+					<!-- 위탁배송 -->
+					<div class="basic-data-group middle special_product" style="display: none">
+					</div>
+					<!-- //위탁배송 -->
+					<!-- 업체배송 -->
+					<div class="basic-data-group middle out_product" style="display: none">
+						<h3 class="delivery-title black">업체배송</h3>
+						<div class="shop-cart-list">
+						</div>
+					</div>
+					<!-- //업체배송 -->
+				</div>
+				<button type="button" class="btn-detail-toggle btn-order-product-toggle ">주문 상품 전체 보기</button>
+			</div>
+			<!-- //주문 상품 -->
+			<!-- 주문자 정보 -->
+			<div class="basic-data-group vvsmall2">
+				<div class="con-title-group">
+					<h4 class="con-title">주문자 정보</h4>
+				</div>
+				<div class="form-group">
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">주문자 성명</div>
+							<div class="form-item-data">
+								<input type="text" id="customer_name" name="customer_name" class="form-control" placeholder="입력">
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">연락처</div>
+							<div class="form-item-data">
+								<input type="number" id="cellphone" name="cellphone" class="form-control" numberonly placeholder="'-' 없이 입력" maxlength="12" value="<?=($cellphone != "")? $cellphone : '010' ?>">
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">이메일</div>
+							<div class="form-item-data">
+								<div class="form-email">
+									<div class="form-email-input">
+										<input type="text" id="customer_email" name="customer_email" class="form-control" placeholder="입력" value="<?=$user_email[0] ?>">
+										<div class="char">@</div>
+										<input type="text" id="customer_email_suffix" name="customer_email_suffix" class="form-control" placeholder="입력" value="<?=$user_email[1] ?>">
+									</div>
+									<select class="customer_email_suffix_list">
+                                        <option value="direct">직접입력</option>
+										<option value="gmail.com">gmail.com</option>
+										<option value="naver.com">naver.com</option>
+                                        <option value="daum.net">daum.net</option>
+                                        <option value="kakao.com">kakao.com</option>
+                                        <option value="hotmail.net">hotmail.net</option>
+									</select>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //주문자 정보 -->
+			<!-- 배송지 정보 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">배송지 정보</h4>
+					<label class="form-checkbox"><input type="checkbox" id="same_order_name" class="same_order_name" name=""><span class="form-check-icon"><em>주문자명과 동일</em></span></label>
+				</div>
+				<div class="form-group">
+                    <?php if($user_id == "itseokbeom@gmail.com"){ ?>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">배송지 선택</div>
+							<div class="form-item-data type-2" style="margin-bottom:10px;">
+								<select class="addr_info">
+									<option value="">선택</option>
+									<option value="">선택</option>
+									<option value="">선택</option>
+								</select>
+							</div>
+						</div>
+					</div>
+                    <div class="con-title-group save_addr_wrap" style="margin-bottom:25px">
+                        <input class="con-title" type="text" placeholder="주소명칭" style="width:55%;">
+                        <label class="form-checkbox"><input type="checkbox" id="save_addr" class="save_addr" name=""><span class="form-check-icon"><em>배송지 저장</em></span></label>
+                    </div>
+                    <?php } ?>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">받으시는 분</div>
+							<div class="form-item-data">
+								<input type="text" id="shipping_name" name="shipping_name" class="form-control" placeholder="입력">
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">연락처</div>
+							<div class="form-item-data">
+								<input type="text" id="shipping_cellphone" name="shipping_cellphone" class="form-control" placeholder="입력">
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">받으시는 곳</div>
+							<div class="form-item-data">
+								<div class="form-vertical-cell">
+									<div class="form-control-btns">
+										<input type="text" id="zipcode" name="zipcode" class="form-control postcode" readonly placeholder="주소입력">
+										<button type="button" class="btn btn-outline-gray btn-round btn-inline search_addr_btn">검색</button>
+									</div>
+								</div>
+								<div class="form-vertical-cell">
+									<input type="text" id="addr1" name="addr1" class="form-control roadAddress" readonly placeholder="기본주소">
+                                    <input type="hidden" id="addr2" name="addr2" class="input jibunAddress" placeholder="지번주소" readonly>
+                                    <input type="hidden" id="addr3" name="addr3" class="input extraAddress" placeholder="지번주소" readonly>
+								</div>
+								<div class="form-vertical-cell">
+									<input type="text" id="addr4" name="addr4" class="form-control detailAddress" placeholder="상세주소">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">택배요청사항</div>
+							<div class="form-item-data type-2">
+								<div class="form-vertical-cell">
+									<select class="shipping_memo_list">
+										<option value="부재시 경비실에 맡겨주세요.">부재시 경비실에 맡겨주세요.</option>
+                                        <option value="부재시 휴대폰으로 연락바랍니다.">부재시 휴대폰으로 연락바랍니다.</option>
+                                        <option value="집 앞에 놓아주세요.">집 앞에 놓아주세요.</option>
+                                        <option value="택배함에 넣어주세요.">택배함에 넣어주세요.</option>
+										<option value="direct">직접입력</option>
+									</select>
+								</div>
+								<div class="form-vertical-cell">
+									<input type="text" name="shipping_memo" class="form-control" value="부재시 경비실에 맡겨주세요." placeholder="택배요청사항">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //배송지 정보 -->
+			<!-- 결제 정보 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">결제정보</h4>
+				</div>
+				<div class="price-data-wrap">
+					<div class="price-data-group">
+						<div class="price-data-list">	
+							<div class="price-data-list-cell">	
+								<div class="price-data-list-title">상품가격</div>
+								<div class="price-data-list-value total_goods_price">40,000원</div>
+							</div>
+							<div class="price-data-list-cell">	
+								<div class="price-data-list-title">+ 배송비</div>
+								<div class="price-data-list-value total_shipping_price">4,000원</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //결제 정보 -->
+			<!-- 포인트사용 -->
+			<div class="basic-data-group small line">
+				<div class="con-title-group point1" style="display: none;">
+					<h5 class="con-title">포인트사용</h5>
+				</div>
+				<div class="form-point">
+					<div class="form-point-info point2" style="display: none;">사용가능 포인트 : <span class="point_score"></span>원</div>
+					<div class="form-point-input point3" style="display: none;">
+						<input type="number" name="point_price" class="point" placeholder="">
+						<div class="char">원</div>
+						<button type="button" class="btn btn-outline-gray btn-round btn-inline point_use">전액 사용</button>
+					</div>
+					<!-- 회원 할인 -->
+					<div class="form-point-sale point4" style="display: none;">첫 구매 자동 3,000원 할인!</div>
+					<!-- //회원 할인 -->
+					<div class="price-data-wrap">
+						<div class="price-data-group">
+							<div class="price-data-list">	
+								<div class="price-data-list-cell middle">	
+									<div class="price-data-list-title">총 결제예정 금액</div>
+									<div class="price-data-list-value"><strong class="font-color-purple total_pay_price">원</strong></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>				
+			</div>
+			<!-- //포인트사용 -->
+			<!-- 결제수단 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">결제수단</h4>
+				</div>
+				<div class="form-check-group">
+					<div class="form-check-inner">
+						<div class="check-cell"><label for="pay_type_1" class="form-radiobox"><input type="radio" id="pay_type_1" name="pay_type" value="1" checked><span class="form-check-icon"><em>신용/체크카드</em></span></label></div>
+						<div class="check-cell"><label for="pay_type_2" class="form-radiobox"><input type="radio" id="pay_type_2" name="pay_type" value="2"><span class="form-check-icon"><em>무통장입금</em></span></label></div>
+					</div>
+				</div>
+				<!-- 무통장 입금 -->
+				<div class="bank-info-wrap" style="display:none">
+					<div class="pay-bank-group">
+						<div class="pay-bank-name">기업은행 054-143076-01-013<br>주식회사 펫이지</div>
+						<div class="form-group">
+							<div class="form-group-cell">
+								<div class="form-group-item">
+									<div class="form-item-label">입금자 성명</div>
+									<div class="form-item-data">
+										<input type="text" id="bank_name" name="bank_name" placeholder="이름을 입력해 주세요" class="form-control"/>
+										<div class="form-input-info">*계좌이체 시 <em class="font-color-red">반드시</em> 같은 이름으로 입금 부탁드립니다.</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- //무통장 입금 -->
+			</div>
+			<!-- //결제수단 -->
+			<!-- 주문동의 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">주문동의</h4>
+				</div>
+				<div class="pay-card-group">
+					<!-- 비회원 -->
+					<div class="pay_type_2_chk pay-card-cell line" style="display:none">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" id="chk_ag2" name=""><span class="form-check-icon"><em>비회원 주문에 대한 개인정보 수집 이용동의</em></span></label>
+							</div>
+							<div class="pay-card-detail">
+							1. 개인정보 수집목적 및 이용목적 : 비회원 구매 서비스 제공<br>
+							(서비스 제공에 따른 요금정산, 콘텐츠 제공, 구매 및 요금결제, 금융거래 본인 인증 및 금융서비스)<br>
+							2. 수집하는 개인정보 항목 : 성명, 주소, 전화번호, 이메일, 결제정보<br>
+							3. 보유기간 : 목적 달성 후 5일까지<br>
+							(관계법률로 인해 필요 시, 일정기간 보존)<br><br>
+							* 동의를 거부할 수 있으나, 거부시 비회원 구매 서비스 이용이 불가능합니다.
+							</div>
+						</div>
+					</div>
+					<!-- //비회원 -->
+					<!-- 회원 -->
+					<div class="pay-card-cell line">
+						<div class="pay-card-rule-wrap">
+							<div class="pay-card-check">
+								<label class="form-checkbox"><input type="checkbox" id="chk_ag" name=""><span class="form-check-icon"><em>구매내역을 확인하였으며, 구매진행에 동의합니다.</em></span></label>
+							</div>
+						</div>
+					</div>
+					<!-- //회원 -->
+				</div>
+			</div>
+			<!-- //주문동의 -->
+		</form>
+		<!-- //order-wrap -->  
+	</div>
+    <div id="search_addr_wrap" style="display: none;"></div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<!-- 
+		//	비활성화시 
+		// - a태그는 disabled 클래스 추가
+		// - button 태그는 disabled 속성 추가
+		-->
+		<a class="btn-page-bottom yes_payment">결제하기</a>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<form id="INIpay_form" method="POST" action="<?=$INI_url['card']; ?>" accept-charset="euc-kr" onsubmit="emulAcceptCharset(this)">
+    <input type="hidden" name="P_INI_PAYMENT" value="card" placeholder="결제요청 지불수단" />
+    <input type="hidden" name="P_MID" value="<?=$INI_shopNumber ?>" placeholder="상점아이디" />
+    <input type="hidden" name="P_OID" value="<?=$order_num ?>" placeholder="주문번호" />
+    <input type="hidden" name="P_AMT" value="" placeholder="거래금액" />
+    <input type="hidden" name="P_UNAME" value="" placeholder="고객성명" />
+    <input type="hidden" name="P_MNAME" value="펫이지" placeholder="가맹점 이름" />
+    <input type="hidden" name="P_NOTI" value="item" placeholder="기타주문정보(전달값그대로반환)" />
+    <input type="hidden" name="P_GOODS" value="" placeholder="결제상품명" />
+    <input type="hidden" name="P_MOBILE" value="<?=$cellphone ?>" placeholder="구매자 휴대폰번호" />
+    <input type="hidden" name="P_EMAIL" value="<?=$user_id ?>" placeholder="구매자 이메일" />
+    <input type="hidden" name="P_NEXT_URL" value="<?php echo $siteDomain ?>/mainpage/INI_return.php?PHPSESSID=<?=$_COOKIE["PHPSESSID"]?>&no=<?=$order_num?>" placeholder="인증결과수신 URL" />
+    <input type="hidden" name="P_NOTI_URL" value="<?php echo $siteDomain ?>/mainpage/INI_result.php" placeholder="승인결과통보 URL" />
+    <!--input type="hidden" name="P_TAX" value="" placeholder="부가세" /-->
+    <!--input type="hidden" name="P_TAXFREE" value="" placeholder="비과세" /-->
+    <!--input type="hidden" name="P_OFFER_PERIOD" value="별도 제공 기간 없음" placeholder="제공기간" /-->
+    <!-- 신용카드 전용 필드 -->
+    <input type="hidden" name="P_CARD_OPTION" value="" placeholder="신용카드 우선선택 옵션" />
+    <input type="hidden" name="P_ONLY_CARDCODE" value="" placeholder="신용카드 노출제한 옵션" />
+    <input type="hidden" name="P_QUOTABASE" value="" placeholder="신용카드 할부기간 지정" />
+    <!-- 기타 옵션 필드 -->
+    <input type="hidden" name="P_CHARSET" value="utf8" placeholder="케릭터셋 설정" />
+    <!-- 복합필드(&으로 구분), 2020-10-14 아이폰 결제용으로 app_scheme=banjjack 추가 -->
+    <?php if($token_index > 0){ // iOS ?>
+        <input type="hidden" name="P_RESERVED" value="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack://" placeholder="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack://" />
+    <?php }else{ ?>
+        <input type="hidden" name="P_RESERVED" value="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack" placeholder="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack" />
+    <?php } ?>
+</form>
+
+<script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script>
+
+    var order_num = "<?=$order_num ?>"; // 주문번호
+    var direct_chk = "<?=$direct_chk ?>"; // 바로구매 여부 1:바로구매, 0:장바구니
+    var $item_cart = $("#container");
+    var $item_cart_popup = $("#item_cart_popup");
+    var customer_id = "<?=$user_id ?>";
+    var company_cnt = <?php echo count($company_cnt) ?>; // 업체배송, 직배송 포함 업체 수
+    var shipping_price = ["",3500, 4000, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 배송비
+    var is_free_shipping_limit = ["", 100000, 300000, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 무료배송 시작 금액
+    var is_free_shipping_total = ["", 0, 0, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 무료배송인 상품
+    var is_free_shipping_cnt = ["", 0, 0, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 상품 개수
+    var is_free_shipping_price = ["", 0, 0, 0]; // '', 업체배송, 직배송, 건너뛰기  ==> 최종 구매가격
+    var is_free_shipping_do = ["", 1, 1, 0] // '', 업체배송, 직배송, 건너뛰기 ==> 무료배송정책 사용여부 0:미사용, 1:사용
+    var is_jbook_runout = 0; // 정글북 재고없음 여부(1-품절, 0-재고있음)
+    var orderItem = []; // 정글북 상품 배열
+    var first_payment = [0, 0]; // 첫결제여부
+    var soldout_flag = 0;
+    var item_update_flag = 0;
+    var item_cart_cnt = 0;
+    var cart = [];
+    var _height = 220; // 팝업창 높이 default 220
+    var moblieChk = "<?=$obj->mobileConcertCheck() ?>";
+
+
+
+    // 도서산간지역 추가배송비(5,000원)
+    var plus_shipping_island = [22386,22387,22388,23004,23005,23006,23007,23008,23009,23010,23100,23101,23102,23103,23104,23105,23106,23107,23108,23109,23110,23111,23112,23113,23114,23115,23116,23124,23125,23126,23127,
+        23128,23129,23130,23131,23132,23133,23134,23135,23136,31708,32133,33411,40200,40201,40202,40203,40204,40205,40206,40207,40208,40209,40210,40211,40212,40213,40214,40215,40216,40217,40218,
+        40219,40220,40221,40222,40223,40224,40225,40226,40227,40228,40229,40230,40231,40232,40233,40234,40235,40236,40237,40238,40239,40240,52570,52571,53031,53032,53033,53089,53090,53091,53092,
+        53093,53094,53095,53096,53097,53098,53099,53100,53101,53102,53103,53104,54000,46768,46769,46770,46771,56347,56348,56349,57068,57069,58760,58761,58762,58800,58801,58802,58803,58804,58805,
+        58806,58807,58808,58809,58810,58816,58817,58818,58826,58828,58829,58830,58831,58832,58833,58834,58835,58836,58837,58838,58839,58840,58841,58842,58843,58844,58845,58846,58847,58848,58849,
+        58850,58851,58852,58853,58854,58855,58856,58857,58858,58859,58860,58861,58862,58863,58864,58865,58866,58953,58954,58955,58956,58957,58958,59102,59103,59106,59127,59129,59137,59138,59139,
+        59140,59141,59142,59143,59144,59145,59146,59147,59148,59149,59150,59151,59152,59153,59154,59155,59156,59157,59158,59159,59160,59161,59162,59163,59164,59165,59166,59421,59531,59551,59563,
+        59568,59650,59766,59781,59782,59783,59784,59785,59786,59787,59788,59789,59790];
+    // 제주지역 추가배송비(3,000원)
+    var plus_shipping_jeju = [];
+    for(var i = 63000; i <= 63644; i++){
+        plus_shipping_jeju.push(i);
+    }
+    // 제주 추자면, 우도 추가배송비(8,000원)
+    var plus_shipping_udo = [63000,63001,63365];
+
+    // 지역 적용 전 배송비(price_calculator()에서 계산)
+    var plus_before_shipping = [];
+
+    // 제품 가격 합
+    var product_total_price = 0;
+
+    // 포인트 최초 한번만 실행할 구분 변수
+    var point_score_only = 0;
+
+    // 구매구분
+    var direct_buy = "<?=$direct_chk ?>"; // 바로구매:1, 장바구니에서 구매:2
+
+
+    var direct_buy_cancel = true; // 바로구매 삭제 조건
+    // 페이지 벗어날 때
+    $(window).bind("beforeunload", function(e){
+        if(direct_buy == '1' && direct_buy_cancel == true){
+            direct_delete();
+        }
+    });
+
+    // 백키 누를때
+    function go_back(){
+        if(direct_buy == "1"){
+            //direct_delete("1");
+            window.history.back();
+        }else{
+            window.history.back();
+        }
+    }
+
+
+    function direct_delete(back){
+        /*
+        $.ajax({
+            url: 'data/item_ajax.php',
+            data: {
+                mode : "set_delete_item_cart",
+                order_num: order_num,
+                user_id: customer_id,
+                delete_txt: "바로구매 종료로 인한 삭제"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    if(back == "1"){
+                        window.history.back();
+                    }
+                }else{
+                    console.log(data.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                if(xhr.status != 0){
+                }
+            }
+        });
+        */
+    }
+
+    $(function(){
+        get_partner_list()
+            .then(get_item_cart)
+            .then(get_addr);
+
+        // 포인트 불러오기
+        if(customer_id != ""){
+            $.ajax({
+                type: 'post',
+                url: "data/item_ajax.php",
+                data: {
+                    mode: "get_customer_point",
+                    customer_id: customer_id
+                },
+                dataType: 'json',
+                error: function() {
+                },
+                success: function(json) {
+                    if(json.code == "000000"){
+                        console.log(json.data);
+                        $("#container .point_score").html('').html(Math.round(json.data).format());
+                        $("#container input[name='point_score']").val(Math.round(json.data));
+                    }else{
+                        alert(json.data+"("+json.code+")");
+                    }
+                },
+                complete: function() {
+                    // console.log('complete');
+                    //서브밋 차단 해제
+                    //$("#loading").css("display","none");
+                }
+            });
+        }else{
+            $("#container .point_score").html('').html(0);
+            $("#container input[name='point_score']").val(0);
+            $("#container .pay_type_2_chk").css("display", "block");
+        }
+    });
+
+    // 위탁업체 칸 만들기
+    function get_partner_list(){
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: 'data/item_ajax.php',
+                data: {
+                    mode: "get_partner_list"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+
+                        console.log(data.data[0]);
+                        var html = '<h3 class="delivery-title apricot">위탁배송</h3><br>';
+                        $.each(data.data[0], function(i, v){
+                            html += '<div class="shop-cart-list cart_list_'+v.ip_seq+'" style="display: none;">['+v.company_name+']</div>';
+                            html += '<div class="basic-data-group middle free_shipping_'+v.ip_seq+'" style="display: none;">';
+                            html += '</div>';
+                            is_free_shipping_limit.push(parseInt(v.free_shipping_price)); // 무료배송 시작 금액
+                            shipping_price.push(v.shipping_price); // 배송비
+                            is_free_shipping_total.push(0); // 무료배송인 상품 개수
+                            is_free_shipping_cnt.push(0) // 총 상품 개수
+                            is_free_shipping_price.push(0) // 최종 구매 가격
+                            is_free_shipping_do.push(parseInt(v.is_free_shipping)); // 무배정책 사용 여부 0: 미사용 1: 가격으로 사용 2: 개수로 사용(우선 가격만 적용)
+                        });
+                        $item_cart.find('.special_product').prepend(html);
+                        console.log(is_free_shipping_limit);
+                        console.log(is_free_shipping_total);
+                        console.log(is_free_shipping_cnt);
+                        console.log(is_free_shipping_price);
+                        console.log(is_free_shipping_do);
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                    resolve();
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 장바구니에 담긴 제품 가져오기
+    function get_item_cart(){
+        console.log("get_item_cart" );
+        return new Promise(function(resolve, reject) {
+            $.ajax({
+                url: 'data/item_ajax.php',
+                data: {
+                    mode: "get_cart",
+                    no: order_num,
+                    direct_chk: direct_chk,
+                    customer_id: customer_id
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+
+                        if(data.data[0] && data.data[0].length > 0){
+                            item_cart_cnt = data.data[0].length;
+                            console.log("상품개수"+item_cart_cnt);
+                            $('.item_cnt').text("주문상품 ("+item_cart_cnt+"건)");
+
+                            $.each(data.data[0], function(i, v){
+                                get_item_list(v)
+                                    .then(price_calculator)
+                                    .then(get_first_payment);
+                            });
+                        }else{
+                        }
+
+                        resolve();
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 장바구니에 담긴 제품 뿌려주기
+    function get_item_list(cart_data){
+        return new Promise(function(resolve, reject) {
+            console.log("get_item_list");
+            console.log(cart_data);
+            //var cart_data = JSON.parse(cart_data);
+            $.ajax({
+                url: 'data/item_ajax.php',
+                data: {
+                    mode : "get_item",
+                    product_no: cart_data.product_no
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data['item']);
+                        var html = '';
+                        var sum_price = 0;
+                        var item_name = '';
+
+                        if(data.data['item'] && data.data['item'].length > 0){
+                            $.each(data.data['item'], function(i, v){
+                                var is_free = 0; // 무료배송상품인지 확인 - 체크시 사용
+                                // 상품명 생성
+                                if(i == 0){
+                                    item_name = (item_cart_cnt > 1)? v.product_name+' 외 '+(parseInt(item_cart_cnt)-1)+'건' : v.product_name; // 자기자신은 횟수에서 제외
+                                }
+                                var parse_cart_data = JSON.parse(cart_data.cart_data);
+
+                                if(v.is_soldout == 2){
+                                    html += '<div class="shop-cart-list-cell soldout" data-seq="'+cart_data.ic_seq+'">';
+                                }else{
+                                    html += '<div class="shop-cart-list-cell" data-seq="'+cart_data.ic_seq+'">';
+                                }
+                                html += '<div class="shop-cart-items" data-seq="'+cart_data.ic_seq+'">';
+                                // html +=     '<div class="shop-cart-header">'
+                                // html +=         '<div>'
+                                // html +=             '<label class="form-checkbox"><input type="checkbox" class="company_num" id="chk_'+cart_data.ic_seq+'" name="chk[]" value="'+cart_data.ic_seq+'" checked ><span class="form-check-icon"><em>선택</em></span></label>'
+                                // html +=         '</div>'
+                                // html +=         '<div>'
+                                // html +=             '<div class="shop-cart-ui">'
+                                // html +=                 '<div class="shop-cart-ui-cell"><button type="button" onclick="modify_item(\''+cart_data.ic_seq+'\');" class="btn-shop-cart-ui-item">주문내용 수정</button></div>'
+                                // html +=                 '<div class="shop-cart-ui-cell"><button type="button" onclick="delete_item(\''+cart_data.ic_seq+'\');" class="btn-shop-cart-ui-item">삭제</button></div>'
+                                // html +=             '</div>'
+                                // html +=         '</div>'
+                                // html +=     '</div>'
+                                html +=     '<div class="shop-cart-body">'
+                                html +=         '<div class="item-info-wrap">'
+                                html +=             '<div class="item-thumb"><img src="'+data.data['photo'][i]+'" alt=""></div>'
+                                html +=             '<div class="item-data">'
+                                html +=                 '<div class="item-data-inner">'
+                                html +=                     '<div class="item-name">'+v.product_name+'</div>'
+
+                                $.each(parse_cart_data, function(i2, v2){
+
+                                    html +=                     '<div class="item-option">'
+                                    html +=                         '<div>'+v2.txt+'</div>'
+                                    html +=                         '<div class="item-option-division">/</div>'
+                                    html +=                         '<div>'+(v2.value).format()+'원</div>'
+                                    html +=                         '<div class="item-option-division">/</div>'
+                                    html +=                         '<div>'+v2.amount+'개</div>'
+                                    html +=                     '</div>'
+
+                                    // 무료배송인 상품 개수 구하기
+
+                                    if(v2.is_free_shipping == 1){
+                                        is_free = 1;
+                                        if(v.ip_seq > 0){
+                                            is_free_shipping_total[v.ip_seq]++;
+                                        }else{
+                                            is_free_shipping_total[v.is_supply]++;
+                                        }
+                                    }
+
+                                    //총 상품 개수 구하기
+                                    if(v.ip_seq > 0){
+                                        is_free_shipping_cnt[v.ip_seq]++;
+                                    }else{
+                                        is_free_shipping_cnt[v.is_supply]++;
+                                    }
+                                    sum_price += parseInt(v2.value * v2.amount);
+
+                                    if(v.is_supply == "1" && v.supplier == "정글북"){ // 외주업체(정글북)
+                                        console.log("goods", v.goodsNo, v2.amount, cart_data.ic_seq);
+                                        get_jbook_list2("goods", v.goodsNo, v2.amount, cart_data.ic_seq);
+                                    }
+                                });
+
+                                // 해당 상품의 최종 구매 가격 구하기 && 순서 구하기
+                                var company_num = 0;
+                                if(v.ip_seq > 0){
+                                    is_free_shipping_price[v.ip_seq] += sum_price;
+                                    company_num = v.ip_seq;
+                                }else{
+                                    is_free_shipping_price[v.is_supply] += sum_price;
+                                    company_num = v.is_supply;
+                                }
+
+                                html +=                     '<div class="item-price" data-free="'+is_free+'" data-num="'+company_num+'" data-price="'+sum_price+'">'+sum_price.format()+'원</div>'
+                                html +=                 '</div>'
+                                html +=             '</div>'
+                                html +=         '</div>'
+                                // if(is_free_shipping == 1){
+                                //     html +=         '<div class="item-total-price">상품 '+sum_price+'원(배송비무료) = '+sum_price+'원</div>'
+                                // }else{
+                                //     const sum = sum_price + shipping_price;
+                                //     html +=         '<div class="item-total-price">상품 '+sum_price+'원 + 배송비 '+shipping_price+'원 = '+sum+'원</div>'
+                                // }
+                                html +=     '</div>'
+                                html += '</div>'; //shop-cart-items
+                                html += '</div>'; //shop-cart-list-cell
+
+
+                                if(v.is_supply == "2"){ // 직배송
+                                    $item_cart.find('.in_product .shop-cart-list').append(html);
+                                    $item_cart.find('.in_product').css("display","block");
+                                    $item_cart.find('.in_product .shop-cart-list .company_num').addClass('num'); // 순서 지정 업체배송, 직배송, 비워두기, 위탁업체
+                                }else if(v.is_supply == "1" && v.ip_seq > 0){ // 위탁 판매
+                                    $item_cart.find('.special_product .cart_list_'+v.ip_seq).append(html).css("display","block");
+                                    $item_cart.find('.special_product .item_total_price_'+v.ip_seq).css("display","block");
+                                    $item_cart.find('.special_product .free_shipping_'+v.ip_seq).css("display","block");
+                                    $item_cart.find('.special_product').css("display","block");
+                                    $item_cart.find('.special_product .shop-cart-list .company_num').data('num',v.ip_seq); // 순서 지정 업체배송, 직배송, 비워두기, 위탁업체
+                                }else{ // 업체배송
+                                    $item_cart.find('.out_product .shop-cart-list').append(html);
+                                    $item_cart.find('.out_product').css("display","block");
+                                    $item_cart.find('.out_product .shop-cart-list .company_num').data('num',1); // 순서 지정 업체배송, 직배송, 비워두기, 위탁업체
+                                }
+
+                                if(v.is_use_point == "1" && customer_id != ""){
+                                    $("input#is_use_point").val(v.is_use_point);
+                                    $(".point1").css("display", "flex");
+                                    $(".point2").css("display", "flex");
+                                    $(".point3").css("display", "flex");
+                                    // $(".point4").css("display", "flex");
+                                    //}else{
+                                    //	console.log(v);
+                                }
+
+                                item_update_flag++;
+                                resolve();
+                            });
+                            $("#container input[name='product_name']").val(item_name);
+                            $("#INIpay_form input[name='P_GOODS']").val(item_name);
+                            $("#SendPayForm_id input[name='goodname']").val(item_name);
+                        }
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+
+    // 정글북 상품 품절 확인
+    function get_jbook_list2(menu, option, amount, ic_seq){
+        console.log(menu, option);
+        $.ajax({
+            url: './data/jbook_item_ajax.php',
+            data: {
+                mode : "get_item_list",
+                menu : menu,
+                option : option
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log("jbookdata");
+                    console.log(data.data);
+                    var result_txt = '0';
+                    if(data.data && parseInt(data.data.total) > 0){
+                        $.each(data.data.data, function(i, v){
+                            result_txt = (v.runout == "1")? '품절' : v.goodsStock;
+                            if(v.runout == "1"){
+                                is_jbook_runout = 1;
+                                $("#container .shop-cart-list-cell[data-seq='"+ic_seq+"']").addClass('soldout');
+                                // 품절
+
+                                $('#firstRequestMsg1').find('.msg-txt').text('품절된 상품이 있습니다.');
+                                pop.open("firstRequestMsg1");
+                            }else{
+                                orderItem.push({goodsNo: option, ea: amount}); // 정글북 데이터 입력
+                                $("#item_order_sheet .order_data_wrap tr.out_product td .item[data-id='"+ic_seq+"']").attr('data-amount', result_txt);
+                            }
+                        });
+                    }
+
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    // 총 주문금액 계산하기
+    function price_calculator(){
+        return new Promise(function(resolve, reject) {
+            if(item_update_flag == item_cart_cnt){ // each end flag
+                var total_shipping_price = 0; // 최종 배송비 합
+                var _shipping_price = <?php echo json_encode($company_cnt) ?>; // 배송비 배열
+                // var _total_price = is_free_shipping_price[1] + is_free_shipping_price[2] + is_free_shipping_price[3];
+                var _total_price = 0;
+                var special_total_price = 0; // 위탁업체 상품 총 가격
+                var special_shipping_price = 0; // 위탁업체 배송비 총 가격
+                for(var i=1;i<company_cnt;i++){
+                    // 모든상품 최종 결제 금액
+                    console.log(is_free_shipping_price[i]);
+                    _total_price += parseInt(is_free_shipping_price[i]);
+                }
+                console.log(_total_price);
+                console.log("무배 스타트");
+
+                for(var i=1;i<company_cnt;i++){
+                    // 아무 상품도 선택 안됐을때(사실상 뜨지않음)
+                    if(is_free_shipping_price[i] == 0){
+                    // 선택한 상품이 있을때
+                    }else{
+                        // 선택 가격이 무료배송시작금액보다 클 경우
+                        if(is_free_shipping_price[i] >= is_free_shipping_limit[i]){
+                            _shipping_price[i] = 0;
+                            //_shipping_price[i] = parseInt(shipping_price[i]);
+                        // 선택 가격이 무료배송시작금액보다 작을 경우
+                        }else{
+                            // 무료배송 상품이 있을 경우
+                            if(is_free_shipping_total[i] > 0){
+                                _shipping_price[i] = 0;
+                                //_shipping_price[i] = parseInt(shipping_price[i]);
+                            // 무료배송 상품 없을경우
+                            }else{
+                                _shipping_price[i] = parseInt(shipping_price[i]);
+                            }
+                        }
+
+                        if(_shipping_price[i] < 0){
+                            _shipping_price[i] = 0;
+                        }
+
+                        if(is_free_shipping_cnt[i] == 0){
+                            _shipping_price[i] = 0;
+                        }
+
+                    }
+                    plus_before_shipping = _shipping_price; // 도서산간지역 추가 확인 전 배송비
+                    product_total_price = _total_price; // 도서산간지역 추가 확인 전 상품 총 금액
+                    total_shipping_price += parseInt(_shipping_price[i]);
+
+                    // if((parseInt(_shipping_price[1]) + parseInt(_shipping_price[2]) + parseInt(_shipping_price[3])) == 0){
+                    //     $item_cart.find('.vmiddle').hide();
+                    // }else{
+                    //     $item_cart.find('.vmiddle').show();
+                    // }
+
+                }
+                $item_cart.find('.total_goods_price').text(_total_price.format()+"원");
+                $item_cart.find('.total_shipping_price').text(total_shipping_price.format()+"원");
+                $item_cart.find('.total_pay_price').text((_total_price + total_shipping_price).format()+"원");
+                $item_cart.find('.yes_payment').text((_total_price + total_shipping_price).format()+"원 결제하기");
+
+                $item_cart.find("input[name='product_price']").val(_total_price); // form태그 name 값에 제품금액 입력
+                $item_cart.find("input[name='shipping_price']").val(total_shipping_price); // form태그 name 값에 배송비 입력
+                $item_cart.find("input[name='total_price']").val(_total_price + total_shipping_price); // form태그 name 값에 제품금액+배송비 입력
+
+            }
+
+            resolve([_total_price,total_shipping_price]);
+        });
+    }
+
+
+    // 도서산간지역 추가배송비
+    function plus_shipping(zipcode){
+
+        console.log(zipcode);
+        var parse_zipcode = parseInt(zipcode); // 우편번호 정수로 가공
+        var plus_after_shipping = ["",0, 0, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 배송비
+        var total_shipping_price = 0; // 최종 배송비
+        var total_after_price = product_total_price; // 최종 상품금액 + 배송비(우선 상품금액 먼저 넣기)
+        var is_shipping_island = plus_shipping_island.indexOf(parse_zipcode); // 섬지역인지 판단(-1:아님, 0이상:섬지역-추가배송비5,000원)
+        var is_shipping_jeju = plus_shipping_jeju.indexOf(parse_zipcode); // 제주인지 판단(-1:아님, 0이상:제주-추가배송비3,000원)
+        var is_shipping_udo = plus_shipping_udo.indexOf(parse_zipcode);// 제주 추자면,우도인지 판단(-1:아님, 0이상:추자면,우도-추가배송비5,000원)
+        console.log("섬지역여부 "+is_shipping_island);
+        console.log("제주지역여부 "+is_shipping_jeju);
+        console.log("추자,우도여부 "+is_shipping_udo);
+        console.log(plus_before_shipping); // 지역 적용 전 배송비
+
+        // 상품 배열 초기화
+        $.ajax({
+            url: 'data/item_ajax.php',
+            data: {
+                mode: "get_partner_list"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data[0]);
+                    $.each(data.data[0], function(i, v){
+                        plus_after_shipping.push(0); // 무료배송 시작 금액
+                    });
+                    console.log(plus_after_shipping);
+                    // 추가배송비 계산
+                    for(var i=1;i<company_cnt;i++){
+                        // 배송비가 발생했을때
+                        if(plus_before_shipping[i] > 0){
+
+                            // 기타 섬지역일 경우
+                            if(is_shipping_island >= 0){
+                                plus_after_shipping[i] = parseInt(plus_before_shipping[i]) + 5000;
+                            // 제주지역일 경우
+                            }else if(is_shipping_jeju >= 0){
+                                // 추자면, 우도일 경우
+                                if(is_shipping_udo >= 0){
+                                    plus_after_shipping[i] = parseInt(plus_before_shipping[i]) + 8000;
+                                // 추자면, 우도 제외한 제주지역일 경우
+                                }else{
+                                    plus_after_shipping[i] = parseInt(plus_before_shipping[i]) + 3000;
+                                }
+                            // 일반 내륙지방일 경우
+                            }else{
+                                plus_after_shipping[i] = plus_before_shipping[i];
+                            }
+                        }
+                        total_shipping_price += parseInt(plus_after_shipping[i]); // 총 배송비 합
+                        total_after_price += parseInt(plus_after_shipping[i]); // 상품 총금액에 배송비 합
+
+                        $("#container input[name='shipping_price']").val(total_shipping_price); // form태그 name 값에 배송비 입력
+                        $("#container input[name='total_price']").val(total_after_price); // form태그 name 값에 제품금액 입력
+                        $('#container input[name="point_price"]').val(0); // 포인트 사용 금액 초기화
+                        $item_cart.find('.total_shipping_price').text(total_shipping_price.format()+"원");
+                        $item_cart.find('.total_pay_price').text(total_after_price.format()+"원");
+                        $item_cart.find('.yes_payment').text(total_after_price.format()+"원 결제하기");
+                    }
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+
+        // 첫결제인지 판단
+        get_first_payment([product_total_price, total_shipping_price]);
+
+    }
+
+    function get_first_payment(price_data){
+        return new Promise(function(resolve, reject) {
+            if(item_update_flag == item_cart_cnt){ // each end flag
+                if(customer_id && customer_id != "" && $("input#is_use_point").val() == "1"){
+                    $.ajax({
+                        type: 'post',
+                        url: "data/item_ajax.php",
+                        data: {
+                            mode: "get_first_payment",
+                            customer_id: customer_id
+                        },
+                        dataType: 'json',
+                        success: function(json) {
+                            if(json.code == "000000"){
+                                console.log(json.data);
+
+                                if(json.data){
+                                    if(json.data.cnt == 0){ // 결제내역 없음 = 첫결제
+                                        var event_point = 0;
+                                        var point_score = $('#container input[name="point_score"]').val();
+                                        console.log(price_data);
+
+                                        if(price_data[0] >= 30000){
+                                            event_point = 3000;
+                                        }else if(price_data[0] >= 20000){
+                                            event_point = 2000;
+                                        }else if(price_data[0] >= 10000){
+                                            event_point = 1000;
+                                        }
+
+                                        first_payment[0] = 1;
+                                        first_payment[1] = event_point;
+                                        $('#container input[name="point_price"]').val(event_point);
+                                        $('#container input[name="point_price"]').prop("readonly", false);
+                                        if(point_score_only < 1){ // 최초 한번만 실행(이게 왜 필요한지는 모름)
+                                            $('#container input[name="point_score"]').val(parseInt(point_score) + event_point);
+                                            point_score_only = 1;
+                                        }
+                                        $('#container input[name="total_price"]').val(price_data[0] + price_data[1] - event_point);
+                                        $('#container .total_pay_price').text((price_data[0] + price_data[1] - event_point).format()+"원"); // 블프 끝나면 주석풀기
+                                        if(event_point > 0){
+                                            $('#container .point4').show();
+                                            $('#container .point4').html('<div class="form-point-sale point4">첫 구매 자동 '+event_point.format()+'원 할인!</div>');
+                                        }
+                                        console.log(first_payment);
+                                    }else{
+                                        console.log("첫결제아님");
+                                        console.log(json.data);
+                                    }
+
+                                }else{
+                                    console.log("no result");
+                                }
+                                resolve(price_data); // 블프 끝나면 주석 풀기
+                            }else{
+                                alert(json.data+"("+json.code+")");
+                            }
+                        },
+                        complete: function() {
+                            // console.log('complete');
+                            //서브밋 차단 해제
+                            //$("#loading").css("display","none");
+                        }
+                    });
+                }else{
+                    resolve(price_data); // 블프 끝나면 주석 풀기
+                }
+            }
+
+        });
+    }
+
+////////////////////////////////// 주문/배송 정보 시작 //////////////////////////////
+
+    // 이메일 뒷주소 선택
+    $(document).on("change", "#container .customer_email_suffix_list", function(){
+        var email = $(this).children("option:selected").val();
+        $("#container input[name='customer_email_suffix']").val('');
+
+        if(email == ""){
+            $("#container input[name='customer_email_suffix']").prop("readonly", true);
+        }else if(email == "direct"){
+            $("#container input[name='customer_email_suffix']").prop("readonly", false);
+        }else{
+            $("#container input[name='customer_email_suffix']").prop("readonly", true);
+            $("#container input[name='customer_email_suffix']").val(email);
+        }
+        var value = $("#container input[name='customer_email']").val();
+
+        $("#INIpay_form input[name='P_EMAIL']").val(value+"@"+email);
+        $("#SendPayForm_id input[name='buyeremail']").val(value+"@"+email);
+    });
+
+    // 받는사람, 연락처에 주문자명, 연락처 가져오기
+    $(document).on("click", "#container input.same_order_name", function(){
+        if($(this).is(":checked") == true){
+            $("#container input[name='shipping_name']").val($("#container input[name='customer_name']").val());
+            $("#container input[name='shipping_cellphone']").val($("#container input[name='cellphone']").val());
+        }else{
+            $("#container input[name='shipping_cellphone']").val('010');
+            $("#container input[name='shipping_name']").val('');
+        }
+    });
+
+    // 저장된 배송지 가져오기
+    function get_addr(){
+
+        if(customer_id != ""){
+            $.ajax({
+                type: 'post',
+                url: "data/item_ajax.php",
+                data: {
+                    mode: "get_customer_addr_list",
+                    customer_id: customer_id
+                },
+                dataType: 'json',
+                error: function() {
+                },
+                success: function(json) {
+                    if(json.code == "000000"){
+                        console.log(json.data);
+                        var html = '<option value="direct">직접입력</option>';
+                        $.each(json.data, function(i, v){
+                            html += '<option value="'+v.ca_seq+'">';
+                            // html += '	<input type="radio" id="choice_addr_'+(i+1)+'" name="choice_addr" value="'+v.ca_seq+'" />';
+                            // html += '	<label for="choice_addr_'+(i+1)+'">'+v.addr_name+'</label>';
+                            html += v.addr_name;
+                            html += '</option>';
+                        });
+                        $("#container .addr_info").html(html);
+                    }else{
+                        alert(json.data+"("+json.code+")");
+                    }
+                },
+                complete: function() {
+                    // console.log('complete');
+                    //서브밋 차단 해제
+                    //$("#loading").css("display","none");
+                }
+            });
+        }
+    }
+
+    // 주소 선택(정회원)
+    $(document).on("change", "#container .addr_info", function(){
+        var choice_addr_seq = $(this).val();
+        if(choice_addr_seq != 'direct'){
+            $('.save_addr_wrap').css('display','none');
+        }else{
+            $('.save_addr_wrap').css('display','flex');
+        }
+
+        $.ajax({
+            type: 'post',
+            url: "data/item_ajax.php",
+            data: {
+                mode: "get_customer_addr",
+                customer_id: customer_id,
+                ca_seq: choice_addr_seq
+            },
+            dataType: 'json',
+            error: function() {
+            },
+            success: function(json) {
+                if(json.code == "000000"){
+                    //console.log(json.data);
+                    // 배송지에 추가하기
+                    $.each(json.data, function(i, v){
+                        $("input[name='addr1']").val(v.road_addr);
+                        $("input[name='addr2']").val(v.jibun_addr);
+                        $("input[name='addr3']").val(v.extra_addr);
+                        $("input[name='addr4']").val(v.detail_addr);
+                        $("input[name='zipcode']").val(v.zipcode);
+
+                        // 추가배송비 관련 테스트
+                        plus_shipping(v.zipcode);
+                    });
+                }else{
+                    alert(json.data+"("+json.code+")");
+                }
+            },
+            complete: function() {
+                // console.log('complete');
+                //서브밋 차단 해제
+                $("#loading").css("display","none");
+            }
+        });
+    });
+
+    // 배송메모 선택
+    $(document).on("change", "#container .shipping_memo_list", function(){
+        var memo = $(this).children("option:selected").val();
+        $("#container input[name='shipping_memo']").val('');
+        if(memo == ""){
+            $("#container input[name='shipping_memo']").prop("readonly", true);
+        }else if(memo == "direct"){
+            $("#container input[name='shipping_memo']").prop("readonly", false);
+        }else{
+            $("#container input[name='shipping_memo']").prop("readonly", true);
+            $("#container input[name='shipping_memo']").val(memo);
+        }
+    });
+
+    /////////////////////////////
+    // 포인트 시작
+    ////////////////////////////
+    // 포인트 입력 keyup
+    $(document).on("keyup", "#container input[name='point_price']", function(){
+        console.log("keyup");
+        var _this = $(this);
+        var point_price = parseInt(_this.val());
+        var point_score = parseInt($("#container input[name='point_score']").val());
+        var product_price = parseInt($("#container input[name='product_price']").val());
+        var shipping_price = parseInt($("#container input[name='shipping_price']").val());
+        var total_price = product_price + shipping_price;
+
+        if(point_price > point_score){
+            if(point_score >= total_price){
+                point_price = total_price;
+            }else{
+                point_price = point_score;
+            }
+        }else{
+            if(point_price > total_price){
+                point_price = total_price;
+            }
+
+            if(point_price <= parseInt(first_payment[1])){
+                point_price = parseInt(first_payment[1]);
+            }
+
+            if(isNaN(point_price)){
+                point_price = parseInt(first_payment[1]);
+            }
+        }
+        //_this.val(point_price);
+        total_price_calculator(); // 결제금액 계산
+    });
+
+    // 포인트 입력 focusout
+    $(document).on("focusout", "#container input[name='point_price']", function(){
+        console.log("focusout");
+        var _this = $(this);
+        var point_price = parseInt(_this.val());
+        var point_score = parseInt($("#container input[name='point_score']").val());
+        var product_price = parseInt($("#container input[name='product_price']").val());
+        var shipping_price = parseInt($("#container input[name='shipping_price']").val());
+        var total_price = product_price + shipping_price;
+
+        if(point_price > point_score){
+            if(point_score >= total_price){
+                point_price = total_price;
+            }else{
+                point_price = point_score;
+            }
+        }else{
+            if(point_price > total_price){
+                point_price = total_price;
+            }
+
+            if(point_price <= parseInt(first_payment[1])){
+                point_price = parseInt(first_payment[1]);
+            }
+
+            if(isNaN(point_price)){
+                point_price = parseInt(first_payment[1]);
+            }
+        }
+
+        _this.val(point_price);
+        total_price_calculator(); // 결제금액 계산
+    });
+
+    // 포인트 전부 사용
+    $(document).on("click", "#container .point_use", function(){
+        var point_score = parseInt($("#container input[name='point_score']").val());
+        var product_price = parseInt($("#container input[name='product_price']").val());
+        var shipping_price = parseInt($("#container input[name='shipping_price']").val());
+        var total_price = product_price + shipping_price;
+        //console.log(total_price, point_score);
+        var point = 0;
+
+        if(point_score > 0){ // 포인트 여부
+            if(point_score >= total_price){
+                point = total_price;
+            }else{
+                point = point_score;
+            }
+        }
+
+        $("#container input[name='point_price']").val(point);
+        total_price_calculator(); // 결제금액 계산
+    });
+
+    // 포인트 계산
+    function total_price_calculator(){
+        var product_price = parseInt($("#container input[name='product_price']").val());
+        var shipping_price = parseInt($("#container input[name='shipping_price']").val());
+        var point_price = parseInt($("#container input[name='point_price']").val());
+        var total_price = 0;
+
+        total_price = product_price + shipping_price - point_price;
+        if(total_price <= 0){
+            total_price = 0;
+        }
+
+        if(isNaN(total_price)){
+            total_price = product_price + shipping_price;
+        }
+        $("#container input[name='total_price']").val(total_price); // 블프 끝나면 주석 제거
+        $("#container .total_pay_price").text(total_price.format()+"원"); // 블프 끝나면 주석 제거
+        $('#container .yes_payment').text(total_price.format()+"원 결제하기");
+    }
+
+    /////////////////////////////
+    // 포인트 끝
+    ////////////////////////////
+
+    // 결제수단 선택(PG, 계좌이체)
+    $(document).on("click", "#container input[name='pay_type']", function(){
+        var value = $(this).val();
+        $("#container .pay_type_wrap tbody").removeClass("on");
+        $("#container .pay_type_tab_"+value).addClass("on");
+        if(value == "1"){
+            $("#container .bank-info-wrap").css("display", "none");
+        }else{
+            $("#container .bank-info-wrap").css("display", "block");
+        }
+    });
+
+    /////////////////////////////////
+    // 주소 입력창 시작
+    /////////////////////////////////
+
+    // 주소 검색 모달창
+    $(document).on("click", "#customer_addr_wrap .search_addr_btn", function(){
+        $("#search_addr_wrap").dialog({
+            modal: true,
+            title: '우편번호 검색',
+            autoOpen: true,
+            maxWidth: "96%",
+            minHeight: Number($(window).height()) - 40,
+            width: "96%",
+            height: Number($(window).height()) - 40,
+            autoSize: true,
+            resizable: false,
+            draggable: false,
+            open: function(event, ui) {
+                // to do something...
+                execDaumPostcode($("#customer_addr_wrap"));
+            },
+            close: function() {
+                // to do something...
+            }
+        });
+    });
+
+    // 주소 검색 모달창
+    $(document).on("click", "#container .search_addr_btn", function(){
+        $("#search_addr_wrap").dialog({
+            modal: true,
+            title: '우편번호 검색',
+            autoOpen: true,
+            maxWidth: "96%",
+            minHeight: Number($(window).height()) - 40,
+            width: "96%",
+            height: Number($(window).height()) - 40,
+            autoSize: true,
+            resizable: false,
+            draggable: false,
+            open: function(event, ui) {
+                // to do something...
+                execDaumPostcode($("#container"));
+            },
+            close: function() {
+                // to do something...
+            }
+        });
+    });
+
+    // 우편번호 찾기 찾기 화면을 넣을 element
+    var element_wrap = document.getElementById('search_addr_wrap');
+
+    function execDaumPostcode(target) {
+        // 현재 scroll 위치를 저장해놓는다.
+        var currentScroll = Math.max(document.body.scrollTop, document.documentElement.scrollTop);
+        new daum.Postcode({
+            oncomplete: function(data) {
+                // 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+
+                // 각 주소의 노출 규칙에 따라 주소를 조합한다.
+                // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
+                var addr = ''; // 주소 변수
+                var extraAddr = ''; // 참고항목 변수
+
+                //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
+                /*
+                if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
+                    addr = data.roadAddress;
+                } else { // 사용자가 지번 주소를 선택했을 경우(J)
+                    addr = data.jibunAddress;
+                }
+                */
+
+                // 사용자가 선택한 주소가 도로명 타입일때 참고항목을 조합한다.
+                if(data.userSelectedType === 'R'){
+                    // 법정동명이 있을 경우 추가한다. (법정리는 제외)
+                    // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
+                    if(data.bname !== '' && /[동|로|가]$/g.test(data.bname)){
+                        extraAddr += data.bname;
+                    }
+                    // 건물명이 있고, 공동주택일 경우 추가한다.
+                    if(data.buildingName !== '' && data.apartment === 'Y'){
+                        extraAddr += (extraAddr !== '' ? ', ' + data.buildingName : data.buildingName);
+                    }
+                    // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
+                    if(extraAddr !== ''){
+                        extraAddr = ' (' + extraAddr + ')';
+                    }
+                    // 조합된 참고항목을 해당 필드에 넣는다.
+                    //document.getElementById("extraAddress").value = extraAddr;
+                    target.find(".extraAddress").val(extraAddr);
+
+                } else {
+                    //document.getElementById("extraAddress").value = '';
+                    target.find(".extraAddress").val('');
+
+                }
+                /*
+                // 우편번호와 주소 정보를 해당 필드에 넣는다.
+                document.getElementById('postcode').value = data.zonecode;
+                document.getElementById("roadAddress").value = data.roadAddress;
+                document.getElementById("jibunAddress").value = data.jibunAddress;
+                // 커서를 상세주소 필드로 이동한다.
+                document.getElementById("detailAddress").focus();
+                */
+                target.find(".postcode").val(data.zonecode);
+                target.find(".roadAddress").val(data.roadAddress);
+                target.find(".jibunAddress").val(data.jibunAddress);
+                target.find(".detailAddress").focus();
+
+                plus_shipping(data.zonecode);
+
+                // iframe을 넣은 element를 안보이게 한다.
+                // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
+                element_wrap.style.display = 'none';
+                $("#search_addr_wrap").dialog('close');
+
+                // 우편번호 찾기 화면이 보이기 이전으로 scroll 위치를 되돌린다.
+                document.body.scrollTop = currentScroll;
+            },
+            // 우편번호 찾기 화면 크기가 조정되었을때 실행할 코드를 작성하는 부분. iframe을 넣은 element의 높이값을 조정한다.
+            onresize : function(size) {
+                element_wrap.style.height = size.height+'px';
+            },
+            width : '100%',
+            height : '100%'
+        }).embed(element_wrap);
+
+        // iframe을 넣은 element를 보이게 한다.
+        element_wrap.style.display = 'block';
+    }
+    /////////////////////////////////
+    // 주소 입력창 끝
+    /////////////////////////////////
+
+////////////////////////////////// 주문/배송 정보 끝 //////////////////////////////
+
+////////////////////////////////// 결제 시작 //////////////////////////////
+
+    // 일반결제
+    $(document).on("click", "#container .yes_payment", function(){
+        // 정글북인경우 재고 체크
+        /*
+        console.log(orderItem.length);
+        if(orderItem.length > 0){
+            $.each(orderItem, function(i, v){
+                get_jbook_list("goods", v.goodsNo, '');
+            });
+        }else{
+            change_payment('');
+        }
+        */
+        if(is_jbook_runout == 0){
+            change_payment('');
+        }else{
+            $('#firstRequestMsg1').find('.msg-txt').text('품절된 상품은 결제하실 수 없습니다.');
+            pop.open("firstRequestMsg1");
+        }
+    });
+
+    // 결제 1단계
+    function change_payment(type){
+        var reserve = "vbank_receipt=N&bank_receipt=N&cp_yn=N";
+        var reserve2 = "Card";
+        var reserve3 = "HPP(1):no_receipt:va_receipt:vbanknoreg(0):below1000";
+
+        if(type == "naverpay"){
+            reserve += "&d_npay=Y";
+            reserve2 = "onlynaverpay";
+            reserve3 += ":cardonly";
+        }else if(type == "kakaopay"){
+            reserve += "&d_kakaopay=Y";
+            reserve2 = "onlykakaopay";
+            reserve3 += ":cardonly";
+        }
+
+        if(parseInt("<?=$token_index ?>") > 0){
+            reserve += "&app_scheme=banjjack://";
+        }else{
+            reserve += "&app_scheme=banjjack";
+        }
+
+        $("#INIpay_form input[name='P_RESERVED']").val(reserve);
+        $("#SendPayForm_id input[name='gopaymethod']").val(reserve2);
+        $("#SendPayForm_id input[name='acceptmethod']").val(reserve3);
+
+        yes_payment();
+    }
+
+    // 결제
+    function yes_payment(){
+        var _this = $(this);
+        _this.prop("disabled", true);
+        if($("#container input[name='customer_name']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("주문자 성명을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='customer_name']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='cellphone']").val() == "010" || $("#container input[name='cellphone']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("주문자 연락처를 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='cellphone']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='customer_email']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("주문자 이메일을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='customer_email']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='customer_email_suffix']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("주문자 이메일을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='customer_email_suffix']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='shipping_name']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("배송 받으시는 분의 성명을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='shipping_name']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='shipping_cellphone']").val() == "010" || $("#container input[name='shipping_cellphone']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("배송 받으시는 분의 연락처를 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='shipping_cellphone']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='zipcode']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("배송 받으실 주소를 검색해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='zipcode']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='addr4']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("배송 받으실 상세주소를 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='addr4']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container textarea[name='shipping_memo']").val() == ""){
+            $('#firstRequestMsg1').find('.msg-txt').text("택배 요청사항을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container textarea[name='shipping_memo']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='bank_name']").val() == "" && $("#container input:radio[name='pay_type']:checked").val() == "2"){
+            $('#firstRequestMsg1').find('.msg-txt').text("입금자명을 입력해주세요.");
+            popalert.open("firstRequestMsg1");
+            $("#container input[name='bank_name']").focus();
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#chk_ag").is(":checked") == false){
+            $('#firstRequestMsg1').find('.msg-txt').text("구매진행에 동의해주세요.");
+            popalert.open("firstRequestMsg1");
+            _this.prop("disabled", false);
+            return false;
+        }
+        if($("#container input[name='customer_id']").val() == ""){
+            if($("#chk_ag2").is(":checked") == false){
+                $('#firstRequestMsg1').find('.msg-txt').text("비회원 주문에 대한 개인정보 활용에 동의해주세요.");
+                popalert.open("firstRequestMsg1");
+                _this.prop("disabled", false);
+                return false;
+            }
+        }
+
+        var is_payment = false;
+        var post_data = $("#item_payment").serialize();
+        post_data += "&mode=set_insert_item_payment_log_ready";
+        //console.log(data);
+        if(is_payment == false){
+            is_payment = true; // 따닥방지
+            direct_buy_cancel = false; // 결제시에는 바로구매 카트 삭제 안하게
+            $.ajax({
+                type: 'post',
+                url: "data/item_list_ajax.php",
+                data: {
+                    mode: "get_item_payment_log_chk",
+                    order_num: order_num
+                },
+                dataType: 'json',
+                beforeSend: function() {
+                    $("#loading").css("display","flex");
+                },
+                error: function() {
+                    is_payment = false;
+                    _this.prop("disabled", false);
+                },
+                success: function(json) {
+                    is_payment = false;
+                    _this.prop("disabled", false);
+                    if(json.code == "000000"){
+                        console.log(json.data);
+                        if(json.data == "0"){
+                            if(orderItem.length > 0){ // 정글북이면 정글북 등록 후 결제 준비 > 이동
+                                $.ajax({
+                                    type: 'post',
+                                    url: "data/jbook_item_ajax.php",
+                                    data: {
+                                        mode: "set_insert_item_order",
+                                        order_num: order_num,
+                                        orderItem: orderItem
+                                    },
+                                    dataType: 'json',
+                                    beforeSend: function() {
+                                        //$("#loading").css("display","flex");
+                                    },
+                                    error:function(request,status,error){
+                                        alert("에러가 발생했습니다.");
+                                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                                    },
+                                    success: function(json) {
+                                        if(json.code == "000000"){
+                                            console.log(json.data);
+
+                                            $.ajax({
+                                                type: 'post',
+                                                url: "data/item_list_ajax.php",
+                                                data: post_data,
+                                                dataType: 'json',
+                                                beforeSend: function() {
+                                                    //$("#loading").css("display","flex");
+                                                },
+                                                success: function(json) {
+                                                    if(json.code == "000000"){
+                                                        console.log(json.data);
+                                                        order_next(json.data.price, json.data.product_name, json.data.pay_type);
+                                                    }else if(json.code == "003902"){ // 이미 등록된 결제 진행이 있음
+                                                        popalert.confirm('firstRequestMsg2', '이미 등록된 결제 진행이 있습니다.', '/');
+                                                        return false;
+                                                    }else if(json.code == "003903"){ // total 금액이 0원임
+                                                        popalert.confirm('firstRequestMsg2', '[결제오류]결제를 다시 진행해 주십시요.', '/');
+                                                        return false;
+                                                    }else{
+                                                        alert(json.data+"("+json.code+")");
+                                                        console.log(json.data);
+                                                    }
+                                                },
+                                                complete: function() {
+                                                    // console.log('complete');
+                                                    //서브밋 차단 해제
+                                                    $("#loading").css("display","none");
+                                                },
+                                                error:function(request,status,error){
+                                                    alert("에러가 발생했습니다.");
+                                                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                                                }
+                                            });
+                                        }else{
+                                            alert(json.data+"("+json.code+")");
+                                        }
+                                    },
+                                    complete: function() {
+                                        // console.log('complete');
+                                        //서브밋 차단 해제
+                                        $("#loading").css("display","none");
+                                    }
+                                });
+                            }else{ // 정글북 아니면 바로 결제처리
+                                $.ajax({
+                                    type: 'post',
+                                    url: "data/item_list_ajax.php",
+                                    data: post_data,
+                                    dataType: 'json',
+                                    beforeSend: function() {
+                                        //$("#loading").css("display","flex");
+                                    },
+                                    success: function(json) {
+                                        if(json.code == "000000"){
+                                            console.log(json.data);
+                                            order_next(json.data.price, json.data.product_name, json.data.pay_type);
+                                        }else if(json.code == "003902"){ // 이미 등록된 결제 진행이 있음
+                                            popalert.confirm('firstRequestMsg2', '이미 등록된 결제 진행이 있습니다.', '/');
+                                            return false;
+                                        }else if(json.code == "003903"){ // total 금액이 0원임
+                                            popalert.confirm('firstRequestMsg2', '[결제오류]결제를 다시 진행해 주십시요.', '/');
+                                            return false;
+                                        }else{
+                                            alert(json.data+"("+json.code+")");
+                                            console.log(json.data);
+                                        }
+                                    },
+                                    complete: function() {
+                                        // console.log('complete');
+                                        //서브밋 차단 해제
+                                        $("#loading").css("display","none");
+                                    },
+                                    error:function(request,status,error){
+                                        alert("에러가 발생했습니다.");
+                                        alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                                    }
+                                });
+                            }
+                        }else{
+                            // 이미 입력됨
+                            var is_chk = 0;
+                            $.each(json.data, function(i, v){
+                                if(v.pay_status == '1' && v.receipt_id === null){
+                                    is_chk++;
+                                }
+                            });
+                            if(is_chk > 0){
+                                if(is_chk == 1){
+                                    //그러시면 결제로 바로 가시죠
+                                    //alert("재결제");
+                                    var pay_type_arr = ['', 'card', 'bank'];
+                                    var total_price = $('#container input[name="total_price"]').val();
+                                    var product_name = $('#container input[name="product_name"]').val();
+                                    var pay_type = $('#container input[name="pay_type"]:checked').val();
+                                    //order_next(total_price, product_name, pay_type_arr[pay_type]);
+                                    // 재결제 루틴 필요
+                                    $.ajax({
+                                        type: 'post',
+                                        url: "data/item_list_ajax.php",
+                                        data: {
+                                            mode: "set_update_item_payment_retry",
+                                            pay_type: pay_type,
+                                            product_name: product_name,
+                                            total_price: total_price,
+                                            order_num: order_num
+                                        },
+                                        dataType: 'json',
+                                        beforeSend: function() {
+                                            $("#loading").css("display","flex");
+                                        },
+                                        success: function(json) {
+                                            if(json.code == "000000"){
+                                                console.log(json.data);
+                                                order_next(total_price, product_name, pay_type_arr[pay_type]);
+                                            }else{
+                                                alert(json.data+"("+json.code+")");
+                                                console.log(json.data);
+                                            }
+                                        },
+                                        complete: function() {
+                                            // console.log('complete');
+                                            //서브밋 차단 해제
+                                            $("#loading").css("display","none");
+                                        },
+                                        error:function(request,status,error){
+                                            alert("에러가 발생했습니다.");
+                                            alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                                            $("#loading").css("display","none");
+                                        }
+                                    });
+                                }else{
+                                    // 결제건 중복이므로 문의
+                                    alert("결제도중 문제가 발생했습니다.");
+                                }
+                            }
+                        }
+                    }else{
+                        alert(json.data+"("+json.code+")");
+                    }
+                },
+                complete: function() {
+                    // console.log('complete');
+                    //서브밋 차단 해제
+                    $("#loading").css("display","none");
+                    is_payment = false;
+                    _this.prop("disabled", false);
+                }
+            });
+        }else{
+            // To do something..
+            // 따닥방지
+            is_payment = false;
+        }
+    }
+
+
+    /////////////////////////////////
+    // 결제 모듈 시작
+    /////////////////////////////////
+    var is_app = <?=$is_android?>;
+    var is_iOS = <?=$is_ios?>;
+    if (is_app == false){
+        is_app = is_iOS;
+    }
+    // 사파리 모바일에서 MacOS로 체크되는 경우 예외처리용
+    var isIOSchk = /iPad|iPhone|iPod/.test(navigator.platform) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+
+    // accept-charset 지원하지 않는 브라우저 처리용
+    function emulAcceptCharset(form) {
+        if (form.canHaveHTML) { // detect IE
+            document.charset = form.acceptCharset;
+        }
+        return true;
+    }
+
+    // 1. 모바일, PC 결제여부 분기
+    function order_next (pprice, pname, payment_type) {
+        //console.log(pprice, pname, payment_type, is_app, moblieChk);
+        if (pprice > 0) {
+            $("#INIpay_form").find('input[name="P_AMT"]').val(pprice);
+            if (payment_type == 'bank') {
+                // 결제모듈 없이 바로 완료처리
+                set_update_item_payment_log_price_zero();
+                return false;
+            }else{
+                if (is_app) {
+                    $("#INIpay_form").submit();
+                } else {
+                    if(moblieChk == "mobile"){
+                        $("#INIpay_form").submit();
+                    }else{
+                        if(isIOSchk == true){
+                            $("#INIpay_form").submit();
+                        }else{
+                            // PC init
+                            alert("모바일에서만 결제가 가능합니다.");
+                            return false;
+                            /*
+                            $.ajax({
+                                type: 'post',
+                                url: "<?=$item_directory ?>/item_list_ajax.php",
+							data: {
+								mode: "INI_PC_init",
+								product_no: no,
+								price: pprice
+							},
+							dataType: 'json',
+							beforeSend: function() {
+								 //$("#loading").css("display","flex");
+							},
+							error:function(request,status,error){
+								$.MessageBox("에러가 발생했습니다.");
+								alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+							},
+							success: function(json) {
+								if(json.code == "000000"){
+									console.log(json.data);
+									$("#SendPayForm_id").find('input[name="mid"]').val(json.data.mid);
+									$("#SendPayForm_id").find('input[name="price"]').val(pprice);
+									$("#SendPayForm_id").find('input[name="goodname"]').val(pname);
+									$("#SendPayForm_id").find('input[name="timestamp"]').val(json.data.timestamp);
+									$("#SendPayForm_id").find('input[name="signature"]').val(json.data.sign);
+									$("#SendPayForm_id").find('input[name="mKey"]').val(json.data.mKey);
+									$("#SendPayForm_id").find('input[name="nointerest"]').val(json.data.cardNoInterestQuota);
+									$("#SendPayForm_id").find('input[name="quotabase"]').val(json.data.cardQuotaBase);
+
+									INIStdPay.pay('SendPayForm_id'); // PC
+								}else{
+									alert(json.data+"("+json.code+")");
+								}
+							},
+							complete: function() {
+								// console.log('complete');
+								//서브밋 차단 해제
+								//$("#loading").css("display","none");
+							}
+						});
+						*/
+                        }
+                    }
+                }
+            }
+        }else if (pprice == 0) {
+            set_update_item_payment_log_price_zero();
+        }
+    }
+
+    function set_update_item_payment_log_price_zero(){
+        // 회원만 포인트로 가격을 0 만들 수 있으므로 정회원 기준으로 작업
+        console.log('set_zero까지 들어옴');
+        $.ajax({
+            type: 'post',
+            url: "data/item_list_ajax.php",
+            data: {
+                mode: "set_update_item_payment_log_price_zero",
+                order_num: order_num,
+                customer_id: customer_id
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                //$("#loading").css("display","flex");
+            },
+            error:function(request,status,error){
+                alert("에러가 발생했습니다.");
+                alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+            },
+            success: function(json) {
+                if(json.code == "000000"){
+                    console.log(json.data);
+                    location.href = "shop_pay_com?no="+order_num;
+                }else{
+                    alert(json.data+"("+json.code+")");
+                }
+            },
+            complete: function() {
+                // console.log('complete');
+                //서브밋 차단 해제
+                //$("#loading").css("display","none");
+            }
+        });
+    }
+    /////////////////////////////////
+    // 결제모듈 끝
+    /////////////////////////////////
+
+////////////////////////////////// 결제 끝 //////////////////////////////
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+</script>
+</body>
+</html>

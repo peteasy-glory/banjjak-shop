@@ -112,7 +112,7 @@ $cat = sql_fetch_array($sql);
     <!-- container -->
     <section id="container">
         <!-- page-body -->
-        <form action="./data/make_new_reservation" method="post" name="f">
+        <form action="./data/make_new_reservation.php" method="post" name="f">
             <input type="hidden" name="shopName" value="<?php echo $r['name'];?>">
             <input type="hidden" name="worker" value="<?php echo $worker; ?>">
             <input type="hidden" name="workTime" value="<?php echo $workTime; ?>">
