@@ -746,9 +746,9 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                         setCookie_popup('guide_beauty_shop', 'Y', 1);
                         $(this).dialog("close");
                     },
-                    "자세히 보기": function() {
-                        location.href = "mypage_notice_view?notice_seq=19";
-                            //setCookie_popup('guide_beauty_shop', 'Y', 1);
+                    "오늘 그만보기": function() {
+                        // location.href = "mypage_notice_view?notice_seq=19";
+                            setCookie_popup('guide_beauty_shop', 'Y', 1);
                         $(this).dialog("close");
                     }
                 },

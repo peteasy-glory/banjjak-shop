@@ -3304,6 +3304,7 @@ if(empty($grade[0]['grade_name'])){
         //서비스 정보 업데이트
         $(document).on('click','.update-service-btn',function(){
             document.service_update.submit();
+            history.scrollRestoration ="auto";
         });
 
         function callback(){
