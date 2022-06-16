@@ -220,25 +220,9 @@ if(empty($grade[0]['grade_name'])){
         <!-- page-body -->
         <div class="page-body" id="page-body">
             <div class="shortcut-wrap" id="shortcutWrap">
-<<<<<<< HEAD
                 <a href="#header"><img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();"></a>
                 <a href="#shortCutTarget2"><img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();"></a>
                 <a href="#shortCutTarget3"><img src="/images/icon-pay.png" alt="" onclick="scrollMove3();"></a>
-=======
-<<<<<<< HEAD
-                <img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();">
-=======
-<<<<<<< Updated upstream
-                <img src="/images/icon-page-top.png" alt="" onclick="common.pageMove(0);">
->>>>>>> 8c33158eb5f0f065dfb0bb6f01e2029afac43dbc
-                <img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();">
-                <img src="/images/icon-pay.png" alt="" onclick="scrollMove3();">
-=======
-                <a href="#header"><img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();"></a>
-                <a href="#shortCutTarget2"><img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();"></a>
-                <a href="#shortCutTarget3"><img src="/images/icon-pay.png" alt="" onclick="scrollMove3();"></a>
->>>>>>> Stashed changes
->>>>>>> d6f2051f9c89842255a82775a4047c42278ca9a3
 
             </div>
             <div class="reserve-pay-management">
@@ -3900,51 +3884,6 @@ if(empty($grade[0]['grade_name'])){
 
 
 
-
-
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-
-            //wide-tab 클릭시 #basic-data-group-target으로 이동
-
-
-
-            // $(document.body).on("touchstart", ".tab-cell button", tabTouch);
-            // $(document).on("click", ".tab-cell button", tabClick);
-            //
-            // function tabClick(){
-            //     const click_target= document.querySelector("#basic-data-group-target");
-            //     const click_targetY= pageYOffset + click_target.getBoundingClientRect().top -80
-            //     console.log("click");
-            //     $("body,html").stop().animate(
-            //         {
-            //             scrollTop: click_targetY,
-            //         },
-            //         500
-            //     );
-            // }
-            //
-            // function tabTouch(){
-            //     const touch_target= document.querySelector("#basic-data-group-target");
-            //     const touch_targetY= pageYOffset + touch_target.getBoundingClientRect().top -80
-            //     console.log("touch");
-            //
-            //     $("body,html").stop().animate(
-            //         {
-            //             scrollTop: touch_targetY,
-            //         },
-            //         500
-            //     );
-            // }
-
-
-
-           $(document).on("click", ".tab-cell a", function (event) {
-=======
->>>>>>> 999dfa0aaf62c4394c90a8b9f47f7b5b5f92384c
->>>>>>> d6f2051f9c89842255a82775a4047c42278ca9a3
-
         //wide-tab
         $(document).on("click", ".tab-cell a", function (event) {
 
@@ -3988,117 +3927,45 @@ if(empty($grade[0]['grade_name'])){
         document.addEventListener("touchmove",timeoutScroll)
 
 
-        //short-cut
+            //short-cut
 
-        $.fn.scrollStopped = function(callback) {
-            var _this = this, $this = $(_this);
-            $this.scroll(function(event) {
-                clearTimeout($this.data('scrollTimeout'));
-                $this.data('scrollTimeout', setTimeout(callback.bind(_this), 250, event));
-            });
-        };
-
-
-
-        let shortCutFlag = true;
-
-        let pageTitle = document.querySelector(".page-title").clientHeight;
-        let pageTitle_pc = document.querySelector(".pc-header").clientHeight;
-        let shortCutTarget2 = document.querySelector("#shortCutTarget2").getBoundingClientRect().top;
-
-        let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
-
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
-        let shortCutTarget4 = document.querySelector("#shortCutTarget4").getBoundingClientRect().top;
-
-        let pageBodyRectTop = document.querySelector("#page-body").getBoundingClientRect().top;
-
-        // let pageBodyScrollTop = $("#page-body").scrollTop();
->>>>>>> d6f2051f9c89842255a82775a4047c42278ca9a3
-
-        let shortcut = $("#shortcutWrap");
-
-        let mql = window.matchMedia("screen and (min-width: 1025px)");
+            $.fn.scrollStopped = function(callback) {
+                var _this = this, $this = $(_this);
+                $this.scroll(function(event) {
+                    clearTimeout($this.data('scrollTimeout'));
+                    $this.data('scrollTimeout', setTimeout(callback.bind(_this), 250, event));
+                });
+            };
 
 
-        $(window).on("touchmove",function(){
+
+            let shortCutFlag = true;
+
+            let pageTitle = document.querySelector(".page-title").clientHeight;
+            let pageTitle_pc = document.querySelector(".pc-header").clientHeight;
+            let shortCutTarget2 = document.querySelector("#shortCutTarget2").getBoundingClientRect().top;
+
+            let shortCutTarget3 = document.querySelector("#shortCutTarget3").getBoundingClientRect().top;
+
+
+            let shortcut = $("#shortcutWrap");
+
+            let mql = window.matchMedia("screen and (min-width: 1025px)");
+
+
+            $(window).on("touchmove",function(){
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
 
-        $(window).on("scroll",function(){
+            $(window).on("scroll",function(){
                 console.log("스크롤");
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
 
-        $("#page-body").scrollStopped(function(){
-            if($("#page-body").scrollTop() === 0){
-
-                shortcut.stop().css("display","flex");
-                shortcut.stop().animate({"opacity":1},50);
-
-            }else{
-                shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
-                    shortcut.css("display","none");
-                });
-
-            }
-        })
-
-        $(window).scrollStopped(function(){
-            if(!mql.matches){
-                if($(window).scrollTop() === 0){
-
-<<<<<<< HEAD
-                    shortcut.stop().css("display","flex");
-                    shortcut.stop().animate({"opacity":1},50);
-=======
-                shortcut.stop().css("display","flex");
-                shortcut.stop().animate({"opacity":1},50);
-=======
-<<<<<<< Updated upstream
-        console.log(pageTitle);
-        function scrollMove2(){
-
-            $('.page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
-=======
-
-        let shortcut = $("#shortcutWrap");
-
-        let mql = window.matchMedia("screen and (min-width: 1025px)");
-
-
-        $(window).on("touchmove",function(){
-                shortcut.stop().css("display","flex");
-                shortcut.stop().animate({"opacity":1},300);
-            })
-
-        $(window).on("scroll",function(){
-                console.log("스크롤");
-                shortcut.stop().css("display","flex");
-                shortcut.stop().animate({"opacity":1},300);
-            })
-
-        $("#page-body").scrollStopped(function(){
-            if($("#page-body").scrollTop() === 0){
-
-                shortcut.stop().css("display","flex");
-                shortcut.stop().animate({"opacity":1},50);
-
-            }else{
-                shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
-                    shortcut.css("display","none");
-                });
-
-            }
-        })
-
-        $(window).scrollStopped(function(){
-            if(!mql.matches){
-                if($(window).scrollTop() === 0){
+            $("#page-body").scrollStopped(function(){
+                if($("#page-body").scrollTop() === 0){
 
                     shortcut.stop().css("display","flex");
                     shortcut.stop().animate({"opacity":1},50);
@@ -4109,78 +3976,43 @@ if(empty($grade[0]['grade_name'])){
                     });
 
                 }
-            }
-        })
+            })
 
+            $(window).scrollStopped(function(){
+                if(!mql.matches){
+                    if($(window).scrollTop() === 0){
 
+                        shortcut.stop().css("display","flex");
+                        shortcut.stop().animate({"opacity":1},50);
 
-        function scrollMove1(){
-                    $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
-        }
-        function scrollMove2(){
-                $('#page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
->>>>>>> Stashed changes
-        }
+                    }else{
+                        shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
+                            shortcut.css("display","none");
+                        });
 
-
-        function scrollMove3(){
-                $('#page-body').stop().animate({'scrollTop': shortCutTarget3-pageTitle}, {
-                    queue: false,
-                    duration: 350
-                });
-                shortcut.stop().animate({"opacity": 0}, 150, function () {
-                    shortcut.css("display", "none");
-                })
-        }
-
-
-
-            $(document).on("click","#shortcutWrap a", function (event){
-
-                event.preventDefault();
-
-                $("body,html").stop().animate({
-                    scrollTop:$(this.hash).offset().top - 80
-                },500);
-
-<<<<<<< Updated upstream
-            $('.page-body').stop().animate({'scrollTop':shortCutTarget3-pageTitle}, {queue:false, duration:350});
->>>>>>> 8c33158eb5f0f065dfb0bb6f01e2029afac43dbc
->>>>>>> d6f2051f9c89842255a82775a4047c42278ca9a3
-
-                }else{
-                    shortcut.stop().delay(1200).animate({"opacity":0},500,function(){
-                        shortcut.css("display","none");
-                    });
-
+                    }
                 }
-            }
-        })
-
-
-
-        function scrollMove1(){
-                    $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
-        }
-        function scrollMove2(){
-                $('#page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
-        }
-
-
-        function scrollMove3(){
-                $('#page-body').stop().animate({'scrollTop': shortCutTarget3-pageTitle}, {
-                    queue: false,
-                    duration: 350
-                });
-                shortcut.stop().animate({"opacity": 0}, 150, function () {
-                    shortcut.css("display", "none");
-                })
-        }
-=======
             })
 
 
->>>>>>> Stashed changes
+
+            function scrollMove1(){
+                $('#page-body').stop().animate({'scrollTop':0}, {queue:false, duration:350});
+            }
+            function scrollMove2(){
+                $('#page-body').stop().animate({'scrollTop':shortCutTarget2-pageTitle}, {queue:false, duration:350});
+            }
+
+
+            function scrollMove3(){
+                $('#page-body').stop().animate({'scrollTop': shortCutTarget3-pageTitle}, {
+                    queue: false,
+                    duration: 350
+                });
+                shortcut.stop().animate({"opacity": 0}, 150, function () {
+                    shortcut.css("display", "none");
+                })
+            }
 
 
 
@@ -4193,6 +4025,13 @@ if(empty($grade[0]['grade_name'])){
                 },500);
 
             })
+
+
+
+
+
+
+
 
 
 
