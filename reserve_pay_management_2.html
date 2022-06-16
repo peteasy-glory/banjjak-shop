@@ -813,7 +813,7 @@ if(empty($grade[0]['grade_name'])){
                 </div>
             </form>
             <!-- 서비스 정보 변경 -->
-            <form action="./data/make_reservation_update" method="post" name="service_update" id="service_update" target="hiddenFrame" >
+            <form action="./data/make_reservation_update.php" method="post" name="service_update" id="service_update" target="hiddenFrame" >
                 <input type="hidden" name="backurl" value="reserve_pay_management_2?payment_log_seq=<?php echo $payment_log_seq?>">
                 <input type="hidden" name="seq" value="<?php echo $payment_log_seq?>">
                 <input type="hidden" name="artist_id" value="<?php echo $pay['artist_id'];?>">
@@ -1817,7 +1817,7 @@ if(empty($grade[0]['grade_name'])){
             <!--변경 버튼 시작 -->
             <div class="basic-data-group middle sticky-bottom" id="sticky-bottom">
                 <div class="sticky-bottom-inner pc-mg-bt-20" >
-                    <a href="javascript:;" class="btn btn-outline-purple btn-round btn-middle-size update-service-btn">변경</a>
+                    <div onclick="service_submit()" class="btn btn-outline-purple btn-round btn-middle-size update-service-btn">변경</div>
                 </div>
             </div>
             <!--변경 버튼 끝 -->
@@ -2165,9 +2165,9 @@ if(empty($grade[0]['grade_name'])){
                 <?php } ?>
                 <!-- 단골고객할인-->
 
-                <div class="basic-data-group " id="prev_cmt">
+                <div class="basic-data-group " id="prev_cmt" >
 
-                    <div class="con-title-group con-title-group-add">
+                    <div class="con-title-group con-title-group-add " id="submit-scroll-target">
                         <h4 class="con-title">단골 고객 할인</h4>
                     </div>
 
@@ -3302,12 +3302,64 @@ if(empty($grade[0]['grade_name'])){
 
 
         //서비스 정보 업데이트
-        $(document).on('click','.update-service-btn',function(){
-            document.service_update.submit();
+        // $(document).on('click','.update-service-btn',function(){
+        //     document.service_update.submit();
+        //
+        //
+        //
+        // });
+        function getCookie_submit(name) {
+            var obj = name + "=";
+            var x = 0;
+            while (x <= document.cookie.length) {
+                var y = (x + obj.length);
+                if (document.cookie.substring(x, y) == obj) {
+                    if ((endOfCookie = document.cookie.indexOf(";", y)) == -1)
+                        endOfCookie = document.cookie.length;
+                    return unescape(document.cookie.substring(y, endOfCookie));
+                }
+                x = document.cookie.indexOf(" ", x) + 1;
+                if (x == 0)
+                    break;
+            }
+            return "";
+        }
+        function setCookie_submit(name, value, expiredays) {
+            var todayDate = new Date();
+            todayDate.setDate(todayDate.getDate() + expiredays);
+            document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure';
+        }
+
+        function deleteCookie(name) {
+            document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+
+
+        function service_submit(){
 
 
 
-        });
+            setCookie_submit('submit?', 'Y',1)
+
+            $("form[name=service_update]").submit();
+
+        }
+
+        let submit_scroll_target = document.querySelector("#submit-scroll-target").getBoundingClientRect().top;
+        let deviceHeight = window.screen.height;
+
+        if(getCookie_submit('submit?') === 'Y'){
+
+            $('#page-body').stop().animate({'scrollTop':submit_scroll_target-deviceHeight}, {queue:false, duration:350});
+
+            deleteCookie('submit?');
+
+        }
+
+
+
+
+
 
         function callback(){
             popalert.open('confirmOnlyOkLink','서비스정보가 변경되었습니다.');
