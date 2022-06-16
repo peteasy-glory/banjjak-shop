@@ -220,7 +220,7 @@ if(empty($grade[0]['grade_name'])){
         <!-- page-body -->
         <div class="page-body" id="page-body">
             <div class="shortcut-wrap" id="shortcutWrap">
-                <a href="#header"><img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();"></a>
+                <a href="#header"><img src="/images/icon-page-top.png" alt="" onclick="scrollMove1();" id="shortcut1"></a>
                 <a href="#shortCutTarget2"><img src="/images/icon-reserve.png" alt="" onclick="scrollMove2();"></a>
                 <a href="#shortCutTarget3"><img src="/images/icon-pay.png" alt="" onclick="scrollMove3();"></a>
 
@@ -1825,7 +1825,7 @@ if(empty($grade[0]['grade_name'])){
             <!-- 하단 결제 부분 시작 -->
             <div class="basic-data-group">
                 <!-- 결제금액 리스트 표시-->
-                <div class="basic-data-group vvsmall2">
+                <div class="basic-data-group vvsmall2" id="receipt">
                     <div class="user-receipt-item user-receipt-item-add">
                         <div class="receipt-buy-detail">
                             <div class="item-data-list">
@@ -3304,7 +3304,9 @@ if(empty($grade[0]['grade_name'])){
         //서비스 정보 업데이트
         $(document).on('click','.update-service-btn',function(){
             document.service_update.submit();
-            history.scrollRestoration ="auto";
+
+
+
         });
 
         function callback(){
@@ -3955,19 +3957,19 @@ if(empty($grade[0]['grade_name'])){
 
 
             $(window).on("touchmove",function(){
+                $("#shortcut1").css("display","block");
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
 
             $(window).on("scroll",function(){
-
+                $("#shortcut1").css("display","block");
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
             $("#page-body").on("scroll",function(){
 
-                console.log($(window).scrollTop())
-                console.log($("#page-body").scrollTop())
+                $("#shortcut1").css("display","block");
                 shortcut.stop().css("display","flex");
                 shortcut.stop().animate({"opacity":1},300);
             })
@@ -3977,7 +3979,7 @@ if(empty($grade[0]['grade_name'])){
 
             $("#page-body").scrollStopped(function(){
                 if($("#page-body").scrollTop() === 0){
-
+                    $("#shortcut1").css("display","none");
                     shortcut.stop().css("display","flex");
                     shortcut.stop().animate({"opacity":1},50);
 
@@ -3998,7 +4000,7 @@ if(empty($grade[0]['grade_name'])){
             $(window).scrollStopped(function(){
                 if(!mql.matches){
                     if($("#page-body").scrollTop() === 0){
-
+                        $("#shortcut1").css("display","none");
                         shortcut.stop().css("display","flex");
                         shortcut.stop().animate({"opacity":1},50);
 
