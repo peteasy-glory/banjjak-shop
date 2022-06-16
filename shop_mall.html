@@ -38,7 +38,7 @@ $md_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$md_item} = '1' AND a.is_shop = '2' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+    WHERE a.is_delete = '1' AND {$md_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
 $md_item_array = sql_fetch_array($md_item_sql);
 
 // 베스트 쇼핑템
@@ -48,7 +48,7 @@ $best_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$best_item} = '1' AND a.is_shop = '2' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+    WHERE a.is_delete = '1' AND {$best_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
 $best_item_array = sql_fetch_array($best_item_sql);
 
 // new 쇼핑템
@@ -58,7 +58,7 @@ $new_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$new_item} = '1' AND a.is_shop = '2' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt DESC LIMIT 30";
+    WHERE a.is_delete = '1' AND {$new_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt DESC LIMIT 30";
 $new_item_array = sql_fetch_array($new_item_sql);
 
 //돌아갈 url을 세션에 저장한다.
@@ -122,14 +122,15 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
                     <div style="display:block;" class="tab_menu">
                         <div class="item_menu_list horizontal-swiper-scoller auto">
                             <div class="scroller-inner" style="overflow: auto;">
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=53"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-1.png"></div><div class="txt">키튼<br>(1세미만)</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=54"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-2.png"></div><div class="txt">어덜트<br>(1-6세)</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=55"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-3.png"></div><div class="txt">시니어<br>(7세이상)</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=56"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-4.png"></div><div class="txt">전연령</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=58"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-5.png"></div><div class="txt">건식사료</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=59"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-6.png"></div><div class="txt">주식캔</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=60"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-cat-feed-7.png"></div><div class="txt">파우치</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=53"><div class="icons"><img src="../static/pub/images/icon/icon-shop-category-more.png"></div><div class="txt">+ 더보기</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=1"><div class="icons"><img src=""></div><div class="txt">목욕</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=2"><div class="icons"><img src=""></div><div class="txt">가위</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=3"><div class="icons"><img src=""></div><div class="txt">클리퍼</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=4"><div class="icons"><img src=""></div><div class="txt">브러쉬</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=5"><div class="icons"><img src=""></div><div class="txt">미용도구</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=6"><div class="icons"><img src=""></div><div class="txt">테이블</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=7"><div class="icons"><img src=""></div><div class="txt">드라이기</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=8"><div class="icons"><img src=""></div><div class="txt">소모품</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=9"><div class="icons"><img src=""></div><div class="txt">기타</div></a></div>
                             </div>
                         </div>
                     </div>
@@ -330,13 +331,6 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
             <!-- //20220218 수정 : 구조 변경 -->
         </div>
         <!-- //New 쇼핑템 -->
-        <!-- 하단 배너 -->
-        <div class="basic-data-group">
-            <div class="bottom-banner">
-                <a href="shop_event?seq=28" class="btn-bottom-banner-item"><img src="https://image.banjjakpet.com/images/toyhotdeal_nodate.jpg" alt=""/></a>
-            </div>
-        </div>
-        <!-- //하단 배너 -->
         <div class="page-footer">
             <div class="footer-business">
                 <button type="button" class="btn-footer-business">(주)펫이지 사업자 정보</button>
@@ -347,20 +341,6 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
                     <div class="footer-address-cell">서울시 종로구 종로6 5층 서울창조경제혁신센터</div>
                     <div class="footer-address-cell">개인정보 담당자: 이석범 privacy@peteasy.kr</div>
                 </div>
-            </div>
-            <div class="footer-customer-menu">
-                <ul>
-                    <li><a href="javascript:newWindowOpen();">미용샵/호텔입점신청</a></li>
-                    <li><a href=
-                           <?php
-                           if($user_id == ""){
-                               echo "/login_1";
-                           }else{
-                               echo "/home_alliance_request?back=shop";
-                           }
-                           ?>
-                        >쇼핑입점/제휴광고문의</a></li>
-                </ul>
             </div>
             <div class="footer-etc-menu">
                 <ul>
@@ -387,7 +367,7 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
     //	page-bottom 이 있을 경우 이위치
     <div class="page-bottom">
     </div>
-    -->-
+    -->
     <!-- page-bottom -->
 
     <!-- //page-bottom -->

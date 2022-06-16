@@ -724,7 +724,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
     function setCookie_popup(name, value, expiredays) {
         var todayDate = new Date();
         todayDate.setDate(todayDate.getDate() + expiredays);
-        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Sequre';
+        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure';
     }
 
     $(document).ready(function(){
@@ -743,7 +743,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 draggable: false,
                 buttons: {
                     '닫기': function() {
-                        // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                        setCookie_popup('guide_beauty_shop ', 'Y', 1);
                         $(this).dialog("close");
                     },
                     "오늘 그만보기": function() {
