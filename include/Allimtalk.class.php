@@ -141,7 +141,7 @@ class Allimtalk{
     }
 
 	public function sendOrderAccount_new($customerNumber, $orderNum, $payDt, $productName, $shippingDt, $totalPrice, $shippingName, $btnLink){
-        $templateNo = "14757";
+        $templateNo = "20012";
         $btnName = "주문내역 확인하기";
         $message = "반려생활의 단짝, 반짝에서 ".$customerNumber."님의 주문내역(계좌이체)을 알려드립니다."
 		."\n\n▶ 주문번호 : ".$orderNum
@@ -160,7 +160,7 @@ class Allimtalk{
     }
 
     public function sendOrderReceipt_new($customerNumber, $orderNum, $payDt, $productName, $btnLink){
-        $templateNo = "14756";
+        $templateNo = "20010";
         $btnName = "주문내역 확인하기";
         $message = "반려생활의 단짝, 반짝에서 ".$customerNumber."님의 주문내역을 알려드립니다."
 		."\n\n▶ 주문번호 : ".$orderNum

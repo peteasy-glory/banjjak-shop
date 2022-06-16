@@ -652,6 +652,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 /* 라벨 */
 .label {display:inline-block; height:19px; padding:0 6px; font-size:10px; line-height:19px; font-weight:500; border-radius:10px; color:#000; border:1px solid #000; box-sizing:border-box;text-align:center; white-space:nowrap;}
 .label-add-purple {display:inline-block; height:25px; padding:0 9px; font-size:12px; line-height:25px; font-weight:700; border-radius:15px; color:#fff; border:1px solid #6840b1; box-sizing:border-box;text-align:center; white-space:nowrap; background-color:#6840b1;}
+.label-add-pink {display:inline-block; height:25px; padding:0 9px; font-size:12px; line-height:25px; font-weight:700; border-radius:15px; color:#fff; border:1px solid #e74f55; box-sizing:border-box;text-align:center; white-space:nowrap; background-color:#e74f55;}
 .label > em {font-weight:500;}
 .label.middle {padding:0 9px; height:21px; line-height:21px; font-weight:500}
 .label.vmiddle {padding:0 9px; height:26px; font-size:14px; line-height:26px; font-weight:500;border-radius:5px;}
@@ -1512,7 +1513,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 #header .reserve-state-bar {position:absolute;bottom:0;left:0;width:100%;margin:0;}
 #container > form {position:relative; flex:1; width:100%; height:100%; display:flex; flex-direction:column; overflow:hidden;}
 #container > form .page-body {}
-.page-body {position:relative; flex:1; width:100%; height:100%; padding:0 20px 32px 20px; overflow-x:hidden; overflow-y:auto; box-sizing:border-box;}
+.page-body {position:relative; flex:1; width:100%;padding:0 20px 32px 20px; overflow-x:hidden; overflow-y:auto; box-sizing:border-box;}
 .page-body.fix-bottom-page {padding-bottom:130px;}
 .page-bottom {}
 .page-contents {padding:20px 0 0 0;}
@@ -3595,11 +3596,17 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .user-receipt-wrap{border-radius: 12px; margin-top:12px !important;border:1px solid #EBEBEB; padding:23px 24px 23px 24px;}
 
 
+
+
 .sticky-remove{
 	display:block !important;
 	position:relative !important;
 }
 
+
+/*2022.06.14 shortcut css 추가*/
+.shortcut-wrap{right:19px;  bottom:85px; cursor:pointer; display:flex; flex-direction: column; position: fixed; z-index: 100;}
+.shortcut-wrap img{margin-top:10px; width:40px; height:40px;}
 
 
 
