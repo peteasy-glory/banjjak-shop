@@ -348,7 +348,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
             echo '<div class="header-right">
                     <div class="label-group">
                         <a href="https://partner.banjjakpet.com/mypage_notice_view?notice_seq=20"><div class="label-add-pink"><em>회원등급제란?</em></div></a>
-                    </div>
+                    </div>                                        
                 </div>';
         }
     } else {

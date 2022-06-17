@@ -1,0 +1,103 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+$customer_name = (isset($_GET['name']))? $_GET['name'] : "";
+
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
+
+?>
+
+<!-- header -->
+<header id="header">		
+	<div class="header-left">
+		<a href="/" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">주문조회</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- nomember-pay-inquiry -->  
+		<div class="nomember-pay-inquiry">
+			<div class="con-title-group">
+				<h3 class="con-title">주문서 정보</h3>
+			</div>
+			<div class="basic-data-group small">
+				<div class="form-group">
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">주문자 성명</div>
+							<div class="form-item-data">
+								<input type="text" name="order_name" class="form-control" value="<?=$customer_name?>" placeholder="입력">
+							</div>
+						</div>
+					</div>
+					<div class="form-group-cell">
+						<div class="form-group-item">
+							<div class="form-item-label">주문번호</div>
+							<div class="form-item-data">
+								<input type="text" name="order_num" class="form-control" value="<?=$order_num?>" placeholder="입력">
+							</div>
+							<div class="form-bottom-info">*주문번호를 잊으신 경우, 고객센터로 문의하여 주시기 바랍니다.</div>							
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="nomember-pay-ui">
+				<a href="#" class="btn btn-outline-purple btn-round btn-middle-size btn-nomember-inquiry order_search">조회하기</a>
+			</div>
+		</div>
+		<!-- //nomember-pay-inquiry -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<script>
+    $(document).on("click", "#container .order_search", function(){
+        var order_name = $("#container input[name='order_name']").val();
+        var order_num = $("#container input[name='order_num']").val();
+
+        $.ajax({
+            type: 'post',
+            url: "/data/item_list_ajax.php",
+            data: {
+                mode: "get_order_num",
+                order_name: order_name,
+                order_num: order_num
+            },
+            dataType: 'json',
+            beforeSend: function() {
+                $("#loading").show();
+            },
+            error: function() {
+            },
+            success: function(json) {
+                if(json.code == "000000"){
+                    console.log(json.data);
+                    if(json.data != ''){
+                        location.href = "/shop_pay_view?no="+json.data[0].order_num;
+                    }else{
+                        $('#firstRequestMsg1').find('.msg-txt').text('입력하신 내용을 다시 확인해주세요.');
+                        pop.open("firstRequestMsg1");
+                    }
+                }else{
+                    alert(json.data+"("+json.code+")");
+                }
+            },
+            complete: function() {
+                // console.log('complete');
+                //서브밋 차단 해제
+                $("#loading").hide();
+            }
+        });
+    });
+</script>
+</body>
+</html>
