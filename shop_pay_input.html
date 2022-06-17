@@ -406,8 +406,8 @@ $siteDomain = "https://customer.banjjakpet.com"; //가맹점 도메인 입력
     <input type="hidden" name="P_GOODS" value="" placeholder="결제상품명" />
     <input type="hidden" name="P_MOBILE" value="<?=$cellphone ?>" placeholder="구매자 휴대폰번호" />
     <input type="hidden" name="P_EMAIL" value="<?=$user_id ?>" placeholder="구매자 이메일" />
-    <input type="hidden" name="P_NEXT_URL" value="<?php echo $siteDomain ?>/mainpage/INI_return.php?PHPSESSID=<?=$_COOKIE["PHPSESSID"]?>&no=<?=$order_num?>" placeholder="인증결과수신 URL" />
-    <input type="hidden" name="P_NOTI_URL" value="<?php echo $siteDomain ?>/mainpage/INI_result.php" placeholder="승인결과통보 URL" />
+    <input type="hidden" name="P_NEXT_URL" value="<?php echo $siteDomain ?>/data/INI_return.php?PHPSESSID=<?=$_COOKIE["PHPSESSID"]?>&no=<?=$order_num?>" placeholder="인증결과수신 URL" />
+    <input type="hidden" name="P_NOTI_URL" value="<?php echo $siteDomain ?>/data/INI_result.php" placeholder="승인결과통보 URL" />
     <!--input type="hidden" name="P_TAX" value="" placeholder="부가세" /-->
     <!--input type="hidden" name="P_TAXFREE" value="" placeholder="비과세" /-->
     <!--input type="hidden" name="P_OFFER_PERIOD" value="별도 제공 기간 없음" placeholder="제공기간" /-->
