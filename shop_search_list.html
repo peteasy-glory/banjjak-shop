@@ -1,0 +1,139 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+$user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+$rank_one = (isset($_GET["one"])) ? $_GET["one"]: "";
+$rank_two = (isset($_GET["two"])) ? $_GET["two"]: "";
+$rank_three = (isset($_GET["three"])) ? $_GET["three"]: "";
+$rank_four = (isset($_GET["four"])) ? $_GET["four"]: "";
+$rank_five = (isset($_GET["five"])) ? $_GET["five"]: "";
+
+
+?>     
+
+<!-- header -->
+<header id="header">	
+	<h1 class="page-title">쇼핑</h1>
+	<div class="header-right">
+		<a href="<?=$_SESSION['backurl_shop']?>" class="btn-page-ui btn-page-close"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></a>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- shop-search-wrap -->  
+		<div class="shop-search-wrap">
+			<div class="con-title-group">
+				<h3 class="con-title">어떤 상품을 찾으세요?</h3>
+			</div>
+			<div class="basic-data-group vvsmall">
+				<form action="shop_search_result" class="form-btns">
+					<input type="text" id="word" name="word" placeholder="검색어 입력">
+					<button type="submit" onclick="javascript:return chk_word();" class="btn-data-send btn-data-search"><span class="icon icon-size-24 icon-page-search">검색</span></button>
+				</form>
+			</div>
+
+			<div class="basic-data-group small">
+				<div class="con-title-group">
+					<h4 class="con-title">인기 검색어</h4>
+				</div>
+				<div class="single-btns-list">
+					<!-- <div class="list-cell"><a href="#" class="btn-single-item"><div class="txt small">1. 인기검색어</div></a></div>
+					<div class="list-cell"><a href="#" class="btn-single-item"><div class="txt small">2. 인기검색어</div></a></div>
+					<div class="list-cell"><a href="#" class="btn-single-item"><div class="txt small">3. 인기검색어</div></a></div>
+					<div class="list-cell"><a href="#" class="btn-single-item"><div class="txt small">4. 인기검색어</div></a></div>
+					<div class="list-cell"><a href="#" class="btn-single-item"><div class="txt small">5. 인기검색어</div></a></div> -->
+				</div>
+			</div>
+
+			<div class="basic-data-group vmiddle">
+				<div class="page-middle-banner">
+                    <a href="shop_event?seq=28" class="btn-bottom-banner-item"><img src="https://image.banjjakpet.com/upload/main_banner/164144544021.jpg" alt=""/></a>
+				</div>
+			</div>
+
+			
+		</div>
+		<!-- //shop-search-wrap -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<script>
+
+    $(function(){
+            get_beauty_list();
+             //.then(get_search_banner);
+    });
+
+    function chk_word(){
+        if($("#word").val() == ''){
+            $('#firstRequestMsg1').find('.msg-txt').text('검색어를 입력해주세요.');
+            pop.open('firstRequestMsg1');
+            return false
+        }
+    }
+    
+    function get_beauty_list(){
+        return new Promise(function(resolve, reject) {
+    
+            $.ajax({
+                url: 'data/item_search_manage_ajax.php',
+                data: {
+                    mode : "get_rank"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+                        var rebuy = 0;
+                        var html = '';
+    
+                        if(data.data && data.data.length > 0){
+                            $.each(data.data, function(i, v){
+                                var url = `shop_search_result?word=${v.search}`;
+                                html += `<div class="list-cell">
+                                            <a href="${url}" class="btn-single-item">
+                                                <div class="txt small">${v.num}. ${v.search}</div>
+                                            </a>
+                                        </div>`;
+
+                                if(i > 0){
+                                    rebuy += Number(v.search);
+                                }
+                            });
+                            $(document).find('.basic-data-group .single-btns-list').html(html);
+                            console.log();
+    
+                        }else{
+                        }
+                        
+                        resolve();
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $("#loading").css("display", "none");
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        });
+    }
+    </script>
+
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer.php");
+?>

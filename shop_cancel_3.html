@@ -1,0 +1,453 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+
+if($order_num != ""){
+    $sql = "
+		SELECT * 
+		FROM tb_item_payment_log
+		WHERE order_num = '".$order_num."'
+	";
+    $result = mysqli_query($connection,$sql);
+    $row = mysqli_fetch_array($result);
+    $expire_dt = ($row["expire_dt"] != "")? DATE("Y년 m월 d일 H시 i분", STRTOTIME($row["expire_dt"])) : "";
+    $customer_name = explode(',',$row["guest_info"]);
+
+
+}
+
+$reason_type_arr = array(
+    "1" => "단순변심",
+    "2" => "상품불량",
+    "3" => "제품변경",
+    "etc" => "그밖에(직접입력)"
+);
+
+$banks['003'] = "기업은행";
+$banks['004'] = "국민은행";
+$banks['011'] = "농협중앙회";
+$banks['012'] = "단위농협";
+$banks['020'] = "우리은행";
+$banks['031'] = "대구은행";
+$banks['005'] = "외환은행";
+$banks['023'] = "SC제일은행";
+$banks['032'] = "부산은행";
+$banks['045'] = "새마을금고";
+$banks['027'] = "한국씨티은행";
+$banks['034'] = "광주은행";
+$banks['039'] = "경남은행";
+$banks['007'] = "수협";
+$banks['048'] = "신협";
+$banks['037'] = "전북은행";
+$banks['035'] = "제주은행";
+$banks['064'] = "산림조합";
+$banks['071'] = "우체국";
+$banks['081'] = "하나은행";
+$banks['088'] = "신한은행";
+$banks['090'] = "카카오뱅크";
+$banks['209'] = "동양종금증권";
+$banks['243'] = "한국투자증권";
+$banks['240'] = "삼성증권";
+$banks['230'] = "미래에셋";
+$banks['247'] = "우리투자증권";
+$banks['218'] = "현대증권";
+$banks['266'] = "SK증권";
+$banks['278'] = "신한금융투자";
+$banks['262'] = "하이증권";
+$banks['263'] = "HMC증권";
+$banks['267'] = "대신증권";
+$banks['270'] = "하나대투증권";
+$banks['279'] = "동부증권";
+$banks['280'] = "유진증권";
+$banks['287'] = "메리츠증권";
+$banks['291'] = "신영증권";
+$banks['238'] = "대우증권";
+asort($banks); // 가나다순
+
+?>
+
+<!-- header -->
+<header id="header">		
+	<div class="header-left">
+		<a href="shop_cancel_2?no=<?=$order_num?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">취소요청</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- user-pay-wrap -->  
+		<div class="shop-cancel-wrap">
+			<div class="con-title-group">
+				<h3 class="con-title">3. 취소정보</h3>
+			</div>
+			<div class="shop-cancel-step-info">취소 정보를 확인해 주세요.</div>
+			
+			<!-- 취소상품 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">취소상품</h4>
+				</div>
+				<div class="shop-cart-list shop-cancel-view-list product_list">
+					<div class="shop-cart-list-cell">
+						<div class="shop-cart-items">
+							<div class="shop-cart-body">
+								<div class="item-info-wrap">
+									<div class="item-thumb"><img src="" alt=""></div>
+									<div class="item-data">
+										<div class="item-data-inner">
+											<div class="item-name">[도기프렌드] 수제 간식세트</div>
+											<div class="item-option">
+												<div>올리브</div>
+												<div class="item-option-division">/</div>
+												<div>1개</div>
+											</div>
+											<div class="item-price">7,500원</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="basic-data-group vmiddle">
+					<div class="form-group">
+						<div class="form-group-cell">
+							<div class="form-group-item">
+								<div class="form-item-label">취소 사유</div>
+								<div class="form-item-data type-2">
+									<div class="gray-box-txt"><?=($_SESSION["RNC_REASONTYPE"] == "etc")? "[직접입력]".$_SESSION["RNC_REASONDETAIL"] : $reason_type_arr[$_SESSION["RNC_REASONTYPE"]]; ?></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //취소상품 -->
+
+			<!-- 환불정보 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">환불정보</h4>
+				</div>
+				<div class="price-data-wrap type-3">
+					<div class="price-data-group">
+						<div class="price-data-list">	
+							<div class="price-data-list-cell read">	
+								<div class="price-data-list-title">상품금액</div>
+								<div class="price-data-list-value"><?=number_format($row['product_price']) ?>원</div>
+							</div>
+                            <div class="price-data-list-cell read">
+                                <div class="price-data-list-title">배송비</div>
+                                <div class="price-data-list-value"><?=number_format($row['shipping_price']) ?>원</div>
+                            </div>
+							<div class="price-data-list-cell read">	
+								<div class="price-data-list-title">포인트사용</div>
+								<div class="price-data-list-value"><?=number_format($row['point_price']) ?>원</div>
+							</div>
+							<!--<div class="price-data-list-cell read">	
+								<div class="price-data-list-title">취소비용(차감)</div>
+								<div class="price-data-list-value"><span class="minus_price">0</span>원</div>
+							</div>-->
+							<div class="price-data-list-cell total read">	
+								<div class="price-data-list-title"><span class="font-color-red">환불 예상금액</span></div>
+								<div class="price-data-list-value"><span class="font-color-red"><?=number_format($row['total_price']) ?>원</span></div>
+							</div>
+						</div>
+					</div>
+				</div>
+                <?php
+                if($row['pay_type'] == '2'){
+                ?>
+				<div class="basic-data-group small line bank_info">
+					<div class="form-group">
+						<div class="form-group-cell">
+							<div class="form-group-item">
+								<div class="form-item-label">환불 계좌</div>
+								<div class="form-item-data type-2">
+									<select  id="bank_option" name="cancel_bank">
+                                        <option value="">선택</option>
+                                        <?php foreach($banks AS $key => $value){ ?>
+                                            <option value="<?=$key?>"><?=$value?></option>
+                                        <?php } ?>
+									</select>
+								</div>
+							</div>
+						</div>
+						<div class="form-group-cell">
+							<div class="form-group-item">
+								<div class="form-item-label pay_detail">계좌이체 / <?=number_format($row['total_price']) ?>원</div>
+								<div class="form-item-data">
+									<input type="number" class="form-control" name="cancel_account" placeholder="계좌번호를 입력해주세요"/>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+                <?php
+                }
+                ?>
+			</div>
+			<!-- //환불정보 -->
+			
+			
+			<div class="shop-cancel-ui">
+				<div class="grid-layout btn-grid-group">
+					<div class="grid-layout-inner">
+<!--						<div class="grid-layout-cell grid-2"><a href="javascript:history.back();" class="btn btn-outline-gray btn-middle-size btn-round">이전단계</a></div>-->
+						<div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round set_update_item_payment_cancel">취소접수</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- //user-pay-wrap -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<article id="cancel_fnish" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt">취소처리가 완료되었습니다.</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="finish_location();">확인</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>
+
+<script>
+    var no = "<?=$order_num ?>";
+    var user_id = "<?=$user_id ?>";
+    var cancel_pay_type = "<?=$row['pay_type']?>";
+    var cancel_price = <?=$row['total_price']?>;
+    var minus_price = 0;
+    var receipt_id = "<?=$row['receipt_id']?>";
+    var customer_name = "<?=$customer_name?>";
+    var chk_list = ("<?=$_SESSION['RNC_CHKLIST'] ?>" != "")? (("<?=$_SESSION['RNC_CHKLIST'] ?>".indexOf(','))? "<?=$_SESSION['RNC_CHKLIST'] ?>".split(',') : ["<?=$_SESSION['RNC_CHKLIST'] ?>"]) : [];
+
+    $(function(){
+        get_item_payment_log_product();
+    });
+
+    // 상품 정보 뿌리기
+    function get_item_payment_log_product(){
+        $.ajax({
+            url: 'data/item_ajax.php',
+            data: {
+                mode : "get_item_payment_log_product",
+                order_num: no
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    var html = '';
+
+                    $.each(data.data, function(i, v) {
+                        var option = JSON.parse(v.option_data);
+                        var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path);
+                        var _chk_val = v.iplp_seq+'_'+i;
+
+
+                        html += '<div class="shop-cart-list-cell">';
+                        html += '    <div class="shop-cart-items">';
+                        html += '        <div class="shop-cart-body">';
+                        html += '            <div class="item-info-wrap">';
+                        html += '                <div class="item-thumb"><img src="'+img_link+'" alt=""></div>';
+                        html += '                <div class="item-data">';
+                        html += '                    <div class="item-data-inner">';
+                        html += '                        <div class="item-name">'+v.product_name+'</div>';
+                        $.each(option, function(i_,v_){
+                            html += '                        <div class="item-option">';
+                            html += '                            <div>'+v_.txt+'</div>';
+                            html += '                            <div class="item-option-division">/</div>';
+                            html += '                            <div>'+v_.amount+'개</div>';
+                            html += '                        </div>';
+                        });
+                        html += '                        <div class="item-price">'+v.product_price+'원</div>';
+                        html += '                    </div>';
+                        html += '                </div>';
+                        html += '            </div>';
+                        html += '        </div>';
+                        html += '    </div>';
+                        html += '</div>';
+                    });
+                    $('.product_list').html(html);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error + "네트워크에러");
+            }
+        });
+    }
+
+    // 취소완료 후 페이지 이동
+    function finish_location(){
+        if(user_id != ""){
+            location.href = "shop_pay_list";
+        }else{
+            location.href = "allim/pay_info?no="+no;
+        }
+    }
+
+    // 취소 클릭
+    $(document).on("click", "#container .set_update_item_payment_cancel", function(){
+        var cancel_account = $("#container input[name='cancel_account']").val();
+        var cancel_bank = $("#container select[name='cancel_bank'] option:selected").val();
+
+        if(cancel_price <= 0){
+            alert("환불금액이 없어 진행할 수 없습니다.");
+            return false;
+        }
+
+        if(cancel_pay_type == "2"){
+            if(cancel_bank == ""){
+                alert("환불받을 은행을 선택하세요.");
+                return false;
+            }
+            if(cancel_account == ""){
+                alert("환불받을 계좌를 입력하세요.");
+                return false;
+            }
+        }
+
+        if(cancel_pay_type == "1" && receipt_id != null){ // 카드 결제 취소처리
+            // 0024 상품결제취소
+            $.ajax({
+                url: 'data/item_list_ajax.php',
+                data: {
+                    mode : "item_payment_cancel",
+                    receipt_id : receipt_id,
+                    customer_name : customer_name,
+                    cancel_reason : "사용자 요청에 의해 직접 취소",
+                    cancel_price : cancel_price,
+                    cancel_type : "cancel"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+                        // 취소처리 0036
+                        $.ajax({
+                            url: 'data/item_list_ajax.php',
+                            data: {
+                                mode : "set_update_item_return_n_cancel_step3",
+                                return_pay_type : cancel_pay_type,
+                                return_account : cancel_account,
+                                return_bank : cancel_bank,
+                                return_price : cancel_price,
+                                order_num : no
+                            },
+                            type: 'POST',
+                            dataType: 'JSON',
+                            success: function(data) {
+                                if(data.code == "000000"){
+                                    console.log(data.data);
+                                    pop.open('cancel_fnish');
+                                }else{
+                                    alert(data.data+"("+data.code+")");
+                                    console.log(data.data);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                //alert(error + "네트워크에러");
+                                if(xhr.status != 0){
+                                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                }
+                            }
+                        });
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }else{
+            // 취소처리 0036
+            $.ajax({
+                url: 'data/item_list_ajax.php',
+                data: {
+                    mode : "set_update_item_return_n_cancel_step3",
+                    return_pay_type : cancel_pay_type,
+                    return_account : cancel_account,
+                    return_bank : cancel_bank,
+                    return_price : cancel_price,
+                    order_num : no
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+                        pop.open('cancel_fnish');
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.data);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+    });
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+
+    //남는 길이만큼 0으로 채움
+    function fillZero(width, str){
+        var str = String(str);//문자열 변환
+        return str.length >= width ? str:new Array(width-str.length+1).join('0')+str;
+    }
+</script>
+</body>
+</html>

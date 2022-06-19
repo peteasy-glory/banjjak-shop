@@ -1,0 +1,141 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+
+?>
+
+<!-- header -->
+<header id="header">		
+	<div class="header-left">
+		<a href="shop_cancel_1?no=<?=$order_num?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">취소요청</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- user-pay-wrap -->  
+		<div class="shop-cancel-wrap">
+			<div class="con-title-group">
+				<h3 class="con-title">2. 사유선택</h3>
+			</div>
+			<div class="shop-cancel-step-info">취소 사유를 선택해 주세요</div>
+
+			<div class="basic-data-group middle">
+				<div class="form-check-group vertical">
+					<div class="form-check-inner">
+						<div class="check-cell">
+							<label for="cancel1" class="form-radiobox"><input type="radio" id="cancel1" name="reason_type" value="1"><span class="form-check-icon"><em>단순변심</em></span></label>
+						</div>
+						<div class="check-cell">
+							<label for="cancel2" class="form-radiobox"><input type="radio" id="cancel2" name="reason_type" value="2"><span class="form-check-icon"><em>상품불량</em></span></label>
+						</div>
+						<div class="check-cell">
+							<label for="cancel3" class="form-radiobox"><input type="radio" id="cancel3" name="reason_type" value="3"><span class="form-check-icon"><em>제품변경</em></span></label>
+						</div>
+						<div class="check-cell">
+							<label for="cancel4" class="form-radiobox"><input type="radio" id="cancel4" name="reason_type" value="etc"><span class="form-check-icon"><em>직접입력</em></span></label>
+							<div class="form-check-input" style="display:block;">
+								<input type="text" name="reason_detail" class="form-control" placeholder="입력">
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="shop-cancel-ui">
+				<div class="grid-layout btn-grid-group">
+					<div class="grid-layout-inner">
+<!--						<div class="grid-layout-cell grid-2"><a href="javascript:history.back();" class="btn btn-outline-gray btn-middle-size btn-round">이전단계</a></div>-->
+						<div class="grid-layout-cell grid-1"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round next">다음단계</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- //user-pay-wrap -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+<script>
+
+    var no = "<?=$order_num ?>";
+    var reason_chk = ("<?=$_SESSION['RNC_REASONTYPE'] ?>" != "")? "<?=$_SESSION['RNC_REASONTYPE'] ?>" : "";
+    console.log(reason_chk);
+
+    $(function(){
+        $.each($("#container input[type='radio']"), function(i2, v2){
+            var _this = $(this);
+
+            if(_this.val() == reason_chk){
+                _this.prop("checked", true);
+            }
+        });
+    });
+
+
+    $(document).on("click", ".next", function(){
+        var reason_type = '';
+        var reason_detail = $("#container input[name='reason_detail']").val();
+
+        $.each($("#container input[type='radio']"), function(i2, v2){
+            var _this = $(this);
+
+            if(_this.is(":checked") == true){
+                reason_type = _this.val();
+            }
+        });
+        console.log(reason_type);
+
+        if(reason_type != ""){
+            if(reason_type == "etc" && reason_detail == ""){
+                $('#firstRequestMsg1').find('.msg-txt').text('취소 사유를 입력해주세요.');
+                pop.open("firstRequestMsg1");
+                return false;
+            }
+        }else{
+            $('#firstRequestMsg1').find('.msg-txt').text('취소 사유를 선택해주세요.');
+            pop.open("firstRequestMsg1");
+            return false;
+        }
+
+        $.ajax({
+            url: 'data/item_list_ajax.php',
+            data: {
+                mode : "set_update_item_return_n_cancel_step2",
+                reason_type : reason_type,
+                reason_detail : reason_detail
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    location.href="shop_cancel_3?no="+no;
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    });
+
+</script>
+	
+</body>
+</html>
