@@ -418,12 +418,18 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 				<div class="list-cell"><a href="customer_inquiry"><div class="title">전체고객</div><div class="value"></div></a></div>
 			</div>
 		</div>
-		
-		<!--<div class="partner-middle-banner">
+
+        <?php
+        if($user_id == 'itseokbeom@gmail.com' || $user_id == "jack@peteasy.kr" || $user_id == "eaden@peteasy.kr" || $user_id == "luna@peteasy.kr" || $user_id == "lisa@peteasy.kr"){
+        ?>
+		<div class="partner-middle-banner">
 			<div class="icon icon-size-24 icon-cart-black"></div>
 			<div class="txt">반짝 파트너 전문몰</div>
-			<a href="https://www.gopet.kr/pet/shop/item_special_mall_home.php?backurl=%2Fpet%2Fshop%2Findex.php" class="btn btn-outline-darkgray btn-vsmall-size btn-inline"><em>바로가기</em></a>
-		</div>-->
+			<a href="shop_mall" class="btn btn-outline-darkgray btn-vsmall-size btn-inline"><em>바로가기</em></a>
+		</div>
+        <?php
+        }
+        ?>
 		
 		<div class="basic-data-group mainlist_none" style="display:none;">
 

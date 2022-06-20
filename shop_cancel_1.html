@@ -1,0 +1,281 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+
+if($order_num != ""){
+    $sql = "
+		SELECT * 
+		FROM tb_item_payment_log
+		WHERE order_num = '".$order_num."'
+	";
+    $result = mysqli_query($connection,$sql);
+    $row = mysqli_fetch_array($result);
+    $expire_dt = ($row["expire_dt"] != "")? DATE("Y년 m월 d일 H시 i분", STRTOTIME($row["expire_dt"])) : "";
+    $ip_cnt = mysqli_num_rows($result);
+    if($ip_cnt <= 0){
+        ?>
+        <script>
+            alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+            location.href = "/";
+        </script>
+        <?php
+        return false;
+    }
+}else{
+    ?>
+    <script>
+        alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+        location.href = "/";
+    </script>
+    <?php
+    return false;
+}
+
+
+?>
+
+<!-- header -->
+<header id="header">		
+	<div class="header-left">
+		<a href="javascript:pop.open('cancel_cancel');" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">취소요청</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- user-pay-wrap -->  
+		<div class="shop-cancel-wrap">
+			<div class="con-title-group">
+				<h3 class="con-title">1. 취소상품 선택</h3>
+			</div>
+			<div class="shop-cancel-step-info">취소 상품을 선택해 주세요</div>
+
+			<div class="basic-data-group middle">
+				<div class="shop-cart-list shop-cancel-list product_list">
+
+                    <!--<div class="shop-cart-list-cell">
+                        <div class="shop-cart-items">
+                            <div class="shop-cart-header">
+                                <div>
+                                    <label class="form-checkbox"><input type="checkbox" name="all"><span class="form-check-icon"><em>선택</em></span></label>
+                                </div>
+                            </div>
+                            <div class="shop-cart-body">
+                                <div class="item-info-wrap">
+                                    <div class="item-thumb"><img src="/static/pub/images/user_thumb.png" alt=""></div>
+                                    <div class="item-data">
+                                        <div class="item-data-inner">
+                                            <div class="item-name">[도기프렌드] 수제 간식세트</div>
+                                            <div class="item-option">
+                                                <div>올리브</div>
+                                                <div class="item-option-division">/</div>
+                                                <div>1개</div>
+                                            </div>
+                                            <div class="item-price">7,500원</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>-->
+
+				</div>
+			</div>
+			
+			<div class="shop-cancel-ui">
+				<div class="grid-layout btn-grid-group">
+					<div class="grid-layout-inner">
+						<div class="grid-layout-cell grid-2"><a href="javascript:pop.open('cancel_cancel');" class="btn btn-outline-gray btn-middle-size btn-round">취소하기</a></div>
+						<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round next">다음단계</a></div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- //user-pay-wrap -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<!--  취소창 -->
+<article id="cancel_cancel" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt">상품취소 신청을 취소하시겠습니까?</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="cancel_cancel_comfirm();">확인</button>
+                    <button type="button" class="btn btn-confirm" onclick="pop.close();">취소</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>
+<!-- //취소창 -->
+
+<script>
+
+    var $item_order_detail = $('#container');
+    var no = '<?=$order_num ?>';
+
+    var chk_list = ("<?=$_SESSION['RNC_CHKLIST'] ?>" != "")? (("<?=$_SESSION['RNC_CHKLIST'] ?>".indexOf(','))? "<?=$_SESSION['RNC_CHKLIST'] ?>".split(',') : ["<?=$_SESSION['RNC_CHKLIST'] ?>"]) : [];
+
+    $(document).ready(function(){
+        get_item_payment_log_product();
+    });
+
+    // 상품 정보 불러오기
+    function get_item_payment_log_product(){
+        $.ajax({
+            url: 'data/item_ajax.php',
+            data: {
+                mode : "get_item_payment_log_product",
+                order_num: no
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    var html = '';
+
+                    $.each(data.data, function(i, v) {
+                        var option = JSON.parse(v.option_data);
+                        var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path);
+                        var _chk_val = v.iplp_seq+'_'+i;
+
+
+                        html += '<div class="shop-cart-list-cell">';
+                        html += '    <div class="shop-cart-items">';
+                        html += '        <div class="shop-cart-header">';
+                        html += '            <div>';
+                        html += '                <label class="form-checkbox"><input type="checkbox"id="chk_ag'+v.iplp_seq+''+i+'" name="chk_ag[]" value="'+_chk_val+'" checked><span class="form-check-icon"><em>선택</em></span></label>';
+                        html += '            </div>';
+                        html += '        </div>';
+                        html += '        <div class="shop-cart-body">';
+                        html += '            <div class="item-info-wrap">';
+                        html += '                <div class="item-thumb"><img src="'+img_link+'" alt=""></div>';
+                        html += '                <div class="item-data">';
+                        html += '                    <div class="item-data-inner">';
+                        html += '                        <div class="item-name">'+v.product_name+'</div>';
+                        $.each(option, function(i_,v_){
+                            html += '                        <div class="item-option">';
+                            html += '                            <div>'+v_.txt+'</div>';
+                            html += '                            <div class="item-option-division">/</div>';
+                            html += '                            <div>'+v_.amount+'개</div>';
+                            html += '                        </div>';
+                        });
+                        html += '                        <div class="item-price">'+v.product_price+'원</div>';
+                        html += '                    </div>';
+                        html += '                </div>';
+                        html += '            </div>';
+                        html += '        </div>';
+                        html += '    </div>';
+                        html += '</div>';
+                    });
+                    $('.product_list').html(html);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error + "네트워크에러");
+            }
+        });
+    }
+
+    // 다음단계
+    $(document).on("click", ".next", function(){
+        chk_list = [];
+        $.each($("#container input[type='checkbox']"), function(i, v){
+            var _this = $(this);
+            console.log(_this.is(":checked"), _this.val());
+            if($(this).is(":checked") == true){
+                chk_list.push(_this.val());
+            }
+        });
+        chk_list = chk_list.join(",");
+
+        if(chk_list != ""){
+
+            $.ajax({
+                url: 'data/item_list_ajax.php',
+                data: {
+                    mode : "set_update_item_return_n_cancel_step1",
+                    action_type : "cancel",
+                    chk_list : chk_list,
+                    order_num : no
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+                    if(data.code == "000000"){
+                        console.log(data.data);
+                        location.href = "shop_cancel_2?no="+no;
+                    }else{
+                        alert(data.data+"("+data.code+")");
+                        console.log(data.code);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+
+
+        }else{
+            $('#firstRequestMsg1').find('.msg-txt').text('상품을 선택해주세요.');
+            pop.open("firstRequestMsg1");
+        }
+    });
+
+    // 취소를 취소하기
+    function cancel_cancel_comfirm(){
+        $.ajax({
+            url: 'data/item_list_ajax.php',
+            data: {
+                mode : "set_update_item_return_n_cancel_to_cancel"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    location.replace("shop_pay_view?no="+no);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+
+</script>
+	
+</body>
+</html>
