@@ -29,6 +29,8 @@ unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'reserve_main_day?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_main_day';
+unset($_SESSION['backurl_wait']);
+$_SESSION['backurl_wait'] = 'reserve_main_day?ch=da&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
 
 $from = $_GET['from'];
 
