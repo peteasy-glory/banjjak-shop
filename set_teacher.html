@@ -26,8 +26,6 @@ $header_right	= '
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
-unset($_SESSION['backurl1']);
-$_SESSION['backurl1'] = 'set_teacher';
 ?>
 
 
@@ -201,7 +199,7 @@ $_SESSION['backurl1'] = 'set_teacher';
 
                         $.ajax({
                            type : 'post',
-                           url : './data/get_book_data_ajax',
+                           url : './data/get_book_data_ajax.php',
                             data : {'mode':'setBeautyChangeGrade','grade':grade,'name':name,'artist_id':artist},
                             dataType : 'json',
                             success : function(json){
@@ -276,7 +274,7 @@ $_SESSION['backurl1'] = 'set_teacher';
                         post_data += "&mode=set_insert_artist_list";
                         //console.log(post_data);
                         $.ajax({
-                            url: 'data/manage_artist_ajax',
+                            url: 'data/manage_artist_ajax.php',
                             data: post_data,
                             type: 'POST',
                             dataType: 'JSON',
@@ -446,7 +444,7 @@ $_SESSION['backurl1'] = 'set_teacher';
             var is_out = $('#goout').data('out');
             popalert.close();
             $.ajax({
-                url: 'data/manage_artist_ajax',
+                url: 'data/manage_artist_ajax.php',
                 data: {
                     mode: "set_update_artist_list",
                     artist_id: artist_id,
@@ -486,7 +484,7 @@ $_SESSION['backurl1'] = 'set_teacher';
             var is_out = $('#gooutcancel').data('is_out');
             popalert.close();
             $.ajax({
-                url: 'data/manage_artist_ajax',
+                url: 'data/manage_artist_ajax.php',
                 data: {
                     mode: "set_update_artist_list",
                     artist_id: artist_id,
@@ -533,7 +531,7 @@ $_SESSION['backurl1'] = 'set_teacher';
                 }).done(function(){*/
                 if(confirm("해당 미용사를 노출처리 하시겠습니까?")) {
                     $.ajax({
-                        url: 'data/manage_artist_ajax',
+                        url: 'data/manage_artist_ajax.php',
                         data: {
                             mode: "set_update_artist_list",
                             artist_id: artist_id,
@@ -574,7 +572,7 @@ $_SESSION['backurl1'] = 'set_teacher';
                 }).done(function(){*/
                 if(confirm("숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.\n해당 미용사를 숨김처리 하시겠습니까?")) {
                     $.ajax({
-                        url: 'data/manage_artist_ajax',
+                        url: 'data/manage_artist_ajax.php',
                         data: {
                             mode: "set_update_artist_list",
                             artist_id: artist_id,
@@ -668,7 +666,7 @@ $_SESSION['backurl1'] = 'set_teacher';
 
         function get_artist_list(){
             $.ajax({
-                url: 'data/manage_artist_ajax',
+                url: 'data/manage_artist_ajax.php',
                 data: {
                     mode: "get_artist_list",
                     artist_id: artist_id
@@ -819,7 +817,7 @@ $_SESSION['backurl1'] = 'set_teacher';
 
         function get_working_schedule(){
             $.ajax({
-                url: 'data/manage_artist_ajax',
+                url: 'data/manage_artist_ajax.php',
                 data: {
                     mode: "get_working_schedule",
                     artist_id: artist_id
@@ -846,7 +844,7 @@ $_SESSION['backurl1'] = 'set_teacher';
 
         function get_regular_holiday(){
             $.ajax({
-                url: 'data/manage_artist_ajax',
+                url: 'data/manage_artist_ajax.php',
                 data: {
                     mode: "get_regular_holiday",
                     artist_id: artist_id
@@ -893,7 +891,7 @@ $_SESSION['backurl1'] = 'set_teacher';
                 $(this).parents(".card-teacher-header").next().show();
             })
             $('#header_bell').css('display','none');
-            $('#btn_page_prev').prop('href','javascript:history.back()')
+            $('#btn_page_prev').prop('href','<?=$_SESSION['backurl1']?>')
         })
     </script>
 
