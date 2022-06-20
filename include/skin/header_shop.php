@@ -292,7 +292,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                         <div class="list-cell"><a href="mypage_inquiry_list" class="btn-single-item arrow"><div class="txt">1:1 문의하기</div></a></div>
                         <?php
                         if($user_id == 'itseokbeom@gmail.com' || $user_id == "jack@peteasy.kr" || $user_id == "eaden@peteasy.kr" || $user_id == "luna@peteasy.kr" || $user_id == "lisa@peteasy.kr"
-                            || $user_id == "pickmon@pickmon.com" || $user_id == "sally@peteasy.kr" || $user_id == "dew@peteasy.kr" || $user_id == "joseph@peteasy.kr" || $user_id == "noah@peteasy.kr"){
+                            || $user_id == "pickmon@pickmon.com" || $user_id == "sally@peteasy.kr" || $user_id == "dew@peteasy.kr" || $user_id == "joseph@peteasy.kr" || $user_id == "noah@peteasy.kr" || $user_id == "pettester@peteasy.kr"){
                             ?><div class="list-cell"><a href="shop_pay_list" class="btn-single-item arrow"><div class="txt">상품결제내역</div></a></div><?php
                         }
                         ?>
