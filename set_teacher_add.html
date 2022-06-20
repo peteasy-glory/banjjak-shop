@@ -265,7 +265,7 @@ $(function(){
 				message: "해당 미용사를 퇴사취소처리 하시겠습니까?"
 			}).done(function(){
 				$.ajax({
-					url: 'data/manage_artist_ajax',
+					url: 'data/manage_artist_ajax.php',
 					data: {
 						mode: "set_update_artist_list",
 						artist_id: artist_id,
@@ -304,7 +304,7 @@ $(function(){
 				message: "퇴사자로 처리되면 예약접수를 할수 없습니다.<br/><br/>해당 미용사를 퇴사처리하시겠습니까?"
 			}).done(function(){
 				$.ajax({
-					url: 'data/manage_artist_ajax',
+					url: 'data/manage_artist_ajax.php',
 					data: {
 						mode: "set_update_artist_list",
 						artist_id: artist_id,
@@ -350,7 +350,7 @@ $(function(){
 				message: "해당 미용사를 노출처리 하시겠습니까?"
 			}).done(function(){
 				$.ajax({
-					url: 'data/manage_artist_ajax',
+					url: 'data/manage_artist_ajax.php',
 					data: {
 						mode: "set_update_artist_list",
 						artist_id: artist_id,
@@ -388,7 +388,7 @@ $(function(){
 				message: "숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.<br/><br/>해당 미용사를 숨김처리 하시겠습니까?"
 			}).done(function(){
 				$.ajax({
-					url: 'data/manage_artist_ajax',
+					url: 'data/manage_artist_ajax.php',
 					data: {
 						mode: "set_update_artist_list",
 						artist_id: artist_id,
@@ -481,7 +481,7 @@ $(function(){
 
 	function get_artist_list(){
 		$.ajax({
-			url: 'data/manage_artist_ajax',
+			url: 'data/manage_artist_ajax.php',
 			data: {
 				mode: "get_artist_list",
 				artist_id: artist_id
@@ -556,7 +556,7 @@ $(function(){
 
 	function get_working_schedule(){
 		$.ajax({
-			url: 'data/manage_artist_ajax',
+			url: 'data/manage_artist_ajax.php',
 			data: {
 				mode: "get_working_schedule",
 				artist_id: artist_id
@@ -583,7 +583,7 @@ $(function(){
 
 	function get_regular_holiday(){
 		$.ajax({
-			url: 'data/manage_artist_ajax',
+			url: 'data/manage_artist_ajax.php',
 			data: {
 				mode: "get_regular_holiday",
 				artist_id: artist_id
@@ -640,13 +640,13 @@ $(function(){
 			$('.time-from').each(function(index){
 
 			    if($('#checkbox_time_'+index).is(':checked')==true) {
-                    if ($(this).val() == $('.time-end').eq(index).val()) {
+                    if ($(this).val() >= $('.time-end').eq(index).val()) {
                         cnt++;
                     }
                 }
             });
 			if(cnt>0){
-                alert('동일한 근무시간은 설정하실수 없습니다.');
+                alert('근무시간을 확인해주세요.');
                 return false;
             }
 
@@ -654,7 +654,7 @@ $(function(){
 		    post_data += "&mode=set_insert_artist_list&old_name="+"<?=$data[name]?>";
 			//console.log(post_data);
 			$.ajax({
-				url: 'data/manage_artist_ajax',
+				url: 'data/manage_artist_ajax.php',
 				data: post_data,
 				type: 'POST',
 				dataType: 'JSON',

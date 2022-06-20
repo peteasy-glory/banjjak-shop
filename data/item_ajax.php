@@ -14,9 +14,9 @@ if($mode){
             $sql = "
                 SELECT * FROM (
                     SELECT a.*, 
-                            (SELECT COUNT(*) FROM tb_item_list WHERE FIND_IN_SET(a.ic_seq, ic_seq)
+                            (SELECT COUNT(*) FROM tb_item_list WHERE FIND_IN_SET(a.ismc_seq, ic_seq)
                             AND is_shop = '1' AND is_delete = '1') cnt
-                    FROM tb_item_category a WHERE a.parent_seq = '".$category."'
+                    FROM tb_item_special_mall_category a WHERE a.parent_seq = '".$category."'
                 ) main
                 WHERE main.cnt > 0
             ";

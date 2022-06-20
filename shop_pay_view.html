@@ -1,0 +1,382 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "";
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
+
+$order_num = (isset($_GET['no']))? $_GET['no'] : "";
+
+if($order_num != ""){
+    $sql = "
+		SELECT * 
+		FROM tb_item_payment_log
+		WHERE order_num = '".$order_num."'
+	";
+    $result = mysqli_query($connection,$sql);
+    $row = mysqli_fetch_array($result);
+    $expire_dt = ($row["expire_dt"] != "")? DATE("Y년 m월 d일 H시 i분", STRTOTIME($row["expire_dt"])) : "";
+    $ip_cnt = mysqli_num_rows($result);
+    if($ip_cnt <= 0){
+        ?>
+        <script>
+            alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+            location.href = "/";
+        </script>
+        <?php
+        return false;
+    }
+}else{
+    ?>
+    <script>
+        alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+        location.href = "/";
+    </script>
+    <?php
+    return false;
+}
+
+$order_status_arr = array(
+    "1" => "주문접수",
+    "2" => "입금대기",
+    "3" => "결제완료",
+    "7" => "결제실패",
+    "8" => "입금시간만료",
+    "9" => "결제취소"
+);
+
+$pay_status_arr = array(
+    "1" => "상품준비중",
+    "2" => "배송준비중",
+    "3" => "배송중",
+    "4" => "배송완료",
+    "8" => "반품",
+    "9" => "취소"
+);
+
+$pay_status_arr_old = array(
+    "1" => "진행중",
+    "2" => "입금대기",
+    "3" => "상품준비중",
+    "4" => "배송준비중",
+    "5" => "배송중",
+    "6" => "배송완료",
+    "7" => "취소",
+    "8" => "보류",
+    "9" => "실패"
+);
+
+$reason_type_arr = array(
+    "1" => "단순변심",
+    "2" => "상품불량",
+    "3" => "제품변경",
+    "etc" => "기타"
+);
+
+?>
+
+<!-- header -->
+<header id="header">		
+	<div class="header-left">
+		<a href="<?=$_SESSION['backurl2']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title">결제/주문 상세내역</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<!-- user-pay-view -->  
+		<div class="user-pay-view">
+			<div class="con-title-group">
+				<h3 class="con-title"><?php echo ($row['order_status'] == '3')? "결제완료" : "입금대기"; ?></h3>
+			</div>
+			<!-- 주문번호 -->
+			<div class="user-pay-number"><em>주문번호</em><p><?=$order_num ?></p></div>
+			<!-- 주문번호 -->
+			<!-- 배송지 정보 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">배송지 정보</h4>
+				</div>
+				<div class="flex-table read">
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">받으시는 분</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+									<?=$row['shipping_name'] ?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">연락처</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?=$row['shipping_cellphone'] ?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">받으시는 곳</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?=$row['shipping_addr']." ".$row['shipping_addr2'] ?>
+								</div>		
+							</div>
+						</div>
+					</div>
+					<div class="flex-table-cell">
+						<div class="flex-table-item">
+							<div class="flex-table-title"><div class="txt">배송요청사항</div></div>
+							<div class="flex-table-data">
+								<div class="flex-table-data-inner">
+                                    <?=$row['shipping_memo'] ?>
+								</div>		
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //배송지 정보 -->
+			<!-- 결제 정보 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">결제정보</h4>
+				</div>				
+				<div class="price-data-wrap type-2">
+					<div class="price-data-group">
+						<div class="price-data-list">	
+							<div class="price-data-list-cell smiddle">	
+								<div class="price-data-list-title">상품가격</div>
+								<div class="price-data-list-value"><?=number_format($row['product_price']) ?>원</div>
+							</div>
+							<div class="price-data-list-cell smiddle">	
+								<div class="price-data-list-title">+ 배송비</div>
+								<div class="price-data-list-value"><?=number_format($row['shipping_price']) ?>원</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="basic-data-group vmiddle">
+					<div class="con-title-group">
+						<h5 class="con-title">포인트사용</h5>
+					</div>			
+					<div class="price-data-wrap type-2">
+						<div class="price-data-group">
+							<div class="price-data-list">	
+								<div class="price-data-list-cell smiddle">	
+									<div class="price-data-list-title">사용한 포인트</div>
+									<div class="price-data-list-value"><?=number_format($row['point_price']) ?>원</div>
+								</div>
+								<div class="price-data-list-cell total line">	
+									<div class="price-data-list-title"><span class="font-color-gray">총 결제 금액</span></div>
+									<div class="price-data-list-value"><?=number_format($row['total_price']) ?>원</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+			</div>
+			<!-- //결제 정보 -->
+			<!-- 주문상품 -->
+			<div class="basic-data-group">
+				<div class="con-title-group">
+					<h4 class="con-title">주문상품</h4>
+				</div>
+				<div class="user-pay-list product_list">
+				</div>
+				<div class="basic-data-group vmiddle line">
+					<div class="price-data-wrap">
+						<div class="price-data-group">
+							<div class="price-data-list">
+                                <?php if($row["pay_type"] == "2" && $row["order_status"] != "3"){ ?>
+								<div class="price-data-list-cell read">	
+									<div class="price-data-list-title">입금자명</div>
+									<div class="price-data-list-value"><?=$row['bank_name'] ?></div>
+								</div>
+								<div class="price-data-list-cell read">	
+									<div class="price-data-list-title">입금계좌</div>
+									<div class="price-data-list-value">기업은행 054-143076-01-013<br>주식회사 펫이지</div>
+								</div>
+								<div class="price-data-list-cell read">	
+									<div class="price-data-list-title">입금마감일시</div>
+									<div class="price-data-list-value"><?=$expire_dt ?></div>
+								</div>
+                                <?php } ?>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //주문상품 -->
+
+		</div>
+		<!-- //user-pay-view -->  
+	</div>
+	<!-- //page-body -->	
+</section>
+<!-- //container -->
+
+<script>
+    var $item_order_detail = $('#container');
+    var pay_status_arr = $.parseJSON('<?=json_encode($pay_status_arr)?>');
+    var order_status_arr = $.parseJSON('<?=json_encode($order_status_arr)?>');
+    var pay_status_arr_old = $.parseJSON('<?=json_encode($pay_status_arr_old)?>');
+    var reason_type_arr = $.parseJSON('<?=json_encode($reason_type_arr)?>');
+    var no = '<?=$order_num ?>';
+    $(document).ready(function(){
+        get_item_payment_log_product();
+    });
+
+    function get_item_payment_log_product(){
+        $.ajax({
+            url: 'data/item_ajax.php',
+            data: {
+                mode : "get_item_payment_log_product",
+                order_num: no
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    var html = '';
+
+                    $.each(data.data, function(i, v) {
+                        var option = JSON.parse(v.option_data);
+                        //var img_link = (v.file_path != '' || v.file_path != null)? "https://image.banjjakpet.com"+img_link_change(v.file_path) : v.goodsRepImage;
+                        var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path);
+                        html += '<div class="user-pay-list-cell">';
+                        html += '    <div class="shop-cart-items">';
+                        html += '        <div class="shop-cart-body">';
+                        html += '            <div class="item-info-wrap">';
+                        html += '                <div class="item-thumb"><img src="'+img_link+'" alt=""></div>';
+                        html += '                <div class="item-data">';
+                        html += '                    <div class="item-data-inner">';
+                        html += '                        <div class="item-name">'+v.product_name+'</div>';
+
+                        // product_price가 0일때(옵션상품이면)
+                        var sum_option_price = 0;
+                        $.each(option, function(i_,v_){
+                            html += '                        <div class="item-option">';
+                            html += '                            <div>'+v_.txt+'</div>';
+                            html += '                            <div class="item-option-division">/</div>';
+                            html += '                            <div>'+v_.amount+'개</div>';
+                            html += '                        </div>';
+                            sum_option_price = parseInt(sum_option_price) + parseInt(v_.value);
+                        });
+                        html += '                        <div class="item-price">'+((v.product_price == 0)? sum_option_price : v.product_price).format()+'원</div>';
+                        html += '                    </div>';
+                        html += '                </div>';
+                        html += '                <div class="label label-shop-state">'+pay_status_arr[v.pay_status]+'</div>';
+                        html += '            </div>';
+                        html += '        </div>';
+                        html += '    </div>';
+                        if(v.pay_status == "1"){
+                            html += '    <button type="button" onclick="javascript:location.href=\'shop_cancel_1?no=<?=$order_num?>\'" class="btn btn-middle-size btn-outline-gray btn-round btn-user-pay-action">취소 요청</button>';
+                        }else if(v.pay_status == "2"){
+                            html += '    <div class="grid-layout btn-grid-group btn-user-pay-action">';
+                            html += '        <div class="grid-layout-inner">';
+                            html += '           <div class="grid-layout-cell grid-2"><button type="button" onclick="shipping_chk(\''+v.shipping_company+'\',\''+v.shipping_invoice+'\')" class="btn btn-purple btn-middle-size btn-round">배송조회</button></div>';
+                            html += '           <div class="grid-layout-cell grid-2"><button type="button" onclick="javascript:location.href=\'shop_cancel_1?no=<?=$order_num?>\'" class="btn btn-outline-gray btn-middle-size btn-round">취소요청</button></div>';
+                            html += '       </div>';
+                            html += '    </div>';
+                        }else if(v.pay_status == "3"){
+                            html += '    <div class="grid-layout btn-grid-group btn-user-pay-action">';
+                            html += '        <div class="grid-layout-inner">';
+                            html += '           <div class="grid-layout-cell grid-2"><button type="button" onclick="shipping_chk(\''+v.shipping_company+'\',\''+v.shipping_invoice+'\')" class="btn btn-purple btn-middle-size btn-round">배송조회</button></div>';
+                            html += '           <div class="grid-layout-cell grid-2"><button type="button" onclick="javascript:location.href=\'shop_return_1?no=<?=$order_num?>\'" class="btn btn-outline-gray btn-middle-size btn-round">반품요청</button></div>';
+                            html += '       </div>';
+                            html += '    </div>';
+                        }else if(v.pay_status == "4"){
+                            html += '    <button type="button" onclick="javascript:location.href=\'shop_return_1?no=<?=$order_num?>\'" class="btn btn-middle-size btn-outline-gray btn-round btn-user-pay-action">반품요청</button>';
+                        }else if(v.pay_status == "8"){
+                            // 반품사유
+                        }else if(v.pay_status == "9"){
+                            // 취소사유
+                        }
+                        // html += '    <button type="button" class="btn btn-middle-size btn-outline-gray btn-round btn-user-pay-action">취소 요청</button>';
+                        // html += '    <button type="button" class="btn btn-middle-size btn-outline-purple btn-round btn-user-pay-action">수취확인</button>';
+                        // html += '    <div class="grid-layout btn-grid-group btn-user-pay-action">';
+                        // html += '        <div class="grid-layout-inner">';
+                        // html += '           <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-purple btn-middle-size btn-round">구매확정</button></div>';
+                        // html += '           <div class="grid-layout-cell grid-2"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round">반품요청</button></div>';
+                        // html += '       </div>';
+                        // html += '    </div>';
+                        // html += '</div>';
+                    });
+                    $('.product_list').html(html);
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert(error + "네트워크에러");
+            }
+        });
+    }
+
+    function go_cancel(){
+
+        $('#firstRequestMsg1').find('.msg-txt').text('1대1 문의나 고객센터(1661-9956)를 이용해 주세요.');
+        pop.open("firstRequestMsg1");
+    }
+
+    // 배송조회
+    function shipping_chk(shipping_company,shipping_invoice){ // 배송조회
+
+        if(shipping_company == "2"){ // 우체국
+//		window.open("https://service.epost.go.kr/iservice/usr/trace/usrtrc001k01.jsp", "_BLANK");
+            window.open("http://service.epost.go.kr/trace.RetrieveRegiPrclDeliv.postal?sid1="+shipping_invoice, "_BLANK");
+        }else if(shipping_company == "1"){ // 대한통운
+            window.open("https://www.cjlogistics.com/ko/tool/parcel/newTracking?gnbInvcNo="+shipping_invoice, "_BLANK");
+            //window.open("https://www.cjlogistics.com/ko/tool/parcel/tracking", "_BLANK");
+            //window.open("http://nplus.doortodoor.co.kr/web/detail.jsp?slipno="+shipping_invoice, "_BLANK");
+        }else if(shipping_company == "0"){ // 한진택배
+//		html = '';
+//		html += '<form id="send_shipping_data" method="post" action="https://www.hanjin.co.kr/kor/CMS/DeliveryMgr/WaybillResult.do" style="display: none;">';
+////		html += '	<input type="text" id="div" name="div" value="B" />';
+////		html += '	<input type="text" id="show" name="show" value="true" />';
+//		html += '	<input type="text" id="mCode" name="mCode" value="MN038" />';
+//		html += '	<input type="text" id="schLang" name="schLang" value="KR" />';
+//		html += '	<input type="text" id="wblNum" name="wblnum" value="'+shipping_invoice+'" />';
+//		html += '</form>';
+//		$(document).find("#item_order_detail").after(html);
+//		$(document).find("#send_shipping_data").submit();
+            window.open("https://www.hanjin.co.kr/kor/CMS/DeliveryMgr/WaybillResult.do?mCode=MN038&schLang=KR&wblnum="+shipping_invoice, "_BLANK");
+        }
+    }
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+</script>
+	
+</body>
+</html>

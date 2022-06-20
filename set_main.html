@@ -17,7 +17,8 @@ $yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
 $mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
 $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
-
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = 'set_main';
 
 $shop_title	= "MY SHOP";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");

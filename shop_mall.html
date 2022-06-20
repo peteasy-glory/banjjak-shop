@@ -1,0 +1,549 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id'] : "";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname'] : "";
+
+
+$pet_type = (isset($_COOKIE['pet_type']))? $_COOKIE['pet_type'] : "dog";
+//$pet_type = (isset($_GET['pet_type']))? $_GET['pet_type'] : "dog";
+
+if($pet_type == "cat"){
+    $type = "4";
+    $big_banner = "a.odr_4";
+    $md_item = "a.is_view_main_7";
+    $best_item = "a.is_view_main_9";
+    $new_item = "a.is_view_main_8";
+}else{
+    $type = "3";
+    $big_banner = "a.odr_3";
+    $md_item = "a.is_view_main_3";
+    $best_item = "a.is_view_main_5";
+    $new_item = "a.is_view_main_4";
+}
+
+// 빅 배너
+$banner_sql = "
+    SELECT a.mb_seq, a.link, b.file_path FROM tb_main_banner AS a
+    INNER JOIN tb_file AS b ON a.banner = b.f_seq
+    WHERE a.is_delete = '2' AND a.is_use = '1' AND a.type REGEXP '{$type}' ORDER BY {$big_banner} ASC, a.reg_dt DESC
+";
+$banner_array = sql_fetch_array($banner_sql);
+
+// 엠디 추천 아이템
+$md_item_sql = "
+    SELECT * FROM tb_item_list a
+        LEFT JOIN (
+            SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
+            FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
+            ) b ON b.p_no = a.product_no
+    WHERE a.is_delete = '1' AND {$md_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+$md_item_array = sql_fetch_array($md_item_sql);
+
+// 베스트 쇼핑템
+$best_item_sql = "
+    SELECT * FROM tb_item_list a
+        LEFT JOIN (
+            SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
+            FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
+            ) b ON b.p_no = a.product_no
+    WHERE a.is_delete = '1' AND {$best_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+$best_item_array = sql_fetch_array($best_item_sql);
+
+// new 쇼핑템
+$new_item_sql = "
+    SELECT * FROM tb_item_list a
+        LEFT JOIN (
+            SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
+            FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
+            ) b ON b.p_no = a.product_no
+    WHERE a.is_delete = '1' AND {$new_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt DESC LIMIT 30";
+$new_item_array = sql_fetch_array($new_item_sql);
+
+//돌아갈 url을 세션에 저장한다.
+unset($_SESSION['backurl_shop']);
+$_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
+
+unset($_SESSION['backurl_event']);
+$_SESSION['backurl_event'] = $_SERVER[ "REQUEST_URI" ];
+
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
+
+?>
+
+
+<!-- header -->
+<header id="header">
+    <div class="header-left">
+        <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+    </div>
+    <div class="page-title">반짝 전문몰</div>
+    <div class="header-right">
+        <a href="shop_search_list" class="btn-page-ui btn-page-search"><div class="icon icon-size-24 icon-page-search">검색</div></a>
+    </div>
+</header>
+<!-- //header -->
+<!-- //header -->
+
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- 빅배너 -->
+        <div class="basic-data-group">
+            <div class="main-big-banner">
+                <div class="swiper-list">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <?php
+                            if(count($banner_array)>0){
+                                foreach($banner_array as $rs){
+                                    $path = explode(".", $rs['file_path']);
+                                    $path = $path[0]."_1.png";
+                                    $href = "shop_event?seq=".$rs['mb_seq'];
+                                    if($rs['mb_seq'] == '37'){ // 링크없음
+                                        $href = '#';
+                                    }
+                                    ?>
+                                    <!--                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"></a></div></div>-->
+                                    <div class="swiper-slide"><div class="slider-item"><a href="<?=$href ?>" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($path)?>" alt=""/></a></div></div>
+                                    <!--                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/shop_main_banner.png" alt=""/></a></div></div>-->
+                                    <!--                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="/static/pub/images/shop_main_banner.png" alt=""/></a></div></div>-->
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </div>
+                    </div>
+                    <div class="swiper-page"></div>
+                </div>
+            </div>
+            <div class="main-category-wrap">
+                <div class="sort-tab-data">
+                    <div style="display:block;" class="tab_menu">
+                        <div class="item_menu_list ">
+                            <div class="scroller-inner item-menu-list-category" style="overflow: auto;">
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=1"><div class="icons"><img src="/images/cate_01@2x.png"></div><div class="txt">목욕</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=2"><div class="icons"><img src="/images/cate_02@2x.png"></div><div class="txt">가위</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=3"><div class="icons"><img src="/images/cate_03@2x.png"></div><div class="txt">클리퍼</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=4"><div class="icons"><img src="/images/cate_04@2x.png"></div><div class="txt">브러쉬</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=5"><div class="icons"><img src="/images/cate_05@2x.png"></div><div class="txt">미용도구</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=6"><div class="icons"><img src="/images/cate_06@2x.png"></div><div class="txt">테이블</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=7"><div class="icons"><img src="/images/cate_07@2x.png"></div><div class="txt">드라이기</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=8"><div class="icons"><img src="/images/cate_08@2x.png"></div><div class="txt">소모품</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=9"><div class="icons"><img src="/images/cate_09@2x.png"></div><div class="txt">기타</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=9"><div class="icons"><img src="/images/cate_10@2x.png"></div><div class="txt">더보기</div></a></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- //빅배너 -->
+        <!-- MD 추천 쇼핑템  -->
+        <div class="basic-data-group">
+            <div class="con-title-group">
+                <h4 class="con-title">MD 추천 쇼핑템</h4>
+            </div>
+            <!-- 20220218 수정 : 구조 변경 -->
+            <div class="horizontal-swiper-scoller group">
+                <div class="scroller-inner">
+                    <div class="scroller-mulity-group">
+                        <div class="scroller-mulity-inner" style="overflow: auto;">
+                            <?php
+                            if(count($md_item_array)>0){
+                                foreach($md_item_array as $rs){
+                                    // 메인사진 구하기
+                                    $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$rs['product_img']}) LIMIT 1";
+                                    $file_result = sql_query($file_sql);
+                                    $file_row = sql_fetch($file_result);
+                                    $photo = ($file_row['file_path'])? "https://image.banjjakpet.com".img_link_change($file_row['file_path']) : $rs['goodsRepImage'];
+
+                                    //할인율 구하기
+                                    $percent = ($rs['product_price'] == 0 || $rs['sale_price'] == 0)? 0 : 100 - ($rs['sale_price'] / $rs['product_price'] * 100);
+                                    ?>
+                                    <div class="scroller-item">
+                                        <a href="shop_view?product_no=<?=$rs['product_no']?>" class="product-item">
+                                            <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
+                                            <div class="info-wrap">
+                                                <div class="item-name"><?= $rs['product_name']?></div>
+                                                <div class="item-price-group">
+                                                    <div class="price-sale"><?=round($percent)?>%</div>
+                                                    <div class="price-value"><?=number_format($rs['sale_price'])?>원</div>
+                                                </div>
+                                                <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em><?=round($rs['rating_avg'])?></em>(<?php echo ($rs['rating_cnt']>0)?$rs['rating_cnt']:0; ?>)</div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            <!-- //20220218 수정 : 구조 변경 -->
+        </div>
+        <!-- //MD 추천 쇼핑템 -->
+        <!-- Best 쇼핑템 -->
+        <div class="basic-data-group">
+            <div class="con-title-group">
+                <h4 class="con-title">Best 쇼핑템</h4>
+            </div>
+            <!-- 20220218 수정 : 구조 변경 -->
+            <div class="horizontal-swiper-scoller group">
+                <div class="scroller-inner">
+                    <div class="scroller-mulity-group" style="overflow: auto;">
+                        <div class="scroller-mulity-inner">
+                            <?php
+                            for($i=0;$i<count($best_item_array);$i=$i+2){
+                                // 메인사진 구하기
+                                $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$best_item_array[$i]['product_img']}) LIMIT 1";
+                                $file_result = sql_query($file_sql);
+                                $file_row = sql_fetch($file_result);
+                                $photo = ($file_row['file_path'])? "https://image.banjjakpet.com".img_link_change($file_row['file_path']) : $best_item_array[$i]['goodsRepImage'];
+
+                                //할인율 구하기
+                                $percent = ($best_item_array[$i]['product_price'] == 0 || $best_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($best_item_array[$i]['sale_price'] / $best_item_array[$i]['product_price'] * 100);
+                                ?>
+                                <div class="scroller-item">
+                                    <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>" class="product-item">
+                                        <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
+                                        <div class="info-wrap">
+                                            <div class="item-name"><?=$best_item_array[$i]['product_name']?></div>
+                                            <div class="item-price-group">
+                                                <div class="price-sale"><?=round($percent)?>%</div>
+                                                <div class="price-value"><?=number_format($best_item_array[$i]['sale_price'])?>원</div>
+                                            </div>
+                                            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em><?=round($best_item_array[$i]['rating_avg'])?></em>(<?php echo ($best_item_array[$i]['rating_cnt']>0)?$best_item_array[$i]['rating_cnt']:0; ?>)</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                        <div class="scroller-mulity-inner">
+                            <?php
+                            for($i=1;$i<count($best_item_array);$i=$i+2){
+                                // 메인사진 구하기
+                                $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$best_item_array[$i]['product_img']}) LIMIT 1";
+                                $file_result = sql_query($file_sql);
+                                $file_row = sql_fetch($file_result);
+                                $photo = ($file_row['file_path'])? "https://image.banjjakpet.com".img_link_change($file_row['file_path']) : $best_item_array[$i]['goodsRepImage'];
+
+                                //할인율 구하기
+                                $percent = ($best_item_array[$i]['product_price'] == 0 || $best_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($best_item_array[$i]['sale_price'] / $best_item_array[$i]['product_price'] * 100);
+                                ?>
+                                <div class="scroller-item">
+                                    <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>" class="product-item">
+                                        <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
+                                        <div class="info-wrap">
+                                            <div class="item-name"><?=$best_item_array[$i]['product_name']?></div>
+                                            <div class="item-price-group">
+                                                <div class="price-sale"><?=round($percent)?>%</div>
+                                                <div class="price-value"><?=number_format($best_item_array[$i]['sale_price'])?>원</div>
+                                            </div>
+                                            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em><?=round($best_item_array[$i]['rating_avg'])?></em>(<?php echo ($best_item_array[$i]['rating_cnt']>0)?$best_item_array[$i]['rating_cnt']:0; ?>)</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- //20220218 수정 : 구조 변경 -->
+        </div>
+        <!-- //Best 쇼핑템 -->
+        <!-- New 쇼핑템 -->
+        <div class="basic-data-group">
+            <div class="con-title-group">
+                <h4 class="con-title">New 쇼핑템</h4>
+            </div>
+            <!-- 20220218 수정 : 구조 변경 -->
+            <div class="horizontal-swiper-scoller group">
+                <div class="scroller-inner">
+                    <div class="scroller-mulity-group" style="overflow: auto;">
+                        <div class="scroller-mulity-inner">
+                            <?php
+                            for($i=0;$i<count($new_item_array);$i=$i+2){
+                                // 메인사진 구하기
+                                $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$new_item_array[$i]['product_img']}) LIMIT 1";
+                                $file_result = sql_query($file_sql);
+                                $file_row = sql_fetch($file_result);
+                                $photo = ($file_row['file_path'])? "https://image.banjjakpet.com".img_link_change($file_row['file_path']) : $new_item_array[$i]['goodsRepImage'];
+
+                                //할인율 구하기
+                                $percent = ($new_item_array[$i]['product_price'] == 0 || $new_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($new_item_array[$i]['sale_price'] / $new_item_array[$i]['product_price'] * 100);
+                                ?>
+                                <div class="scroller-item">
+                                    <a href="shop_view?product_no=<?=$new_item_array[$i]['product_no']?>" class="product-item">
+                                        <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
+                                        <div class="info-wrap">
+                                            <div class="item-name"><?=$new_item_array[$i]['product_name']?></div>
+                                            <div class="item-price-group">
+                                                <div class="price-sale"><?=round($percent)?>%</div>
+                                                <div class="price-value"><?=number_format($new_item_array[$i]['sale_price'])?>원</div>
+                                            </div>
+                                            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em><?=round($new_item_array[$i]['rating_avg'])?></em>(<?php echo ($new_item_array[$i]['rating_cnt']>0)?$new_item_array[$i]['rating_cnt']:0; ?>)</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                        <div class="scroller-mulity-inner">
+                            <?php
+                            for($i=1;$i<count($new_item_array);$i=$i+2){
+                                // 메인사진 구하기
+                                $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$new_item_array[$i]['product_img']}) LIMIT 1";
+                                $file_result = sql_query($file_sql);
+                                $file_row = sql_fetch($file_result);
+                                $photo = ($file_row['file_path'])? "https://image.banjjakpet.com".img_link_change($file_row['file_path']) : $new_item_array[$i]['goodsRepImage'];
+
+                                //할인율 구하기
+                                $percent = ($new_item_array[$i]['product_price'] == 0 || $new_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($new_item_array[$i]['sale_price'] / $new_item_array[$i]['product_price'] * 100);
+                                ?>
+                                <div class="scroller-item">
+                                    <a href="shop_view?product_no=<?=$new_item_array[$i]['product_no']?>" class="product-item">
+                                        <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
+                                        <div class="info-wrap">
+                                            <div class="item-name"><?=$new_item_array[$i]['product_name']?></div>
+                                            <div class="item-price-group">
+                                                <div class="price-sale"><?=round($percent)?>%</div>
+                                                <div class="price-value"><?=number_format($new_item_array[$i]['sale_price'])?>원</div>
+                                            </div>
+                                            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em><?=round($new_item_array[$i]['rating_avg'])?></em>(<?php echo ($new_item_array[$i]['rating_cnt']>0)?$new_item_array[$i]['rating_cnt']:0; ?>)</div>
+                                        </div>
+                                    </a>
+                                </div>
+                                <?php
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- //20220218 수정 : 구조 변경 -->
+        </div>
+        <!-- //New 쇼핑템 -->
+        <div class="page-footer">
+            <div class="footer-business">
+                <button type="button" class="btn-footer-business">(주)펫이지 사업자 정보</button>
+                <div class="footer-address">
+                    <div class="footer-address-cell">대표: 신동찬</div>
+                    <div class="footer-address-cell">사업자등록번호: 157-86-01070 사업자정보확인</div>
+                    <div class="footer-address-cell">통신판매업 제 2021-서울종로-0183호</div>
+                    <div class="footer-address-cell">서울시 종로구 종로6 5층 서울창조경제혁신센터</div>
+                    <div class="footer-address-cell">개인정보 담당자: 이석범 privacy@peteasy.kr</div>
+                </div>
+            </div>
+            <div class="footer-etc-menu">
+                <ul>
+                    <li><a href="terms4">이용약관</a></li>
+                    <li><a href="terms3">개인정보처리방침</a></li>
+                </ul>
+            </div>
+            <div class="footer-etc-menu">
+                <ul>
+                    <li><a>고객센터</a></li>
+                    <li><a href="tel:1661-9956">1661-9956</a></li>
+                </ul>
+            </div>
+            <div class="footer-etc-menu">
+                <ul>
+                    <li><a href="mailTo:help@peteasy.kr">help@peteasy.kr</a></li>
+                </ul>
+            </div>
+            <div class="footer-copy">©PetEasy Co. Ltd. All rights reserved</div>
+        </div>
+    </div>
+    <!-- //page-body -->
+    <!--
+    //	page-bottom 이 있을 경우 이위치
+    <div class="page-bottom">
+    </div>
+    -->
+    <!-- page-bottom -->
+
+    <!-- //page-bottom -->
+    <!-- 20220106 수정 -->
+    <div class="common-bottom-ui left">
+        <a href="shop_cart" class="btn-page-cart"><em>0</em></a>
+    </div>
+    <!-- 20220106 수정 -->
+    <div class="common-bottom-ui right">
+        <button type="button" id="btnPageTop" class="btn-page-top" onclick="common.pageMove(0);">상단 바로가기</button>
+    </div>
+    <!-- //20220106 수정 -->
+
+    <!-- 페이지 공통 배너 -->
+    <!--
+    // page-banner-wrap 클래스에 actived클래스 추가시 활성화
+    -->
+    <div class="page-banner-wrap" id="popup">
+        <div class="page-banner-inner">
+            <div class="page-banner-data">
+                <div class="page-banner-slider">
+                    <div class="swiper-container">
+                        <div class="swiper-wrapper">
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-page-banner-item"><img src="https://image.banjjakpet.com/images/package_charge.jpg" alt=""/></a></div></div>
+                            <!--<div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-page-banner-item"><img src="/static/pub/images/main_banner_sample.png" alt=""/></a></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-page-banner-item"><img src="/static/pub/images/main_banner_sample.png" alt=""/></a></div></div>
+                            <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-page-banner-item"><img src="/static/pub/images/main_banner_sample.png" alt=""/></a></div></div>-->
+                        </div>
+                    </div>
+                    <!--                        <div class="swiper-page"></div>-->
+                    <!--                        <button type="button" class="btn-swiper-slider-prev"></button>-->
+                    <!--                        <button type="button" class="btn-swiper-slider-next"></button>-->
+                </div>
+                <div class="page-common-footer">
+                    <div class="week-none"><label class="form-checkbox"><input name="no_pop" type="checkbox"><span class="form-check-icon"><em>오늘 그만보기</em></span></label></div>
+                    <button type="button" class="btn-close" onclick="pop_close();">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- //페이지 공통 배너 -->
+</section>
+<!-- //container -->
+<script>
+
+    // 팝업
+    function getCookie_popup(name) {
+        var obj = name + "=";
+        var x = 0;
+        while (x <= document.cookie.length) {
+            var y = (x + obj.length);
+            if (document.cookie.substring(x, y) == obj) {
+                if ((endOfCookie = document.cookie.indexOf(";", y)) == -1)
+                    endOfCookie = document.cookie.length;
+                return unescape(document.cookie.substring(y, endOfCookie));
+            }
+            x = document.cookie.indexOf(" ", x) + 1;
+            if (x == 0)
+                break;
+        }
+        return "";
+    }
+
+    function setCookie_popup(name, value, expiredays) {
+        var todayDate = new Date();
+        todayDate.setDate(todayDate.getDate() + expiredays);
+        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure ';
+    }
+
+    function pop_close(){
+        var is_chk = $("input:checkbox[name=no_pop]").is(':checked');
+        if(is_chk == true){
+            setCookie_popup('guide_beauty_shop', 'Y', 1);
+        }
+        $('#popup').removeClass('actived');
+    }
+
+    // 팝업 끝
+
+    $(document).ready(function(){
+        if (getCookie_popup('guide_beauty_shop') != 'Y') {
+            //$("#popup").addClass('actived'); // 주석 제가하면 팝업 생성
+        }
+        /*
+        new Swiper('.swiper-container', {
+            slidesPerView: 'auto',
+            spaceBetween: 30,
+            loopAdditionalSlides: 1,
+            autoplay: {
+                delay: 2500,
+                disableOnInteraction: true,
+            },
+            loop : true,
+            observeParents: true,
+            pagination: {
+                el: '.swiper-page',
+                type: 'fraction',
+            },
+            on: {
+                slideChangeTransitionEnd: function(){
+                    category_group = this.activeIndex + 1;
+                },
+            },
+
+        });
+         */
+
+        // 장바구니 개수
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: "get_cart_cnt",
+                customer_id: "<?=$user_id ?>"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $(".btn-page-cart em").text(data.data);
+            }
+        });
+
+        $(".btn-tab-item").click(function(){
+            var idx	= $(".btn-tab-item").index($(this));
+            $(".tab-cell").removeClass("actived").eq(idx).addClass("actived");
+            $(".tab_menu").hide().eq(idx).show();
+
+        })
+    });
+
+    $("#select-type").change(function(){
+        var pet_type = '<?=$pet_type?>'; // 현재 펫타입
+        var select_type = $("#select-type").val(); // 선택한 펫타입
+        // console.log(pet_type, select_type);
+        // 펫 타입이 달라질때
+        if(select_type != pet_type){
+            //location.replace('shop_main?pet_type='+select_type);
+
+            // cookie 로 생성
+            $.ajax({
+                url: './data/make_petType_session.php',
+                data: {pet_type: select_type},
+                type: 'POST',
+                success: function(data){
+                    console.log(data);
+                    console.log(select_type);
+                    //if(data == select_type){
+                    location.replace('shop_main?pet_type='+select_type);
+                    //}
+                },
+                error: function(xhr, status, error) {
+                    //alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+
+
+
+
+        }
+    });
+
+    function  newWindowOpen(){
+        window.open("https://ceo.banjjakpet.com/","_blank", "");
+    }
+</script>
+
+
+
+
+
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer.php");
+?>

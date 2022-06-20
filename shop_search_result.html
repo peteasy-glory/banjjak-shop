@@ -1,0 +1,169 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+$user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+$word = (isset($_GET["word"])) ? $_GET["word"]: "";
+
+//돌아갈 url을 세션에 저장한다.
+unset($_SESSION['backurl_shop']);
+$_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
+
+?>
+
+<!-- header -->
+<header id="header">	
+	<div class="header-input">
+		<form action="shop_search_result" class="form-btns">
+			<input type="text" id="word" name="word" placeholder="검색어 입력">
+			<button type="submit" onclick="javascript:return chk_word();" class="btn-data-send btn-data-search"><span class="icon icon-size-24 icon-page-search">검색</span></button>
+		</form>
+	</div>
+	<div class="header-right">
+		<a href="shop_mall" class="btn-page-ui btn-page-close"><div class="icon icon-size-24 icon-page-close">페이지 닫기</div></a>
+	</div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body fix-bottom-page">
+		<!-- shop-search-wrap -->  
+		<div class="shop-search-wrap">			
+			<div class="con-title-group">
+				<h3 class="con-title">'<?=$word?>' 검색결과</h3>
+			</div>
+			<div class="search-result-option item_result"></div>
+
+			<div class="basic-data-group vmiddle" id="item_list">
+			</div>
+		</div>
+		<!-- //shop-search-wrap -->  
+	</div>
+	<!-- //page-body -->	
+	<div class="common-bottom-ui left">
+		<a href="#" class="btn-page-cart"><em>0</em></a>
+	</div>
+	<div class="common-bottom-ui right">
+		<button type="button" id="btnPageTop" class="btn-page-top" onclick="common.pageMove(0);">상단 바로가기</button>
+	</div>
+</section>
+<!-- //container -->
+<script>
+    var search_word_before = '<?=$word ?>';
+    var search_word = search_word_before.replace(/ /gi, '%\' and product_name like \'%'); // 띄어쓰기를 %로 변경하여 다중 검색 가능
+
+    $(document).ready(function(){
+
+        // 장바구니 개수
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: "get_cart_cnt",
+                customer_id: "<?=$user_id ?>"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $(".btn-page-cart em").text(data.data);
+            }
+        });
+       get_item_list(search_word);
+    });
+
+    function chk_word(){
+        if($("#word").val() == ''){
+            $('#firstRequestMsg1').find('.msg-txt').text('검색어를 입력해주세요.');
+            pop.open('firstRequestMsg1');
+            return false
+        }
+    }
+
+    function get_item_list(search_word){
+        $.ajax({
+            url: 'data/item_search_manage_ajax.php',
+            data: {
+                mode : "get_item_list",
+                search_word : search_word
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data) {
+                if(data.code == "000000"){
+                    console.log(data.data);
+                    var html = '';
+                    html +='<div class="product-vertical-list">';
+                    html +='    <div class="list-inner">';
+                    if(data.data.list.length > 0){
+                        $.each(data.data.list, function(i, v){
+                            var soldout = (v.is_soldout == '2')? '<div class="label-soldout">품절</div>' : ''; // 품절 확인
+                            var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path); // 상품 이미지
+                            //할인율 구하기
+                            var percent = (v.product_price == 0 || v.sale_price == 0)? 0 : 100 - (v.sale_price / v.product_price * 100);
+                            html += '<div class="list-cell">';
+                            html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                            html += '        <div class="thumb"><div class="obj"><img src="'+img_link+'" alt="">'+soldout+'</div></div>';
+                            html += '        <div class="info-wrap">';
+                            html += '            <div class="item-name">'+v.product_name+'</div>';
+                            html += '            <div class="item-price-group">';
+                            html += '                <div class="price-sale">'+Math.round(percent)+'%</div>';
+                            html += '                <div class="price-value">'+(v.sale_price).format()+'원</div>';
+                            html += '            </div>';
+                            html += '            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em>'+Math.round(v.rating_avg)+'</em>('+Math.round(v.rating_cnt)+')</div>';
+                            html += '        </div>';
+                            html += '    </a>';
+                            html += '</div>';
+                        });
+                        html +='</div></div>';
+                    }else{
+                        html += '<div class="common-none-data">';
+                        html += '    <div class="none-inner">';
+                        html += '        <div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>';
+                        html += '        <div class="item-info">검색결과가 없습니다.</div>';
+                        html += '    </div>';
+                        html += '</div>';
+                    }
+                    $("#item_list").html(html);
+                    $(".item_result").text("현재 상품 수 : "+data.data.cnt+"개 / 총 상품 수 : "+data.data.list.length+"개");
+
+
+                }else{
+                    alert(data.data+"("+data.code+")");
+                    console.log(data.code);
+                }
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+        });
+    }
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+
+</script>
+	
+</body>
+</html>
