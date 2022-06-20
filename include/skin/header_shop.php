@@ -290,6 +290,11 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                     <div class="single-btns-list">
                         <div id="hiddenMyMenu" style="display:none;"></div>
                         <div class="list-cell"><a href="mypage_inquiry_list" class="btn-single-item arrow"><div class="txt">1:1 문의하기</div></a></div>
+                        <?php
+                        if($user_id == "itseokbeom@gmail.com"){
+                            ?><div class="list-cell"><a href="shop_pay_list" class="btn-single-item arrow"><div class="txt">상품결제내역</div></a></div><?php
+                        }
+                        ?>
                         <div class="list-cell"><a href="mypage_member" class="btn-single-item arrow"><div class="txt">회원정보 관리</div></a></div>
                         <div class="list-cell"><a href="mypage_notice_list" class="btn-single-item arrow"><div class="txt">공지사항</div></a></div>
                     </div>
@@ -348,7 +353,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
             echo '<div class="header-right">
                     <div class="label-group">
                         <a href="https://partner.banjjakpet.com/mypage_notice_view?notice_seq=20"><div class="label-add-pink"><em>회원등급제란?</em></div></a>
-                    </div>
+                    </div>                                        
                 </div>';
         }
     } else {

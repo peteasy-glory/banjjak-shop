@@ -1479,6 +1479,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 						GROUP BY order_num
 					) AS iplp ON ipl.order_num = iplp.order_num
 				WHERE ipl.is_delete = '1'
+				  	AND ipl.is_shop = '1' 
 					AND ipl.order_status != '1'
 					".$where_qy."
 			";
@@ -1521,6 +1522,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 						GROUP BY order_num
 					) AS iplp ON ipl.order_num = iplp.order_num
 				WHERE ipl.is_delete = '1'
+				  	AND ipl.is_shop = '1'
 					AND ipl.order_status != '1'
 					".$where_qy."
 			";
