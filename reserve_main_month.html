@@ -518,7 +518,7 @@ $payment_log =  array();
 // $payment_log = array(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
 // 날짜별 예약 건수 호출
 $o_sql = "
-    SELECT C.name, A.* FROM
+    SELECT D.is_approve is_wait, C.name, A.* FROM
 	(SELECT *
 	FROM `tb_payment_log`
 	WHERE artist_id = '" . $user_id . "'
@@ -536,7 +536,8 @@ $o_sql = "
 	WHERE artist_id = '{$user_id}'
 	    AND is_out = 2 AND is_view = 2
 	GROUP BY name) B ON TRIM(A.worker) = TRIM(B.name)
-	LEFT JOIN tb_mypet C ON A.pet_seq = C.pet_seq	
+	LEFT JOIN tb_mypet C ON A.pet_seq = C.pet_seq
+	LEFT JOIN tb_grade_reserve_approval_mgr D ON A.payment_log_seq = D.payment_log_seq		
 ";
 
 //echo $o_sql;
@@ -546,14 +547,15 @@ $payment_data   = array();
 while ($o_rows = mysqli_fetch_assoc($o_result)) {
     $payment_log[$o_rows['day']] += 1;
     $payment_data[$o_rows['day']][]    = $o_rows;
-    $que = "SELECT COUNT(*) AS await_cnt FROM tb_grade_reserve_approval_mgr WHERE payment_log_seq = {$o_rows['payment_log_seq']}";
+    $que = "SELECT COUNT(*) AS await_cnt FROM tb_grade_reserve_approval_mgr WHERE payment_log_seq = {$o_rows['payment_log_seq']} AND is_approve = 0";
     //echo $que."<br>";
     $gram = sql_fetch_array($que);
     if($gram[0]['await_cnt']>0) {
         //echo $gram[0]['await_cnt']."<br>";
-        $dt = $o_rows['year'].'-'.$o_rows['month'].'-'.$o_rows['day'];
+        $dt = date('Y-m-d',strtotime($o_rows['year'].'-'.$o_rows['month'].'-'.$o_rows['day']));
         //$tgram[$dt][] = $o_rows['year'].'-'.$o_rows['month'].'-'.$o_rows['day'];
         $tgram[$dt]['cnt'] += $gram[0]['await_cnt'];
+        //echo "<br><br><br><br>".$dt;
     }
 }
 
@@ -704,7 +706,7 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                             // 7. 총 가로칸 만들기
                                             for ($j = 0; $j < 7; $j++) {
                                                 $rest_word = "";
-                                                $await_day = date("" . $yy . "-" . $mm);
+                                                $await_day = date('Y-m',strtotime("" . $yy . "-" . $mm));
                                                 $current_time = date("" . $yy . "-" . $mm . "-" . $day . " 00:00:00");
                                                 $next_3month_time = date("Y-m-d 00:00:00", strtotime("+3 months"));
                                                 $next_3month_int = strtotime($next_3month_time);
@@ -873,8 +875,9 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                                             <?php } ?>
                                                             <div class="state"><?php echo $rest_word; ?></div>
                                                         </div>
-                                                        <?php if($tgram[$await_day.'-'.$day]['cnt']>0){?>
-                                                            <div class="calendar-month-day-item wait"> 대기 <?php echo $tgram[$await_day.'-'.$day]['cnt'];?>건</div>
+                                                        <?php $wait_day = ($day < 10)? "0".$day : $day; ?>
+                                                        <?php if($tgram[$await_day.'-'.$wait_day]['cnt']>0){?>
+                                                            <div class="calendar-month-day-item wait"> 대기 <?php echo $tgram[$await_day.'-'.$wait_day]['cnt'];?>건</div>
                                                         <?php } ?>
                                                         <div class="calendar-drag-item-group">
                                                             <?php if ($payment_log[$day] > 0) {?>
@@ -883,7 +886,9 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                                                     if($val['is_no_show']){
                                                                         $div_class  = "red";
                                                                     }else{
-                                                                        if($val['pay_type'] == "card" || $val['pay_type'] == "bank"){
+                                                                        if($val['is_wait'] == '0') {
+                                                                            $div_class  = "wait";
+                                                                        }else if($val['pay_type'] == "card" || $val['pay_type'] == "bank"){
                                                                             $div_class  = "yellow";
                                                                         }else if($val['pay_type'] == "offline-card" || $val['pay_type'] == "offline-cash" || $val['pay_type'] == "offline"){
                                                                             $div_class  = "purple";
