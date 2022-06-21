@@ -2371,7 +2371,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-month-day-item.red {background:#ff4848;}
 .calendar-month-day-item.mint {background:#72d6b0;}
 .calendar-month-day-item.orange {background:#fdab73;}
-.calendar-month-day-item.wait {background:#fff; color:#ff4848; font-weight:700;}
+.calendar-month-day-item.wait {background:#f2f2f2; color:#ff4848; font-weight:700;}
 .calendar-month-day-item.whitepink {background:#feb8b1; text-align:center;}
 .calendar-month-day-item.whiteapricot {background:#ffd3b5; text-align:center;}
 .calendar-month-day-item.whitegreen {background:#c9e896; text-align:center;}
@@ -2417,7 +2417,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-week-time-item {position:relative; z-index:5; width:calc( 100% -  1px ); min-height:40px; padding:6px 4px 12px 4px; text-align:left; border-left:4px solid #000; border-top:3px solid #fff; border-bottom:3px solid #fff; border-right:2px solid #fff; border-radius:10px;background:#fffbed; box-sizing:border-box; overflow:hidden; user-select: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none;}
 .calendar-week-time-item .item-name {font-size:13px;line-height:17px;font-weight:700;}
 .calendar-week-time-item .item-cate {font-size:11px;line-height:14px;font-weight:400;}
-.calendar-week-time-item .item-price {font-size:11px;line-height:12px;font-weight:500; color:#666; margin-top:4px;}
+.calendar-week-time-item .item-price {font-size:11px;line-height:12px;font-weight:700; margin-top:4px;}
 .calendar-week-time-item .item-option {font-size:11px;line-height:12px;font-weight:500; color:#202020; margin-top:10px;}
 .calendar-week-time-item .item-cash {position:absolute; bottom:0; right:0; margin-right:5px;}
 .calendar-week-time-item .item-master {position:absolute; bottom:0; left:0;}
@@ -3639,6 +3639,39 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 }
 
+/*2022.06.20 예약관리 일간 UI 변경*/
+.calendar-day-time-item-add{
+	display: flex !important;
+	padding: 0px 0px 0px 6px !important;
+
+}
+.item-select-option{
+	font-size:11px;
+	display: flex;
+}
+.item-memo{
+	font-size:11px;
+	margin-top:3px;
+}
+.item-thumb-add{
+	width:20px;
+	height:20px;
+	margin-right:8px;
+
+}
+.item-thumb-add img{
+
+	border-radius: 7px;
+	border:0.5px solid #bebebe;
+}
+.item-group-wrap{
+	display:flex;
+}
+.item-group{
+	display:flex;
+	flex-direction: column;
+
+}
 
 /*========================================
 @ PC버전
