@@ -545,10 +545,20 @@ $await_cnt = $gram[0]['cnt'];
 
 
 ?>
+<div class="thumb-modal">
+    <div class="thumb-modal-content-wrap">
+        <div class="thumb-modal-img">
+            <img src="" alt="">
+        </div>
+        <div class="thumb-close" onclick="thumb_modal_off()"><span>확인</span></div>
+    </div>
+
+</div>
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->    
 	<div class="page-body">
+
         <div class="common-bottom-ui left" style="position:fixed;bottom:74px;">
             <a href="customer_inquiry"><img src="https://image.banjjakpet.com/images/icon-circle-float_search.png" alt="" style="width:64px;"></a>
         </div>
@@ -858,8 +868,9 @@ $await_cnt = $gram[0]['cnt'];
                                                                 }
                                                             }
                                                             ?>
-                                                        <div class="item-thumb-add"><img src="<?=$img_pet_thumb?>" alt=""></div>
+                                                        <div class="item-thumb-add" onclick="thumb_modal_on(this)"><img src="<?=$img_pet_thumb?>" alt=""></div>
                                                         <div class="item-group-wrap">
+<!--                                                            <span>--><?php //print_r($type)?><!--</span>-->
                                                         <div class="item-group">
                                                             <div class="item-name-cate">
                                                         <div class="item-name"><?php echo ($chk_rev[$a]['is_await']=='0')?'승인대기':$chk_rev[$a]['pet_name']; ?></div>
@@ -876,15 +887,23 @@ $await_cnt = $gram[0]['cnt'];
                                                         <div class="item-price"><?php echo $pay_price.' 원'; ?></div>
                                                         <?php if($style_height != 0){ ?>
                                                         <!--<div class="item-option">"--><?php //echo $type[4]; ?><!--"</div>-->
-                                                            <?php $separate = explode('|',$chk_rev[0]['product'])?>
-                                                                <?php $separate_3 = explode(':',$separate[3]); $separate_6 = explode(':',$separate[6]);?>
                                                             <div class="item-select-option">
-                                                                <span><?php echo $separate_3[0]?></span>
+                                                                <span><?php echo ($type[1]=="개") ? $type[4] : ""?></span>
                                                                 <span class="span-after">&nbsp|&nbsp</span>
-                                                                <span><?php echo $separate_6[0]?></span>
+                                                                <span><?php echo explode(':',$type[6])[0]?></span>
+                                                                <span class="span-after">&nbsp|&nbsp</span>
+                                                                <?php if($type[1] == "개"){
+                                                                    echo '<span>'.(explode(':',$type[7])[0] !== "") ? explode(':',$type[7])[0].'mm' : "" .'</span>';
+
+                                                                }else{
+
+                                                                    echo '<span>'.($type[1]=="고양이")? explode(':',$type[4])[0] : "".'</span>';
+                                                                }?>
+
+
                                                             </div>
                                                             </div>
-                                                            <div class="item-option"><?php echo ($type[1]=="고양이")? explode(':',$type[4])[0] : $type[4]; ?></div>
+
 
                                                             <?php if(!empty($binfo[3]) && $binfo[3]!='all:0'){ ?>
 
@@ -1822,6 +1841,10 @@ $(document).ready(function(){
 
         $.each(day_item, function(i,el){
 
+            $(el).find('.item-name').css({'font-size':'16px'});
+            $(el).find('.item-cate').css({'font-size':'14px'});
+            $(el).find('.item-price').css({'font-size':'14px'});
+            $(el).find('.item-memo').css({'font-size':'16px'});
 
             if($(el).innerHeight() <= 40){
 
@@ -1834,7 +1857,7 @@ $(document).ready(function(){
             }else if($(el).innerHeight() > 40 && $(el).innerHeight() <= 70){
 
                 $(el).children('.item-thumb-add').css({'padding':'6px 0px 0px 6px'});
-                $(el).find('.item-memo').css({'position':'absolute','left':'105px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                $(el).find('.item-memo').css({'position':'absolute','left':'150px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
 
 
             }else if($(el).innerHeight() > 71 ){
@@ -1857,7 +1880,10 @@ $(document).ready(function(){
         $.each(day_item, function(i,el){
 
             $(el).find('.item-thumb-add').css({'display':'none'});
-
+            $(el).find('.item-name').css({'font-size':'15px'});
+            $(el).find('.item-cate').css({'font-size':'13px'});
+            $(el).find('.item-price').css({'font-size':'13px'});
+            $(el).find('.item-memo').css({'font-size':'15px'});
 
             if($(el).innerHeight() <= 40){
                 $(el).find('.item-memo').css({'display':'none'});
@@ -1884,7 +1910,9 @@ $(document).ready(function(){
     }else if(row_length === 4){
 
         $.each(day_item, function(i,el){
+            $(el).find('.span-after').css({'display':'none'});
             $(el).find('.item-thumb-add').css({'display':'none'});
+
 
             // $(el).children('.item-select-option').css({'flex-direction':'column'})
             // $(el).children('.item-select-option').children('.span-after').css({'display':'none'})
@@ -1897,8 +1925,9 @@ $(document).ready(function(){
             }else if($(el).innerHeight() > 40 && $(el).innerHeight() <= 70){
 
                 $(el).children('.item-price').css({'margin-top':'5px'});
-                $(el).children('.item-select-option').css({'margin-top':'1px'});
+                $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
                 $(el).find('.item-memo').css({'display':'none'});
+
 
 
             }else if($(el).innerHeight() > 71 ){
@@ -1906,13 +1935,38 @@ $(document).ready(function(){
                 $(el).find('.item-memo').css({'max-width':'100px'})
                 $(el).find('.item-group-wrap').css({'flex-direction':'column'})
                 $(el).children('.item-price').css({'margin-top':'5px'});
-                $(el).children('.item-select-option').css({'margin-top':'1px'});
 
+                if($(el).innerHeight() > 150){
+
+                    $(el).find('.item-select-option').css({'margin-top':'10px','flex-direction':'column'});
+                }else{
+                    $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
+                }
 
 
             }
         })
 
+    }
+
+    function thumb_modal_on(e){
+
+
+        event.stopPropagation();
+
+
+        let thumb_link = $(e).children('img').attr("src");
+        console.log("눌렀따");
+        $('.thumb-modal').css({'display':'block'})
+
+        $('.thumb-modal-content-wrap').css({'top':`calc(50% - ${$('.thumb-modal-content-wrap').innerHeight()/2}px)`})
+        $('.thumb-close').css({'left':`calc(50% - ${$('.thumb-close').innerHeight()/2}px`});
+        $('.thumb-modal-img img').attr('src',`${thumb_link}`)
+    }
+
+    function thumb_modal_off(){
+
+        $('.thumb-modal').css({'display':'none'})
     }
 </script>
 
