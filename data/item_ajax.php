@@ -569,6 +569,24 @@ if($mode){
         }else{
             $return_data = array("code" => "007102", "data" => "중요 데이터가 누락되었습니다.");
         }
+    }else if($mode == "get_chk_list"){
+        if($_SESSION["RNC_CHKLIST"] != ""){	// is_delete - 삭제여부(1-미삭제, 2-삭제)
+            $sql = "
+                    SELECT a.*, b.product_name, c.file_path, b.goodsRepImage FROM tb_item_payment_log_product a
+                    LEFT JOIN tb_item_list b ON b.product_no = a.product_no
+                    LEFT JOIN tb_file c ON c.f_seq = b.product_img
+					WHERE a.is_delete = '1'
+					AND a.iplp_seq in (".$_SESSION["RNC_CHKLIST"].")
+				";
+            $result = mysqli_query($connection,$sql);
+            while($row = mysqli_fetch_assoc($result)){
+                $data[] = $row;
+            }
+
+            $return_data = array("code" => "000000", "data" => $data, "sql" => $sql);
+        }else{
+            $return_data = array("code" => "007102", "data" => "중요 데이터가 누락되었습니다.");
+        }
     }else{
         $return_data = array("code" => "000007", "data" => "중요 데이터 누락".$mode);
     }
