@@ -147,6 +147,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
     var limit = 0; // 스크롤 내릴때의 상품 노출 리미트
     var timer;
     $(document).ready(function(){
+        $("#loading").removeClass("actived");
        click_tab(seq);
         click_category(middle_category);
         $(".page-body").on('scroll',function(){
