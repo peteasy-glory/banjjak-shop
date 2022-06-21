@@ -3654,15 +3654,18 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	margin-top:3px;
 }
 .item-thumb-add{
-	width:20px;
-	height:20px;
+	width:30px;
+	height:30px;
 	margin-right:8px;
+	overflow: hidden;
+	border-radius: 5px;
+	border:0.5px solid #bebebe;
 
 }
 .item-thumb-add img{
 
-	border-radius: 7px;
-	border:0.5px solid #bebebe;
+
+
 }
 .item-group-wrap{
 	display:flex;
