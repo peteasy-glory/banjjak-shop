@@ -1,0 +1,222 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+$user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id'] : "";
+$user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname'] : "";
+$seq = (isset($_GET['seq']))? $_GET['seq'] : "";
+
+if($seq == ""){
+    ?>
+    <script>
+        alert("잘못된 접근입니다. 메인페이지로 이동합니다.");
+        location.href = "/";
+    </script>
+    <?php
+    return false;
+}
+
+//돌아갈 url을 세션에 저장한다.
+unset($_SESSION['backurl_shop']);
+$_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
+
+?>
+<!-- header -->
+<header id="header">	
+	<div class="header-left">
+		<a href="<?=$_SESSION['backurl1']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+	</div>
+	<div class="page-title" id="title"></div>
+</header>
+<!-- //header -->
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body fix-bottom-page" id="event">
+
+		
+	</div>
+	<!-- //page-body -->	
+	<div class="common-bottom-ui left">
+		<a href="shop_cart" class="btn-page-cart"><em>0</em></a>
+	</div>
+	<div class="common-bottom-ui right">
+		<button type="button" id="btnPageTop" class="btn-page-top" onclick="common.pageMove(0);">상단 바로가기</button>
+	</div>
+</section>
+<!-- //container -->
+<script>
+
+
+    var seq = "<?=$seq?>";
+    if(seq == '63') {
+        var title = "비요세까이 기획전";
+        var banner = ["https://image.banjjakpet.com/images/bathmon.jpg"];
+        var sub_title = [''];
+        var event_item_list0 = ['BYS-PT-K60~90','BYS-P.BT-K60~90','BYS-P.ST-K60~90','BYS-P.GT-K60~90','BYS-WT-K70~80','BYS-W.BT-K70~80','BYS-W.ST-K70~80','BYS-W.GT-K70~80','BYS-WW-BBAEK','BYS-WT-BBAEK','BYS-WT-FINE','BYS-PT7-BBAEK','BYS-PW7-BBAEK','BYS-WT7-BBAEK','BYS-WT7-M2','BYS-WT7-MULTI','BYS-WNW-MULTI','BYS-P.BM-C70~80','BYS-P.SM-C70~80','BYS-P.GM-C70~80','BYS-PW-C.MULTI','BYS-PW-C.BBAEK'];
+    }else if(seq == '64'){
+        var title = "브리지테일 기획전";
+        var banner = ["https://image.banjjakpet.com/images/bathmon.jpg"];
+        var sub_title = [''];
+        var event_item_list0 = ['ETCB-BREEZYTAIL-B19','ETCB-BREEZYTAIL-B20','ETCB-BREEZYTAIL-B14','ETCB-BREEZYTAIL-B18','ETCB-BREEZYTAIL-B17','ETCB-BREEZYTAIL-B15','ETCB-BREEZYTAIL-B06','ETCB-BREEZYTAIL-B03'];
+    }else if(seq == '65'){
+        var title = "리케이 기획전";
+        var banner = ["https://image.banjjakpet.com/images/bathmon.jpg"];
+        var sub_title = ['클리퍼','가위','아이그룸','브러쉬'];
+        var event_item_list0 = ['ETCB-RIKEI-A16','ETCB-RIKEI-A17','ETCB-RIKEI-A13','ETCB-RIKEI-A12'];
+        var event_item_list1 = ['ETCB-RIKEI-A105','ETCB-RIKEI-A126','ETCB-RIKEI-A87','ETCB-RIKEI-A151','ETCB-RIKEI-A178'];
+        var event_item_list2 = ['ETCB-RIKEI-A227','ETCB-RIKEI-A230','ETCB-RIKEI-A235','ETCB-RIKEI-A238','ETCB-RIKEI-A241','ETCB-RIKEI-A234'];
+        var event_item_list3 = ['ETCB-RIKEI-A60','ETCB-RIKEI-A50','ETCB-RIKEI-A53','ETCB-RIKEI-A42'];
+    }else if(seq == '28'){
+        var title = "장난감 할인전";
+        var banner = ["https://image.banjjakpet.com/images/toyhotdeal.jpg"];
+        var sub_title = ['인형/삑삑이','쭉쭉이','플로팅','라텍스','바스락','LED/야광','로프'];
+        var event_item_list0 = ['JB-T-A75','JB-T-A76','JB-T-A77','JB-T-A02','JB-T-A01','JB-T-A30','JB-T-A29','JB-T-A28','JB-T-A14','JB-T-A13','JB-T-A16','JB-T-A15','JB-T-A96','JB-T-A95','JB-T-A98','JB-T-A97','JB-T-A123','JB-T-A105'];
+        var event_item_list1 = ['JB-T-A138','JB-T-A139','JB-T-A140'];
+        var event_item_list2 = ['CN-TT-A01','JB-T-A137','JB-T-A136','JB-T-A135'];
+        var event_item_list3 = ['JB-T-A36','JB-T-A34','JB-T-A35','JB-T-A33','JB-T-A81','JB-T-A46','JB-T-A104'];
+        var event_item_list4 = ['JB-T-A85','JB-T-A84','JB-T-A86'];
+        var event_item_list5 = ['JB-T-A70','JB-T-A71','JB-T-A72','JB-TT-A10'];
+        var event_item_list6 = ['JB-T-A129','JB-T-A130','JB-TT-A01','JB-TT-A02','JB-T-A131','JB-T-A130','JB-T-A128','JB-T-A102','JB-T-A101','JB-T-A100'];
+    }
+
+    var lastScrollTop = 0;
+    var timer = null;
+    var customer_id = "<?=$user_id ?>";
+
+    $(document).ready(function(){
+            // 장바구니 개수
+            $.ajax({
+                url: './data/item_ajax.php',
+                data: {
+                    mode: "get_cart_cnt",
+                    customer_id: "<?=$user_id ?>"
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data){
+                    $(".btn-page-cart em").text(data.data);
+                }
+            });
+
+        get_event_item_list_html()
+            .then(get_event_list);
+    })
+
+    function get_event_item_list_html(){
+        return new Promise(function(resolve, reject) {
+            var html = '';
+
+            html += '<div class="main-big-banner">';
+            for(var j = 0; j < banner.length; j++){
+                html += '    <div class="swiper-slide"><div class="slider-item"><img src="'+banner[j]+'" alt=""/></div></div>';
+            }
+            html += '</div>';
+
+
+            for(var i = 0; i < sub_title.length; i++){
+                html += '<div class="basic-data-group">';
+                html += '    <div class="con-title-group">';
+                html += '        <h4 class="con-title">'+sub_title[i]+'</h4>';
+                html += '    </div>';
+                html += '    <div class="product-total-value">'+eval("event_item_list"+i).length+'개의 상품</div>';
+                html += '    <div class="product-vertical-list">';
+                html += '        <div class="list-inner" id="list_'+i+'">';
+                html += '        </div>';
+                html += '    </div>';
+                html += '</div>';
+                console.log(sub_title[i]);
+            }
+
+            $('#event').html(html);
+            $("#title").text(title);
+            $("#banner").attr("src",banner);
+            resolve();
+        });
+    }
+
+    function get_event_list(){
+        return new Promise(function(resolve, reject) {
+            // 타이들 개수별 반복
+            $.each(sub_title, function(_i, _v){
+                // 상품명 서브쿼리 만들기
+                var product_in = '';
+                $.each(eval("event_item_list"+_i), function(j, b){
+                    product_in += "'"+b+"',";
+                });
+                product_in = product_in.slice(0,-1);
+                $.ajax({
+                    url: 'data/item_ajax.php',
+                    data: {
+                        mode : "get_event_item",
+                        product_in : product_in
+                    },
+                    type: 'POST',
+                    dataType: 'JSON',
+                    success: function(data) {
+                        if(data.code == "000000"){
+                            var list = data.data[0]
+                            var html = '';
+                            $.each(list, function(i, v){
+                                console.log(v);
+                                var soldout = (v.is_soldout == '2')? '<div class="label-soldout">품절</div>' : ''; // 품절 확인
+                                var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path); // 상품 이미지
+                                //할인율 구하기
+                                var percent = (v.product_price == 0 || v.sale_price == 0)? 0 : 100 - (v.sale_price / v.product_price * 100);
+                                html += '<div class="list-cell">';
+                                html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                                html += '        <div class="thumb"><div class="obj"><img src="'+img_link+'" alt="">'+soldout+'</div></div>';
+                                html += '        <div class="info-wrap">';
+                                html += '            <div class="item-name">'+v.product_name+'</div>';
+                                html += '            <div class="item-price-group">';
+                                html += '                <div class="price-sale">'+Math.round(percent)+'%</div>';
+                                html += '                <div class="price-value">'+(v.sale_price).format()+'원</div>';
+                                html += '            </div>';
+                                html += '            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em>'+Math.round(v.rating_avg)+'</em>('+Math.round(v.rating_cnt)+')</div>';
+                                html += '        </div>';
+                                html += '    </a>';
+                                html += '</div>';
+                            });
+                            $('#list_'+_i).html(html);
+                            resolve();
+                        }else{
+                            alert(data.data+"("+data.code+")");
+                            console.log(data.code);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        //alert(error + "네트워크에러");
+                        if(xhr.status != 0){
+                            alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                        }
+                    }
+                });
+            });
+        });
+    }
+
+    // 세자리 숫자 콤마
+    Number.prototype.format = function() {
+        if (this == 0) return 0;
+
+        var reg = /(^[+-]?\d+)(\d{3})/;
+        var n = (this + '');
+
+        while (reg.test(n)) n = n.replace(reg, '$1' + ',' + '$2');
+
+        return n;
+    };
+
+    // 문자열 타입에서 쓸 수 있도록 format() 함수 추가
+    String.prototype.format = function() {
+        var num = parseFloat(this);
+        if (isNaN(num)) return "0";
+
+        return num.format();
+    };
+
+</script>
+	
+</body>
+</html>

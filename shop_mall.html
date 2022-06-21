@@ -13,8 +13,8 @@ $pet_type = (isset($_COOKIE['pet_type']))? $_COOKIE['pet_type'] : "dog";
     $type = "5";
     $big_banner = "a.odr_5";
     $md_item = "a.is_view_main_1";
-    $best_item = "a.is_view_main_2";
-    $new_item = "a.is_view_main_5";
+    $best_item = "a.is_view_main_5";
+    $new_item = "a.is_view_main_2";
 //}else{
 //    $type = "3";
 //    $big_banner = "a.odr_3";
@@ -71,6 +71,8 @@ $_SESSION['backurl_event'] = $_SERVER[ "REQUEST_URI" ];
 unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
 
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
 ?>
 
 
@@ -417,6 +419,9 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
 <!-- //container -->
 <script>
 
+    $(document).ready(function(){
+        $("#loading").removeClass("actived");
+    })
     // 팝업
     function getCookie_popup(name) {
         var obj = name + "=";
