@@ -209,62 +209,6 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                    html += '        <a href="javascript:click_category('+v.ismc_seq+',\''+v.cate_name+'\');" class="middle_category swiper-slide middle_category_add" data-id="'+v.ismc_seq+'">'+v.cate_name+'</a>';
                });
                html += '    </div>';
-                   // html += '</div>';
-
-               // 두칸일때
-               /*
-               }else if(length > 9 && length < 18){
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=0;i<9;i++){
-                       var checked = (data.data[0][i]['ismc_seq'] == middle_category)? 'actived' : '';
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category '+checked+'" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=9;i<length;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-               // 세칸일때
-               }else if(length > 18){
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=0;i<9;i++){
-                       var checked = (data.data[0][i]['ismc_seq'] == middle_category)? 'actived' : '';
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category '+checked+'" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=9;i<18;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=18;i<length;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-               }
-               */
-
-               // html += '</div>';
-               // html += '    <div class="swiper-page"></div>';
 
                $(".shop-category-menu").html(html);
                var swiper_category = new Swiper('.swiper-container', {
@@ -278,7 +222,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                    observer: true,
                });
 
-
+               click_category(category,"전체");
                 console.log(category);
                 console.log(data.data);
 

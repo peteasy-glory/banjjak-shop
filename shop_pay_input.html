@@ -669,8 +669,8 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
 
                             $.each(data.data[0], function(i, v){
                                 get_item_list(v)
-                                    .then(price_calculator)
-                                    .then(get_first_payment);
+                                    .then(price_calculator);
+                                    //.then(get_first_payment);
                             });
                         }else{
                         }
@@ -1052,7 +1052,7 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
         });
 
         // 첫결제인지 판단
-        get_first_payment([product_total_price, total_shipping_price]);
+        //get_first_payment([product_total_price, total_shipping_price]);
 
     }
 
