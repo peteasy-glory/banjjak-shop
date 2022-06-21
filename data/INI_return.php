@@ -504,7 +504,7 @@
 					}else{
 						// 거래 업데이트 실패 - 변경 실패
 						?><script language="javascript">
-							alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM01 ]");
+							alert("네트워크 환경으로 결제실패. 재시도 해주세요. [ EM01 ]");
 							location.href = '../shop_pay_input?no=<?=$return_arr["P_OID"] ?>';
 						</script><?php
 					}
@@ -512,13 +512,13 @@
 					// 데이터가 존재하지 않음 - 변경할 데이터가 없음
 					?><script language="javascript">
 						alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM02 ]");
-						location.href = '/';
+						location.href = '../shop_mall';
 					</script><?php
 				}else{
 					// 중복 거래건이 있음 - 변경할 경우 데이터 손실 가능성 있음
 					?><script language="javascript">
 						alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM03 ]");
-						location.href = '/';
+						location.href = '../shop_mall';
 					</script><?php
 				}
 			//}else if($return_arr["P_NOTI"] == "hotel"){ // 호텔
@@ -529,7 +529,7 @@
 				// 누구세요? 어디서 오셨어요?
 				?><script language="javascript">
 					alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM04 ]");
-					location.href = '/'; // 도착지가 정해지지 않으면 메인페이지로 이동
+					location.href = '../shop_mall'; // 도착지가 정해지지 않으면 메인페이지로 이동
 				</script><?php
 			}
 		}else{
@@ -544,7 +544,7 @@
 				//}else if("<?=$return_arr['P_NOTI'] ?>" == "playroom"){
 				//	location.href = '../test/test_playroom_payment.php';
 				}else{
-					location.href = '/main'; // 도착지가 정해지지 않으면 메인페이지로 이동
+					location.href = '/'; // 도착지가 정해지지 않으면 메인페이지로 이동
 				}
 			</script><?php
 		}

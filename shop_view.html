@@ -6,6 +6,8 @@ $product_no = (isset($_GET['product_no']))? $_GET['product_no'] : "ETCB-RIKEI-A4
 $user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']:"";
 $user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
 
+$obj = new module();
+$chk_mobile = $obj->mobileConcertCheck();
 if($product_no == ""){
     ?>
     <script>
@@ -564,21 +566,12 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
     var group_option = []; // 그룹옵션 배열
     var shipping_price = ["",3500, 3000, 0]; // '', 업체배송, 직배송, 건너뛰기 ==> 배송비
 
-    $(document).ready(function(){
+    var chk_mobile = "<?=$chk_mobile ?>"; // 모바일 체크
 
-        // 장바구니 개수
-        $.ajax({
-            url: './data/item_ajax.php',
-            data: {
-                mode: "get_cart_cnt",
-                customer_id: "<?=$user_id ?>"
-            },
-            type: 'POST',
-            dataType: 'JSON',
-            success: function(data){
-                $(".btn-page-cart em").text(data.data);
-            }
-        });
+    $(document).ready(function(){
+        $("#loading").removeClass("actived");
+        // 장바구니 개수 넣기
+        cnt_cart();
 
         // 상품이 옵션일때 함수 실행
         if(is_option == 'option'){ // 일반 옵션
@@ -617,6 +610,23 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
 
         get_cart_list().then(shipping);
     });
+
+    // 장바구니 개수
+    function cnt_cart(){
+
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: "get_cart_cnt",
+                customer_id: "<?=$user_id ?>"
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function(data){
+                $(".btn-page-cart em").text(data.data);
+            }
+        });
+    }
 
     // 장바구니 수 체크하기
     function get_cart_cnt(){
@@ -1058,59 +1068,70 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
     }
 
     ////////////////////////// 구매 시작 ////////////////////////////////////////
+    // 따닥 방지
+    var double_chk = true;
     // 바로구매 direct, 장바구니 cart
     function buy_product(type){
-        // 구매한 정보(cart)를 세션에 담는다
-        if(cart.length <= 0){
-            alert("상품을 선택해주세요.");
-        }else{
-            // 장바구니
-            if(type == 'cart'){
-                get_cart_list()
-                    .then(get_special_mall_chk)
-                    .then(get_cart_item_duplicate_chk);
-
-                // 바로구매
+        if(double_chk == true){
+            double_chk = false;
+            // 구매한 정보(cart)를 세션에 담는다
+            if(cart.length <= 0){
+                //alert("상품을 선택해주세요.");
+                popalert.open('firstRequestMsg1','상품을 선택해주세요.');
+                double_chk = true;
             }else{
-                $.ajax({
-                    url: 'data/item_ajax.php',
-                    data: {
-                        mode : "set_insert_cart",
-                        total_price: product_price,
-                        user_id: customer_id,
-                        product_no: product_no,
-                        is_shop: is_shop,
-                        ip_seq: ip_seq,
-                        is_supply: is_supply,
-                        supplier: supplier,
-                        direct_chk: "1",
-                        cart_data: JSON.stringify(cart)
-                    },
-                    type: 'POST',
-                    dataType: 'JSON',
-                    success: function(data) {
-                        if(data.code == "000000"){
-                            console.log(data.data);
-                            // setCookie("order_num", data.data, 1440);
-                            // setCookie("order_step", "1", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
+                // 장바구니
+                if(type == 'cart'){
+                    get_cart_list()
+                        .then(get_special_mall_chk)
+                        .then(get_cart_item_duplicate_chk);
 
-                            if(customer_id != ""){
-                                location.href = "shop_pay_input?no="+data.data+"&direct_chk=1";
-                            }else{
-                                location.href = "login_1?no="+data.data+"&direct_chk=1";
+                    // 바로구매
+                }else{
+                    if(chk_mobile == 'mobile'){
+                        $.ajax({
+                            url: 'data/item_ajax.php',
+                            data: {
+                                mode : "set_insert_cart",
+                                total_price: product_price,
+                                user_id: customer_id,
+                                product_no: product_no,
+                                is_shop: is_shop,
+                                ip_seq: ip_seq,
+                                is_supply: is_supply,
+                                supplier: supplier,
+                                direct_chk: "1",
+                                cart_data: JSON.stringify(cart)
+                            },
+                            type: 'POST',
+                            dataType: 'JSON',
+                            success: function(data) {
+                                if(data.code == "000000"){
+                                    console.log(data.data);
+                                    // setCookie("order_num", data.data, 1440);
+                                    // setCookie("order_step", "1", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
+
+                                    if(customer_id != ""){
+                                        location.href = "shop_pay_input?no="+data.data+"&direct_chk=1";
+                                    }else{
+                                        location.href = "login_1?no="+data.data+"&direct_chk=1";
+                                    }
+                                }else{
+                                    alert(data.data+"("+data.code+")");
+                                    console.log(data.data);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                //alert(error + "네트워크에러");
+                                if(xhr.status != 0){
+                                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                }
                             }
-                        }else{
-                            alert(data.data+"("+data.code+")");
-                            console.log(data.data);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        //alert(error + "네트워크에러");
-                        if(xhr.status != 0){
-                            alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-                        }
+                        });
+                    }else{
+                        popalert.open('firstRequestMsg1','모바일에서 주문가능합니다.');
                     }
-                });
+                }
             }
         }
     }
@@ -1384,19 +1405,9 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
                                 set_insert_cart(total_price, user_id, is_special_mall);
                             }else{
                                 // 중복상품이여서 수량 추가한 후 완료 처리
+                                cnt_cart();
                                 // 처리완료 메시지
-                                setCookie("order_num", data.data, 1440);
-                                setCookie("order_step", "3", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
-                                if(is_shop == "1"){ // 펫샵일경우 ( 추후 분리예정 )
-                                    setCookie("is_shop", "1", 1440);
-                                }
-//							if(user_id != ""){ // 비회원 구매하도록 풀기
-//                                 get_cart_cnt(); // cart_count
-                                // 장바구니 팝업
                                 pop.open('shopCartMsg');
-//							}else{
-//								location.href = "/pet/login/";
-//							}
                             }
                         }else{
                             // 장바구니 제품 추가
@@ -1475,19 +1486,9 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
             success: function(data) {
                 if(data.code == "000000"){
                     console.log(data.data);
-
-                    setCookie("order_num", data.data, 1440);
-                    setCookie("order_step", "3", 1440); // 1 - 구매, 2 - 조회, 3 - 장바구니
-                    if(is_shop == "1"){ // 펫샵일경우 ( 추후 분리예정 )
-                        setCookie("is_shop", "1", 1440);
-                    }
-//				if(user_id != ""){
-//                     get_cart_cnt(); // cart_count
+                    cnt_cart()
                     // 장바구니 팝업
                     pop.open('shopCartMsg');
-//				}else{
-//					location.href = "/pet/login/";
-//				}
                 }else{
                     alert(data.data+"("+data.code+")");
                     console.log(data.data);

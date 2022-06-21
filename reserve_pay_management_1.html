@@ -1886,7 +1886,7 @@ if(empty($grade[0]['grade_name'])){
             return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         }
         $(document).ready(function(){
-            $('#btn_page_prev').prop('href','reserve_waiting');
+            $('#btn_page_prev').prop('href','<?=$_SESSION['backurl_wait'] ?>');
         });
 
     </script>

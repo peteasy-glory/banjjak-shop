@@ -315,7 +315,11 @@ $pay_status_arr_old = array(
                                         html += '           <div class="item-price">'+v.total_price.format()+'원</div>';
                                         html += '	    </div>';
                                         html += '	</div>';
-                                        html += '   <div class="label label-shop-state">'+pay_status_arr[v2.pay_status]+'</div>';
+                                        if(v.order_status == '2'){ // 입금대기 표시
+                                            html += '   <div class="label label-shop-state">입금대기</div>';
+                                        }else{
+                                            html += '   <div class="label label-shop-state">'+pay_status_arr[v2.pay_status]+'</div>';
+                                        }
                                         html += '</div><br>';
                                     });
 

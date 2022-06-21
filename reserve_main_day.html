@@ -29,6 +29,8 @@ unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'reserve_main_day?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_main_day';
+unset($_SESSION['backurl_wait']);
+$_SESSION['backurl_wait'] = 'reserve_main_day?ch=da&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
 
 $from = $_GET['from'];
 
@@ -540,11 +542,15 @@ $gram = sql_fetch_array($que);
 $await_cnt = $gram[0]['cnt'];
 
 
+
+
 ?>
+
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->    
 	<div class="page-body">
+
         <div class="common-bottom-ui left" style="position:fixed;bottom:74px;">
             <a href="customer_inquiry"><img src="https://image.banjjakpet.com/images/icon-circle-float_search.png" alt="" style="width:64px;"></a>
         </div>
@@ -799,6 +805,7 @@ $await_cnt = $gram[0]['cnt'];
                                                 <?php
                                                 if(!empty($chk_rev)){
                                                     for($a=0;$a<count($chk_rev);$a++){
+
                                                         //상태표시
                                                         if (!$chk_rev[$a]['is_no_show']) {
                                                             if($chk_rev[$a]['is_await']=='0') {
@@ -837,10 +844,31 @@ $await_cnt = $gram[0]['cnt'];
 
 
                                                         ?>
-                                                    <div class="calendar-week-time-item <?=$css_pay_type?> time_payment_link <?php echo $is_rev_true;?>"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer;" data-approve_chk="<?php echo $chk_rev[$a]['is_await'];?>" data-approve_seq="<?php echo $chk_rev[$a]['approve_seq'];?>" data-customer-id="<?= $customer_id ?>" data-order-id="<?= $order_id ?>" data-payment-log-seq="<?= $chk_rev[$a]['payment_log_seq'] ?>"  data-etc_memo="<?php echo $chk_rev[$a]['etc_memo']?>"
+                                                    <div class="calendar-week-time-item <?=$css_pay_type?> time_payment_link <?php echo $is_rev_true;?> calendar-day-time-item-add"  style="height:calc( <?=$style_height?>% - 1px );cursor:pointer;" data-approve_chk="<?php echo $chk_rev[$a]['is_await'];?>" data-approve_seq="<?php echo $chk_rev[$a]['approve_seq'];?>" data-customer-id="<?= $customer_id ?>" data-order-id="<?= $order_id ?>" data-payment-log-seq="<?= $chk_rev[$a]['payment_log_seq'] ?>"  data-etc_memo="<?php echo $chk_rev[$a]['etc_memo']?>"
                                                     >
+                                                        <?
+                                                            $sql_pet_thumb = "SELECT * FROM tb_mypet_beauty_photo WHERE pet_seq = '{$chk_rev[0]['pet_seq']}' AND artist_id = '{$chk_rev[0]['artist_id']}' ORDER BY upload_dt DESC LIMIT 1";
+                                                            $rw_pet_thumb = sql_fetch_array($sql_pet_thumb);
+                                                            $json_decode_pay_data = json_decode($chk_rev[0]['pay_data'], JSON_UNESCAPED_UNICODE);
+                                                            if(!empty($rw_pet_thumb[0]['file_path'])){
+                                                                $img_pet_thumb = "https://image.banjjakpet.com".img_link_change($rw_pet_thumb[0]['file_path']);
+                                                            } else {
+                                                                if ($json_decode_pay_data['pet_kind'] === 'dog') {
+                                                                    $img_pet_thumb = '/images/dog/dog_90x90/dog_90x90@3x.png';
+                                                                } else {
+                                                                    $img_pet_thumb = '/images/cat/cat_90x90/cat_90x90@3x.png';
+                                                                }
+                                                            }
+                                                            ?>
+                                                        <div class="item-thumb-add" onclick="show_img_pop(this)"><img src="<?=$img_pet_thumb?>" alt=""></div>
+                                                        <div class="item-group-wrap">
+<!--                                                            <span>--><?php //print_r($type)?><!--</span>-->
+                                                        <div class="item-group">
+                                                            <div class="item-name-cate">
+                                                                <div class="item-name-cate-2">
                                                         <div class="item-name"><?php echo ($chk_rev[$a]['is_await']=='0')?'승인대기':$chk_rev[$a]['pet_name']; ?></div>
-                                                        <div class="item-cate"><?php echo $chk_rev[$a]['pet_type']; ?></div>
+                                                        <div class="item-cate"><?php echo '('.$chk_rev[$a]['pet_type'].')'; ?></div>
+                                                                </div>
                                                          <?php
                                                                             if($chk_rev[$a]['status'] == 'R1'){
                                                                                 $pay_price = number_format($chk_rev[$a]['total_price']);
@@ -848,11 +876,47 @@ $await_cnt = $gram[0]['cnt'];
                                                                                 $pay_price = number_format($chk_rev[$a]['local_price']+$chk_rev[$a]['local_price_cash']);
                                                                             }
                                                                             ?>
-                                                        <div class="item-price"><?php echo $pay_price; ?></div>
+                                                            </div>
+                                                            <div class="item-etc">
+                                                        <div class="item-price"><?php echo $pay_price.' 원'; ?></div>
                                                         <?php if($style_height != 0){ ?>
                                                         <!--<div class="item-option">"--><?php //echo $type[4]; ?><!--"</div>-->
-                                                            <div class="item-option">"<?php echo ($type[1]=="고양이")? explode(':',$type[4])[0] : $type[4]; ?>"</div>
-                                                        <?php if(!empty($binfo[3]) && $binfo[3]!='all:0'){ ?>
+                                                            <div class="item-select-option">
+
+                                                                <?php if($type[1] =="개"){
+                                                                    if($type[4] !== ""){
+                                                                        echo '<span>'.$type[4].'<span class="span-after">&nbsp|&nbsp</span></span>';
+                                                                    }
+                                                                }
+//                                                                else if($type[1] == "고양이"){
+//                                                                    echo '<span>미용-'.explode(':',$json_decode_pay_data['cat_bath'])[0].'<span class="span-after">&nbsp|&nbsp</span></span>';
+//                                                                }
+                                                                ?>
+                                                                <?php if($type[1] =="개"){
+                                                                        if($type[6] !== ""){
+                                                                            echo '<span>'.explode(':',$type[6])[0].'<span class="span-after">&nbsp|&nbsp</span></span>';
+
+                                                                        }
+                                                                    }?>
+
+
+                                                                <?php if($type[1] == "개"){
+                                                                        if($type[7] !== ""){
+                                                                            echo '<span class="item-hair">'.explode(':',$type[7])[0]."mm".'</span>';
+                                                                        }
+                                                                }else{
+
+//                                                                    echo '<span>'.($type[1]=="고양이")? explode(':',$type[4])[0] : "".'</span>';
+                                                                }?>
+
+
+
+                                                            </div>
+                                                            </div>
+
+
+                                                            <?php if(!empty($binfo[3]) && $binfo[3]!='all:0'){ ?>
+
                                                         <div class="item-cash">
                                                             <?php
 
@@ -889,8 +953,13 @@ $await_cnt = $gram[0]['cnt'];
                                                             <?php } else { ?>
                                                                 <div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
                                                         <?php }} ?>
+                                                        </div>
+                                                        <div class="item-memo"><?php echo $chk_rev[$a]['etc_memo']?></div>
+                                                        </div>
                                                     </div>
-                                                <?php }} else {
+
+
+                                                    <?php }} else {
                                                     //타임제 선택되었을경우에
                                                     if($data["time_schedule"]["is_time_type"]==2){
                                                         $time_schedule_color = '';
@@ -978,6 +1047,23 @@ $await_cnt = $gram[0]['cnt'];
                     <button type="button" class="btn btn-confirm btn-reserv-send">예약접수</button>
                 </div>
             </div>
+        </div>
+    </div>
+</article>
+
+<article id="bigImg" class="layer-pop-wrap" style="z-index: 100002;">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt"></div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </article>
@@ -1769,6 +1855,140 @@ $(document).ready(function(){
     $('#header_bell').css('display','none');
     $('#btn_page_prev').prop('href','home_main')
 })
+
+
+        //미용사 수만큼 css 변경
+
+    let row_length = $(".calendar-day-header-row").children().length;
+
+    let day_item = $(".calendar-day-time-item-add");
+
+    if(row_length === 2){
+
+
+        $.each(day_item, function(i,el){
+
+            $(el).find('.item-name').css({'font-size':'16px'});
+            $(el).find('.item-cate').css({'font-size':'14px'});
+            $(el).find('.item-price').css({'font-size':'14px'});
+            $(el).find('.item-memo').css({'font-size':'16px'});
+
+            if($(el).innerHeight() <= 40){
+
+                $(el).children('.item-thumb-add').css({'margin':'2px 8px 0px 0px'});
+                $(el).children('.item-group-wrap').css({'flex-direction':'row'});
+                $(el).find('.item-group').css({'flex-direction':'row'});
+                $(el).find('.item-name-cate').css({'margin-right':'14px'});
+                $(el).find('.item-memo').css({'display':'none'});
+
+            }else if($(el).innerHeight() > 40 && $(el).innerHeight() <= 70){
+
+                $(el).find('.item-name-cate').css({'margin-top':'3px'})
+                $(el).children('.item-thumb-add').css({'margin':'5px 8px 0px 0px'});
+                $(el).find('.item-memo').css({'position':'absolute','left':'150px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+
+
+            }else if($(el).innerHeight() > 71 ){
+                $(el).children('.item-thumb-add').css({'margin':'5px 8px 0px 0px'});
+
+                $(el).find('.item-name-cate').css({'display':'flex'})
+                if($(el).width() > 800){
+                    $(this).css({'flex-direction':'row'});
+                    $(el).find('.item-group-wrap').css({'flex-direction':'row'})
+                    $(el).find('.item-memo').css({'position':'absolute','left':'105px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                }else{
+                    $(el).find('.item-group-wrap').css({'flex-direction':'column','margin':'5px 8px 0px 0px','max-width':'300px'})
+                    $(this).css({'flex-direction':'row'})
+                }
+            }
+        })
+
+    }else if(row_length === 3){
+
+
+        $.each(day_item, function(i,el){
+
+            $(el).find('.item-thumb-add').css({'display':'none'});
+            $(el).find('.item-name').css({'font-size':'15px'});
+            $(el).find('.item-cate').css({'font-size':'13px'});
+            $(el).find('.item-price').css({'font-size':'13px'});
+            $(el).find('.item-memo').css({'font-size':'15px'});
+            $(el).find('.span-after').eq(1).css({'display':'none'});
+            $(el).find('.item-hair').css({'display':'none'});
+
+            if($(el).innerHeight() <= 40){
+                $(el).find('.item-memo').css({'display':'none'});
+
+
+
+            }else if($(el).innerHeight() > 40 && $(el).innerHeight() <= 70){
+
+                $(el).children('.item-price').css({'margin-top':'5px'});
+                $(el).children('.item-select-option').css({'margin-top':'1px'});
+                $(el).find('.item-name-cate').css({'margin-top':'3px'})
+                $(el).find('.item-memo').css({'display':'none'});
+
+
+            }else if($(el).innerHeight() > 71 ){
+
+                $(el).find('.item-group-wrap').css({'flex-direction':'column'})
+                $(el).children('.item-price').css({'margin-top':'5px'});
+                $(el).find('.item-name-cate').css({'margin-top':'5px'})
+                $(el).children('.item-select-option').css({'margin-top':'1px'});
+
+
+            }
+
+        })
+    }else if(row_length === 4){
+
+        $.each(day_item, function(i,el){
+            $(el).find('.span-after').css({'display':'none'});
+            $(el).find('.item-thumb-add').css({'display':'none'});
+
+
+            // $(el).children('.item-select-option').css({'flex-direction':'column'})
+            // $(el).children('.item-select-option').children('.span-after').css({'display':'none'})
+
+            if($(el).innerHeight() <= 40){
+                $(el).find('.item-memo').css({'display':'none'});
+
+
+
+            }else if($(el).innerHeight() > 40 && $(el).innerHeight() <= 70){
+
+                $(el).children('.item-price').css({'margin-top':'5px'});
+                $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
+                $(el).find('.item-memo').css({'display':'none'});
+
+
+
+            }else if($(el).innerHeight() > 71 ){
+
+                $(el).find('.item-memo').css({'max-width':'100px'})
+                $(el).find('.item-group-wrap').css({'flex-direction':'column'})
+                $(el).children('.item-price').css({'margin-top':'5px'});
+
+                if($(el).innerHeight() > 150){
+
+                    $(el).find('.item-select-option').css({'margin-top':'10px','flex-direction':'column'});
+                }else{
+                    $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
+                }
+
+
+            }
+        })
+
+    }
+
+        function show_img_pop(e){
+
+            event.stopPropagation();
+            let img_pop = $(e).children('img').attr('src');
+            $('#bigImg .msg-txt').html('<img src="'+img_pop+'">')
+            popalert.open('bigImg');
+        }
 </script>
 
 
