@@ -685,7 +685,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
         <div id="popup_wrap">
             <div class="custom-modal-content">
                 <div class="popup_img">
-                    <div class="swiper-container_front">
+                    <div class="swiper-container_front swiper-container">
                         <div class="swiper-wrapper">
                             <div class="swiper-slide">
                                 <a href="javascript:location.href='mypage_notice_view?notice_seq=19';">
@@ -808,6 +808,16 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
             $('#gallery').prop('src',img);
             popalert.open('talkExam');
         }
+
+
+        let popup_swiper = new Swiper('.swiper-container_front', {
+
+            direction:'horizontal',
+            slidesPerView:1,
+
+            observer:true,
+            observeParents:true,
+        });
     </script>
 
 <?
