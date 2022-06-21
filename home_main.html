@@ -370,9 +370,9 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
         #popup_wrap { display: none; }
         #popup_wrap .custom-modal-content { margin: 0px auto; width: 100%; }
         #popup_wrap .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
-        #popup_wrap .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; }
+        #popup_wrap .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important; }
         #popup_wrap .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
-        #popup_wrap .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; }
+        #popup_wrap .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important }
         #popup_wrap .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
         #popup_wrap .swiper-wrapper { height: auto; }
         #popup_wrap .swiper-slide {  }
@@ -699,8 +699,8 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                                     </div>
                         </div>
                         <!-- Add Arrows -->
-                        <div class="next"><i class="fas fa-chevron-left"></i></div>
-                        <div class="prev"><i class="fas fa-chevron-right"></i></div>
+                        <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
                         <div class="swiper-pagination_front"></div>
                     </div>
                 </div>
@@ -765,7 +765,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                         $(event.target).parent().css('top', '50%'); // dialog fixed
                         $(event.target).parent().css('left', '50%'); // dialog fixed
                         $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
-                        //$('.ui-dialog').position({ my: "center", at: "center", of: window });
+                        // $('.ui-dialog').position({ my: "center", at: "center", of: window });
                     },
                     close: function() {
                     }
@@ -817,6 +817,14 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 
             observer:true,
             observeParents:true,
+
+            navigation:{
+                nextEl:".prev",
+                prevEl:".next",
+            },
+            watchOverflow:true,
+
+
         });
     </script>
 

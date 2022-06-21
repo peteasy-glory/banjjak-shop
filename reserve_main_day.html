@@ -883,13 +883,20 @@ $await_cnt = $gram[0]['cnt'];
                                                         <!--<div class="item-option">"--><?php //echo $type[4]; ?><!--"</div>-->
                                                             <div class="item-select-option">
 
-                                                                <?php if($type[4] !== ""){
-                                                                    if($type[1] == "개"){
+                                                                <?php if($type[1] =="개"){
+                                                                    if($type[4] !== ""){
                                                                         echo '<span>'.$type[4].'<span class="span-after">&nbsp|&nbsp</span></span>';
                                                                     }
-                                                                }?>
-                                                                <?php if($type[6] !== ""){
+                                                                }
+//                                                                else if($type[1] == "고양이"){
+//                                                                    echo '<span>미용-'.explode(':',$json_decode_pay_data['cat_bath'])[0].'<span class="span-after">&nbsp|&nbsp</span></span>';
+//                                                                }
+                                                                ?>
+                                                                <?php if($type[1] =="개"){
+                                                                        if($type[6] !== ""){
                                                                             echo '<span>'.explode(':',$type[6])[0].'<span class="span-after">&nbsp|&nbsp</span></span>';
+
+                                                                        }
                                                                     }?>
 
 
@@ -899,8 +906,9 @@ $await_cnt = $gram[0]['cnt'];
                                                                         }
                                                                 }else{
 
-                                                                    echo '<span>'.($type[1]=="고양이")? explode(':',$type[4])[0] : "".'</span>';
+//                                                                    echo '<span>'.($type[1]=="고양이")? explode(':',$type[4])[0] : "".'</span>';
                                                                 }?>
+
 
 
                                                             </div>
