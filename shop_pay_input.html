@@ -7,7 +7,7 @@ $user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']
 $user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
 
 $order_num = (isset($_GET['no']))? $_GET['no'] : "";
-$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : "";
+$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : "0";
 
 // 사용자 정보
 if($user_id != ""){
@@ -423,6 +423,32 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
     <?php }else{ ?>
         <input type="hidden" name="P_RESERVED" value="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack" placeholder="vbank_receipt=N&bank_receipt=N&cp_yn=N&app_scheme=banjjack" />
     <?php } ?>
+</form>
+
+<form id="SendPayForm_id" name="" method="POST">
+    <input type="hidden" name="version" value="1.0" >
+    <input type="hidden" name="mid" value="" >
+    <input type="hidden" name="goodname" value="" >
+    <input type="hidden" name="oid" value="<?=$order_num ?>" >
+    <input type="hidden" name="price" value="" >
+    <input type="hidden" name="currency" value="WON" >
+    <input type="hidden" name="buyername" value="" >
+    <input type="hidden" name="buyertel" value="<?=$cellphone ?>" >
+    <input type="hidden" name="buyeremail" value="<?=$user_id ?>" >
+    <input type="hidden" name="timestamp" value="" >
+    <input type="hidden" name="signature" value="" >
+    <input type="hidden" name="returnUrl" value="<?php echo $siteDomain ?>/data/INI_return_pc.php" > <!-- INIStdPayReturn.php -->
+    <input type="hidden" name="mKey" value="" >
+    <input type="hidden" name="gopaymethod" value="Card" >
+    <input type="hidden" name="offerPeriod" value="" >
+    <input type="hidden" name="acceptmethod" value="HPP(1):no_receipt:va_receipt:vbanknoreg(0):below1000" >
+    <input type="hidden" name="languageView" value="ko" >
+    <input type="hidden" name="charset" value="UTF-8" >
+    <input type="hidden" name="payViewType" value="overlay" >
+    <input type="hidden" name="closeUrl" value="<?php echo $siteDomain ?>/data/close.php" >
+    <input type="hidden" name="nointerest" value="" >
+    <input type="hidden" name="quotabase" value="" >
+    <input type="hidden" name="merchantData" value="item" >
 </form>
 
 <script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
@@ -1888,44 +1914,44 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
                             /*
                             $.ajax({
                                 type: 'post',
-                                url: "<?=$item_directory ?>/item_list_ajax.php",
-							data: {
-								mode: "INI_PC_init",
-								product_no: no,
-								price: pprice
-							},
-							dataType: 'json',
-							beforeSend: function() {
-								 //$("#loading").css("display","flex");
-							},
-							error:function(request,status,error){
-								$.MessageBox("에러가 발생했습니다.");
-								alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
-							},
-							success: function(json) {
-								if(json.code == "000000"){
-									console.log(json.data);
-									$("#SendPayForm_id").find('input[name="mid"]').val(json.data.mid);
-									$("#SendPayForm_id").find('input[name="price"]').val(pprice);
-									$("#SendPayForm_id").find('input[name="goodname"]').val(pname);
-									$("#SendPayForm_id").find('input[name="timestamp"]').val(json.data.timestamp);
-									$("#SendPayForm_id").find('input[name="signature"]').val(json.data.sign);
-									$("#SendPayForm_id").find('input[name="mKey"]').val(json.data.mKey);
-									$("#SendPayForm_id").find('input[name="nointerest"]').val(json.data.cardNoInterestQuota);
-									$("#SendPayForm_id").find('input[name="quotabase"]').val(json.data.cardQuotaBase);
+                                url: "data/item_list_ajax.php",
+                                data: {
+                                    mode: "INI_PC_init",
+                                    product_no: order_num,
+                                    price: pprice
+                                },
+                                dataType: 'json',
+                                beforeSend: function() {
+                                     //$("#loading").css("display","flex");
+                                },
+                                error:function(request,status,error){
+                                    $.MessageBox("에러가 발생했습니다.");
+                                    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);
+                                },
+                                success: function(json) {
+                                    if(json.code == "000000"){
+                                        console.log(json.data);
+                                        $("#SendPayForm_id").find('input[name="mid"]').val(json.data.mid);
+                                        $("#SendPayForm_id").find('input[name="price"]').val(pprice);
+                                        $("#SendPayForm_id").find('input[name="goodname"]').val(pname);
+                                        $("#SendPayForm_id").find('input[name="timestamp"]').val(json.data.timestamp);
+                                        $("#SendPayForm_id").find('input[name="signature"]').val(json.data.sign);
+                                        $("#SendPayForm_id").find('input[name="mKey"]').val(json.data.mKey);
+                                        $("#SendPayForm_id").find('input[name="nointerest"]').val(json.data.cardNoInterestQuota);
+                                        $("#SendPayForm_id").find('input[name="quotabase"]').val(json.data.cardQuotaBase);
 
-									INIStdPay.pay('SendPayForm_id'); // PC
-								}else{
-									alert(json.data+"("+json.code+")");
-								}
-							},
-							complete: function() {
-								// console.log('complete');
-								//서브밋 차단 해제
-								//$("#loading").css("display","none");
-							}
-						});
-						*/
+                                        INIStdPay.pay('SendPayForm_id'); // PC
+                                    }else{
+                                        alert(json.data+"("+json.code+")");
+                                    }
+                                },
+                                complete: function() {
+                                    // console.log('complete');
+                                    //서브밋 차단 해제
+                                    //$("#loading").css("display","none");
+                                }
+                            });
+                            */
                         }
                     }
                 }

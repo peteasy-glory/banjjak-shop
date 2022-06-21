@@ -1596,7 +1596,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                 html1 += `block`;
                             }
                             html1 += `">`+json.beauty.info[i];
-                            html1 += `<div class="memo-link"><a href="reserve_pay_management_2?payment_log_seq=`+json.beauty.pay[i]+`" class="btn-memo-link">상세보기<div class="icon icon-arrow-right-small"></div></a></div></div>`;
+                            html1 += `<div class="memo-link"><a href="reserve_pay_management_2?payment_log_seq=`+json.beauty.pay[i]+`&history_back=1" class="btn-memo-link">상세보기<div class="icon icon-arrow-right-small"></div></a></div></div>`;
                         }
 
                         $('#prev_beauty_list').empty().append(html1)

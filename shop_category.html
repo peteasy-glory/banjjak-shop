@@ -10,7 +10,7 @@ $category_sql = "SELECT * FROM tb_item_special_mall_category WHERE ismc_seq = '"
 $category_result = sql_query($category_sql);
 $category_row = sql_fetch($category_result);
 
-$main_category = $category_row['parent_seq'];
+$main_category = $category;
 
 
 
@@ -21,7 +21,7 @@ $best_item_sql = "
                 SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
                 FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
                 ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+    WHERE a.is_delete = '1' AND a.is_shop = '1' AND a.is_view_main_6 = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
 $best_item_array = sql_fetch_array($best_item_sql);
 
 //돌아갈 url을 세션에 저장한다.
@@ -44,14 +44,14 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<!-- page-body -->    
 	<div class="page-body fix-bottom-page">
 		<div class="shop-category-wrap">
-			<div class="wide-tab">
-				<div class="wide-tab-inner">
+			<div class="swiper-container">
+				<div class="wide-tab-inner swiper-wrapper shop-category-inner">
 					<!-- 활성화시 actived클래스 추가 -->
                     <?php
                     $parent_sql = "SELECT * FROM tb_item_special_mall_category WHERE parent_seq = 0";
                     $parent_array = sql_fetch_array($parent_sql);
                     for($i=0;$i<count($parent_array);$i++){
-                        ?><div class="tab-cell"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item" id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
+                        ?><div class="tab-cell swiper-slide shop-category-item"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item btn-tab-item-add" id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
                     }
                     ?>
 <!--                        <div class="tab-cell actived"><a href="javascript:click_tab(52);" class="btn-tab-item" id="middle_category_52">사료</a></div>-->
@@ -147,6 +147,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
     var limit = 0; // 스크롤 내릴때의 상품 노출 리미트
     var timer;
     $(document).ready(function(){
+        $("#loading").removeClass("actived");
        click_tab(seq);
         click_category(middle_category);
         $(".page-body").on('scroll',function(){
@@ -193,23 +194,25 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
            success: function (data){
                var html = '';
                html += '<div class="swiper-container">';
-               html += '    <div class="swiper-wrapper">';
-               var length = (data.data[0].length > 0)? data.data[0].length : 0;
+               // html += '    <div class="swiper-wrapper">';
+               //var length = (data.data[0].length > 0)? data.data[0].length : 0;
                var cnt = 0;
 
                // 한칸일때
-               if(length <= 9) {
+               //if(length <= 9) {
 
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   $.each(data.data[0], function (i, v) {
-                       var checked = (v.ismc_seq == middle_category)? 'actived' : '';
-                       html += '        <a href="javascript:click_category('+v.ismc_seq+',\''+v.cate_name+'\');" class="middle_category '+checked+'" data-id="'+v.ismc_seq+'">'+v.cate_name+'</a>';
-                   });
-                   html += '    </div>';
-                   html += '</div>';
+                   // html += '<div class="swiper-slide">';
+               var checked = (category == middle_category)? 'actived' : '';
+               html += '    <div class="shop-category-menu-list swiper-wrapper">';
+               html += '        <a href="javascript:click_category('+category+',\'전체\');" class="middle_category swiper-slide middle_category_add '+checked+'" data-id="'+category+'">전체</a>';
+               $.each(data.data[0], function (i, v) {
+                   html += '        <a href="javascript:click_category('+v.ismc_seq+',\''+v.cate_name+'\');" class="middle_category swiper-slide middle_category_add" data-id="'+v.ismc_seq+'">'+v.cate_name+'</a>';
+               });
+               html += '    </div>';
+                   // html += '</div>';
 
                // 두칸일때
+               /*
                }else if(length > 9 && length < 18){
 
                    html += '<div class="swiper-slide">';
@@ -258,8 +261,10 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                    html += '</div>'
 
                }
-               html += '</div>';
-               html += '    <div class="swiper-page"></div>';
+               */
+
+               // html += '</div>';
+               // html += '    <div class="swiper-page"></div>';
 
                $(".shop-category-menu").html(html);
                var swiper_category = new Swiper('.swiper-container', {
@@ -269,17 +274,14 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                    debugger: true,
                    loop: false,
                    // initialSlide: (category_group - 1),
-                   pagination: {
-                       el: '.swiper-page',
-                       type: 'fraction',
-                   },
+
                    observer: true,
                });
 
 
                 console.log(category);
                 console.log(data.data);
-                console.log(data.data[0].length);
+
 
            },
             error: function(xhr, status, error) {
@@ -422,6 +424,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
         return num.format();
     };
+
 
 
 </script>

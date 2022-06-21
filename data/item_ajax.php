@@ -15,7 +15,7 @@ if($mode){
                 SELECT * FROM (
                     SELECT a.*, 
                             (SELECT COUNT(*) FROM tb_item_list WHERE FIND_IN_SET(a.ismc_seq, ic_seq)
-                            AND is_shop = '1' AND is_delete = '1') cnt
+                            AND is_shop = '1' AND is_delete = '1' AND is_view = '1') cnt
                     FROM tb_item_special_mall_category a WHERE a.parent_seq = '".$category."'
                 ) main
                 WHERE main.cnt > 0
@@ -36,7 +36,7 @@ if($mode){
             // 총 개수 구하기
             $cnt_sql = "
                 SELECT * FROM tb_item_list WHERE FIND_IN_SET(" . $category . ", ic_seq)
-                AND is_shop = '1' AND is_delete = '1'
+                AND is_shop = '1' AND is_delete = '1' AND is_view = '1'
             ";
             $cnt_result = mysqli_query($connection, $cnt_sql);
             $item_cnt = mysqli_num_rows($cnt_result);
@@ -49,7 +49,7 @@ if($mode){
                     FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
                 ) b ON b.p_no = a.product_no
                 WHERE FIND_IN_SET(" . $category . ", a.ic_seq)
-                AND a.is_shop = '1' AND a.is_delete = '1' ORDER BY a.is_soldout, a.reg_dt DESC
+                AND a.is_shop = '1' AND a.is_delete = '1' AND is_view = '1' ORDER BY a.is_soldout, a.reg_dt DESC
                 LIMIT " . $limit . ", 20
             ";
             $array = sql_fetch_array($sql);
@@ -559,6 +559,24 @@ if($mode){
                     LEFT JOIN tb_file c ON c.f_seq = b.product_img
 					WHERE a.is_delete = '1'
 						".$where_qy."
+				";
+            $result = mysqli_query($connection,$sql);
+            while($row = mysqli_fetch_assoc($result)){
+                $data[] = $row;
+            }
+
+            $return_data = array("code" => "000000", "data" => $data, "sql" => $sql);
+        }else{
+            $return_data = array("code" => "007102", "data" => "중요 데이터가 누락되었습니다.");
+        }
+    }else if($mode == "get_chk_list"){
+        if($_SESSION["RNC_CHKLIST"] != ""){	// is_delete - 삭제여부(1-미삭제, 2-삭제)
+            $sql = "
+                    SELECT a.*, b.product_name, c.file_path, b.goodsRepImage FROM tb_item_payment_log_product a
+                    LEFT JOIN tb_item_list b ON b.product_no = a.product_no
+                    LEFT JOIN tb_file c ON c.f_seq = b.product_img
+					WHERE a.is_delete = '1'
+					AND a.iplp_seq in (".$_SESSION["RNC_CHKLIST"].")
 				";
             $result = mysqli_query($connection,$sql);
             while($row = mysqli_fetch_assoc($result)){

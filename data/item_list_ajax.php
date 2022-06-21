@@ -1087,8 +1087,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$pushImage = "";
 				$pushPayType = ($r_pay_type == "1")? "카드" : "계좌이체";
 				$admin_message = substr($cellphone, -4) . "(".$r_customer_email."@".$r_customer_email_suffix.")님이 [".$r_product_name."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
-				a_push("itseokbeom@gmail.com", "반짝_상품구매알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
-                //a_push("joseph@peteasy.kr", "반짝_상품구매알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
+				a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+                //a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
 
 				// 알림톡 발송
 				if($r_pay_type == "1"){ // 신용카드
@@ -2157,8 +2157,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 					$pushImage = "";
 					$pushPayType = ($row["pay_type"] == "1")? "카드" : "계좌이체";
 					$admin_message = substr($row["cellphone"], -4) . "(".explode(",", $row["guest_info"])[1].")님이 [".$row["product_name"]."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
-					a_push("itseokbeom@gmail.com", "반짝_상품구매알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
-                    //a_push("joseph@peteasy.kr", "반짝_상품구매알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
+					a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+                    //a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
 
 					$return_data = array("code" => "000000", "data" => "OK");
 				}else{
@@ -3574,8 +3574,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 						$pushImage = "";
 						$pay_type = ($row["pay_type"] == "1")? "카드" : "계좌이체";
 						$admin_message = substr($row["cellphone"], -4) . " (".$row["guest_info"].")님이 [".$row["product_name"]."]을 구매취소(".$pay_type."). 상품결제 관리를 확인하세요.";
-						a_push("pickmon@pickmon.com", "반짝_상품결제취소알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
-                        a_push("joseph@peteasy.kr", "반짝_상품구매알림(견주앱)", $admin_message, $pushPath, $pushImage, "customer");
+						a_push("pickmon@pickmon.com", "반짝_전문몰상품결제취소알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+                        a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
 					}
 				}
 

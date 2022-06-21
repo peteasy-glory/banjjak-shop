@@ -42,6 +42,9 @@ $week = $_GET['week'];
 
 $backurl = $_GET['backurl'];
 
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = 'reserve_main_list?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+
 $daily = array('일', '월', '화', '수', '목', '금', '토');
 $selected_date = $yy . "-" . $mm . "-" . $dd;
 
@@ -592,12 +595,12 @@ $await_cnt = $gram[0]['cnt'];
             </div>
             <div class="reserve-calendar-float-cell">
                 <button type="button" class="btn-reserve-calendar-menu btn-reserve-calendar-toggle"><span
-                        class="icon icon-circle-float-menu"></span><em><?= $wait_count ?></em></button>
+                        class="icon icon-circle-float-menu"></span><em><?= $wait_count+$await_cnt ?></em></button>
                 <div class="reserve-calendar-float-menu">
                     <button type="button" class="btn-float-menu" onclick="location.href='customer_inquiry';">고객조회</button>
                     <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>
                     <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : <?= $wait_count ?></button>
-                    <button type="button" class="btn-float-menu">예약 승인 대기 :<?php echo $await_cnt; ?> </button>
+                    <button type="button" class="btn-float-menu" onclick="location.href='reserve_waiting';">예약 승인 대기 : <?php echo $await_cnt; ?> </button>
                     <!--<button type="button" onclick="location.href='reserve_time_sale_step1_3'" class="btn-float-menu">빈시간 판매하기</button>-->
                 </div>
             </div>

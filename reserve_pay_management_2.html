@@ -1991,7 +1991,7 @@ if(empty($grade[0]['grade_name'])){
                                 </div>
                                 <?php if(!empty($kg[0])){ ?>
                                     <div class="list-cell">
-                                        <div class="list-title">미용 : <?php echo $kg[0];?></div>
+                                        <div class="list-title">미용 : <?php echo $kg[0].'kg';?></div>
                                         <div class="list-value"><?php $sum+=$kg[1]; echo number_format($kg[1]);?>원</div>
                                     </div>
                                 <?php } ?>
@@ -3358,8 +3358,7 @@ if(empty($grade[0]['grade_name'])){
 
 
 
-
-
+        //
 
         function callback(){
             popalert.open('confirmOnlyOkLink','서비스정보가 변경되었습니다.');

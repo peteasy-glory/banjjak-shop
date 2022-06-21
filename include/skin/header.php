@@ -16,7 +16,8 @@
 	<script src="/static/pub/js/common.js?v=<?=$jsVersion?>"></script>
 	<script src="/static/pub/js/dev_common.js?v=<?=$jsVersion?>"></script>
 	<script src="/static/pub/js/jquery.fileupload.js"></script>    
-	<script src="/static/pub/js/jquery.ui.widget.js"></script>   
+	<script src="/static/pub/js/jquery.ui.widget.js"></script>
+
 </head>
 <body>        
 <!-- [필수사항]을(를) 입력해주세요.  -->

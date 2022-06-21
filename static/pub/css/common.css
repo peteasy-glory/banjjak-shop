@@ -1982,16 +1982,16 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .search-result-option {font-size:16px; line-height:23px;}
 
 /* 샵 카테고리 */
-.shop-category-menu {margin-top:20px;}
+.shop-category-menu {margin-top:13px;}
 .shop-category-menu .swiper-page {position:relative; width:100%; margin-top:15px; padding-top:12px; font-size:14px; line-height:18px; color:#666; font-weight:500; text-align:center; white-space:normal; height:auto; background:none;border-radius:0; border-top:1px solid #f4f4f4; box-sizing:border-box;}
 
-.shop-category-menu-list {display:flex; width:100%; flex-wrap:wrap;}
+.shop-category-menu-list {display:flex; width:100%; }
 .shop-category-menu-list > a,
 .shop-category-menu-list > button {width:33.33%; display:flex; font-size:14px; line-height:20px; height:44px; align-items:center; justify-content:center; color:#8f8f8f;}
 .shop-category-menu-list > a.press,
 .shop-category-menu-list > button.press {background:#f0f0f0;}
 .shop-category-menu-list > a.actived,
-.shop-category-menu-list > button.actived {font-weight:700;color:#202020;}
+.shop-category-menu-list > button.actived {font-weight:700;color:white; background: #6840b1;}
 
 
 /* 장바구니 */
@@ -2371,7 +2371,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-month-day-item.red {background:#ff4848;}
 .calendar-month-day-item.mint {background:#72d6b0;}
 .calendar-month-day-item.orange {background:#fdab73;}
-.calendar-month-day-item.wait {background:#fff; color:#ff4848; font-weight:700;}
+.calendar-month-day-item.wait {background:#f2f2f2; color:#ff4848; font-weight:700;}
 .calendar-month-day-item.whitepink {background:#feb8b1; text-align:center;}
 .calendar-month-day-item.whiteapricot {background:#ffd3b5; text-align:center;}
 .calendar-month-day-item.whitegreen {background:#c9e896; text-align:center;}
@@ -2417,7 +2417,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-week-time-item {position:relative; z-index:5; width:calc( 100% -  1px ); min-height:40px; padding:6px 4px 12px 4px; text-align:left; border-left:4px solid #000; border-top:3px solid #fff; border-bottom:3px solid #fff; border-right:2px solid #fff; border-radius:10px;background:#fffbed; box-sizing:border-box; overflow:hidden; user-select: none; -webkit-user-select: none; -khtml-user-select: none; -moz-user-select: none; -ms-user-select: none;}
 .calendar-week-time-item .item-name {font-size:13px;line-height:17px;font-weight:700;}
 .calendar-week-time-item .item-cate {font-size:11px;line-height:14px;font-weight:400;}
-.calendar-week-time-item .item-price {font-size:11px;line-height:12px;font-weight:500; color:#666; margin-top:4px;}
+.calendar-week-time-item .item-price {font-size:11px;line-height:12px;font-weight:700; margin-top:4px;}
 .calendar-week-time-item .item-option {font-size:11px;line-height:12px;font-weight:500; color:#202020; margin-top:10px;}
 .calendar-week-time-item .item-cash {position:absolute; bottom:0; right:0; margin-right:5px;}
 .calendar-week-time-item .item-master {position:absolute; bottom:0; left:0;}
@@ -3608,8 +3608,118 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .shortcut-wrap{right:19px;  bottom:85px; cursor:pointer; display:flex; flex-direction: column; position: fixed; z-index: 100;}
 .shortcut-wrap img{margin-top:10px; width:40px; height:40px;}
 
+/*2022.06.20 shop_mall category*/
+.item-menu-list-category{
+	display:grid;
+	grid-template-rows: repeat(2,1fr);
+	grid-template-columns: repeat(5,1fr) ;
+}
+.shop-category-item{
+	flex:0.25;
+	margin:0 !important;
+}
+.shop-category-inner{
+	width:230%;
+	border-bottom:2px solid #ebebeb;
+}
+.btn-tab-item-add:after{
+	bottom:-3px !important;
+	background: #6840b1 !important;
+}
+.middle_category_add{
+	margin:0 !important;
+	height: 35px !important;
+	background: #f4f4f4;
+	border-radius: 60px;
+	color:rgba(32, 32, 32, 0.48);
+	margin-right:8px !important;
+	width: auto !important;
+	min-width:65px;
+	padding : 0px 5px 0px 5px;
+
+}
+
+/*2022.06.20 예약관리 일간 UI 변경*/
+.calendar-day-time-item-add{
+	display: flex !important;
+	padding: 0px 0px 0px 6px !important;
+
+}
+.item-select-option{
+	font-size:13px;
+	display: flex;
+}
+.item-memo{
+	font-size:13px;
+	margin-top:3px;
+}
+.item-thumb-add{
+	width:30px;
+	height:30px;
+	margin-right:8px;
+	overflow: hidden;
+	border-radius: 5px;
+	border:0.5px solid #bebebe;
+
+}
+.item-thumb-add img{
 
 
+
+}
+.item-group-wrap{
+	display:flex;
+}
+.item-group{
+	display:flex;
+	flex-direction: column;
+
+}
+.thumb-modal{
+	position: absolute;
+	width:100vw;
+	height:100vh;
+	background: rgba(0,0,0,0.30);
+	z-index:510;
+	display:none;
+}
+
+.thumb-modal-content-wrap{
+	width:90%;
+	height:45%;
+	background: white;
+	z-index:511;
+	margin:0 auto;
+	border-radius: 15px;
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+
+
+}
+.thumb-modal-img{
+	width:80%;
+	max-height: 250px;
+	overflow: hidden;
+	margin-top:20px;
+	display: flex;
+	justify-content: center;
+}
+.thumb-modal-img img{
+	width:80%;
+
+}
+.thumb-close{
+	display: flex;
+	justify-content: center;
+	position: absolute;
+	bottom: 20px;
+
+}
+/*.item-name-cate .item-name,.item-cate{*/
+/*	font-size:15px !important;*/
+/*}*/
 
 /*========================================
 @ PC버전

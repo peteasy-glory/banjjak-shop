@@ -49,6 +49,7 @@ unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_main_week';
 
 
+
 $daily = array('일', '월', '화', '수', '목', '금', '토');
 $selected_date = $yy . "-" . $mm . "-" . $dd;
 
@@ -238,6 +239,9 @@ $worker = $_GET['worker'] ? $_GET['worker'] : (($artist_flag === true) ? $_SESSI
 
 unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
+
+unset($_SESSION['backurl_wait']);
+$_SESSION['backurl_wait'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
 
 
 $now = new DateTime($yy . '-' . $mm . '-' . $dd);

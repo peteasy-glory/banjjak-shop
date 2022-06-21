@@ -9,19 +9,19 @@ $user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_u
 $pet_type = (isset($_COOKIE['pet_type']))? $_COOKIE['pet_type'] : "dog";
 //$pet_type = (isset($_GET['pet_type']))? $_GET['pet_type'] : "dog";
 
-if($pet_type == "cat"){
-    $type = "4";
-    $big_banner = "a.odr_4";
-    $md_item = "a.is_view_main_7";
-    $best_item = "a.is_view_main_9";
-    $new_item = "a.is_view_main_8";
-}else{
-    $type = "3";
-    $big_banner = "a.odr_3";
-    $md_item = "a.is_view_main_3";
+//if($pet_type == "cat"){
+    $type = "5";
+    $big_banner = "a.odr_5";
+    $md_item = "a.is_view_main_1";
     $best_item = "a.is_view_main_5";
-    $new_item = "a.is_view_main_4";
-}
+    $new_item = "a.is_view_main_2";
+//}else{
+//    $type = "3";
+//    $big_banner = "a.odr_3";
+//    $md_item = "a.is_view_main_3";
+//    $best_item = "a.is_view_main_5";
+//    $new_item = "a.is_view_main_4";
+//}
 
 // 빅 배너
 $banner_sql = "
@@ -71,6 +71,8 @@ $_SESSION['backurl_event'] = $_SERVER[ "REQUEST_URI" ];
 unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
 
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
 ?>
 
 
@@ -123,17 +125,18 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
             <div class="main-category-wrap">
                 <div class="sort-tab-data">
                     <div style="display:block;" class="tab_menu">
-                        <div class="item_menu_list horizontal-swiper-scoller auto">
-                            <div class="scroller-inner" style="overflow: auto;">
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=1"><div class="icons"><img src=""></div><div class="txt">목욕</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=2"><div class="icons"><img src=""></div><div class="txt">가위</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=3"><div class="icons"><img src=""></div><div class="txt">클리퍼</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=4"><div class="icons"><img src=""></div><div class="txt">브러쉬</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=5"><div class="icons"><img src=""></div><div class="txt">미용도구</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=6"><div class="icons"><img src=""></div><div class="txt">테이블</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=7"><div class="icons"><img src=""></div><div class="txt">드라이기</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=8"><div class="icons"><img src=""></div><div class="txt">소모품</div></a></div>
-                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=9"><div class="icons"><img src=""></div><div class="txt">기타</div></a></div>
+                        <div class="item_menu_list ">
+                            <div class="scroller-inner item-menu-list-category" style="overflow: auto;">
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=1"><div class="icons"><img src="/images/cate_01@2x.png"></div><div class="txt">목욕</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=2"><div class="icons"><img src="/images/cate_02@2x.png"></div><div class="txt">가위</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=3"><div class="icons"><img src="/images/cate_03@2x.png"></div><div class="txt">클리퍼</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=4"><div class="icons"><img src="/images/cate_04@2x.png"></div><div class="txt">브러쉬</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=5"><div class="icons"><img src="/images/cate_05@2x.png"></div><div class="txt">미용도구</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=6"><div class="icons"><img src="/images/cate_06@2x.png"></div><div class="txt">테이블</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=7"><div class="icons"><img src="/images/cate_07@2x.png"></div><div class="txt">드라이기</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=8"><div class="icons"><img src="/images/cate_08@2x.png"></div><div class="txt">소모품</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=9"><div class="icons"><img src="/images/cate_09@2x.png"></div><div class="txt">기타</div></a></div>
+                                <div class="scroller-item"><a class="btn-category-item" href="shop_category?category=1"><div class="icons"><img src="/images/cate_10@2x.png"></div><div class="txt">더보기</div></a></div>
                             </div>
                         </div>
                     </div>
@@ -416,6 +419,9 @@ $_SESSION['backurl1'] = $_SERVER[ "REQUEST_URI" ];
 <!-- //container -->
 <script>
 
+    $(document).ready(function(){
+        $("#loading").removeClass("actived");
+    })
     // 팝업
     function getCookie_popup(name) {
         var obj = name + "=";

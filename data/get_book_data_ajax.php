@@ -1639,8 +1639,8 @@ switch($clear['mode']){
                 $date = $arr['year'] . '-' . $arr['month'] . '-' . $arr['day'];
                 $prev_beauty = explode("|", $arr['product']);
                 $kg = explode(":", $prev_beauty[5]);
-                $json['beauty']['info'][] = date('Y.m.d',strtotime($date)) .'/'. $pet[0]["name"].'/'.$prev_beauty[4] .'/'. $kg[0] .'Kg / '.number_format($kg[1]).'원';
-                $json['beauty']['pay']['pay'] = $arr['payment_log_seq'];
+                $json['beauty']['info'][] = date('Y.m.d',strtotime($date)) .'/'. $pet[0]["name"].'/'.$prev_beauty[4] .'/'. $kg[0] .'Kg / '.number_format($arr['local_price']+$arr['local_price_cash']).'원';
+                $json['beauty']['pay'][] = $arr['payment_log_seq'];
             }
             $json['beauty']['total'] = $cnt;
         } else {
