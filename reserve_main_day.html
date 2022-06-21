@@ -545,15 +545,7 @@ $await_cnt = $gram[0]['cnt'];
 
 
 ?>
-<div class="thumb-modal">
-    <div class="thumb-modal-content-wrap">
-        <div class="thumb-modal-img">
-            <img src="" alt="">
-        </div>
-        <div class="thumb-close" onclick="thumb_modal_off()"><span>확인</span></div>
-    </div>
 
-</div>
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->    
@@ -868,7 +860,7 @@ $await_cnt = $gram[0]['cnt'];
                                                                 }
                                                             }
                                                             ?>
-                                                        <div class="item-thumb-add" onclick="thumb_modal_on(this)"><img src="<?=$img_pet_thumb?>" alt=""></div>
+                                                        <div class="item-thumb-add" onclick="show_img_pop(this)"><img src="<?=$img_pet_thumb?>" alt=""></div>
                                                         <div class="item-group-wrap">
 <!--                                                            <span>--><?php //print_r($type)?><!--</span>-->
                                                         <div class="item-group">
@@ -1045,6 +1037,23 @@ $await_cnt = $gram[0]['cnt'];
                     <button type="button" class="btn btn-confirm btn-reserv-send">예약접수</button>
                 </div>
             </div>
+        </div>
+    </div>
+</article>
+
+<article id="bigImg" class="layer-pop-wrap" style="z-index: 100002;">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt"></div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                </div>
+            </div>
+
         </div>
     </div>
 </article>
@@ -1959,33 +1968,13 @@ $(document).ready(function(){
 
     }
 
-    function thumb_modal_on(e){
+        function show_img_pop(e){
 
-
-
-        event.stopPropagation();
-
-        let thumb_link = $(e).children('img').attr("src");
-
-        if(thumb_link === "/images/icon_reserve_dog@2x.png" || thumb_link === "/images/icon_reserve_cat@2x.png"){
-            return;
+            event.stopPropagation();
+            let img_pop = $(e).children('img').attr('src');
+            $('#bigImg .msg-txt').html('<img src="'+img_pop+'">')
+            popalert.open('bigImg');
         }
-
-        $('.thumb-modal').css({'display':'block'})
-
-        $('.thumb-modal-content-wrap').css({'top':`calc(50% - ${$('.thumb-modal-content-wrap').innerHeight()/2}px)`})
-        $('.thumb-close').css({'left':`calc(50% - ${$('.thumb-close').innerHeight()/2}px`});
-
-        $('.thumb-modal-img img').attr('src',`${thumb_link}`)
-
-
-
-    }
-
-    function thumb_modal_off(){
-
-        $('.thumb-modal').css({'display':'none'})
-    }
 </script>
 
 
