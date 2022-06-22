@@ -493,8 +493,8 @@
 						$pushImage = "";
 						$pushPayType = ($row["pay_type"] == "1")? "카드" : "계좌이체";
 						$admin_message = substr($row["cellphone"], -4) . "(".explode(",", $row["guest_info"])[1].")님이 [".$row["product_name"]."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
-						//a_push("pickmon@pickmon.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
-                        //a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
+						a_push("pickmon@pickmon.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
+                        a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
                         a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
 
 						// 거래완료 페이지 이동
@@ -511,13 +511,13 @@
 				}else if($payment_cnt <= 0){
 					// 데이터가 존재하지 않음 - 변경할 데이터가 없음
 					?><script language="javascript">
-						alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM02 ]");
+						alert("네트워크 환경으로 결제실패. 재시도 해주세요. [ EM02 ]");
 						location.href = '../shop_mall';
 					</script><?php
 				}else{
 					// 중복 거래건이 있음 - 변경할 경우 데이터 손실 가능성 있음
 					?><script language="javascript">
-						alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM03 ]");
+						alert("네트워크 환경으로 결제실패. 재시도 해주세요. [ EM03 ]");
 						location.href = '../shop_mall';
 					</script><?php
 				}
@@ -528,17 +528,18 @@
 			}else{
 				// 누구세요? 어디서 오셨어요?
 				?><script language="javascript">
-					alert("네트워크 환경으로 예약실패. 재시도 해주세요. [ EM04 ]");
+					alert("네트워크 환경으로 결제실패. 재시도 해주세요. [ EM04 ]");
 					location.href = '../shop_mall'; // 도착지가 정해지지 않으면 메인페이지로 이동
 				</script><?php
 			}
 		}else{
 			?><script language="javascript">
-				alert("네트워크 환경으로 예약실패. 재시도 해주세요.\r\n ( <?=$return_arr['P_RMESG1'].' [ EM8'.$return_arr['P_STATUS'].' ] ' ?> )");
+				alert("네트워크 환경으로 결제실패. 재시도 해주세요.\r\n ( <?=$return_arr['P_RMESG1'].' [ EM8'.$return_arr['P_STATUS'].' ] ' ?> )");
 				if("<?=$return_arr['P_NOTI'] ?>" == "beauty"){
 					location.href = `../reserve_write4?artist_id=<?=$artist_id?>&pet_seq=<?=$pet_seq?>&timeResultArray=${JSON.stringify(timeResultArray)}&serviceResultArray=${JSON.stringify(serviceResultArray)}&etcResultArray=${JSON.stringify(etcResultArray)}`;
 				}else if("<?=$return_arr['P_NOTI'] ?>" == "item"){
-					location.href = '../shop_pay_input?no=<?=$_GET["no"]?>';
+					//location.href = '../shop_pay_input?no=<?=$return_arr["P_OID"]?>';
+                    history.back();
 				//}else if("<?=$return_arr['P_NOTI'] ?>" == "hotel"){
 				//	location.href = '../test/test_hotel_payment.php';
 				//}else if("<?=$return_arr['P_NOTI'] ?>" == "playroom"){
@@ -550,12 +551,13 @@
 		}
 	}else{
 		?><script language="javascript">
-			alert("네트워크 환경으로 예약실패. 재시도 해주세요.\r\n ( <?=$P_RMESG1.' [ EM9'.$P_STATUS.' ] ' ?> )");
+			//alert("네트워크 환경으로 결제실패. 재시도 해주세요.\r\n ( <?=$P_RMESG1.' [ EM9'.$P_STATUS.' ] ' ?> )");
 			if("<?=$P_NOTI ?>" == "beauty"){
 				//location.href = '<?//=$artist_directory ?>///payment.php';
                 location.href = `../reserve_write4?artist_id=<?=$artist_id?>&pet_seq=<?=$pet_seq?>&timeResultArray=${JSON.stringify(timeResultArray)}&serviceResultArray=${JSON.stringify(serviceResultArray)}&etcResultArray=${JSON.stringify(etcResultArray)}`;
 			}else if("<?=$P_NOTI ?>" == "item"){
-				location.href = '../shop_pay_input?no=<?=$_GET["no"]?>';
+				//location.href = '../shop_pay_input?no=<?=$_POST["P_OID"]?>';
+                history.back();
 			//}else if("<?=$P_NOTI ?>" == "hotel"){
 			//	location.href = "../test/test_hotel_payment.php";
 			//}else if("<?=$P_NOTI ?>" == "playroom"){
