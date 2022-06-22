@@ -3721,7 +3721,8 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 /*}*/
 
 /*2022.06.22 shop_category*/
-.btn-tab-item-add-2:after{bottom: -1px !important}
+.btn-tab-item-add-2:after{bottom: -2.5px !important;
+}
 /*.margin-right-0{margin-right:0px !important}*/
 
 /*========================================
