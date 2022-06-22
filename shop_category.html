@@ -35,7 +35,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<div class="header-left">
 		<a href="<?=$_SESSION['backurl1']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
-	<div class="page-title"><?=$category_row['cate_name']?></div>
+	<div class="page-title page_name"><?=$category_row['cate_name']?></div>
 </header>
 <!-- //header -->
 
@@ -44,24 +44,19 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<!-- page-body -->    
 	<div class="page-body fix-bottom-page">
 		<div class="shop-category-wrap">
-			<div class="swiper-container">
-				<div class="wide-tab-inner swiper-wrapper shop-category-inner">
-					<!-- 활성화시 actived클래스 추가 -->
+
+			<div class="shop-category-1 swiper-container " style="border-bottom:2px solid #ebebeb;overflow: visible "  >
+
+                <div class="wide-tab-inner  swiper-wrapper ">
                     <?php
                     $parent_sql = "SELECT * FROM tb_item_special_mall_category WHERE parent_seq = 0";
                     $parent_array = sql_fetch_array($parent_sql);
                     for($i=0;$i<count($parent_array);$i++){
-                        ?><div class="tab-cell swiper-slide shop-category-item"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item btn-tab-item-add" id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
+                        ?><div class="tab-cell swiper-slide " style="flex:none;"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>,'<?=$parent_array[$i]['cate_name']?>');" class="btn-tab-item btn-tab-item-add btn-tab-item-add-2 " id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
                     }
                     ?>
-<!--                        <div class="tab-cell actived"><a href="javascript:click_tab(52);" class="btn-tab-item" id="middle_category_52">사료</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(61);" class="btn-tab-item" id="middle_category_61">간식</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(74);" class="btn-tab-item" id="middle_category_74">용품</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(2);" class="btn-tab-item" id="middle_category_2">사료</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(12);" class="btn-tab-item" id="middle_category_12">간식</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(27);" class="btn-tab-item" id="middle_category_27">용품</a></div>-->
-				</div>
-			</div>
+                </div>
+            </div>
             <div class="shop-category-menu">
                 <!--<div class="swiper-container">
                     <div class="swiper-wrapper">
@@ -75,7 +70,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 					<h4 class="con-title">인기상품</h4>
 				</div>
 				<div class="horizontal-swiper-scoller small">
-					<div class="scroller-inner">
+					<div class="scroller-inner" id="best_item" style="overflow: auto;">
                         <?php
                         for($i=0;$i<count($best_item_array);$i++){
                             // 메인사진 구하기
@@ -88,7 +83,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                             $percent = ($best_item_array[$i]['product_price'] == 0 || $best_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($best_item_array[$i]['sale_price'] / $best_item_array[$i]['product_price'] * 100);
                             ?>
                             <div class="scroller-item">
-                                <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>" class="product-item">
+                                <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>&category=<?=$main_category?>" class="product-item">
                                     <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
                                     <div class="info-wrap">
                                         <div class="item-name"><?=$best_item_array[$i]['product_name']?></div>
@@ -142,19 +137,19 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
 <script>
 
-    var seq = <?=$main_category?>; // 최초 상단 카테고리
+    var main_seq = <?=$main_category?>; // 최초 상단 카테고리
+    var title_name = "<?=$category_row['cate_name']?>"; // 타이틀제목
     var middle_category = <?=$category?>;
     var limit = 0; // 스크롤 내릴때의 상품 노출 리미트
     var timer;
     $(document).ready(function(){
         $("#loading").removeClass("actived");
-       click_tab(seq);
-        click_category(middle_category);
+       click_tab(main_seq,title_name);
+        //click_category(middle_category);
         $(".page-body").on('scroll',function(){
             if (this.offsetHeight + this.scrollTop >= (this.scrollHeight - 200)) {
                 if (!timer) {
                     timer = setTimeout(function() {
-                        timer = null;
                         scroll_down(middle_category, limit);
                     }, 100);
                 }
@@ -176,13 +171,77 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
             });
     });
 
+    // 인기상품 불러오기
+    function get_best_itme(category){
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: 'get_best_itme',
+                category: category
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function (data){
+                var html = '';
+                console.log(data.data);
+                $.each(data.data['item'], function (i, v) {
+
+                    var soldout = (v.is_soldout == '2')? '<div class="label-soldout">품절</div>' : ''; // 품절 표시
+                    var percent = (v.product_price == 0 || v.sale_price == 0)? 0 : 100 - (v.sale_price / v.product_price * 100); // 할인율 구하기
+                    var rating_avg = (v.rating_avg != '' && v.rating_avg)? v.rating_avg : 0; // 별점 평균
+                    var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
+
+                    html += '<div class="scroller-item">';
+                    html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
+                    html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
+                    html += '        <div class="info-wrap">';
+                    html += '            <div class="item-name">'+v.product_name+'</div>';
+                    html += '            <div class="item-price-group">';
+                    html += '                <div class="price-sale">'+Math.round(percent)+'%</div>';
+                    html += '                <div class="price-value">'+v.sale_price.format()+'원</div>';
+                    html += '            </div>';
+                    html += '            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em>'+Math.round(rating_avg)+'</em>('+rating_cnt+')</div>';
+                    html += '        </div>';
+                    html += '    </a>';
+                    html += '</div>';
+                });
+
+                $("#best_item").html(html);
+
+
+                // $(".shop-category-menu").html(html);
+                // var swiper_category = new Swiper('.swiper-container', {
+                //     slidesPerView: 'auto',
+                //     spaceBetween: 30,
+                //     loopAdditionalSlides : 1,
+                //     debugger: true,
+                //     loop: false,
+                //     // initialSlide: (category_group - 1),
+                //
+                //     observer: true,
+                // });
+
+
+
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러1");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+
+        });
+    }
+
     var category_group = 1;
 
     // 상위 카테고리 탭 클릭시
-    function click_tab(category){
+    function click_tab(category,name){
         $(".btn-tab-item").parent().removeClass("actived")
         $("#middle_category_"+category).parent().addClass("actived");
-
+        $(".page_name").text(name);
+        main_seq = category;
         $.ajax({
            url: './data/item_ajax.php',
            data: {
@@ -193,7 +252,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
            dataType: 'JSON',
            success: function (data){
                var html = '';
-               html += '<div class="swiper-container">';
+               html += '<div class="shop-category-2">';
                // html += '    <div class="swiper-wrapper">';
                //var length = (data.data[0].length > 0)? data.data[0].length : 0;
                var cnt = 0;
@@ -209,78 +268,23 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                    html += '        <a href="javascript:click_category('+v.ismc_seq+',\''+v.cate_name+'\');" class="middle_category swiper-slide middle_category_add" data-id="'+v.ismc_seq+'">'+v.cate_name+'</a>';
                });
                html += '    </div>';
-                   // html += '</div>';
-
-               // 두칸일때
-               /*
-               }else if(length > 9 && length < 18){
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=0;i<9;i++){
-                       var checked = (data.data[0][i]['ismc_seq'] == middle_category)? 'actived' : '';
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category '+checked+'" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=9;i<length;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-               // 세칸일때
-               }else if(length > 18){
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=0;i<9;i++){
-                       var checked = (data.data[0][i]['ismc_seq'] == middle_category)? 'actived' : '';
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category '+checked+'" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=9;i<18;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-                   html += '<div class="swiper-slide">';
-                   html += '    <div class="shop-category-menu-list">';
-                   for(var i=18;i<length;i++){
-                       html += '        <a href="javascript:click_category('+data.data[0][i]['ismc_seq']+',\''+data.data[0][i]['cate_name']+'\');" class="middle_category" data-id="'+data.data[0][i]['ismc_seq']+'">'+data.data[0][i]['cate_name']+'</a>';
-                   }
-                   html += '    </div>';
-                   html += '</div>'
-
-               }
-               */
-
-               // html += '</div>';
-               // html += '    <div class="swiper-page"></div>';
 
                $(".shop-category-menu").html(html);
-               var swiper_category = new Swiper('.swiper-container', {
-                   slidesPerView: 'auto',
-                   spaceBetween: 30,
+               var swiper_category = new Swiper('.shop-category-2', {
+                   slidesPerView:4.5,
+                   spaceBetween: 10,
                    loopAdditionalSlides : 1,
                    debugger: true,
                    loop: false,
-                   // initialSlide: (category_group - 1),
+
 
                    observer: true,
                });
 
-
-                console.log(category);
-                console.log(data.data);
+               click_category(category,"전체");
+                // console.log(category);
+                // console.log(data.data);
+               get_best_itme(category);
 
 
            },
@@ -300,7 +304,6 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
         limit = 0;
         $(".middle_category").removeClass("actived");
         $(".middle_category[data-id="+seq+"]").addClass("actived");
-        $(".page-title").text(name);
         middle_category = seq;
         $.ajax({
            url: './data/item_ajax.php',
@@ -324,7 +327,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                        var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
 
                        html += '<div class="list-cell">';
-                       html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                       html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
                        html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
                        html += '        <div class="info-wrap">';
                        html += '            <div class="item-name">'+v.product_name+'</div>';
@@ -336,6 +339,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                        html += '        </div>';
                        html += '    </a>';
                        html += '</div>';
+
                    });
                    $(".list-inner").html(html);
                    limit = limit + 20;
@@ -378,7 +382,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                         var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
 
                         html += '<div class="list-cell">';
-                        html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                        html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
                         html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
                         html += '        <div class="info-wrap">';
                         html += '            <div class="item-name">'+v.product_name+'</div>';
@@ -392,6 +396,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                         html += '</div>';
                     });
                     $(".list-inner").append(html);
+                    timer = null;
                 }else{
                     alert("error");
                 }
@@ -424,6 +429,55 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
         return num.format();
     };
+
+
+
+    let now_location = <?=$category?>;
+
+    if(now_location < 5){
+
+        let swiper_category_1 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:0,
+
+
+
+
+        })
+    }else if(now_location >= 5 && now_location < 9){
+        let swiper_category_2 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:4,
+
+
+
+
+        })
+    }else{
+
+
+        let swiper_category_3 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:9,
+
+
+
+
+        })
+
+    }
+
+
+
 
 
 

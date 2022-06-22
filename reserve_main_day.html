@@ -1885,7 +1885,13 @@ $(document).ready(function(){
 
                 $(el).find('.item-name-cate').css({'margin-top':'3px'})
                 $(el).children('.item-thumb-add').css({'margin':'5px 8px 0px 0px'});
-                $(el).find('.item-memo').css({'position':'absolute','left':'150px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                if($(el).width() > 800){
+                    $(el).find('.item-memo').css({'position':'absolute','left':'300px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                }else{
+                    $(el).find('.item-memo').css({'position':'absolute','left':'150px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                }
+
+
 
 
             }else if($(el).innerHeight() > 71 ){
@@ -1895,9 +1901,9 @@ $(document).ready(function(){
                 if($(el).width() > 800){
                     $(this).css({'flex-direction':'row'});
                     $(el).find('.item-group-wrap').css({'flex-direction':'row'})
-                    $(el).find('.item-memo').css({'position':'absolute','left':'105px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
+                    $(el).find('.item-memo').css({'position':'absolute','left':'300px','max-width':'200px','overflow':'hidden','text-overflow':'ellipsis','white-space':'nowrap'})
                 }else{
-                    $(el).find('.item-group-wrap').css({'flex-direction':'column','margin':'5px 8px 0px 0px','max-width':'300px'})
+                    $(el).find('.item-group-wrap').css({'flex-direction':'column','margin':'5px 8px 0px 0px','max-width':'250px'})
                     $(this).css({'flex-direction':'row'})
                 }
             }
@@ -1970,6 +1976,7 @@ $(document).ready(function(){
                 $(el).children('.item-price').css({'margin-top':'5px'});
 
                 if($(el).innerHeight() > 150){
+
 
                     $(el).find('.item-select-option').css({'margin-top':'10px','flex-direction':'column'});
                 }else{

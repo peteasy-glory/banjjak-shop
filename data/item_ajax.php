@@ -27,6 +27,36 @@ if($mode){
             $return_data = array("code" => "000008", "data" => "error");
         }
 
+    // 카테고리별 인기상품 가져오기
+    }else if($mode == 'get_best_itme'){
+        $category = ($_POST["category"] && $_POST["category"] != "")? $_POST["category"] : "";
+
+        if($category){
+            $sql = "
+                SELECT * FROM tb_item_list a
+                    LEFT JOIN (
+                            SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
+                            FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
+                            ) b ON b.p_no = a.product_no
+                WHERE a.is_delete = '1' AND a.is_shop = '1' AND a.is_view_main_6 = '1' AND a.is_view = '1' AND a.is_soldout = '1'
+                AND FIND_IN_SET(".$category.", a.ic_seq)
+                ORDER BY a.update_dt desc
+            ";
+            $array = sql_fetch_array($sql);
+            foreach ($array as $rs) {
+                // 메인사진 구하기
+                $file_sql = "SELECT * FROM tb_file WHERE is_delete = '1' AND f_seq IN ({$rs['product_img']}) LIMIT 1";
+                $file_result = sql_query($file_sql);
+                $file_row = sql_fetch($file_result);
+                $photo = ($file_row['file_path']) ? "https://image.banjjakpet.com" . img_link_change($file_row['file_path']) : $rs['goodsRepImage'];
+                $data['photo'][] = $photo;
+            }
+            $data['item'] = $array;
+            $return_data = array("code" => "000000", "data" => $data);
+        }else{
+            $return_data = array("code" => "000008", "data" => "error");
+        }
+
     // 카테고리별 상품리스트 가져오기
     }else if($mode == 'get_item_list') {
         $category = ($_POST["category"] && $_POST["category"] != "") ? $_POST["category"] : "";

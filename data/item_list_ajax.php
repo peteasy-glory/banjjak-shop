@@ -1087,8 +1087,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$pushImage = "";
 				$pushPayType = ($r_pay_type == "1")? "카드" : "계좌이체";
 				$admin_message = substr($cellphone, -4) . "(".$r_customer_email."@".$r_customer_email_suffix.")님이 [".$r_product_name."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
-				a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
-                //a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+				a_push("pickmon@pickmon.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+                a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
 
 				// 알림톡 발송
 				if($r_pay_type == "1"){ // 신용카드
@@ -1642,6 +1642,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$where_qy .= ", return_result = '".$_SESSION["RNC_REASONTYPE"]."|".$_SESSION["RNC_REASONDETAIL"]."' ";
 				$where_qy .= ", return_result2 = '".$_SESSION["RNC_CHKLIST"]."|".$r_return_pay_type."|".$r_return_account."|".$r_return_bank."|".$r_return_price."' "; // 삭제아이템번호[]|타입|계좌번호|은행명|금액
 				$where_qy .= ", return_dt = NOW() ";
+				$product_status = '8';
 			}else{
 				$where_qy .= ", pay_status = '7' ";
 				$where_qy .= ", order_status = '9' ";
@@ -1649,6 +1650,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$where_qy .= ", cancel_result = '".$_SESSION["RNC_REASONTYPE"]."|".$_SESSION["RNC_REASONDETAIL"]."' ";
 				$where_qy .= ", cancel_result2 = '".$_SESSION["RNC_CHKLIST"]."|".$r_return_pay_type."|".$r_return_account."|".$r_return_bank."|".$r_return_price."' "; // 삭제아이템번호[]|타입|계좌번호|은행명|금액
 				$where_qy .= ", cancel_dt = NOW() ";
+				$product_status = '9';
 			}
 
 			if($r_order_num == $_SESSION["RNC_ORDERNUM"]){
@@ -1675,6 +1677,16 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 					";
 					$result = mysqli_query($connection,$sql);
 					$row = mysqli_fetch_assoc($result);
+
+					$sql1 = "
+						UPDATE tb_item_payment_log_product SET
+							pay_status = ".$product_status.",
+							update_dt = NOW()
+						WHERE customer_id = '".$row["customer_id"]."'
+							AND order_num = '".$r_order_num."'
+							";
+					$result1 = mysqli_query($connection,$sql1);
+
 					if($row["point_price"] > 0){
 						//include "../include/Point.class.php";
 						$point = new Point;
@@ -2157,8 +2169,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 					$pushImage = "";
 					$pushPayType = ($row["pay_type"] == "1")? "카드" : "계좌이체";
 					$admin_message = substr($row["cellphone"], -4) . "(".explode(",", $row["guest_info"])[1].")님이 [".$row["product_name"]."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
-					a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
-                    //a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+					a_push("pickmon@pickmon.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
+                    a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage, "customer");
 
 					$return_data = array("code" => "000000", "data" => "OK");
 				}else{

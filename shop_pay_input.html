@@ -7,7 +7,14 @@ $user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']
 $user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
 
 $order_num = (isset($_GET['no']))? $_GET['no'] : "";
-$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : "0";
+
+$no_sql = "
+    select * from tb_item_cart where order_num = '".$order_num."' limit 1
+";
+$no_result = mysqli_query($connection,$no_sql);
+$no_row = mysqli_fetch_assoc($no_result);
+
+$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : $no_row['direct_chk'];
 
 // 사용자 정보
 if($user_id != ""){
@@ -669,8 +676,8 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
 
                             $.each(data.data[0], function(i, v){
                                 get_item_list(v)
-                                    .then(price_calculator)
-                                    .then(get_first_payment);
+                                    .then(price_calculator);
+                                    //.then(get_first_payment);
                             });
                         }else{
                         }
@@ -1052,7 +1059,7 @@ $siteDomain = "https://partner.banjjakpet.com"; //가맹점 도메인 입력
         });
 
         // 첫결제인지 판단
-        get_first_payment([product_total_price, total_shipping_price]);
+        //get_first_payment([product_total_price, total_shipping_price]);
 
     }
 

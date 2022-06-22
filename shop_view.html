@@ -63,6 +63,10 @@ $review_sql = "
 ";
 $review_array = sql_fetch_array($review_sql);
 
+if($_GET['category'] != ''){
+    unset($_SESSION['backurl_shop']);
+    $_SESSION['backurl_shop'] = "shop_category?category=".$_GET['category'];
+}
 //돌아갈 url을 세션에 저장한다.
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
@@ -100,7 +104,7 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
                             if(count($img_array)>0){
                                 foreach($img_array as $rs){
                                     ?>
-                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($rs['file_path'])?>" alt=""/></a></div></div>
+                                    <div class="swiper-slide" style="display:flex; justify-content: center"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($rs['file_path'])?>" alt=""/></a></div></div>
                                     <?php
                                 }
                             }else{
@@ -1130,6 +1134,7 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
                         });
                     }else{
                         popalert.open('firstRequestMsg1','모바일에서 주문가능합니다.');
+                        double_chk = true;
                     }
                 }
             }
