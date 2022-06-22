@@ -199,7 +199,7 @@ $(function(){
         formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
         formData.append("filepath", newfilename);
         $.ajax({
-            url: 'data/upload_portfolio',
+            url: 'data/upload_portfolio.php',
             data: formData,
             processData: false,
             contentType: false,
@@ -343,7 +343,7 @@ $(function(){
 	popalert.open('firstRequestMsg1', '포트폴리오가 1개 이상 있어야합니다.');
         }else{	
 				$.ajax({
-					url: 'data/delete_portfolio',
+					url: 'data/delete_portfolio.php',
 					data: post_data,
 					type: 'POST',
 					success: function(data) {

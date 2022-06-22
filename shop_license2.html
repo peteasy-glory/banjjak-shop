@@ -41,7 +41,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 	
 	<!-- page-body -->    
 	<div class="page-body">
-		<form action="data/save_license" id="shop_form" method="POST">
+		<form action="data/save_license.php" id="shop_form" method="POST">
     <input type="hidden" id="filepath" name="filepath" value="">
 		<div class="license-add-wrap">
 			<div class="con-title-group">
@@ -172,7 +172,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         formData.append("filepath", newfilename);
 
         $.ajax({
-            url: 'data/upload_license_photo',
+            url: 'data/upload_license_photo.php',
             data: formData,
             processData: false,
             contentType: false,

@@ -48,7 +48,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 	<div class="page-body">
 		
 		<div class="bussiness-trie-wrap">
-			<form action="data/save_region" id="region_form" method="POST">
+			<form action="data/save_region.php" id="region_form" method="POST">
 			<div class="bussiness-trie-info">출장지역 선택 후 '등록하기' 하시면 출장지가 등록됩니다.</div>
 			<div class="bussiness-trip-sort">
 				<div class="form-cell-group">	
@@ -202,7 +202,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         var selected_top = top_region.options[top_region.selectedIndex].value;
         var post_data = 'top_region=' + encodeURI(selected_top);
         $.ajax({
-            url: 'data/get_middle_region',
+            url: 'data/get_middle_region.php',
             data: post_data,
             type: 'POST',
             success: function(data) {
@@ -224,7 +224,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         var selected_middle = middle_region.options[middle_region.selectedIndex].value;
         var post_data = 'top_region=' + encodeURI(selected_top) + '&middle_region=' + encodeURI(selected_middle);
         $.ajax({
-            url: 'data/get_bottom_region',
+            url: 'data/get_bottom_region.php',
             data: post_data,
             type: 'POST',
             success: function(data) {
@@ -252,7 +252,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 
        if(confirm("삭제하시겠습니까?")){
 	       $.ajax({
-                url: 'data/delete_working_region',
+                url: 'data/delete_working_region.php',
                 data: post_data,
                 type: 'POST',
                 success: function(data) {

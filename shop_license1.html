@@ -40,7 +40,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 <section id="container"> 
 	<!-- page-body -->    
 	<div class="page-body">
-		<form action="data/save_award" id="shop_form" method="POST">
+		<form action="data/save_award.php" id="shop_form" method="POST">
 		<input type="hidden" id="filepath" name="filepath" value="">
 		<div class="license-add-wrap">
 			<div class="con-title-group">
@@ -175,7 +175,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                           formData.append("toronclass", $("input[name=toronclass]").val());
                           formData.append("imgupfile", $("input[name=imgupfile]")[0].files[0]);*/
         $.ajax({
-            url: 'data/upload_license_photo',
+            url: 'data/upload_license_photo.php',
             data: formData,
             processData: false,
             contentType: false,

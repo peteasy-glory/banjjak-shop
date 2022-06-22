@@ -148,7 +148,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
         formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
         formData.append("filepath", newfilename);
         $.ajax({
-            url: 'data/upload_shop_front_image',
+            url: 'data/upload_shop_front_image.php',
             data: formData,
             processData: false,
             contentType: false,
@@ -302,7 +302,7 @@ function deleteImage(path) {
 function selectImage(path) {
     var post_data = 'path=' + path;
     $.ajax({
-        url: 'data/change_front_image',
+        url: 'data/change_front_image.php',
         data: post_data,
         type: 'POST',
         success: function(data) {

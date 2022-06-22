@@ -149,7 +149,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
             $.ajax({
                 async: false,
                 type: 'post' ,
-                url: 'data/data_set_json_blog' ,
+                url: 'data/data_set_json_blog.php' ,
                 data: formData,
                 dataType: 'json' ,
                 error: function() { alert('Error'); } ,
@@ -186,7 +186,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
             $.ajax({
                 async: false,
                 type: 'post' ,
-                url: 'data/data_get_json_blog' ,
+                url: 'data/data_get_json_blog.php' ,
                 data: 'search='+search+'&page='+page ,
                 dataType: 'json' ,
                 error: function() { alert('Error'); } ,
