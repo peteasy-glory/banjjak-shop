@@ -1650,7 +1650,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				$where_qy .= ", cancel_result = '".$_SESSION["RNC_REASONTYPE"]."|".$_SESSION["RNC_REASONDETAIL"]."' ";
 				$where_qy .= ", cancel_result2 = '".$_SESSION["RNC_CHKLIST"]."|".$r_return_pay_type."|".$r_return_account."|".$r_return_bank."|".$r_return_price."' "; // 삭제아이템번호[]|타입|계좌번호|은행명|금액
 				$where_qy .= ", cancel_dt = NOW() ";
-				$product_status = '8';
+				$product_status = '9';
 			}
 
 			if($r_order_num == $_SESSION["RNC_ORDERNUM"]){
