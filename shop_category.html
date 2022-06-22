@@ -432,8 +432,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
 
 
-    let now_location = parseInt($(location).attr('href').at(-1));
-
+    let now_location = <?=$category?>;
 
     if(now_location < 5){
 
