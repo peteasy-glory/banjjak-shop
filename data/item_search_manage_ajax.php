@@ -88,7 +88,7 @@
                 $sql = "
                     SELECT *
                     FROM tb_item_list
-                    WHERE is_delete != '2' AND is_soldout != '2'
+                    WHERE is_delete != '2' AND is_soldout != '2' AND is_shop = '1' 
                     AND (product_name like '%".$r_search_word."%' OR brand LIKE '%".$r_search_word."%')
                 ";
                 $result = mysqli_query($connection, $sql);
