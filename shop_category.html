@@ -35,7 +35,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<div class="header-left">
 		<a href="<?=$_SESSION['backurl1']?>" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
-	<div class="page-title"><?=$category_row['cate_name']?></div>
+	<div class="page-title page_name"><?=$category_row['cate_name']?></div>
 </header>
 <!-- //header -->
 
@@ -70,7 +70,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 					<h4 class="con-title">인기상품</h4>
 				</div>
 				<div class="horizontal-swiper-scoller small">
-					<div class="scroller-inner" id="best_item">
+					<div class="scroller-inner" id="best_item" style="overflow: auto;">
                         <?php
                         for($i=0;$i<count($best_item_array);$i++){
                             // 메인사진 구하기
@@ -240,7 +240,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
     function click_tab(category,name){
         $(".btn-tab-item").parent().removeClass("actived")
         $("#middle_category_"+category).parent().addClass("actived");
-        $(".page-title").text(name);
+        $(".page_name").text(name);
         main_seq = category;
         $.ajax({
            url: './data/item_ajax.php',

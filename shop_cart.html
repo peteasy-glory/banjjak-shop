@@ -2,6 +2,9 @@
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 
+$obj = new module();
+$chk_mobile = $obj->mobileConcertCheck();
+
 $backurl = isset($_GET['backurl']) ? $_GET['backurl']: "";
 $user_id = $_SESSION['gobeauty_user_id'];
 $user_name = $_SESSION['gobeauty_user_nickname'];
@@ -327,7 +330,7 @@ foreach($partner_array as $rs){
         var cart = [];
         var _height = 220; // 팝업창 높이 default 220
         var sofa = 0; // 소파 가격
-
+        var chk_mobile = "<?=$chk_mobile ?>"; // 모바일 체크
         $(function(){
             get_partner_list()
             .then(get_item_cart);
@@ -1295,58 +1298,69 @@ foreach($partner_array as $rs){
 
         });
 
+        // 따닥 방지
+        var double_chk = true;
         // 결제하기
         function set_item_payment(){
-            // 선택한 상품들에게 같은 결제번호 부여(update) 후 결제페이지로 이동
-            var cart_list = [];
-            var cnt = 0;
-            $item_cart.find("input[name='chk[]']").each(function(i, v){
-                if($(this).is(":checked") == true && $(this).val() != ""){
-                    cart_list.push($(this).val());
-                }
-            });
-            console.log(cart_list);
-            if(cart_list.length > 0){
-                $.each(cart_list, function(i, v){
-                    $.ajax({
-                        url: 'data/item_ajax.php',
-                        data: {
-                            mode: "set_update_cart",
-                            customer_id: customer_id,
-                            ic_seq: v,
-                            order_num: new_order_num
-                        },
-                        type: 'POST',
-                        dataType: 'JSON',
-                        success: function(data) {
-                            if(data.code == "000000"){
-                                console.log(data.data);
-                                // 쿠키값 변경??, IOS 예외처리??
-                                //setCookie("order_num", data.data, 1);
-                                //setCookie("order_step", "1", 1); // 1 - 구매, 2 - 조회
-                                cnt++;
-
-                                if(cnt == cart_list.length){
-                                    if(customer_id != ""){
-                                        location.href = "shop_pay_input?no="+new_order_num;
-                                    }else{
-                                        location.href = "login_1?no="+new_order_num;
-                                    }
-                                }
-                            }else{
-                                alert(data.data+"("+data.code+")");
-                                console.log(data.data);
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            //alert(error + "네트워크에러");
-                            if(xhr.status != 0){
-                                alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-                            }
+            if(chk_mobile == 'mobile'){
+                if(double_chk == true){
+                    double_chk = false;
+                    // 선택한 상품들에게 같은 결제번호 부여(update) 후 결제페이지로 이동
+                    var cart_list = [];
+                    var cnt = 0;
+                    $item_cart.find("input[name='chk[]']").each(function(i, v){
+                        if($(this).is(":checked") == true && $(this).val() != ""){
+                            cart_list.push($(this).val());
                         }
                     });
-                });
+                    console.log(cart_list);
+                    if(cart_list.length > 0){
+                        $.each(cart_list, function(i, v){
+                            $.ajax({
+                                url: 'data/item_ajax.php',
+                                data: {
+                                    mode: "set_update_cart",
+                                    customer_id: customer_id,
+                                    ic_seq: v,
+                                    order_num: new_order_num
+                                },
+                                type: 'POST',
+                                dataType: 'JSON',
+                                success: function(data) {
+                                    if(data.code == "000000"){
+                                        console.log(data.data);
+                                        // 쿠키값 변경??, IOS 예외처리??
+                                        //setCookie("order_num", data.data, 1);
+                                        //setCookie("order_step", "1", 1); // 1 - 구매, 2 - 조회
+                                        cnt++;
+
+                                        if(cnt == cart_list.length){
+                                            if(customer_id != ""){
+                                                location.href = "shop_pay_input?no="+new_order_num;
+                                            }else{
+                                                location.href = "login_1?no="+new_order_num;
+                                            }
+                                        }
+                                    }else{
+                                        alert(data.data+"("+data.code+")");
+                                        console.log(data.data);
+                                    }
+                                },
+                                error: function(xhr, status, error) {
+                                    //alert(error + "네트워크에러");
+                                    if(xhr.status != 0){
+                                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                    }
+                                }
+                            });
+                        });
+                    }
+                }
+            }else{
+                popalert.open('firstRequestMsg1','모바일에서 주문가능합니다.');
+                double_chk = true;
             }
+
         }
 
         // 세자리 숫자 콤마
