@@ -432,11 +432,11 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
 
 
-    let now_location = window.location.href.at(-1);
+    let now_location = document.location.href.at(-1);
+
 
     if(now_location < 5){
 
-        console.log("5보다 작아")
         let swiper_category_1 = new Swiper('.shop-category-1',{
 
             direction:'horizontal',
@@ -449,7 +449,6 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
         })
     }else if(now_location >= 5 && now_location < 9){
-        console.log("5보다 크고 9 보다 작다")
         let swiper_category_2 = new Swiper('.shop-category-1',{
 
             direction:'horizontal',
