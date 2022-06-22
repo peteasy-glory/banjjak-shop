@@ -104,7 +104,7 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
                             if(count($img_array)>0){
                                 foreach($img_array as $rs){
                                     ?>
-                                    <div class="swiper-slide"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($rs['file_path'])?>" alt=""/></a></div></div>
+                                    <div class="swiper-slide" style="display:flex; justify-content: center"><div class="slider-item"><a href="#" class="btn-main-big-item"><img src="https://image.banjjakpet.com<?=img_link_change($rs['file_path'])?>" alt=""/></a></div></div>
                                     <?php
                                 }
                             }else{
