@@ -45,8 +45,8 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<div class="page-body fix-bottom-page">
 		<div class="shop-category-wrap">
 
-			<div class="shop-category-1 swiper-container "  >
-                <div style="border-bottom:2px solid #ebebeb;  position:relative;top: 44px;"></div>
+			<div class="shop-category-1 swiper-container " style="border-bottom:2px solid #ebebeb;overflow: visible "  >
+
                 <div class="wide-tab-inner  swiper-wrapper ">
                     <?php
                     $parent_sql = "SELECT * FROM tb_item_special_mall_category WHERE parent_seq = 0";
@@ -432,7 +432,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
 
 
-    let now_location = document.location.href.at(-1);
+    let now_location = parseInt($(location).attr('href').at(-1));
 
 
     if(now_location < 5){
@@ -461,6 +461,8 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
         })
     }else{
+
+
         let swiper_category_3 = new Swiper('.shop-category-1',{
 
             direction:'horizontal',
@@ -474,6 +476,8 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
         })
 
     }
+
+
 
 
 
