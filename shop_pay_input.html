@@ -7,7 +7,14 @@ $user_id = (isset($_SESSION['gobeauty_user_id']))? $_SESSION['gobeauty_user_id']
 $user_name = (isset($_SESSION['gobeauty_user_nickname']))? $_SESSION['gobeauty_user_nickname']:"";
 
 $order_num = (isset($_GET['no']))? $_GET['no'] : "";
-$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : "0";
+
+$no_sql = "
+    select * from tb_item_cart where order_num = '".$order_num."' limit 1
+";
+$no_result = mysqli_query($connection,$no_sql);
+$no_row = mysqli_fetch_assoc($no_result);
+
+$direct_chk = (isset($_GET['direct_chk']))? $_GET['direct_chk'] : $no_row['direct_chk'];
 
 // 사용자 정보
 if($user_id != ""){
