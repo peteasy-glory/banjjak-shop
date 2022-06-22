@@ -40,7 +40,7 @@ if($mode){
                             ) b ON b.p_no = a.product_no
                 WHERE a.is_delete = '1' AND a.is_shop = '1' AND a.is_view_main_6 = '1' AND a.is_view = '1' AND a.is_soldout = '1'
                 AND FIND_IN_SET(".$category.", a.ic_seq)
-                ORDER BY a.reg_dt desc
+                ORDER BY a.update_dt desc
             ";
             $array = sql_fetch_array($sql);
             foreach ($array as $rs) {
