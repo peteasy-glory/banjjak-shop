@@ -44,24 +44,19 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 	<!-- page-body -->    
 	<div class="page-body fix-bottom-page">
 		<div class="shop-category-wrap">
-			<div class="swiper-container">
-				<div class="wide-tab-inner swiper-wrapper shop-category-inner">
-					<!-- 활성화시 actived클래스 추가 -->
+
+			<div class="shop-category-1 swiper-container "  >
+                <div style="border-bottom:2px solid #ebebeb;  position:relative;top: 44px;"></div>
+                <div class="wide-tab-inner  swiper-wrapper ">
                     <?php
                     $parent_sql = "SELECT * FROM tb_item_special_mall_category WHERE parent_seq = 0";
                     $parent_array = sql_fetch_array($parent_sql);
                     for($i=0;$i<count($parent_array);$i++){
-                        ?><div class="tab-cell swiper-slide shop-category-item"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item btn-tab-item-add" id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
+                        ?><div class="tab-cell swiper-slide " style="flex:none;"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item btn-tab-item-add btn-tab-item-add-2 " id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
                     }
                     ?>
-<!--                        <div class="tab-cell actived"><a href="javascript:click_tab(52);" class="btn-tab-item" id="middle_category_52">사료</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(61);" class="btn-tab-item" id="middle_category_61">간식</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(74);" class="btn-tab-item" id="middle_category_74">용품</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(2);" class="btn-tab-item" id="middle_category_2">사료</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(12);" class="btn-tab-item" id="middle_category_12">간식</a></div>-->
-<!--                        <div class="tab-cell"><a href="javascript:click_tab(27);" class="btn-tab-item" id="middle_category_27">용품</a></div>-->
-				</div>
-			</div>
+                </div>
+            </div>
             <div class="shop-category-menu">
                 <!--<div class="swiper-container">
                     <div class="swiper-wrapper">
@@ -193,7 +188,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
            dataType: 'JSON',
            success: function (data){
                var html = '';
-               html += '<div class="swiper-container">';
+               html += '<div class="shop-category-2">';
                // html += '    <div class="swiper-wrapper">';
                //var length = (data.data[0].length > 0)? data.data[0].length : 0;
                var cnt = 0;
@@ -211,13 +206,13 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                html += '    </div>';
 
                $(".shop-category-menu").html(html);
-               var swiper_category = new Swiper('.swiper-container', {
-                   slidesPerView: 'auto',
-                   spaceBetween: 30,
+               var swiper_category = new Swiper('.shop-category-2', {
+                   slidesPerView:4.5,
+                   spaceBetween: 10,
                    loopAdditionalSlides : 1,
                    debugger: true,
                    loop: false,
-                   // initialSlide: (category_group - 1),
+
 
                    observer: true,
                });
@@ -368,6 +363,53 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
         return num.format();
     };
+
+
+
+    let now_location = window.location.href.at(-1);
+
+    if(now_location < 5){
+
+        console.log("5보다 작아")
+        let swiper_category_1 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:0,
+
+
+
+
+        })
+    }else if(now_location >= 5 && now_location < 9){
+        console.log("5보다 크고 9 보다 작다")
+        let swiper_category_2 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:4,
+
+
+
+
+        })
+    }else{
+        let swiper_category_3 = new Swiper('.shop-category-1',{
+
+            direction:'horizontal',
+            slidesPerView: 4,
+            spaceBetween: 30,
+            initialSlide:9,
+
+
+
+
+        })
+
+    }
+
 
 
 

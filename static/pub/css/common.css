@@ -3619,7 +3619,6 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	margin:0 !important;
 }
 .shop-category-inner{
-	width:230%;
 	border-bottom:2px solid #ebebeb;
 }
 .btn-tab-item-add:after{
@@ -3627,15 +3626,11 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	background: #6840b1 !important;
 }
 .middle_category_add{
-	margin:0 !important;
 	height: 35px !important;
 	background: #f4f4f4;
 	border-radius: 60px;
 	color:rgba(32, 32, 32, 0.48);
-	margin-right:8px !important;
-	width: auto !important;
-	min-width:65px;
-	padding : 0px 5px 0px 5px;
+	font-size:12px !important;
 
 }
 
@@ -3656,6 +3651,8 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .item-thumb-add{
 	width:30px;
 	height:30px;
+	min-width:30px;
+	min-height: 30px;
 	margin-right:8px;
 	overflow: hidden;
 	border-radius: 5px;
@@ -3717,9 +3714,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	bottom: 20px;
 
 }
+
+
 /*.item-name-cate .item-name,.item-cate{*/
 /*	font-size:15px !important;*/
 /*}*/
+
+/*2022.06.22 shop_category*/
+.btn-tab-item-add-2:after{bottom: -1px !important}
+/*.margin-right-0{margin-right:0px !important}*/
 
 /*========================================
 @ PC버전
