@@ -52,7 +52,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                     $parent_sql = "SELECT * FROM tb_item_special_mall_category WHERE parent_seq = 0";
                     $parent_array = sql_fetch_array($parent_sql);
                     for($i=0;$i<count($parent_array);$i++){
-                        ?><div class="tab-cell swiper-slide " style="flex:none;"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>);" class="btn-tab-item btn-tab-item-add btn-tab-item-add-2 " id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
+                        ?><div class="tab-cell swiper-slide " style="flex:none;"><a href="javascript:click_tab(<?=$parent_array[$i]['ismc_seq']?>,'<?=$parent_array[$i]['cate_name']?>');" class="btn-tab-item btn-tab-item-add btn-tab-item-add-2 " id="middle_category_<?=$parent_array[$i]['ismc_seq']?>"><?=$parent_array[$i]['cate_name']?></a></div><?php
                     }
                     ?>
                 </div>
@@ -70,7 +70,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 					<h4 class="con-title">인기상품</h4>
 				</div>
 				<div class="horizontal-swiper-scoller small">
-					<div class="scroller-inner">
+					<div class="scroller-inner" id="best_item">
                         <?php
                         for($i=0;$i<count($best_item_array);$i++){
                             // 메인사진 구하기
@@ -83,7 +83,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                             $percent = ($best_item_array[$i]['product_price'] == 0 || $best_item_array[$i]['sale_price'] == 0)? 0 : 100 - ($best_item_array[$i]['sale_price'] / $best_item_array[$i]['product_price'] * 100);
                             ?>
                             <div class="scroller-item">
-                                <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>" class="product-item">
+                                <a href="shop_view?product_no=<?=$best_item_array[$i]['product_no']?>&category=<?=$main_category?>" class="product-item">
                                     <div class="thumb"><div class="obj"><img src="<?= $photo?>"></div></div>
                                     <div class="info-wrap">
                                         <div class="item-name"><?=$best_item_array[$i]['product_name']?></div>
@@ -137,19 +137,19 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
 
 <script>
 
-    var seq = <?=$main_category?>; // 최초 상단 카테고리
+    var main_seq = <?=$main_category?>; // 최초 상단 카테고리
+    var title_name = "<?=$category_row['cate_name']?>"; // 타이틀제목
     var middle_category = <?=$category?>;
     var limit = 0; // 스크롤 내릴때의 상품 노출 리미트
     var timer;
     $(document).ready(function(){
         $("#loading").removeClass("actived");
-       click_tab(seq);
-        click_category(middle_category);
+       click_tab(main_seq,title_name);
+        //click_category(middle_category);
         $(".page-body").on('scroll',function(){
             if (this.offsetHeight + this.scrollTop >= (this.scrollHeight - 200)) {
                 if (!timer) {
                     timer = setTimeout(function() {
-                        timer = null;
                         scroll_down(middle_category, limit);
                     }, 100);
                 }
@@ -171,13 +171,77 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
             });
     });
 
+    // 인기상품 불러오기
+    function get_best_itme(category){
+        $.ajax({
+            url: './data/item_ajax.php',
+            data: {
+                mode: 'get_best_itme',
+                category: category
+            },
+            type: 'POST',
+            dataType: 'JSON',
+            success: function (data){
+                var html = '';
+                console.log(data.data);
+                $.each(data.data['item'], function (i, v) {
+
+                    var soldout = (v.is_soldout == '2')? '<div class="label-soldout">품절</div>' : ''; // 품절 표시
+                    var percent = (v.product_price == 0 || v.sale_price == 0)? 0 : 100 - (v.sale_price / v.product_price * 100); // 할인율 구하기
+                    var rating_avg = (v.rating_avg != '' && v.rating_avg)? v.rating_avg : 0; // 별점 평균
+                    var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
+
+                    html += '<div class="scroller-item">';
+                    html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
+                    html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
+                    html += '        <div class="info-wrap">';
+                    html += '            <div class="item-name">'+v.product_name+'</div>';
+                    html += '            <div class="item-price-group">';
+                    html += '                <div class="price-sale">'+Math.round(percent)+'%</div>';
+                    html += '                <div class="price-value">'+v.sale_price.format()+'원</div>';
+                    html += '            </div>';
+                    html += '            <div class="item-grade"><div class="icon icon-size-16 icon-star-yellow"></div><em>'+Math.round(rating_avg)+'</em>('+rating_cnt+')</div>';
+                    html += '        </div>';
+                    html += '    </a>';
+                    html += '</div>';
+                });
+
+                $("#best_item").html(html);
+
+
+                // $(".shop-category-menu").html(html);
+                // var swiper_category = new Swiper('.swiper-container', {
+                //     slidesPerView: 'auto',
+                //     spaceBetween: 30,
+                //     loopAdditionalSlides : 1,
+                //     debugger: true,
+                //     loop: false,
+                //     // initialSlide: (category_group - 1),
+                //
+                //     observer: true,
+                // });
+
+
+
+            },
+            error: function(xhr, status, error) {
+                //alert(error + "네트워크에러1");
+                if(xhr.status != 0){
+                    alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                }
+            }
+
+        });
+    }
+
     var category_group = 1;
 
     // 상위 카테고리 탭 클릭시
-    function click_tab(category){
+    function click_tab(category,name){
         $(".btn-tab-item").parent().removeClass("actived")
         $("#middle_category_"+category).parent().addClass("actived");
-
+        $(".page-title").text(name);
+        main_seq = category;
         $.ajax({
            url: './data/item_ajax.php',
            data: {
@@ -218,8 +282,9 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                });
 
                click_category(category,"전체");
-                console.log(category);
-                console.log(data.data);
+                // console.log(category);
+                // console.log(data.data);
+               get_best_itme(category);
 
 
            },
@@ -239,7 +304,6 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
         limit = 0;
         $(".middle_category").removeClass("actived");
         $(".middle_category[data-id="+seq+"]").addClass("actived");
-        $(".page-title").text(name);
         middle_category = seq;
         $.ajax({
            url: './data/item_ajax.php',
@@ -263,7 +327,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                        var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
 
                        html += '<div class="list-cell">';
-                       html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                       html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
                        html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
                        html += '        <div class="info-wrap">';
                        html += '            <div class="item-name">'+v.product_name+'</div>';
@@ -275,6 +339,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                        html += '        </div>';
                        html += '    </a>';
                        html += '</div>';
+
                    });
                    $(".list-inner").html(html);
                    limit = limit + 20;
@@ -317,7 +382,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                         var rating_cnt = (v.rating_cnt != '' && v.rating_cnt)? v.rating_cnt : 0; // 후기 수
 
                         html += '<div class="list-cell">';
-                        html += '    <a href="shop_view?product_no='+v.product_no+'" class="product-item">';
+                        html += '    <a href="shop_view?product_no='+v.product_no+'&category='+main_seq+'" class="product-item">';
                         html += '        <div class="thumb"><div class="obj"><img src="'+data.data['photo'][i]+'" alt="">'+soldout+'</div></div>';
                         html += '        <div class="info-wrap">';
                         html += '            <div class="item-name">'+v.product_name+'</div>';
@@ -331,6 +396,7 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
                         html += '</div>';
                     });
                     $(".list-inner").append(html);
+                    timer = null;
                 }else{
                     alert("error");
                 }
