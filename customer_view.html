@@ -698,9 +698,9 @@ $another_reserve = 0;
                                             ?>
 											<tr class="customer-table-cell">
 												<td>
-													<div class="flex align-items-center overflow-hidden">
-														<div class="flex-1 grid-1 overflow-hidden text-align-left"><strong class="ellipsis d-block"><?php echo $pet[0]['name'];?></strong></div>
-														<div class="flex-auto icon icon-arrow-up-gray" onclick="show_div(<?php echo $arr['payment_log_seq'];?>);"></div>
+													<div class="flex align-items-center overflow-hidden  ">
+                                                        <button type="button" class="customer-table-toggle toggle-target"><?php echo $pet[0]['name']?></span></span>
+                                                        </button>
 													</div>
 												</td>
 												<td>
@@ -1251,10 +1251,8 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 
         });
 
-        function show_div(seq, obj){
-            $('.list-more').removeClass('actived');
-            $('#list_'+seq).addClass('actived');
-        }
+
+
 
         $(document).ready(function(){
             var cnt = $('.phone-add-item').length;
@@ -1341,6 +1339,21 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 
 
             });
+
+
+
+            $(".toggle-target").on("click",function(){
+
+                $(this).parents('.customer-table-cell').next().toggle();
+
+                if($(this).hasClass('customer-table-toggle2')){
+                    $(this).removeClass('customer-table-toggle2');
+
+                }else{
+                    $(this).addClass('customer-table-toggle2');
+                }
+
+            })
         });
 
         function change_main_phone(){

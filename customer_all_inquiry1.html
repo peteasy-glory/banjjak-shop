@@ -225,12 +225,7 @@ while($row = mysqli_fetch_assoc($result)){
         var hangul_arr = ['가','나','다','라','마','바','사','아','자','차','카','타','파','하'];
         var hangul_code_arr = [];
 
-        $(document).ready(function(){
-            $(".customer-table").on("click", ".customer-table-toggle", function(){
-                $(".customer-table-view").hide();
-                $(this).parents(".customer-table-cell").next().show();
-            })
-        })
+
         $(function(){
             //$("#loading").css("align-items", "center").css("justify-content", "center");
             //$("#loading").html("<span style='color: #fff; max-width: 50%; text-align:center;'><img src='/pet/images/logo_loading0.gif' style='width: 100px; height: 100px;'/><br/>소중한 고객의 정보를 수집중입니다...</span>");
@@ -625,6 +620,19 @@ while($row = mysqli_fetch_assoc($result)){
                     if(xhr.status != 0){
                         alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
                     }
+                },
+                complete:function(){
+
+                    $(".customer-table-toggle").on("click",function(){
+
+                        $(this).parents(".customer-table-cell").next().toggle();
+                        if($(this).hasClass('customer-table-toggle2')){
+                            $(this).removeClass('customer-table-toggle2');
+
+                        }else{
+                             $(this).addClass('customer-table-toggle2');
+                        }
+                    })
                 }
             });
         }
