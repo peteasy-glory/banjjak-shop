@@ -1422,7 +1422,10 @@ h6.con-title {font-size:15px; line-height:20px;}
 
 /* 파트너 중단 배너 */
 /*.partner-middle-banner {margin:20px 0; background:#f4f4f4; padding:20px 20px 20px 17px; border-radius:8px; display:flex; align-items:center;}*/
-.partner-middle-banner {display:flex; align-items:center; margin-top: 20px;}
+.partner-middle-banner {display:flex; justify-content: center; margin-top: 20px; background:url('/../images/partner_ban_04_bg.png') no-repeat center center; max-height: 110px; border-radius: 10px;}
+.partner-middle-banner img {max-height: 110px;}
+.partner-middle-banner_bg {display:flex; justify-content: center; margin-top: 20px; background:#f2f2f2; max-height: 110px; border-radius: 10px;}
+.partner-middle-banner_bg img {max-height: 110px;}
 .partner-middle-banner .icon {flex:0 0 auto; margin-right:10px;}
 .partner-middle-banner .txt {flex:1; width:100%; font-size:16px;line-height:24px;font-weight:700;}
 .partner-middle-banner .btn {flex:0 0 auto;border-radius:3px; background-color:transparent;}
