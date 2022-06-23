@@ -1838,14 +1838,16 @@ $await_cnt = $gram[0]['cnt'];
 
         $(".btn-reserv-block").on('click',function(){
 
-
+            var close_id = $(this).attr("id");
+            if( close_id === "close-approve-only"
+                || close_id === "close-counselor-only"
+                ||  close_id === "close-btn-msg" )
+                return;
 
             var thisDate = $(this).data('date1');
             var thisTimeStart = $(this).data('startTime');
             var thisTimeEnd = $(this).data('endTime');
             var arrDate = thisDate.split('-');
-
-
 
 
             obj_form_time[0].reset();
@@ -1860,6 +1862,7 @@ $await_cnt = $gram[0]['cnt'];
             var timeEnd = new Date((thisDate + ' ' + thisTimeEnd).replace(/-/g, "/")).getTime() / 1000;
 
             console.log(timeStart+' : '+timeEnd)
+
             //console.log('예약금지설정 팝업창', 'open', thisDate, timeStart, timeEnd);
             // 시작시간
             var obj_res_time = obj_form_time.find('select[name="ph_start_time"]');
@@ -1906,7 +1909,6 @@ $await_cnt = $gram[0]['cnt'];
             }
 
             obj_res_time2.focus();
-
 
             pop.open('reserveCalendarPop3');
 

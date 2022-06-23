@@ -25,7 +25,7 @@
                     <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 </div>
                 <div class="pop-footer">
-                    <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-block" id="close-approve-only" onclick="popalert.close();">닫기</button>
                     <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_waiting';">지금확인</button> 
                 </div>
             </div>
@@ -40,7 +40,7 @@
                 <div class="msg-txt">상담대기중인 예약 <span id="c_cnt">0</span>건 </div>
                 <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 <div class="pop-footer">
-                    <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-block"  id="close-counselor-only" onclick="popalert.close();">닫기</button>
                     <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_advice_list_1';">지금확인</button>
                 </div>
             </div>
@@ -60,7 +60,7 @@
                     <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 </div>
                 <div class="pop-footer">
-                    <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">닫기</button>
+                    <button type="button" class="btn btn-confirm btn-reserv-block" id="close-btn-msg" onclick="popalert.close();">닫기</button>
                     <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_advice_list_1';">상담신청 이동</button>
                     <button type="button" class="btn btn-confirm btn-reserv-send" onclick="location.href='reserve_waiting';">승인대기 이동</button>
                 </div>

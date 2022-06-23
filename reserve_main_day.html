@@ -1477,12 +1477,17 @@ $(function(){
 	//예약금지 버튼 클릭시
     $(".btn-reserv-block").click(function(){
 
+        var close_id = $(this).attr("id");
+        if( close_id === "close-approve-only"
+            || close_id === "close-counselor-only"
+            ||  close_id === "close-btn-msg" )
+            return;
+
         var arrDate = thisDate ? thisDate.split('-') : {};
         var arrTime = thisTime ? thisTime.split(':') : {};
         var thisDate = $(this).data('date1');
         var thisTimeStart = $(this).data('startTime');
         var thisTimeEnd = $(this).data('endTime');
-
 
 
         obj_form_time[0].reset();
@@ -1843,18 +1848,30 @@ function show_alert(obj){
         popalert.open('reserveCalendarPop1','준비중입니다.');
     }
 }
-$(document).ready(function(){
-    var await_cnt = '<?php echo $await_cnt;?>'; // 예약승인
-    var counselor_cnt = '<?php echo $wait_count;?>'; // 상담
 
-    if(await_cnt>0 && counselor_cnt > 0){
-        $('#bothMsg #a1_cnt').text(await_cnt);
-        $('#bothMsg #c1_cnt').text(counselor_cnt);
-        popalert.open('bothMsg');
-    }
-    $('#header_bell').css('display','none');
-    $('#btn_page_prev').prop('href','home_main')
-})
+    $(document).ready(function(){
+        var await_cnt = '<?php echo $await_cnt;?>'; // 예약승인
+        var counselor_cnt = '<?php echo $wait_count;?>'; // 상담
+
+        if(await_cnt>0 && counselor_cnt > 0){
+            $('#bothMsg #a1_cnt').text(await_cnt);
+            $('#bothMsg #c1_cnt').text(counselor_cnt);
+            popalert.open('bothMsg');
+        }
+
+        $('#header_bell').css('display','none');
+
+        if(await_cnt>0 && counselor_cnt == 0){
+            $('#approveOnly #a_cnt').text(await_cnt);
+            popalert.open('approveOnly');
+        }
+        if(counselor_cnt>0 && await_cnt == 0){ // 첫이용상담
+            $('#counselorOnly #c_cnt').text(counselor_cnt);
+            popalert.open('counselorOnly');
+        }
+
+        $('#btn_page_prev').prop('href','home_main')
+    })
 
 
         //미용사 수만큼 css 변경
