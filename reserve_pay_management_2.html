@@ -212,7 +212,6 @@ if(empty($grade[0]['grade_name'])){
     $grade[0]['grade_ord'] = $gd[1]['grade_ord']; // 값 없을때 1(vip)로 주기
 }
 
-$phone = $_GET['customer_cellphone'];
 
 ?>
 
@@ -234,26 +233,26 @@ $phone = $_GET['customer_cellphone'];
                                 -->
 
                                 <?php
-                                for($i=0;$i<count($tel['title']);$i++){
+                                for($i=0;$i<count($tel_f['title']);$i++){
                                     ?>
                                     <div class="phone-add-item">
                                         <div class="item-check">
                                             <?php if(empty($data["customer"]["id"])){ ?>
-                                                <label for="<?php echo $tel['tel'][$i];?>" class="form-radiobox">
-                                                    <input type="radio" name="phone" id="<?php echo $tel['tel'][$i];?>" value="<?php echo $tel['tel'][$i];?>" data-ctel="<?php echo $tel['tel'][$i];?>" data-mtel="<?php echo $phone;?>" class="change-main-phone">
+                                                <label for="<?php echo $tel_f['tel'][$i];?>" class="form-radiobox">
+                                                    <input type="radio" name="phone" id="<?php echo $tel_f['tel'][$i];?>" value="<?php echo $tel_f['tel'][$i];?>" data-ctel="<?php echo $tel_f['tel'][$i];?>" data-mtel="<?php echo $cus['cellphone'];?>" class="change-main-phone">
                                                     <span class="form-check-icon"><em>대표</em></span>
                                                 </label>
                                             <?php } ?>
                                         </div>
                                         <div class="item-data">
                                             <div class="phone-add-item-value">
-                                                <div class="phone-add-name"><div class="ellipsis"><?php echo $tel['title'][$i];?></div></div>
-                                                <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel['tel'][$i]);?></div></div>
+                                                <div class="phone-add-name"><div class="ellipsis"><?php echo $tel_f['title'][$i];?></div></div>
+                                                <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel_f['tel'][$i]);?></div></div>
                                                 <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
                                             </div>
                                         </div>
                                         <div class="item-ui">
-                                            <button type="button" class="btn-phone-del" data-seq="<?php echo $tel['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
+                                            <button type="button" class="btn-phone-del" data-seq="<?php echo $tel_f['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -303,8 +302,8 @@ $phone = $_GET['customer_cellphone'];
                                         <div class="form-group-item">
                                             <div class="form-item-label">전화번호</div>
                                             <div class="form-item-data type-6">
-                                                <input type="text" name="tel" id="main_tel" class="" value="<?php echo $phone;?>" placeholder="'-' 제외하고 입력" >
-                                                <input type="hidden" name="org_tel" id="org_tel" value="<?php echo $phone;?>">
+                                                <input type="text" name="tel" id="main_tel" class="" value="<?php echo $cus['cellphone'];?>" placeholder="'-' 제외하고 입력" >
+                                                <input type="hidden" name="org_tel" id="org_tel" value="<?php echo $cus['cellphone'];?>">
                                             </div>
                                         </div>
                                     </div>
