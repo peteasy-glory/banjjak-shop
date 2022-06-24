@@ -923,7 +923,7 @@ $await_cnt = $gram[0]['cnt'];
                                 </div>
                             </div>
                             <!-- calendar 시작 -->
-                            <div class="calendar-week-body" id="week_body_start">
+                            <div class="calendar-week-body" id="week_body_start" style="overflow: hidden">
                                 <div class="calendar-week-current-time" style="display: block;" id="time_schedule_<?php echo $thisTime;?>" data-curTime="<?php echo $thisTime;?>" data-nowTime="<?php echo date('H:i');?>"><div class="bar"></div><div class="value"><?php echo date('h:i');?></div></div>
                                 <?php
                                 $time_count = 0;
