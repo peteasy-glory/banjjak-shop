@@ -3729,7 +3729,20 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 /*2022.06.22 shop_category*/
 .btn-tab-item-add-2:after{bottom: -1px !important;
 }
-/*.margin-right-0{margin-right:0px !important}*/
+
+
+
+/*2022.06.24 작업/결제관리 보조연락처 */
+.call_edit {
+	width: 63px;
+	height: 27px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 5px;
+	border:1px solid #ebebeb;
+
+}
 
 /*========================================
 @ PC버전
