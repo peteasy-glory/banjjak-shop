@@ -687,7 +687,7 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
             <div class="custom-modal-content">
                 <div class="popup_img">
                     <div class="swiper-container_front swiper-container">
-                        <div class="swiper-wrapper">
+                        <div class="swiper-wrapper" id="popup-wraper">
                             <div class="swiper-slide">
                                 <a href="javascript:location.href='mypage_notice_view?notice_seq=19';">
                                     <img src="/images/banner/grade_banner.jpg" />
@@ -811,6 +811,20 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
         }
 
 
+
+        let slide_length = document.querySelector("#popup-wraper").children.length-1;
+
+        let random = Math.floor(Math.random()*10);
+
+        while(random > slide_length){
+
+            random = Math.floor(Math.random()*10);
+
+        }
+
+
+
+
         let popup_swiper = new Swiper('.swiper-container_front', {
 
             direction:'horizontal',
@@ -824,9 +838,11 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                 prevEl:".next",
             },
             watchOverflow:true,
+            initialSlide:random
 
 
         });
+
     </script>
 
 <?
