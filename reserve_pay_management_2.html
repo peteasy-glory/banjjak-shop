@@ -234,26 +234,26 @@ $phone = $_GET['customer_cellphone'];
                                 -->
 
                                 <?php
-                                for($i=0;$i<count($tel_f['title']);$i++){
+                                for($i=0;$i<count($tel['title']);$i++){
                                     ?>
                                     <div class="phone-add-item">
                                         <div class="item-check">
                                             <?php if(empty($data["customer"]["id"])){ ?>
-                                                <label for="<?php echo $tel_f['tel'][$i];?>" class="form-radiobox">
-                                                    <input type="radio" name="phone" id="<?php echo $tel_f['tel'][$i];?>" value="<?php echo $tel_f['tel'][$i];?>" data-ctel="<?php echo $tel_f['tel'][$i];?>" data-mtel="<?php echo $phone;?>" class="change-main-phone">
+                                                <label for="<?php echo $tel['tel'][$i];?>" class="form-radiobox">
+                                                    <input type="radio" name="phone" id="<?php echo $tel['tel'][$i];?>" value="<?php echo $tel['tel'][$i];?>" data-ctel="<?php echo $tel['tel'][$i];?>" data-mtel="<?php echo $phone;?>" class="change-main-phone">
                                                     <span class="form-check-icon"><em>대표</em></span>
                                                 </label>
                                             <?php } ?>
                                         </div>
                                         <div class="item-data">
                                             <div class="phone-add-item-value">
-                                                <div class="phone-add-name"><div class="ellipsis"><?php echo $tel_f['title'][$i];?></div></div>
-                                                <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel_f['tel'][$i]);?></div></div>
+                                                <div class="phone-add-name"><div class="ellipsis"><?php echo $tel['title'][$i];?></div></div>
+                                                <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel['tel'][$i]);?></div></div>
                                                 <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
                                             </div>
                                         </div>
                                         <div class="item-ui">
-                                            <button type="button" class="btn-phone-del" data-seq="<?php echo $tel_f['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
+                                            <button type="button" class="btn-phone-del" data-seq="<?php echo $tel['seq'][$i];?>"><span class="icon icon-phone-add-del"></span></button>
                                         </div>
                                     </div>
                                 <?php } ?>
@@ -283,6 +283,275 @@ $phone = $_GET['customer_cellphone'];
                             <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="add_tel">등록</button>
                         </div>
                         <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="numberAddPop1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-header">
+                            <h4 class="con-title">전화번호 수정</h4>
+                        </div>
+                        <div class="pop-body phone-add-wrap">
+
+                            <!-- 입력 불가시 phone-add-input 클래스에 disabled 클래스 추가 및 input태그에 disabled속성 추가 -->
+                            <div class="phone-add-input disabled">
+                                <div class="form-group">
+                                    <div class="form-group-cell">
+                                        <div class="form-group-item">
+                                            <div class="form-item-label">전화번호</div>
+                                            <div class="form-item-data type-6">
+                                                <input type="text" name="tel" id="main_tel" class="" value="<?php echo $phone;?>" placeholder="'-' 제외하고 입력" >
+                                                <input type="hidden" name="org_tel" id="org_tel" value="<?php echo $phone;?>">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="modify_tel">수정</button>
+                        </div>
+                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="memberGradeAddPop" class="layer-pop-wrap " style="z-index: 100000;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-header">
+                            <h4 class="con-title">회원등급 부여</h4>
+                        </div>
+                        <div class="pop-body">
+                            <div class="msg-txt">현재 <?php echo $pet_name;?> (<?php echo add_hyphen($phone);?>)고객님의 등급은 <?php echo $grade[0]['grade_name'];?> 입니다.</div>
+                            <div class="form-group">
+                                <div class="form-group-item">
+                                    <select name="member_grade" id="member_grade">
+                                        <?php
+                                        $que = "SELECT * FROM tb_grade_of_shop WHERE artist_id = '{$user_id}' ORDER BY grade_ord ASC";
+                                        echo $que;
+                                        $tgos = sql_fetch_array($que);
+                                        if(count($tgos)){
+                                            foreach($tgos as $tgos){
+                                                //echo $tgos['grade_name'].':'.$grade[0]['name'];
+                                                ?>
+                                                <option value="<?php echo $tgos['idx'];?>" <?php echo ($grade[0]['grade_name']==$tgos['grade_name'])?'selected':'';?>><?php echo $tgos['grade_name'];?></option>
+                                            <?php }}?>
+                                    </select>
+                                    <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="set_grade();">저장</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article id="allMemberGradeAddPop" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-header">
+                            <h4 class="con-title">전체회원 등급부여</h4>
+                        </div>
+                        <div class="pop-body">
+                            <div class="msg-txt">모든 고객님의 등급을<br>하나의 등급으로 반영합니다.</div>
+                            <div class="form-group">
+                                <div class="form-group-item">
+                                    <select>
+                                        <option value="">VIP</option>
+                                        <option value="">Normal</option>
+                                        <option value="">Normal_B</option>
+                                    </select>
+                                    <div class="form-input-info">선택 후 저장하시면 반영됩니다.</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">저장</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <article id="memberGradeComPop" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="memberGradeComPop1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="memberGradeComPop11" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" id="del_num" onclick="del_tel(); popalert.close();">확인</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="memberGradeComPop4" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="memberGradeComPop2" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">등급이 부여되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" id="chk" onclick="change_main_phone();popalert.close();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="phoneConfirm" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">견주에게 핸드폰을 건네주세요.<br>견주가 직접 작성/동의/서명하는 곳입니다.<br><br>(PC의 경우 터치스크린 기능이 있는 화면에서만 가능)</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.href= './customer_beauty_agree?aid=<?php echo $shop_id;?>&uid=<?php echo $phone;?>&pid=<?php echo $pet_seq;?>';">확인</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="deleteCustomer" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">이 고객의 모든 펫 정보와 미용이력이 삭제되며, 복구할 수 없습니다.<br>삭제하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="delete_customer_confirm()">삭제</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="deletePet" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt"><?=$pet['name'] ?> 의 정보와 미용이력이 모두 삭제되며,</br>복구할 수 없습니다.</br></br>삭제하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="delete_pet_confirm()">삭제</button>
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="deleteAlert" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">삭제되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.href='customer_inquiry';">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="deletePetAlert" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">삭제되었습니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="msgAlert" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">준비중입니다.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="petImgAlert" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <img id="pet_pop_img" src="" >
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="location.reload();">확인</button>
+                        </div>
                     </div>
                 </div>
             </div>
