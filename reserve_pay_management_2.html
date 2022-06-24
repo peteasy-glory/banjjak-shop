@@ -3,6 +3,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
+
 if ($artist_flag === true) {
     $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
     $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
@@ -4180,7 +4181,7 @@ $phone = $_GET['customer_cellphone'];
             }
 
             $('#add_tel').on('click',function(){
-                var main_phone = '<?php echo $phone;?>';
+                var main_phone = '<?=$pay['cellphone']>';
                 var phone = $('#family_tel').val().replace('-','');
                 var id = '<?php echo $pay['customer_id'];?>';
                 console.log(phone)
