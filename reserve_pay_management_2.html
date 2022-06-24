@@ -4181,7 +4181,7 @@ $phone = $_GET['customer_cellphone'];
             }
 
             $('#add_tel').on('click',function(){
-                var main_phone = '<?=$pay['cellphone']>';
+                var main_phone = '<?php echo $cus['cellphone'];?> ';
                 var phone = $('#family_tel').val().replace('-','');
                 var id = '<?php echo $pay['customer_id'];?>';
                 console.log(phone)
