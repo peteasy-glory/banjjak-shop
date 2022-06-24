@@ -4171,13 +4171,168 @@ if(empty($grade[0]['grade_name'])){
 
 
         $(document).ready(function(){
-
             var cnt = $('.phone-add-item').length;
 
             if(cnt > 4){
                 $('#family_name, #family_tel').prop('disabled',true);
             }
-        })
+
+            $('#add_tel').on('click',function(){
+                var main_phone = '<?php echo $phone;?>';
+                var phone = $('#family_tel').val().replace('-','');
+                var id = '<?php echo $pay['customer_id'];?>';
+                console.log(phone)
+                if($('#family_name').val()==''){
+                    popalert.open('memberGradeComPop','이름을 입력해주세요.');
+                    $('#family_name').focus();
+                    return false;
+                }
+                if(phone==''){
+                    popalert.open('memberGradeComPop','전화번호를 입력해주세요.');
+                    $('#family_tel').focus();
+                    return false;
+                }
+                $.ajax({
+                    url: './data/get_book_data_ajax',
+                    data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone, 'customer_id':id},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(json) {
+                        if(json.flag == true){ // success
+                            popalert.open('memberGradeComPop1',json.error);
+                        }else{
+                            popalert.open('firstRequestMsg1', json.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr, status, error);
+                    }
+                });
+            });
+
+            //대표번호 수정
+            $('#modify_tel').on('click',function(){
+                var phone = $('#main_tel').val();
+                if(phone==''){
+                    popalert.open('memberGradeComPop','전화번호를 입력해주세요.');
+                    $('#main_tel').focus();
+                    return false;
+                }
+
+                $.ajax({
+                    url: './data/get_book_data_ajax.php',
+                    data: {'mode':'modifyTel','org':$('#org_tel').val(),'tel':phone},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(json) {
+                        if(json.flag == true){ // success
+                            console.log(json.tel)
+                            popalert.open('memberGradeComPop1',json.error);
+                            location.href = 'customer_view?customer_cellphone='+json.tel;
+                        }else{
+                            popalert.open('firstRequestMsg1', json.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr, status, error);
+                    }
+                });
+            });
+
+            //대표번호 변경
+            $('.change-main-phone').on('click',function(){
+                console.log($(this).data('mtel')+' : '+$(this).data('ctel'))
+                $('#memberGradeComPop2 #chk').data('mtel',$(this).data('mtel'));
+                $('#memberGradeComPop2 #chk').data('ctel',$(this).data('ctel'));
+
+                /*if(phone==''){
+                    popalert.open('memberGradeComPop','전화번호를 입력해주세요.');
+                    $('#main_tel').focus();
+                    return false;
+                }*/
+                popalert.open('memberGradeComPop2','대표번호를 변경합니다.');
+
+
+
+            });
+
+
+
+            $(".toggle-target").on("click",function(){
+
+                $(this).parents('.customer-table-cell').next().toggle();
+
+                if($(this).hasClass('customer-table-toggle2')){
+                    $(this).removeClass('customer-table-toggle2');
+
+                }else{
+                    $(this).addClass('customer-table-toggle2');
+                }
+
+            })
+        });
+
+        console.log('test');
+        function change_main_phone(){
+            var mtel = $('#chk').data('mtel');
+            var ctel = $('#chk').data('ctel');
+            console.log(mtel+':'+ctel)
+            $.ajax({
+                url: './data/get_book_data_ajax',
+                data: {'mode':'changeMainPhone','org':mtel,'tel':ctel},
+                type: 'POST',
+                dataType: 'json',
+                success: function(json) {
+                    if(json.flag == true){ // success
+                        popalert.open('memberGradeComPop',json.error);
+                        setTimeout(function(){
+                            location.href = 'customer_view?customer_cellphone='+json.tel;
+                        },3000)
+
+                    }else{
+                        popalert.open('firstRequestMsg1', json.error);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log(xhr, status, error);
+                }
+            });
+        }
+
+        //보조 연락처 삭제
+        $(document).on('click','.btn-phone-del',function(){
+            var seq = $(this).data('seq');
+            $('#del_num').data('seq',seq);
+            popalert.open('memberGradeComPop11','해당 연락처를 삭제하시겠습니까?');
+        });
+
+        function del_tel(){
+            var seq = $('#del_num').data('seq');
+            if(!seq){
+                popalert.open('memberGradeComPop1','연락처 번호가 없습니다.');
+            } else {
+                $.ajax({
+                    url: './data/get_book_data_ajax',
+                    data: {'mode':'extraTelDel','seq':seq},
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(json) {
+                        if(json.flag == true){
+                            popalert.open('memberGradeComPop1','연락처가 삭제되었습니다.');
+                            setTimeout(function(){
+                                location.reload();
+                            },2000)
+                        } else {
+                            alert(json.error);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(xhr, status, error);
+                    }
+                });
+            }
+
+        }
 
 
 
