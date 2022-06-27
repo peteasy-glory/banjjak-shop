@@ -923,7 +923,7 @@ $await_cnt = $gram[0]['cnt'];
                                 </div>
                             </div>
                             <!-- calendar 시작 -->
-                            <div class="calendar-week-body" id="week_body_start" style="overflow: hidden">
+                            <div class="calendar-week-body" id="week_body_start">
                                 <div class="calendar-week-current-time" style="display: block;" id="time_schedule_<?php echo $thisTime;?>" data-curTime="<?php echo $thisTime;?>" data-nowTime="<?php echo date('H:i');?>"><div class="bar"></div><div class="value"><?php echo date('h:i');?></div></div>
                                 <?php
                                 $time_count = 0;
@@ -2270,9 +2270,12 @@ $await_cnt = $gram[0]['cnt'];
 
     let startLabelHeight = $(".time-start-label").height();
 
+    console.log("now_hours = " + now_hours);
+    console.log("workTimeEnd = " + workTimeEnd);
+    console.log("workTimeStart = " + workTimeStart)
 
 
-    if(now_hours > workTimeEnd || now_hours < workTimeStart){
+    if(now_hours > workTimeEnd || now_hours < workTimeStart || (now_hours == workTimeEnd && now_m > 0) ){
         $(".calendar-week-current-time").hide();
 
     }else{
