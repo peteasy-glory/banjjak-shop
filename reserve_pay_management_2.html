@@ -248,7 +248,7 @@ if(empty($grade[0]['grade_name'])){
                                             <div class="phone-add-item-value">
                                                 <div class="phone-add-name"><div class="ellipsis"><?php echo $tel_f['title'][$i];?></div></div>
                                                 <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel_f['tel'][$i]);?></div></div>
-                                                <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
+                                                <div class="phone-state-icon"><a href="tel:<?php echo $pay['cellphone'];?>"><div class="icon icon-phone-add-tel" ></div></a></div>
                                             </div>
                                         </div>
                                         <div class="item-ui">
@@ -4557,7 +4557,7 @@ if(empty($grade[0]['grade_name'])){
                     if(json.flag == true){ // success
                         popalert.open('memberGradeComPop',json.error);
                         setTimeout(function(){
-                            location.href = 'customer_view?customer_cellphone='+json.tel;
+                            Location.reload();
                         },3000)
 
                     }else{
