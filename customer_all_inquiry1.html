@@ -386,7 +386,7 @@ while($row = mysqli_fetch_assoc($result)){
                                 service2 = "[신규등록]";
                             }else{
                                 start_txt = "최근이용일시";
-                                reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round">예약내역</a>';
+                                reserve_info = '<a href="reserve_pay_management_2?payment_log_seq='+v.payment_log_seq+'" class="btn btn-outline-gray btn-small-size btn-round scroll-save" onclick="scroll_save()">예약내역</a>';
                             }
 
                             // 등급 아이콘
@@ -424,7 +424,7 @@ while($row = mysqli_fetch_assoc($result)){
 									<div class="customer-table-txt">${v.sum_local_price_cash.format()}원</div>
 								</td>
 							</tr>
-							<tr class="customer-table-view">
+							<tr class="customer-table-view customer-table-view-${i}">
 								<td colspan="5">
 									<div class="flex-table">
 										<div class="flex-table-cell">
@@ -441,7 +441,7 @@ while($row = mysqli_fetch_assoc($result)){
 																<div class="grid-layout btn-grid-group">
 																	<div class="grid-layout-inner">
                                                                         <div class="grid-layout-cell grid-2">${reserve_info}</div>
-																		<div class="grid-layout-cell grid-2"><a href="customer_view?customer_cellphone=${v.cellphone}&pet_seq=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round">고객정보</a></div>
+																		<div class="grid-layout-cell grid-2"><a href="customer_view?customer_cellphone=${v.cellphone}&pet_seq=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round scroll-save" onclick="scroll_save()" ">고객정보</a></div>
 																	</div>
 																</div>
 															</div>
@@ -487,8 +487,8 @@ while($row = mysqli_fetch_assoc($result)){
 													<div class="flex-table-data-inner">
 														<div class="grid-layout btn-grid-group">
 															<div class="grid-layout-inner">
-																<div class="grid-layout-cell grid-2"><a href="customer_beauty_agree?aid=${artist_id}&uid=${v.cellphone}&pid=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round">미용동의서</a></div>
-																<div class="grid-layout-cell grid-2"><a href="customer_hotel_agree?aid=${artist_id}&uid=${v.cellphone}&pid=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round">호텔동의서</a></div>
+																<div class="grid-layout-cell grid-2"><a href="customer_beauty_agree?aid=${artist_id}&uid=${v.cellphone}&pid=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round scroll-save" onclick="scroll_save()">미용동의서</a></div>
+																<div class="grid-layout-cell grid-2"><a href="customer_hotel_agree?aid=${artist_id}&uid=${v.cellphone}&pid=${v.pet_seq}" class="btn btn-outline-gray btn-small-size btn-round scroll-save" onclick="scroll_save()">호텔동의서</a></div>
 															</div>
 														</div>
 													</div>
@@ -614,6 +614,26 @@ while($row = mysqli_fetch_assoc($result)){
                     var doughnutCtx = document.getElementById('doughnut');
                     var doughnut = new Chart(doughnutCtx , doughnutConfig);
                     */
+
+                    if(!isNaN(parseInt(localStorage.getItem("scroll"))) ){
+                        $('.page-body').stop().animate({'scrollTop':parseInt(localStorage.getItem("scroll"))}, {queue:false, duration:350});
+
+                    }
+
+                    if(localStorage.getItem("item")){
+                        let target_class_name = localStorage.getItem("item").split(" ");
+                        console.log(target_class_name[1].slice(0,-1));
+
+                        let target_class = document.getElementsByClassName(target_class_name[1].slice(0,-1));
+
+                        target_class[0].setAttribute('style','display:table-row');
+                        localStorage.removeItem("item");
+                    }
+
+                    setTimeout(function(){
+                        localStorage.removeItem("scroll");
+
+                    },5000)
                 },
                 error: function(xhr, status, error) {
                     //alert(error + "네트워크에러");
@@ -625,6 +645,9 @@ while($row = mysqli_fetch_assoc($result)){
 
                     $(".customer-table-toggle").on("click",function(){
 
+
+                        let target_class_name = JSON.stringify($(this).parents(".customer-table-cell").next().attr("class"));
+                        localStorage.setItem("item",target_class_name);
                         $(this).parents(".customer-table-cell").next().toggle();
                         if($(this).hasClass('customer-table-toggle2')){
                             $(this).removeClass('customer-table-toggle2');
@@ -787,6 +810,30 @@ while($row = mysqli_fetch_assoc($result)){
                     }
                 }
             });
+        }
+
+        // $(document).ready(function(){
+        //
+        //     if(!localStorage.getItem("scroll") === null){
+        //         $('.page-body').stop().animate({'scrollTop':parseInt(localStorage.getItem("scroll"))}, {queue:false, duration:350});
+        //
+        //
+        //
+        //     }
+        //     if()
+        //
+        //     setTimeout(function(){
+        //         localStorage.removeItem("scroll");
+        //
+        //     },10000)
+        //
+        // })
+
+        function scroll_save(){
+
+            let now_scroll = $(".page-body").scrollTop();
+
+            localStorage.setItem("scroll",now_scroll);
         }
     </script>
 

@@ -1196,7 +1196,9 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
             });
 
             $('#header_bell').css('display','none');
-            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
+            $('#btn_page_prev').on("click",function (){
+                history.back(); return false;
+            })
 
         });
 

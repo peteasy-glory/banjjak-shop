@@ -957,7 +957,10 @@ if($data["pet"]["customer_id"] != ''){
 	}
 
     $(document).ready(function(){
-        $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl2'];?>');
+        //$('#btn_page_prev').prop('href','<?php //echo $_SESSION['backurl2'];?>//');
+        $('#btn_page_prev').on("click",function (){
+            history.back(); return false;
+        })
     })
 
 
