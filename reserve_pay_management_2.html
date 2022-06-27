@@ -656,8 +656,8 @@ if(empty($grade[0]['grade_name'])){
 
                                                     <div class="flex-table-data-side">
                                                         <div class="btn-ui-group">
-                                                            <a href="tel:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
-                                                            <a href="sms:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
+                                                            <a href="tel:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                                            <a href="sms:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -4225,11 +4225,14 @@ if(empty($grade[0]['grade_name'])){
         // 이전미용 상세보기 뒤로가기
         var history_back = '<?=$history_back?>';
         $(document).ready(function(){
-            if(history_back > 0){
-                $('#btn_page_prev').prop('href','javascript:history.back();');
-            }else{
-                $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
-            }
+            // if(history_back > 0){
+            //     $('#btn_page_prev').prop('href','javascript:history.back(); return false;');
+            //}else{
+            //    $('#btn_page_prev').prop('href','<?php //echo $_SESSION['backurl1'];?>//');
+            //}
+            $('#btn_page_prev').on("click",function (){
+                history.back(); return false;
+            })
 
             $('input[name="cat_weight"]').each(function(index){
                 if($(this).is(':checked')==true){

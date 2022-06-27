@@ -17,7 +17,7 @@
 <!-- header -->
 <header id="header">	
 	<div class="header-left">
-		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+		<a href="#" class="btn-page-ui btn-page-prev" id="btn_page_prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
 	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
 	<div class="page-title">호텔동의서</div>
@@ -265,5 +265,12 @@
 	<!-- //page-bottom -->	
 </section>
 <!-- //container -->
+<script>
+    $(document).ready(function(){
+        $('#btn_page_prev').on("click",function (){
+            history.back(); return false;
+        })
+    })
+</script>
 </body>
 </html>
