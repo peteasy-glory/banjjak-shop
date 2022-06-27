@@ -5,7 +5,7 @@
 	
 	$(document).ready(function(){
 		$(".btn-page-prev").click(function(){
-			//history.back();
+			history.back(); return false;
 		})
 		
 		/*

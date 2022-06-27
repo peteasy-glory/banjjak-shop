@@ -3741,6 +3741,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	justify-content: center;
 	border-radius: 5px;
 	border:1px solid #ebebeb;
+	cursor:pointer;
 
 }
 
