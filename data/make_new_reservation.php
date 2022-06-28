@@ -81,6 +81,7 @@ if($_POST['id_use_yn']=='n' && empty($_POST['pet_seq'])) {
     $mounting       = ($_POST['mounting']=='')?0:$_POST['mounting'];
 
     $pet_type = ($_POST['pet_kind'] == 'cat')? $_POST['pet_type_cat'] : $_POST['pet_type'];
+    $neutral = ($_POST['neutral'] != '')? "neutral = '{$_POST['neutral']}', " : "";
 
     //펫 기본 정보 업데이트
     $sql  = "INSERT INTO tb_mypet SET ";
@@ -93,7 +94,7 @@ if($_POST['id_use_yn']=='n' && empty($_POST['pet_seq'])) {
     $sql .= "month          = '{$_POST['pet_month']}', ";
     $sql .= "day            = '{$_POST['pet_day']}', ";
     $sql .= "gender         = '{$_POST['pet_gender_m']}', ";
-    $sql .= "neutral        = '{$_POST['neutral']}', ";
+    $sql .= $neutral;
     $sql .= "weight         = '{$_POST['pet_weight1']}.{$_POST['pet_weight2']}', ";
     $sql .= "beauty_exp     = '{$_POST['beauty_cnt']}', ";
     $sql .= "vaccination    = '{$_POST['vaccination']}', ";
