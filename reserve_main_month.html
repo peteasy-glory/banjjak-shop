@@ -64,15 +64,15 @@ $today_day = date("d");
 // var_dump($_SESSION);
 $artist_flag = $_SESSION['artist_flag'];
 
-if ($artist_flag === true) {
-    $artist_id = $_SESSION['shop_user_id'];
-    $user_id = $_SESSION['shop_user_id'];
-    $user_name = $_SESSION['shop_user_nickname'];
-} else {
-    $artist_id = $_SESSION['artist_id'];
-    $user_id = $_SESSION['gobeauty_user_id'];
-    $user_name = $_SESSION['gobeauty_user_nickname'];
-}
+//if ($artist_flag === true) {
+//    $artist_id = $_SESSION['shop_user_id'];
+//    $user_id = $_SESSION['shop_user_id'];
+//    $user_name = $_SESSION['shop_user_nickname'];
+//} else {
+//    $artist_id = $_SESSION['artist_id'];
+//    $user_id = $_SESSION['gobeauty_user_id'];
+//    $user_name = $_SESSION['gobeauty_user_nickname'];
+//}
 
 $shop_sql = "select * from tb_shop where customer_id = '" . $user_id . "'";
 $shop_result = mysqli_query($connection, $shop_sql);
@@ -408,7 +408,7 @@ while ($ph_datas = mysqli_fetch_object($ph_result)) {
     $em = $ph_datas->end_month;
     $ed = $ph_datas->end_day;
     $eh = $ph_datas->end_hour;
-    if ($type == "all" && $artist_data->worker == $ph_datas->worker) {
+    if ($type == "all") {
         if ($sm < $mm && $em > $mm) {
             $sd = 1;
             $ed = (int) date('t', strtotime("$yy-$mm-01"));
@@ -434,7 +434,6 @@ while ($ph_datas = mysqli_fetch_object($ph_result)) {
         array_push($private_notall_holiday_array, $sd);
     }
 }
-
 
 /* 선택 상자 일자 만들기 2020-02-17 james */
 $sel_year = $yy;
@@ -752,7 +751,7 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                                     $rest_class =   "break";
                                                     $rest_word = "임휴";
                                                     //$is_rest = true;
-                                                } else if (in_array($day, $private_notall_holiday_array)) {
+                                                } else if (in_array($day+1, $private_notall_holiday_array)) {
                                                     //echo " bgcolor='#eceaea' ";
                                                     $rest_word = "일정";
                                                 } else {
