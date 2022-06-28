@@ -2010,6 +2010,15 @@ function show_alert(obj){
             }
         })
 
+    }else{
+        $.each(day_item, function(i,el){
+            $(el).find('.item-group-wrap').css({'flex-direction':'column'})
+            $(el).find('.item-thumb-add').css({'display':'none'});
+            $(el).find('.span-after').css({'display':'none'});
+            $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
+        })
+
+
     }
 
         function show_img_pop(e){
