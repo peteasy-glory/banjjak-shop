@@ -93,6 +93,7 @@ if($_POST['id_use_yn']=='n' && empty($_POST['pet_seq'])) {
     $sql .= "month          = '{$_POST['pet_month']}', ";
     $sql .= "day            = '{$_POST['pet_day']}', ";
     $sql .= "gender         = '{$_POST['pet_gender_m']}', ";
+    $sql .= "neutral        = '{$_POST['neutral']}', ";
     $sql .= "weight         = '{$_POST['pet_weight1']}.{$_POST['pet_weight2']}', ";
     $sql .= "beauty_exp     = '{$_POST['beauty_cnt']}', ";
     $sql .= "vaccination    = '{$_POST['vaccination']}', ";
