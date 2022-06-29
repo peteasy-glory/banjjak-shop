@@ -97,6 +97,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							FROM tb_payment_log
 							WHERE artist_id = '".$r_artist_id."'
 								AND cellphone = pl.cellphone
+								AND is_cancel = 0
 								AND product_type = 'B'
 							LIMIT 0 , 1
 						) as cnt,
