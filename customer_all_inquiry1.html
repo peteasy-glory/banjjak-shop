@@ -616,7 +616,7 @@ while($row = mysqli_fetch_assoc($result)){
                     */
 
                     if(!isNaN(parseInt(localStorage.getItem("scroll"))) ){
-                        $('.page-body').stop().animate({'scrollTop':parseInt(localStorage.getItem("scroll"))}, {queue:false, duration:350});
+                        $('.page-body').stop().animate({'scrollTop':parseInt(localStorage.getItem("scroll"))+$('#header').outerHeight(true)}, {queue:false, duration:350});
 
                     }
 
@@ -627,11 +627,12 @@ while($row = mysqli_fetch_assoc($result)){
                         let target_class = document.getElementsByClassName(target_class_name[1].slice(0,-1));
 
                         target_class[0].setAttribute('style','display:table-row');
-                        localStorage.removeItem("item");
+
                     }
 
                     setTimeout(function(){
                         localStorage.removeItem("scroll");
+                        localStorage.removeItem("item");
 
                     },5000)
                 },

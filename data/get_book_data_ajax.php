@@ -1549,7 +1549,7 @@ switch($clear['mode']){
         $que = "INSERT INTO tb_customer_family SET ";
         $que .= "artist_id          = '{$user_id}', ";
         $que .= "to_cellphone       = '{$tel}', ";
-        $que .= "from_nickname      = '', ";
+        $que .= "from_nickname      = '연락처', ";
         $que .= "from_cellphone     = '{$_POST['org']}', ";
         $que .= "from_customer_id   = '', ";
         $que .= "reg_dt             = NOW() ";
@@ -1562,6 +1562,7 @@ switch($clear['mode']){
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
         break;
         //신규등록 기존고객 / 펫
+
     case 'registNew':
         $json['flag'] = true;
         $json['error'] = '';

@@ -96,7 +96,6 @@ while ($row = mysqli_fetch_assoc($result)) {
 }
 
 
-
 //펫정보
 $where_qy = "";
 // 회원 데이터 호출(정회원)
@@ -242,6 +241,7 @@ $another_reserve = 0;
 
 <!-- container -->
 <section id="container">
+
 	<!-- page-body -->
 	<div class="page-body">
 		<div class="customer-view-wrap">
@@ -849,6 +849,9 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 		</div>
 	</div>
 	<!-- //page-body -->
+<!--    <span>--><?php
+//        print_r($data['customer']);
+//        ?><!--</span>-->
     <article id="numberAddPop" class="layer-pop-wrap">
         <div class="layer-pop-parent">
             <div class="layer-pop-children">
@@ -879,7 +882,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                                     <div class="phone-add-item-value">
                                         <div class="phone-add-name"><div class="ellipsis"><?php echo $tel['title'][$i];?></div></div>
                                         <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel['tel'][$i]);?></div></div>
-                                        <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
+                                        <div class="phone-state-icon"><a href="tel:<?php echo $tel['tel'][$i]; ?>"><div class="icon icon-phone-add-tel" ></div></a></div>
                                     </div>
                                 </div>
                                 <div class="item-ui">
