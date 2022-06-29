@@ -238,7 +238,7 @@ if(empty($grade[0]['grade_name'])){
                                     ?>
                                     <div class="phone-add-item">
                                         <div class="item-check">
-                                            <?php if(empty($data["customer"]["id"])){ ?>
+                                            <?php if(empty($cus_pay['id'])){ ?>
                                                 <label for="<?php echo $tel_f['tel'][$i];?>" class="form-radiobox">
                                                     <input type="radio" name="phone" id="<?php echo $tel_f['tel'][$i];?>" value="<?php echo $tel_f['tel'][$i];?>" data-ctel="<?php echo $tel_f['tel'][$i];?>" data-mtel="<?php echo $cus['cellphone'];?>" class="change-main-phone">
                                                     <span class="form-check-icon"><em>대표</em></span>
