@@ -1282,7 +1282,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                     return false;
                 }
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone, 'customer_id':id},
                     type: 'POST',
                     dataType: 'json',
@@ -1363,11 +1363,12 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 
         console.log('test');
         function change_main_phone(){
+            console.log("이거야")
             var mtel = $('#chk').data('mtel');
             var ctel = $('#chk').data('ctel');
             console.log(mtel+':'+ctel)
             $.ajax({
-                url: './data/get_book_data_ajax',
+                url: './data/get_book_data_ajax.php',
                 data: {'mode':'changeMainPhone','org':mtel,'tel':ctel},
                 type: 'POST',
                 dataType: 'json',
@@ -1376,6 +1377,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                         popalert.open('memberGradeComPop',json.error);
                         setTimeout(function(){
                             location.href = 'customer_view?customer_cellphone='+json.tel;
+
                         },3000)
 
                     }else{
@@ -1401,7 +1403,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                 popalert.open('memberGradeComPop1','연락처 번호가 없습니다.');
             } else {
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'extraTelDel','seq':seq},
                     type: 'POST',
                     dataType: 'json',

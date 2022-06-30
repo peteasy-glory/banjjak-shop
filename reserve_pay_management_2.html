@@ -170,7 +170,7 @@ $que = "SELECT * FROM tb_shop_customer_memo WHERE customer_id = '{$cus['id']}' A
 $scm = sql_fetch_array($que);
 
 //가족번호조회
-$que = "SELECT * FROM tb_customer_family WHERE to_cellphone = '{$pay['cellphone']}' AND artist_id = '{$user_id}' AND is_delete = 0";
+$que = "SELECT * FROM tb_customer_family WHERE to_cellphone = '{$pay['cellphone']}'  AND artist_id = '{$user_id}' AND is_delete = 0";
 //echo $que;
 $arr_t = sql_fetch_array($que);
 if(count($arr_t)>0){
@@ -215,9 +215,9 @@ if(empty($grade[0]['grade_name'])){
 
 ?>
 
+
     <!-- container -->
     <section id="container">
-
 
         <article id="numberAddPop" class="layer-pop-wrap">
             <div class="layer-pop-parent">
@@ -4453,9 +4453,9 @@ if(empty($grade[0]['grade_name'])){
             }
 
             $('#add_tel').on('click',function(){
-                var main_phone = '<?php echo $cus['cellphone'];?> ';
+                var main_phone = '<?php echo $pay['cellphone'];?> ';
                 var phone = $('#family_tel').val().replace('-','');
-                var id = '<?php echo $pay['customer_id'];?>';
+                var id = '';
                 console.log(phone)
                 if($('#family_name').val()==''){
                     popalert.open('memberGradeComPop','이름을 입력해주세요.');
@@ -4468,7 +4468,7 @@ if(empty($grade[0]['grade_name'])){
                     return false;
                 }
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone, 'customer_id':id},
                     type: 'POST',
                     dataType: 'json',
@@ -4553,7 +4553,7 @@ if(empty($grade[0]['grade_name'])){
             var ctel = $('#chk').data('ctel');
             console.log(mtel+':'+ctel)
             $.ajax({
-                url: './data/get_book_data_ajax',
+                url: './data/get_book_data_ajax.php',
                 data: {'mode':'changeMainPhone','org':mtel,'tel':ctel},
                 type: 'POST',
                 dataType: 'json',
@@ -4561,8 +4561,8 @@ if(empty($grade[0]['grade_name'])){
                     if(json.flag == true){ // success
                         popalert.open('memberGradeComPop',json.error);
                         setTimeout(function(){
-                            Location.reload();
-                        },3000)
+                            location.reload();
+                        },2000)
 
                     }else{
                         popalert.open('firstRequestMsg1', json.error);
@@ -4587,7 +4587,7 @@ if(empty($grade[0]['grade_name'])){
                 popalert.open('memberGradeComPop1','연락처 번호가 없습니다.');
             } else {
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'extraTelDel','seq':seq},
                     type: 'POST',
                     dataType: 'json',
