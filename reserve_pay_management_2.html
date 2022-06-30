@@ -273,7 +273,7 @@ if(empty($grade[0]['grade_name'])){
                                         <div class="form-group-item">
                                             <div class="form-item-label">전화번호</div>
                                             <div class="form-item-data type-6">
-                                                <input type="text" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
+                                                <input type="text" maxlength="15" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
                                             </div>
                                         </div>
                                     </div>
@@ -646,7 +646,7 @@ if(empty($grade[0]['grade_name'])){
                                     <div class="call_edit" onclick="popalert.open('numberAddPop')"><span>편집</span></div>
                                 </div>
                                 <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
+                                    <div class="flex-table-data-inner" style="flex-direction: column; align-items: normal">
                                         <?php for($i=0;$i<count($tel_f['title']);$i++){ ?>
                                             <div class="flex-table-item middle">
                                                 <div class="flex-table-data">
@@ -4613,8 +4613,27 @@ if(empty($grade[0]['grade_name'])){
 
 
 
+        function setInputFilter(textbox, inputFilter) {
+            ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+                textbox.addEventListener(event, function() {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            });
+        }
 
 
+
+        setInputFilter(document.getElementById("family_tel"), function(value) {
+            return /^-?\d*$/.test(value); });
 
 
 
