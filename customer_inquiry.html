@@ -256,7 +256,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                     console.log(v)
 
 									var name = (v.payment.product_pet_name)? v.payment.product_pet_name : v.payment.name;
-									var photo = (v.payment.type == "cat")? "../images/cat_pet.png" : "../images/dog_pet.png";
+									var photo = (v.payment.type == "cat")? "/images/cat/cat_90x90/cat_90x90@3x.png" : "/images/dog/dog_90x90/dog_90x90@3x.png";
 									var type = (v.payment.pet_type == "기타")? "<span class='pet_type'>(기타)"+v.payment.pet_type2+"</span>" : "<span class='pet_type'>"+v.payment.pet_type+"</span>";
 									name = (v.payment.pet_name && v.payment.pet_name != "")? v.payment.pet_name : ((v.payment.pet_name && v.payment.pet_name != "")? v.payment.name : name);
 									//photo = (v.payment.photo && v.payment.photo != "")? "https://image.banjjakpet.com"+img_link_change(v.payment.photo) : photo;
