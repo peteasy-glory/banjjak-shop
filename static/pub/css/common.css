@@ -3744,6 +3744,14 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	cursor:pointer;
 
 }
+/*2022.06.30 작업/결제관리 노쇼버튼 수정*/
+.set-noshow{
+	width: 95px !important;
+	margin-right: 20px;
+	font-size: 15px !important;
+	max-height: 30px;
+}
+
 
 /*========================================
 @ PC버전
