@@ -9,6 +9,13 @@
           </advancedOptions>
         </fileTransfer>
       </webServer>
+      <webServer id="3ed69778-a369-407d-9f11-45f5377cd100" name="banjjak_design_publish">
+        <fileTransfer rootFolder="/var/www/html/design_publish" accessType="SFTP" host="15.164.54.42" port="22" sshConfigId="396cda25-50c4-45f6-9261-7c396615a903" sshConfig="ubuntu@15.164.54.42:22 key" keyPair="true">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

@@ -70,7 +70,14 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
         var banner = ["https://image.banjjakpet.com/images/biyosekkai_banner.jpg"];
         var sub_title = [''];
         var event_item_list0 = ['BYS-PT-K60~90','BYS-P.BT-K60~90','BYS-P.ST-K60~90','BYS-P.GT-K60~90','BYS-WT-K70~80','BYS-W.BT-K70~80','BYS-W.ST-K70~80','BYS-W.GT-K70~80','BYS-WW-BBAEK','BYS-WT-BBAEK','BYS-WT-FINE','BYS-PT7-BBAEK','BYS-PW7-BBAEK','BYS-WT7-BBAEK','BYS-WT7-M2','BYS-WT7-MULTI','BYS-WNW-MULTI','BYS-P.BM-C70~80','BYS-P.SM-C70~80','BYS-P.GM-C70~80','BYS-PW-C.MULTI','BYS-PW-C.BBAEK'];
+    }else if(seq == '67'){
+        <?php
+        unset($_SESSION['backurl_shop']);
+        $_SESSION['backurl_shop'] = $_SESSION["backurl1"];
+        ?>
+        location.replace("shop_view?product_no=ETCB-HEEMING-B01");
     }
+
 
     var lastScrollTop = 0;
     var timer = null;
