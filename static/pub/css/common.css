@@ -659,7 +659,7 @@ button.btn-text-button.btn-before-beauty.actived{background-image:url(../images/
 .label.small {padding:0 4px; font-size:11px; height:16px; line-height:14px; font-weight:400}
 .label.vvlarge {padding:0 12px; font-size:13px; height:32px; line-height:30px; font-weight:700}
 .label.vvvlarge {padding:0 12px; font-size:14px; height:40px; line-height:38px; font-weight:700}
-.label.label-noshow {font-size:14px; line-height:24px; padding:0 11px; font-weight:700; border-radius:5px; height:26px;}
+.label.label-noshow {font-size:14px; line-height:30px; padding:0 11px; font-weight:700; border-radius:5px; height:30px;}
 .label-soldout {display:block; font-size:16px; line-height:19px; color:#fff; padding:13px; background:rgba(32, 32, 32, 0.8); box-sizing:border-box; text-align:center;}
 .label.label-shop-state {padding:0 15px; height:35px; font-size:15px; line-height:35px; font-weight:700; color:#666; background:#f4f4f4; border-radius:18px; border:none;}
 .label.label-hotel {padding:0 9px; height:26px; font-size:14px; line-height:26px; font-weight:500;border-radius:5px; min-width:80px;}
@@ -3741,8 +3741,17 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	justify-content: center;
 	border-radius: 5px;
 	border:1px solid #ebebeb;
+	cursor:pointer;
 
 }
+/*2022.06.30 작업/결제관리 노쇼버튼 수정*/
+.set-noshow{
+	width: 95px !important;
+	margin-right: 20px;
+	font-size: 15px !important;
+	max-height: 30px;
+}
+
 
 /*========================================
 @ PC버전

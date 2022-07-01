@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="a659b1b1-e597-4c49-bf39-a6d6a4d66d29" name="gopet">
+        <fileTransfer rootFolder="/opt/apache/htdocs" accessType="SFTP" host="175.126.123.165" port="22" sshConfigId="67068f6d-1813-4ed2-b609-bf0a9cba0da0" sshConfig="root@175.126.123.165:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

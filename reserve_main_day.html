@@ -643,7 +643,7 @@ $await_cnt = $gram[0]['cnt'];
 
 
 
-							<div class="calendar-day-body" style="overflow: hidden">
+							<div class="calendar-day-body" >
 
                             <?php for ($t = $data['schedule']['working_start']; $t < $data['schedule']['working_end']; $t++) { ?>
                                 <?php 
@@ -864,7 +864,9 @@ $await_cnt = $gram[0]['cnt'];
                                                         <div class="item-group-wrap">
 <!--                                                            <span>--><?php //print_r($type)?><!--</span>-->
                                                         <div class="item-group">
+
                                                             <div class="item-name-cate">
+                                                                <div class="item-thumb-add item-thumb-add-2" onclick="show_img_pop(this)" style="display:none;"><img src="<?=$img_pet_thumb?>" alt=""></div>
                                                                 <div class="item-name-cate-2">
                                                         <div class="item-name"><?php echo ($chk_rev[$a]['is_await']=='0')?'승인대기':$chk_rev[$a]['pet_name']; ?></div>
                                                         <div class="item-cate"><?php echo '('.$chk_rev[$a]['pet_type'].')'; ?></div>
@@ -1944,6 +1946,9 @@ function show_alert(obj){
             $(el).find('.item-memo').css({'font-size':'15px'});
             $(el).find('.span-after').eq(1).css({'display':'none'});
             $(el).find('.item-hair').css({'display':'none'});
+            // $(el).find('.item-select-option').css({'flex-direction':'column'});
+            $(el).find('.item-thumb-add-2').css({'display':'block'});
+            $(el).find('.item-name-cate').css({'display':'flex'});
 
             if($(el).innerHeight() <= 40){
                 $(el).find('.item-memo').css({'display':'none'});
@@ -2009,6 +2014,15 @@ function show_alert(obj){
 
             }
         })
+
+    }else{
+        $.each(day_item, function(i,el){
+            $(el).find('.item-group-wrap').css({'flex-direction':'column'})
+            $(el).find('.item-thumb-add').css({'display':'none'});
+            $(el).find('.span-after').css({'display':'none'});
+            $(el).find('.item-select-option').css({'margin-top':'1px','flex-direction':'column'});
+        })
+
 
     }
 

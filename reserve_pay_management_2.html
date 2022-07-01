@@ -54,6 +54,16 @@ $pay = sql_fetch($res);
 
 $notice_yn		= $pay['notice_yn'];
 
+//노쇼 횟수
+$que = "SELECT count(is_no_show) AS nscnt 
+        FROM tb_payment_log 
+        WHERE artist_id = '".$artist_id."'
+            AND is_no_show = 1
+            AND is_cancel = 0
+            AND cellphone = '".$pay['cellphone']."'
+            ";
+$res = sql_query($que);
+$nscnt = sql_fetch($res);
 
 $crypto = new Crypto();
 //회원정보
@@ -170,7 +180,7 @@ $que = "SELECT * FROM tb_shop_customer_memo WHERE customer_id = '{$cus['id']}' A
 $scm = sql_fetch_array($que);
 
 //가족번호조회
-$que = "SELECT * FROM tb_customer_family WHERE to_cellphone = '{$pay['cellphone']}' AND artist_id = '{$user_id}' AND is_delete = 0";
+$que = "SELECT * FROM tb_customer_family WHERE to_cellphone = '{$pay['cellphone']}'  AND artist_id = '{$user_id}' AND is_delete = 0";
 //echo $que;
 $arr_t = sql_fetch_array($que);
 if(count($arr_t)>0){
@@ -215,8 +225,10 @@ if(empty($grade[0]['grade_name'])){
 
 ?>
 
+
     <!-- container -->
     <section id="container">
+
 
         <article id="numberAddPop" class="layer-pop-wrap">
             <div class="layer-pop-parent">
@@ -237,7 +249,7 @@ if(empty($grade[0]['grade_name'])){
                                     ?>
                                     <div class="phone-add-item">
                                         <div class="item-check">
-                                            <?php if(empty($data["customer"]["id"])){ ?>
+                                            <?php if(empty($cus_pay['id'])){ ?>
                                                 <label for="<?php echo $tel_f['tel'][$i];?>" class="form-radiobox">
                                                     <input type="radio" name="phone" id="<?php echo $tel_f['tel'][$i];?>" value="<?php echo $tel_f['tel'][$i];?>" data-ctel="<?php echo $tel_f['tel'][$i];?>" data-mtel="<?php echo $cus['cellphone'];?>" class="change-main-phone">
                                                     <span class="form-check-icon"><em>대표</em></span>
@@ -248,7 +260,7 @@ if(empty($grade[0]['grade_name'])){
                                             <div class="phone-add-item-value">
                                                 <div class="phone-add-name"><div class="ellipsis"><?php echo $tel_f['title'][$i];?></div></div>
                                                 <div class="phone-add-num"><div class="ellipsis"><?php echo add_hyphen($tel_f['tel'][$i]);?></div></div>
-                                                <div class="phone-state-icon"><div class="icon icon-phone-add-tel" ></div></div>
+                                                <div class="phone-state-icon"><a href="tel:<?php echo $tel_f['tel'][$i];?>"><div class="icon icon-phone-add-tel" ></div></a></div>
                                             </div>
                                         </div>
                                         <div class="item-ui">
@@ -272,7 +284,7 @@ if(empty($grade[0]['grade_name'])){
                                         <div class="form-group-item">
                                             <div class="form-item-label">전화번호</div>
                                             <div class="form-item-data type-6">
-                                                <input type="text" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
+                                                <input type="text" maxlength="15" name="tel" id="family_tel" class="" placeholder="'-' 제외하고 입력" >
                                             </div>
                                         </div>
                                     </div>
@@ -281,7 +293,7 @@ if(empty($grade[0]['grade_name'])){
                             </div>
                             <button type="button" class="btn btn-purple btn-smiddle-size btn-round" id="add_tel">등록</button>
                         </div>
-                        <button type="button" class="btn-pop-close" onclick="popalert.close();">닫기</button>
+                        <button type="button" class="btn-pop-close" onclick="popalert.close(this);">닫기</button>
                     </div>
                 </div>
             </div>
@@ -576,20 +588,21 @@ if(empty($grade[0]['grade_name'])){
                 ?>
                 <!-- 예약자 정보 -->
                 <div class="basic-data-group" style="margin-top:15px;">
-                    <div class="con-title-group con-title-group-add">
+                    <div class="con-title-group con-title-group-add" >
                         <h4 class="con-title">예약자 정보</h4>
+                        <div style="width:95px;">
+                        <?php if($nscnt['nscnt'] > 0){ ?>
+                            <div class="label label-outline-pink label-noshow">NO SHOW <?php echo $nscnt['nscnt'];?>회</div>
+                        <?php } ?></div>
+                        <div style="width:95px; margin-right:20px;">
+                        <?php if($pay['is_no_show']!=1){?>
+
+
+                                <a href="javascript:;" class="btn btn-red btn-middle-size btn-round set-noshow">노쇼 등록</a>
+                        <?php } ?></div>
                     </div>
                     <div class="flex-table type-2">
-                        <?php if($pay['is_no_show']>0){ ?>
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt"></div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-side"><div class="label label-outline-pink label-noshow">NO SHOW <?php echo $pay['is_no_show'];?>회</div></div>
-                                </div>
-                            </div>
-                        </div>
-                        <?php } ?>
+
                         <div class="flex-table-cell">
                             <div class="flex-table-item">
                                 <div class="flex-table-title"><div class="txt">등급</div></div>
@@ -645,7 +658,7 @@ if(empty($grade[0]['grade_name'])){
                                     <div class="call_edit" onclick="popalert.open('numberAddPop')"><span>편집</span></div>
                                 </div>
                                 <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
+                                    <div class="flex-table-data-inner" style="flex-direction: column; align-items: normal">
                                         <?php for($i=0;$i<count($tel_f['title']);$i++){ ?>
                                             <div class="flex-table-item middle">
                                                 <div class="flex-table-data">
@@ -656,8 +669,8 @@ if(empty($grade[0]['grade_name'])){
 
                                                     <div class="flex-table-data-side">
                                                         <div class="btn-ui-group">
-                                                            <a href="tel:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
-                                                            <a href="sms:<?php echo $tel['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
+                                                            <a href="tel:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                                            <a href="sms:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -668,12 +681,8 @@ if(empty($grade[0]['grade_name'])){
                             </div>
                         </div>
                     </div>
-                    <?php if($pay['is_no_show']!=1){?>
-                        <div class="basic-data-group vvsmall3 mg-bt-12">
-                            <a href="javascript:;" class="btn btn-red btn-middle-size btn-round set-noshow">노쇼 등록</a>
-                        </div>
-                    <?php } ?>
-                    <div class="form-group-cell middle">
+
+                    <div class="form-group-cell middle" style="margin-top:30px;">
                         <div class="form-group-item">
                             <div class="form-item-label mg-bt-12">
                                 견주관련 메모
@@ -3151,7 +3160,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type : 'post',
-                url : './data/pay_make_ajax',
+                url : './data/pay_make_ajax.php',
                 data : {'mode':'regNoshow','seq':seq, 'backurl':backurl},
                 dataType : 'json',
                 success : function(json){
@@ -4225,11 +4234,14 @@ if(empty($grade[0]['grade_name'])){
         // 이전미용 상세보기 뒤로가기
         var history_back = '<?=$history_back?>';
         $(document).ready(function(){
-            if(history_back > 0){
-                $('#btn_page_prev').prop('href','javascript:history.back();');
-            }else{
-                $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
-            }
+            // if(history_back > 0){
+            //     $('#btn_page_prev').prop('href','javascript:history.back(); return false;');
+            //}else{
+            //    $('#btn_page_prev').prop('href','<?php //echo $_SESSION['backurl1'];?>//');
+            //}
+            $('#btn_page_prev').on("click",function (){
+                history.back(); return false;
+            })
 
             $('input[name="cat_weight"]').each(function(index){
                 if($(this).is(':checked')==true){
@@ -4449,9 +4461,9 @@ if(empty($grade[0]['grade_name'])){
             }
 
             $('#add_tel').on('click',function(){
-                var main_phone = '<?php echo $cus['cellphone'];?> ';
+                var main_phone = '<?php echo $pay['cellphone'];?> ';
                 var phone = $('#family_tel').val().replace('-','');
-                var id = '<?php echo $pay['customer_id'];?>';
+                var id = '';
                 console.log(phone)
                 if($('#family_name').val()==''){
                     popalert.open('memberGradeComPop','이름을 입력해주세요.');
@@ -4464,7 +4476,7 @@ if(empty($grade[0]['grade_name'])){
                     return false;
                 }
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'familyAddTel','name':$('#family_name').val(),'tel':phone,'mphone':main_phone, 'customer_id':id},
                     type: 'POST',
                     dataType: 'json',
@@ -4549,7 +4561,7 @@ if(empty($grade[0]['grade_name'])){
             var ctel = $('#chk').data('ctel');
             console.log(mtel+':'+ctel)
             $.ajax({
-                url: './data/get_book_data_ajax',
+                url: './data/get_book_data_ajax.php',
                 data: {'mode':'changeMainPhone','org':mtel,'tel':ctel},
                 type: 'POST',
                 dataType: 'json',
@@ -4557,8 +4569,8 @@ if(empty($grade[0]['grade_name'])){
                     if(json.flag == true){ // success
                         popalert.open('memberGradeComPop',json.error);
                         setTimeout(function(){
-                            location.href = 'customer_view?customer_cellphone='+json.tel;
-                        },3000)
+                            location.reload();
+                        },2000)
 
                     }else{
                         popalert.open('firstRequestMsg1', json.error);
@@ -4583,7 +4595,7 @@ if(empty($grade[0]['grade_name'])){
                 popalert.open('memberGradeComPop1','연락처 번호가 없습니다.');
             } else {
                 $.ajax({
-                    url: './data/get_book_data_ajax',
+                    url: './data/get_book_data_ajax.php',
                     data: {'mode':'extraTelDel','seq':seq},
                     type: 'POST',
                     dataType: 'json',
@@ -4609,8 +4621,27 @@ if(empty($grade[0]['grade_name'])){
 
 
 
+        function setInputFilter(textbox, inputFilter) {
+            ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+                textbox.addEventListener(event, function() {
+                    if (inputFilter(this.value)) {
+                        this.oldValue = this.value;
+                        this.oldSelectionStart = this.selectionStart;
+                        this.oldSelectionEnd = this.selectionEnd;
+                    } else if (this.hasOwnProperty("oldValue")) {
+                        this.value = this.oldValue;
+                        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                    } else {
+                        this.value = "";
+                    }
+                });
+            });
+        }
 
 
+
+        setInputFilter(document.getElementById("family_tel"), function(value) {
+            return /^-?\d*$/.test(value); });
 
 
 
