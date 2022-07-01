@@ -1808,6 +1808,12 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 /*========================================
 @ 쇼핑
 ========================================*/
+
+/* 22.07.01 상세페이지 썸네일, 상세이미지 + 기획전 타이틀 배너 설정 추가 */
+.shop-view-gallery .slider-item img {width: 100%;}
+.shop-view-detail-data img {width: 100% !important;}
+.main-big-banner img {width: 100%;}
+
 /* 상품 상세 */
 .product-view-group {margin-top:50px;}
 .product-view-group:first-child {margin-top:0;}
