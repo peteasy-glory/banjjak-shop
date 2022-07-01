@@ -617,14 +617,15 @@ switch($clear['mode']){
 
             $start_time = $_POST['date']." ".$row['hour'].':'.$row['minute'];
             $end_time = $_POST['date']." ".$row['to_hour'].':'.$row['to_minute'];
-            $time = strtotime($end_time) - strtotime($start_time);
+            $time = (strtotime($end_time) - strtotime($start_time))/60;
+            $beauty_time = ($time < 30)? 120 : $time;
 
             //시작 일자
             $dt = explode("-",$_POST['date']);
             //시작 시간
             $st = explode(":",$_POST['time']);
 
-            $tmp = explode(":",date('H:i',strtotime($_POST['date'].' '.$_POST['time'].' +120 minute')));
+            $tmp = explode(":",date('H:i',strtotime($_POST['date'].' '.$_POST['time'].' +'.$beauty_time.' minute')));
 
 
             $sql = "SELECT * FROM tb_artist_list WHERE name = '{$_POST['worker']}' AND artist_id = '{$user_id}' ORDER BY seq ASC LIMIT 1";
@@ -1518,6 +1519,20 @@ switch($clear['mode']){
         $json['error'] = '대표번호가 변경되었습니다.';
         $tel = str_replace('-','',$_POST['tel']);
 
+        $select_sql_t = "select * from tb_tmp_user where cellphone = '{$tel}'";
+        $select_result_t = mysqli_query($connection, $select_sql_t);
+        $select_cnt_t = mysqli_num_rows($select_result_t);
+
+        $select_sql_c = "select * from tb_customer where cellphone = '{$tel}'";
+        $select_result_c = mysqli_query($connection, $select_sql_c);
+        $select_cnt_c = mysqli_num_rows($select_result_c);
+        if($select_cnt_c+$select_cnt_t > 0){
+            $json['flag'] = false;
+            $json['error'] = '동일한 휴대전화 번호가 존재합니다..';
+            echo json_encode($json, JSON_UNESCAPED_UNICODE);
+            break;
+        }
+
         $que = "UPDATE tb_tmp_user SET ";
         $que .= "cellphone     = '{$tel}' ";
         $que .= "WHERE cellphone = '{$_POST['org']}' ";
@@ -1543,6 +1558,14 @@ switch($clear['mode']){
         //대표 번호를 변경한다.
         $que = "UPDATE tb_customer_family SET to_cellphone = '{$tel}' WHERE  artist_id = '{$user_id}' AND to_cellphone = '{$_POST['org']}' ";
         //echo $que;
+        sql_query($que);
+
+        //견주 메모 cellphone 변경 by.glory
+        $que = "UPDATE tb_shop_customer_memo SET cellphone = '{$tel}' WHERE cellphone = '{$_POST['org']}' ";
+        sql_query($que);
+
+        //발신번호표시 테이블 cellphone 변경 by.glory
+        $que = "UPDATE tb_sent_cell_id SET cellphone = '{$tel}' WHERE cellphone = '{$_POST['org']}' ";
         sql_query($que);
 
         //이전 대표 번호를 등록한다.

@@ -358,7 +358,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
     <!-- container -->
     <section id="container">
         <!-- page-body -->
-        <form action="./data/make_reservation" method="post" name="f">
+        <form action="./data/make_reservation.php" method="post" name="f">
             <input type="hidden" name="shopName" value="<?php echo $r['name'];?>">
             <input type="hidden" name="cellPhone" value="<?php echo $cellPhone; ?>">
             <input type="hidden" name="worker" value="<?php echo $worker; ?>">
@@ -1264,9 +1264,9 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                                                 </div>
                                                                 <?php for($x=0;$x<count($cat_sec);$x++){ ?>
                                                                 <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
-                                                                        <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="단모" value="<?php echo $cat['short_price']*($x+1);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']*($x+1));?>원</strong></em></label></div>
+                                                                        <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="단모" value="<?php echo $cat['short_price']+($cat['increase_section_price']*$x);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']+($cat['increase_section_price']*$x));?>원</strong></em></label></div>
                                                                 <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
-                                                                        <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="장모" value="<?php echo $cat['long_price']*($x+1);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']*($x+1));?>원</strong></em></label></div>
+                                                                        <input type="radio" name="hair_kg" class="cat-hair-price " data-cat_hair="장모" value="<?php echo $cat['long_price']+($cat['increase_section_price']*$x);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']+($cat['increase_section_price']*$x));?>원</strong></em></label></div>
                                                                 <?php } ?>
                                                             </div>
                                                         </div>

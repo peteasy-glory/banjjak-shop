@@ -820,14 +820,14 @@ $cat = sql_fetch_array($sql);
                                                                 <div class="grid-layout toggle-button-group">
                                                                     <div class="grid-layout-inner flex-dir" id="kgs_list_cat">
                                                                         <div class="grid-layout-cell">
-                                                                            <label class="form-toggle-box form-toggle-price middle" for="weight1">
-                                                                                <input type="radio" name="cat_weight" class="cat-weight" checked>
+                                                                            <label class="form-toggle-box form-toggle-price middle" for="">
+                                                                                <input type="radio" name="cat_weight" class="cat_weight" checked>
                                                                                 <em><span>선택안함</span><strong>0원</strong></em></label>
                                                                         </div>
                                                                         <?php for($x=0;$x<count($cat_sec);$x++){ ?>
                                                                             <div class="grid-layout-cell">
-                                                                                <label class="form-toggle-box form-toggle-price middle" for="weight1">
-                                                                                    <input type="radio" name="cat_weight" class="cat-weight" onclick="cat_show_view(<?php echo $x;?>);" value="<?php echo $cat_sec[$x];?>">
+                                                                                <label class="form-toggle-box form-toggle-price middle" for="">
+                                                                                    <input type="radio" name="cat_weight" class="cat_weight" onclick="cat_show_view(<?php echo $x;?>);" value="<?php echo $cat_sec[$x];?>">
                                                                                     <em><span></span><strong><?php echo $cat_sec[$x];?>kg</strong></em></label>
                                                                             </div>
                                                                         <?php } ?>
@@ -844,9 +844,9 @@ $cat = sql_fetch_array($sql);
                                                                     <div class="grid-layout-inner flex-dir">
                                                                         <?php for($x=0;$x<count($cat_sec);$x++){ ?>
                                                                             <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
-                                                                                    <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="단모" value="<?php echo "단모:".$cat['short_price']*($x+1);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']*($x+1));?>원</strong></em></label></div>
+                                                                                    <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="단모" value="<?php echo $cat['short_price']+($cat['increase_section_price']*$x);?>"><em><span>단모</span><strong><?php echo number_format($cat['short_price']+($cat['increase_section_price']*$x));?>원</strong></em></label></div>
                                                                             <div class="grid-layout-cell cat-weight kg_<?php echo $x;?>" style="display:none;"><label class="form-toggle-box form-toggle-price middle" for="hair1">
-                                                                                    <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="장모" value="<?php echo "장모:".$cat['long_price']*($x+1);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']*($x+1));?>원</strong></em></label></div>
+                                                                                    <input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair="장모" value="<?php echo $cat['long_price']+($cat['increase_section_price']*$x);?>"><em><span>장모</span><strong><?php echo number_format($cat['long_price']+($cat['increase_section_price']*$x));?>원</strong></em></label></div>
                                                                         <?php } ?>
                                                                     </div>
                                                                 </div>
