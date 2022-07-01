@@ -195,6 +195,7 @@ if($_POST['pet_kind']=='dog') {
     $product .= $_POST['shopName'] . '|';
     if(!empty($_POST['cat_weight'])){
         $product .= $_POST['cat_weight'].':'.$_POST['hair_kg'].'|';
+        $total_price += $_POST['hair_kg'];
     } else {
         $product .= 'all:0|';
     }

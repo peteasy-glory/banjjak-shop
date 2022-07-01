@@ -26,7 +26,7 @@ address, caption, cite, code, dfn, em, var {font-style:normal; font-weight:norma
 strong {font-weight:700;}
 em{font-weight:400;}
 caption, legend {position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0, 0, 0, 0); white-space:nowrap; border:0;}
-img {max-width:100%;}
+img {width:100%;}
 q:before, q:after {content:'';}
 hr {display:none;}
 iframe {border:none; outline:none;}

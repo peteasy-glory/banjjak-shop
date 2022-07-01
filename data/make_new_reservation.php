@@ -315,6 +315,7 @@ if($_POST['pet_kind']=='dog') {
     //미용 무게 추가가 선택되었을때
     if(isset($_POST['cat_weight'])){
         $product .= $_POST['cat_weight'].':'.$_POST['hair_kg'].'|';
+        $total_price += $_POST['hair_kg'];
     } else {
         $product .= 'all:0|';
     }
