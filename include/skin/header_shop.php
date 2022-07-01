@@ -176,7 +176,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 </article>
 <!-- //기본 메세지 팝업(버튼2) -->
 
-[<?if($lnb_show!==false){?>
+<?if($lnb_show!==false){?>
 	
 <!-- 20220117 추가 -->
 <header class="pc-header">
