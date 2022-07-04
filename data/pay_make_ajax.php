@@ -22,6 +22,17 @@ switch($clear['mode']){
         }
         echo json_encode($json,JSON_UNESCAPED_UNICODE);
     break;
+
+    case 'cancelNoshow':
+        $json['flag'] = true;
+        $que = "UPDATE tb_payment_log SET is_no_show = 0 WHERE payment_log_seq = {$_POST['seq']}";
+        $res = sql_query($que);
+        if(!$res){
+            $json['flag'] = false;
+        }
+        echo json_encode($json,JSON_UNESCAPED_UNICODE);
+        break;
+
     //특이사항 등록
     case 'etc1':
         $json['flag'] = true;

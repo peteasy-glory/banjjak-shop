@@ -2430,7 +2430,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-week-time-item .item-price {font-size:11px;line-height:12px;font-weight:700; margin-top:4px;}
 .calendar-week-time-item .item-option {font-size:11px;line-height:12px;font-weight:500; color:#202020; margin-top:10px;}
 .calendar-week-time-item .item-cash {position:absolute; bottom:0; right:0; margin-right:5px;}
-.calendar-week-time-item .item-master {position:absolute; bottom:0; left:0;}
+.calendar-week-time-item .item-master {position:absolute; bottom:0; right:0px;}
 .calendar-week-time-item.yellow {border-left-color:#fdd94e;background: #fff7d9;}
 .calendar-week-time-item.purple {border-left-color:#6840b1;background: #e7dff5;}
 .calendar-week-time-item.green {border-left-color:#58d980;background: #e7f6ec;}
@@ -2445,7 +2445,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-week-time-item.hotel-time-item.gray {border-left-color:#b4b4b4;background:#fcfcfc;}
 .calendar-week-time-item.hotel-time-item .item-name {text-overflow:ellipsis; overflow:hidden; white-space:nowrap; margin-bottom:4px;}
 .calendar-week-time-item.hotel-time-item .item-cash {bottom:0; top:auto;}
-.calendar-week-time-item.hotel-time-item .item-master {bottom:20px; top:auto; left:auto; right:0;}
+.calendar-week-time-item.hotel-time-item .item-master {bottom:20px; top:auto; left:auto; right:5px;}
 .calendar-week-time-item .item-check-in {font-size:11px;line-height:12px;font-weight:500; color:#666;}
 .calendar-week-time-item .item-check-out {font-size:11px;line-height:12px;font-weight:500; color:#666;}
 .calendar-week-time-item .item-check-in + .item-name,
@@ -2477,7 +2477,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .calendar-day-time-item .item-price {font-size:11px;line-height:12px;font-weight:500; color:#666; margin-top:4px;}
 .calendar-day-time-item .item-option {font-size:11px;line-height:12px;font-weight:500; color:#202020; margin-top:10px;}
 .calendar-day-time-item .item-cash {position:absolute; bottom:0; right:0;}
-.calendar-day-time-item .item-master {position:absolute; bottom:0; left:0;}
+.calendar-day-time-item .item-master {position:absolute; bottom:0; right:5px;}
 .calendar-day-time-item.yellow {border-left-color:#fdd94e;background: #fff7d9;}
 .calendar-day-time-item.purple {border-left-color:#6840b1;background: #e7dff5;}
 .calendar-day-time-item.green {border-left-color:#58d980;background: #e7f6ec;}
@@ -3754,8 +3754,17 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .set-noshow{
 	width: 95px !important;
 	margin-right: 20px;
-	font-size: 15px !important;
+	font-size: 14px !important;
 	max-height: 30px;
+}
+.cancel-noshow{
+	width: 95px !important;
+	margin-right: 20px;
+	font-size: 14px !important;
+	max-height: 30px;
+	background : #8f8f8f;
+	color:white !important;
+
 }
 
 
