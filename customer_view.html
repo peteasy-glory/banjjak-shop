@@ -670,7 +670,7 @@ $another_reserve = 0;
                                             <?php
                                             $que = "SELECT * FROM tb_payment_log  WHERE 1
                                                     AND is_no_show = 0 
-                                                    AND is_cancel = 0
+                                                    #AND is_cancel = 0
                                                     AND approval = 1   
                                                     AND artist_id = '{$user_id}'
                                                     AND cellphone = '{$phone}'
@@ -695,26 +695,27 @@ $another_reserve = 0;
                                                 //echo $que;
                                                 $pet = sql_fetch_array($que);
                                                 $pet_name = $pet[0]['name'];
+                                                $is_cancel = ($arr['is_cancel'] == 1)? 'style="color:red;"' : '';
                                             ?>
 											<tr class="customer-table-cell">
 												<td>
 													<div class="flex align-items-center overflow-hidden  ">
-                                                        <button type="button" class="customer-table-toggle toggle-target"><?php echo $pet[0]['name']?></span></span>
+                                                        <button type="button" class="customer-table-toggle toggle-target" <?=$is_cancel?>><?php echo $pet[0]['name']?></span></span>
                                                         </button>
 													</div>
 												</td>
-												<td>
+												<td <?=$is_cancel?>>
 													<div class="customer-table-txt"><?php echo $arr['year'];?>.<?php echo sprintf('%02d',$arr['month']);?>.<?php echo sprintf('%02d',$arr['day']);?></div>
 													<div class="customer-table-txt"><?php echo sprintf('%02d',$arr['hour']);?>:<?php echo sprintf('%02d',$arr['minute']);?></div>
 												</td>
-												<td>
+												<td <?=$is_cancel?>>
 													<div class="customer-table-txt">미용</div>
                                                     <div class="customer-table-txt"><?php echo $beauty[4];?></div>
 												</td>
-												<td>
+												<td <?=$is_cancel?>>
 													<div class="customer-table-txt"><?php echo number_format($arr['local_price']);?>원</div>
 												</td>
-												<td>
+												<td <?=$is_cancel?>>
 													<div class="customer-table-txt"><?php echo number_format($arr['local_price_cash']);?>원</div>
 												</td>
 											</tr>
@@ -767,7 +768,7 @@ $another_reserve = 0;
                                                                     <div class="flex-table-title"><div class="txt">취소일시</div></div>
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner">
-                                                                            <?php echo $arr['cancel_time'];?>
+                                                                            <?php echo ($arr['cancel_time'] != '')? date('Y.m.d H:i',strtotime($arr['cancel_time'])) : "";?>
                                                                         </div>
                                                                     </div>
                                                                 </div>

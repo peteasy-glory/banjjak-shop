@@ -925,8 +925,7 @@ if(empty($grade[0]['grade_name'])){
                                     FROM tb_payment_log 
                                     WHERE artist_id = '" . $user_id . "' 
                                         AND is_no_show = 0 
-                                        AND is_cancel = 0 
-                                        AND is_cancel = 0
+                                        #AND is_cancel = 0
                                         AND approval = 1
                                         AND etc_memo != ''
                                         AND pet_seq = '{$pay["pet_seq"]}'   
