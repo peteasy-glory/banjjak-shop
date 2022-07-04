@@ -45,7 +45,7 @@ $beauty_info = explode("|",$pay['product']);
 
 // 등급 회원 구하기
 // 정회원 여부
-$cus_sql = "select * from tb_customer where cellphone = '{$phone}'";
+$cus_sql = "select * from tb_customer where cellphone = '{$phone}' and nickname not like 'cellp_%'";
 $cus_res = mysqli_query($connection,$cus_sql);
 $cus_pay = mysqli_fetch_assoc($cus_res);
 
@@ -61,12 +61,12 @@ if($cus_pay['id'] != ''){ // 정회원일시
 
 $crypto = new Crypto();
 //회원정보
-$que1 = "SELECT * FROM tb_customer WHERE cellphone = '{$phone}'";
+$que1 = "SELECT * FROM tb_customer WHERE cellphone = '{$phone}' and nickname not like 'cellp_%'";
 $res1 = mysqli_query($connection,$que1);
 $cus1 = mysqli_fetch_assoc($res1);
 
 if($cus1['id']) {
-    $que = "SELECT * FROM tb_customer WHERE id = '{$cus1['id']}'";
+    $que = "SELECT * FROM tb_customer WHERE id = '{$cus1['id']}' and nickname not like 'cellp_%'";
 } else {
     $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$phone}'";
 }
@@ -104,6 +104,7 @@ $sql = "
 		SELECT *
 		FROM tb_customer
         WHERE id = '".$cus['id']."'
+        and nickname not like 'cellp_%' 
 	";	// 20210705 by migo - cellp 제외 조건
     //echo $sql."<p>";
 

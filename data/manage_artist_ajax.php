@@ -64,7 +64,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							for($_i = 0; $_i < count($r_time_end); $_i++){
 							    if($r_week[$_i] != '') {
                                     //echo $r_week[$_i]." : ".$r_time_end[$r_week[$_i]];
-                                    $insert_qy .= "('" . $r_artist_id . "', '" . $r_name . "', '" . $r_nicname . "', '" . $r_is_main . "', '" . $r_week[$_i] . "', '" . $r_time_start[$r_week[$_i]] . "', '" . $r_time_end[$r_week[$_i]] . "',NULLIF('" . $_POST['grade'] . "','')),";
+                                    $insert_qy .= "('" . $r_artist_id . "', '" . $r_name . "', '" . $r_nicname . "', '" . $r_is_main . "', '" . $r_week[$_i] . "', '" . $r_time_start[$_i] . "', '" . $r_time_end[$_i] . "',NULLIF('" . $_POST['grade'] . "','')),";
                                 }
 							}
 							$insert_qy = substr($insert_qy, 0, -1);

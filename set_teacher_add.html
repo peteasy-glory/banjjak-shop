@@ -128,7 +128,7 @@ if(count($arr)>0){
 							<div class="item-input">
 								<div class="form-datepicker-group">
 									<div class="form-datepicker">
-										<select name="select_time_from[]" class="time-from">
+										<select name="select_time_from[]" class="time-from" <?php echo (in_array($j,$rs['week']))?'':'disabled';?>>
 											<?for($i=9;$i<=19;$i++){
 												$p_day	= "오전";
 												if($i>=12){
@@ -143,7 +143,7 @@ if(count($arr)>0){
 									</div>
 									<div class="form-unit">~</div>
 									<div class="form-datepicker">
-										<select name="select_time_to[]" class="time-end">
+										<select name="select_time_to[]" class="time-end" <?php echo (in_array($j,$rs['week']))?'':'disabled';?>>
 											<?for($i=9;$i<=19;$i++){
 												$p_day	= "오전";
 												if($i>=12){

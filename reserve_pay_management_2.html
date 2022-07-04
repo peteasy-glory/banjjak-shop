@@ -68,7 +68,7 @@ $nscnt = sql_fetch($res);
 $crypto = new Crypto();
 //회원정보
 if($pay['customer_id']) {
-    $que = "SELECT * FROM tb_customer WHERE id = '{$pay['customer_id']}'";
+    $que = "SELECT * FROM tb_customer WHERE id = '{$pay['customer_id']}' and nickname not like 'cellp_%'";
 } else {
     $que = "SELECT * FROM tb_tmp_user WHERE cellphone = '{$pay['cellphone']}'";
 }
@@ -193,7 +193,7 @@ if(count($arr_t)>0){
 
 // 등급 회원 구하기
 // 정회원 여부
-$cus_sql = "select * from tb_customer where cellphone = '{$pay['cellphone']}'";
+$cus_sql = "select * from tb_customer where cellphone = '{$pay['cellphone']}' and nickname not like 'cellp_%'";
 $cus_res = mysqli_query($connection,$cus_sql);
 $cus_pay = mysqli_fetch_assoc($cus_res);
 
