@@ -645,12 +645,23 @@ $await_cnt = $gram[0]['cnt'];
 
 
                                     ?>
+                                    <?php
+
+                                        $que_master_nickname = "SELECT * FROM tb_artist_list WHERE artist_id ='".$artist_id."' and name = '{$artist_id}'";
+                                        $arr_master_nickname = sql_fetch_array($que_master_nickname);
+                                        $master_nickname = $arr_master_nickname[0][nicname];
+
+
+
+
+                                    ?>
                                     <?php foreach ((array) $data['artist'] as $key => $artist) {
 
                                         $que_holiday[$key] = "SELECT * FROM tb_artist_list
 		                                                WHERE artist_id = '".$artist_id."' and name = '{$artist['name']}'";
                                         $arr_holiday[$key] = sql_fetch_array($que_holiday[$key]);
 
+//
                                         for($j = 0 ; $j <count($arr_holiday[$key]); $j++ ){
                                             $artist_working[$artist['nicname']][$j] = $arr_holiday[$key][$j]['week'];
                                         }
@@ -1942,6 +1953,9 @@ function show_alert(obj){
 
     let day_item = $(".calendar-day-time-item-add");
 
+    let body_cols = $(".calendar-day-body-col");
+
+
     if(row_length === 2){
 
 
@@ -2069,6 +2083,17 @@ function show_alert(obj){
             }
         })
 
+    }else if(row_length === 1){
+
+
+        $(`<div class="calendar-day-header-col"><?=$master_nickname?></div>`).appendTo('.calendar-day-header-row');
+        $.each(body_cols,function(i,el){
+
+            if($(el).attr('data-worker') === '<?=$artist_id?>'){
+                $(this).attr('style','display:block !important');
+                $(this).addClass('break');
+            }
+        })
     }else{
         $.each(day_item, function(i,el){
             $(el).find('.item-group-wrap').css({'flex-direction':'column'})
