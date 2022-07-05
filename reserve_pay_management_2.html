@@ -52,6 +52,9 @@ $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}"
 $res = sql_query($que);
 $pay = sql_fetch($res);
 
+$thisday = $pay['year']."-".$pay['month']."-".$pay['day'];
+$w_day = date('w',strtotime($thisday)); // 해당 미용 요일
+
 $notice_yn		= $pay['notice_yn'];
 
 //노쇼 횟수
@@ -113,9 +116,14 @@ $pet = sql_fetch($res1);
 //print_r($pet);
 
 //미용사 정보
-$que = "SELECT * FROM tb_artist_list WHERE name = '{$pay['worker']}' GROUP BY artist_id ";
+$que = "SELECT * FROM tb_artist_list WHERE name = '{$pay['worker']}' AND week = {$w_day} ";
 //echo $que;
 $ar = sql_fetch_array($que);
+
+if(!$ar){
+    $que = "SELECT * FROM tb_artist_list WHERE name = '{$pay['worker']}' GROUP BY artist_id";
+    $ar = sql_fetch_array($que);
+}
 
 
 $que = "SELECT * FROM tb_working_schedule WHERE customer_id = '{$user_id}'";
