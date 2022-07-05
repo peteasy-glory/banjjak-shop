@@ -635,12 +635,35 @@ $await_cnt = $gram[0]['cnt'];
 							<div class="calendar-day-header">
 								<div class="calendar-day-header-row">
 									<div class="calendar-day-header-col time"></div>
-                                    <?php foreach ((array) $data['artist'] as $key => $artist) { ?>
-                                        <div class="calendar-day-header-col"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></div>
+                                    <?php
+                                    $nowdate_2 = date('Y-m-d',strtotime($selected_date));
+
+                                    $today_disp_2 = date('w',strtotime($nowdate_2));
+
+
+
+
+
+                                    ?>
+                                    <?php foreach ((array) $data['artist'] as $key => $artist) {
+
+                                        $que_holiday[$key] = "SELECT * FROM tb_artist_list
+		                                                WHERE artist_id = '".$artist_id."' and name = '{$artist['name']}'";
+                                        $arr_holiday[$key] = sql_fetch_array($que_holiday[$key]);
+
+                                        for($j = 0 ; $j <count($arr_holiday[$key]); $j++ ){
+                                            $artist_working[$artist['nicname']][$j] = $arr_holiday[$key][$j]['week'];
+                                        }
+
+                                        if(in_array($today_disp_2,$artist_working[$artist['nicname']])){ ?>
+                                            <div class="calendar-day-header-col"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></div>
+
+                                        <?php }
+                                        ?>
+
                                     <?php } ?>
 								</div>
 							</div>
-
 
 
 							<div class="calendar-day-body" >
@@ -741,6 +764,31 @@ $await_cnt = $gram[0]['cnt'];
                                                 $div_class = 'break';
                                                 $status = '정기휴일';
                                             }
+                                            $que_holiday = "SELECT * FROM tb_artist_list
+		                                                    WHERE artist_id = '".$artist_id."' and name = '{$artist['name']}'";
+                                            $arr_holiday = sql_fetch_array($que_holiday);
+                                            if(count($arr_holiday)>0){
+                                                for($i = 0 ; $i <count($arr_holiday); $i++){
+                                                    $holiday[$i] = $arr_holiday[$i]['week'];
+                                                    $working_day[$arr_holiday[$i]['week']] = ['start'=>$arr_holiday[$i]['time_start'], 'end'=>$arr_holiday[$i]['time_end'] ];
+                                                }
+                                            }
+
+                                            if(in_array($today_disp, $artist_working[$artist['nicname']])){
+                                                $explode_start = explode(':', $working_day[$today_disp]['start']);
+
+                                                $explode_end = explode(':', $working_day[$today_disp]['end']);
+
+                                                if ($explode_start[0] > substr($thisTime, 0, 2)
+                                                    || $explode_end[0] < substr($thisTime,0,2)
+                                                    || ($explode_start[0] == substr($thisTime,0,2 ) && $explode_start[1] > substr($thisTime,3,2))
+                                                    || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )) {
+
+                                                    $div_class = 'break';
+
+                                                }
+                                            }
+
 
                                             //해당 일자 예약 가져오기
                                             $is_rev_true = '';
@@ -781,9 +829,15 @@ $await_cnt = $gram[0]['cnt'];
                                                 $ing_cnt1 = 0;
                                             }*/
                                             $star_date_time = strtotime($nowdate.' '.$thisTime);
+
+
                                     ?>
 
-									<div class="calendar-day-body-col <?=$div_class?> time_payment "
+									<div class="calendar-day-body-col <?=$div_class?> time_payment
+
+                                    <?php
+                                           echo in_array($today_disp_2,$artist_working[$artist['nicname']]) ? "" : "ds_none"
+                                    ?>"
                                          data-worker2="<?= $artist['nicname'] ?>"
                                          data-worker="<?= $artist['name'] ?>"
                                          data-date="<?= $nowdate ?>"

@@ -796,10 +796,25 @@ $que = "SELECT count(*) cnt FROM tb_grade_reserve_approval_mgr a
 $gram = sql_fetch_array($que);
 $await_cnt = $gram[0]['cnt'];
 
+
+
+$que_holiday = "SELECT * FROM tb_artist_list
+		WHERE artist_id = '".$artist_id."' and name = '{$worker}'";
+$arr_holiday = sql_fetch_array($que_holiday);
+if(count($arr_holiday)>0){
+    for($i = 0 ; $i <count($arr_holiday); $i++){
+        $holiday[$i] = $arr_holiday[$i]['week'];
+        $working_day[$arr_holiday[$i]['week']] = ['start'=>$arr_holiday[$i]['time_start'], 'end'=>$arr_holiday[$i]['time_end'] ];
+    }
+}
+
 ?>
 
 <!-- container -->
 <section id="container">
+
+
+
     <!-- page-body -->
     <div class="page-body">
         <div class="common-bottom-ui left" style="position:fixed;bottom:74px;">
@@ -1033,10 +1048,33 @@ $await_cnt = $gram[0]['cnt'];
                                                     }
                                                 }
                                                 $today_disp = date('w',strtotime($nowdate));
+
                                                 if(in_array($today_disp,$crwn)) {
                                                     $div_class = 'break';
                                                     $status = '정기휴일';
                                                 }
+
+                                                if(!in_array($today_disp,$holiday)){
+                                                    $div_class = 'break';
+                                                }else if(in_array($today_disp, $holiday)){
+                                                    $explode_start = explode(':', $working_day[$today_disp]['start']);
+
+                                                    $explode_end = explode(':', $working_day[$today_disp]['end']);
+
+                                                    if ($explode_start[0] > substr($thisTime, 0, 2)
+                                                        || $explode_end[0] < substr($thisTime,0,2)
+                                                        || ($explode_start[0] == substr($thisTime,0,2 ) && $explode_start[1] > substr($thisTime,3,2))
+                                                        || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )) {
+
+                                                        $div_class = 'break';
+
+                                                    }
+                                                }
+
+
+
+
+
 
                                                 if($div_class == 'break'){
                                                     $prseq = $crw['ph_seq'];
@@ -1071,7 +1109,11 @@ $await_cnt = $gram[0]['cnt'];
                                                 $star_date_time = strtotime($select_day.' '.$thisTime);
 
                                                 ?>
-                                                <div class="calendar-week-body-col <?=$div_class?> <?php if(!in_array($star_date_time,$res_time['datetime_time'])){ echo 'time_payment';} ?> "
+
+                                                <div class="calendar-week-body-col <?=$div_class?> <?php if(!in_array($star_date_time,$res_time['datetime_time'])){ echo 'time_payment';} ?>
+
+<!--                                                       "
+
                                                      data-worker2="<?= $rs['name'] ?>"
                                                      data-worker="<?= $rs['nicname'] ?>"
                                                      data-date="<?= $select_day ?>"
@@ -1085,6 +1127,7 @@ $await_cnt = $gram[0]['cnt'];
                                                      data-phseq="<?=$prseq?>"
                                                      data-status="<?php echo $status;?>"
                                                      data-pay="<?php echo $chk_rev[0]['payment_log_seq'];?>"
+                                                    data-time-w="<?php echo $today_disp;?>"
                                                 >
 
                                                     <?php if($div_class != 'break'){ ?>
