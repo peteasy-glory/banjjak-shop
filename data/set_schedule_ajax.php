@@ -127,11 +127,10 @@ $is_thursday = ($_POST['is_thursday'])? $_POST['is_thursday'] : 0;
 $is_friday = ($_POST['is_friday'])? $_POST['is_friday'] : 0;
 $is_saturday = ($_POST['is_saturday'])? $_POST['is_saturday'] : 0;
 $is_sunday = ($_POST['is_sunday'])? $_POST['is_sunday'] : 0;
-
+$is_time = ($_POST['time4'])? $_POST['time4'] : 1;
 
 if($row[0]['cnt']>0) {
     $que = "UPDATE tb_regular_holiday SET ";
-    $que .= "is_sunday          = '{$btime}', ";
     $que .= "is_monday          = '{$is_monday}', ";
     $que .= "is_tuesday         = '{$is_tuesday}', ";
     $que .= "is_wednesday       = '{$is_wednesday}', ";
@@ -139,13 +138,12 @@ if($row[0]['cnt']>0) {
     $que .= "is_friday          = '{$is_friday}', ";
     $que .= "is_saturday        = '{$is_saturday}', ";
     $que .= "is_sunday          = '{$is_sunday}', ";
-    $que .= "week_type          = '{$_POST['time4']}', ";
+    $que .= "week_type          = '{$is_time}', ";
     $que .= "update_time        = NOW() ";
     $que .= "WHERE customer_id  = '{$user_id}'";
 } else {
     $que = "INSERT INTO tb_regular_holiday SET ";
     $que .= "customer_id        = '{$user_id}', ";
-    $que .= "is_sunday          = '{$btime}', ";
     $que .= "is_monday          = '{$is_monday}', ";
     $que .= "is_tuesday         = '{$is_tuesday}', ";
     $que .= "is_wednesday       = '{$is_wednesday}', ";
@@ -153,7 +151,7 @@ if($row[0]['cnt']>0) {
     $que .= "is_friday          = '{$is_friday}', ";
     $que .= "is_saturday        = '{$is_saturday}', ";
     $que .= "is_sunday          = '{$is_sunday}', ";
-    $que .= "week_type          = '{$_POST['time4']}', ";
+    $que .= "week_type          = '{$is_time}', ";
     $que .= "update_time        = NOW() ";
 }
 //echo $que;
