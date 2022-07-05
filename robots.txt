@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /common/
+Disallow: /data/
+Disallow: /images/
+Disallow: /include/
+Disallow: /login/
+Disallow: /pub/
+Disallow: /session/
+Disallow: /static/
+Disallow: /upload/
