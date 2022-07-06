@@ -525,7 +525,7 @@ $o_sql = "
 		AND month = '" . $mm . "'
 		AND is_cancel = 0
 		AND data_delete = '0'
-		AND is_no_show = 0
+		#AND is_no_show = 0
 		AND  hour >= {$shop_open_time} AND hour < {$shop_close_time}
         ORDER BY CONCAT(year,'-',month,'-',day,' ',hour,':',minute)
         ) A

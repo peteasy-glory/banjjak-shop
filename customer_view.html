@@ -208,7 +208,7 @@ $que = "SELECT * FROM tb_beauty_agree WHERE artist_id = '{$shop_id}' AND pet_id 
 //echo $que;cus
 $bag = sql_fetch_array($que);
 
-$que = "SELECT COUNT(*) AS noshow_cnt FROM tb_payment_log WHERE artist_id = '{$user_id}' AND pet_seq = '{$pet_seq}' AND is_no_show = 1";
+$que = "SELECT COUNT(*) AS noshow_cnt FROM tb_payment_log WHERE artist_id = '{$user_id}' AND cellphone = '{$phone}' AND is_no_show = 1";
 $tpl = sql_fetch_array($que);
 
 // 펫삭제시 고려
@@ -670,7 +670,7 @@ $another_reserve = 0;
 											<!-- 하나의 아이템 -->
                                             <?php
                                             $que = "SELECT * FROM tb_payment_log  WHERE 1
-                                                    AND is_no_show = 0 
+                                                    #AND is_no_show = 0 
                                                     #AND is_cancel = 0
                                                     AND approval = 1   
                                                     AND artist_id = '{$user_id}'
@@ -696,7 +696,7 @@ $another_reserve = 0;
                                                 //echo $que;
                                                 $pet = sql_fetch_array($que);
                                                 $pet_name = $pet[0]['name'];
-                                                $is_cancel = ($arr['is_cancel'] == 1)? 'style="color:red;"' : '';
+                                                $is_cancel = ($arr['is_cancel'] == 1 || $arr['is_no_show'] == 1)? 'style="color:red;"' : '';
                                             ?>
 											<tr class="customer-table-cell">
 												<td>
@@ -770,6 +770,7 @@ $another_reserve = 0;
                                                                     <div class="flex-table-data">
                                                                         <div class="flex-table-data-inner" style="color:red !important;">
                                                                             <?php echo ($arr['cancel_time'] != '')? date('Y.m.d H:i',strtotime($arr['cancel_time'])) : "";?>
+                                                                            <?php echo ($arr['is_no_show'] == 1)? "NO SHOW" : "";?>
                                                                         </div>
                                                                     </div>
                                                                 </div>
