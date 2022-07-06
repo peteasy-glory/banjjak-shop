@@ -1064,7 +1064,10 @@ if(count($arr_holiday)>0){
                                                     if ($explode_start[0] > substr($thisTime, 0, 2)
                                                         || $explode_end[0] < substr($thisTime,0,2)
                                                         || ($explode_start[0] == substr($thisTime,0,2 ) && $explode_start[1] > substr($thisTime,3,2))
-                                                        || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )) {
+                                                        || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )
+                                                        || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] == substr($thisTime,3,2) )
+
+                                                    ) {
 
                                                         $div_class = 'break';
 
@@ -1130,17 +1133,15 @@ if(count($arr_holiday)>0){
                                                     data-time-w="<?php echo $today_disp;?>"
                                                 >
 
-                                                    <?php if($div_class != 'break'){ ?>
-                                                        <div class="calendar-drag-item-group">
-                                                            <?php
 
+                                                        <div class="calendar-drag-item-group" style="color:#202020 !important;">
+                                                            <?php
                                                             if($cnt == 6) {
                                                                 $week_day = substr($first_date,8,2);
                                                                 $cnt = 0;
                                                             } else {
                                                                 $cnt++;
                                                             }
-
                                                             ?>
                                                             <?=$reserv_text?>
                                                             <?php
@@ -1148,7 +1149,6 @@ if(count($arr_holiday)>0){
                                                                 echo $holiday_1;
                                                             }
                                                             ?>
-
                                                             <?php
                                                             if(!empty($chk_rev)){//예약이 있을 경우
                                                                 for($a=0;$a<count($chk_rev);$a++){
@@ -1280,7 +1280,7 @@ if(count($arr_holiday)>0){
 
                                                             ?>
                                                         </div>
-                                                    <?php } else { ?>
+                                                    <?php if($div_class == 'break'){ ?>
                                                         <?php
                                                         if($status == '정기휴일' && $thisTime == '09:00'){
                                                             echo $status;
@@ -1293,11 +1293,7 @@ if(count($arr_holiday)>0){
                                                         if($status == '휴게시간'){
                                                             //echo $status;
                                                         }
-                                                        if($cnt == 6) {
-                                                            $cnt = 0;
-                                                        } else {
-                                                            $cnt++;
-                                                        }
+
                                                         ?>
 
                                                     <?php } ?>
@@ -1824,7 +1820,7 @@ if(count($arr_holiday)>0){
 
             console.log(thisWorker2+':'+thisWorker)
 
-            if($(this).find(".calendar-week-time-item").length==0 && $(this).hasClass("break")===false){
+            if($(this).find(".calendar-week-time-item").length==0 ){
                 $("#reserveCalendarPop2 .con-title").text(thisWorker2);
                 $("#reserveCalendarPop2 .msg-txt-date").text(thisDate);
                 $("#reserveCalendarPop2 .msg-txt-time").text(thisTime);
@@ -1986,7 +1982,7 @@ if(count($arr_holiday)>0){
             $.ajax({
                 async: false,
                 type: 'post',
-                url: 'data/data_set_private_holiday',
+                url: 'data/data_set_private_holiday.php',
                 data: data_form,
                 dataType: 'json',
                 error: function(request,status,error) {
@@ -2326,6 +2322,27 @@ if(count($arr_holiday)>0){
         // $(".calendar-week-current-time").css("height", startLabelHeight+"px");
 
     }
+
+
+    function isNull(v) {
+        return (v === undefined || v === null || v === " ") ? true : false;
+    }
+
+    $(document).ready(function(){
+
+
+        $.each($('.calendar-drag-item-group'),function(i,el){
+
+
+
+            if(el.innerText.replace(/ /gi,"") === "" ){
+                $(el).remove();
+            }
+        })
+
+
+
+    })
 
 
 </script>

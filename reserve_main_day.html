@@ -666,13 +666,13 @@ $await_cnt = $gram[0]['cnt'];
                                             $artist_working[$artist['nicname']][$j] = $arr_holiday[$key][$j]['week'];
                                         }
 
-                                        if(in_array($today_disp_2,$artist_working[$artist['nicname']])){ ?>
+                                        ?>
                                             <div class="calendar-day-header-col"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></div>
 
                                         <?php }
                                         ?>
 
-                                    <?php } ?>
+
 								</div>
 							</div>
 
@@ -793,11 +793,13 @@ $await_cnt = $gram[0]['cnt'];
                                                 if ($explode_start[0] > substr($thisTime, 0, 2)
                                                     || $explode_end[0] < substr($thisTime,0,2)
                                                     || ($explode_start[0] == substr($thisTime,0,2 ) && $explode_start[1] > substr($thisTime,3,2))
-                                                    || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )) {
-
+                                                    || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] < substr($thisTime,3,2) )
+                                                    || ($explode_end[0] == substr($thisTime,0,2) && $explode_end[1] == substr($thisTime,3,2) )){
                                                     $div_class = 'break';
 
                                                 }
+                                            }else if(!in_array($today_disp,$artist_working[$artist['nicname']])){
+                                                $div_class = 'break';
                                             }
 
 
@@ -844,11 +846,7 @@ $await_cnt = $gram[0]['cnt'];
 
                                     ?>
 
-									<div class="calendar-day-body-col <?=$div_class?> time_payment
-
-                                    <?php
-                                           echo in_array($today_disp_2,$artist_working[$artist['nicname']]) ? "" : "ds_none"
-                                    ?>"
+									<div class="calendar-day-body-col <?=$div_class?> time_payment"
                                          data-worker2="<?= $artist['nicname'] ?>"
                                          data-worker="<?= $artist['name'] ?>"
                                          data-date="<?= $nowdate ?>"
@@ -865,8 +863,7 @@ $await_cnt = $gram[0]['cnt'];
                                          data-pay="<?php echo $chk_rev[0]['payment_log_seq'];?>"
                                     >
 
-                                         <?php if($div_class != 'break'){ ?>
-                                            <div class="calendar-drag-item-group">
+                                            <div class="calendar-drag-item-group" style="color:#202020 !important;">
                                                 <?php
                                                 if(!empty($chk_rev)){
                                                     for($a=0;$a<count($chk_rev);$a++){
@@ -1057,7 +1054,7 @@ $await_cnt = $gram[0]['cnt'];
 
                                                 ?>
                                             </div>
-                                         <?php } else { ?>
+                                         <?php if($div_class == 'break'){?>
                                              <?php
                                              if($status == '정기휴일' && $thisTime == '09:00'){
                                                  echo $status;
@@ -1525,7 +1522,7 @@ $(function(){
         thisTimeEnd   = $(this).attr('data-time-from');
 
 
-        if($(this).find(".calendar-week-time-item").length==0 && $(this).hasClass("break")===false){
+        if($(this).find(".calendar-week-time-item").length==0){
             $("#reserveCalendarPop2 .con-title").text(thisWorker2);
             $("#reserveCalendarPop2 .msg-txt-date").text(thisDate);
             $("#reserveCalendarPop2 .msg-txt-time").text(thisTime);
@@ -2083,17 +2080,6 @@ function show_alert(obj){
             }
         })
 
-    }else if(row_length === 1){
-
-
-        $(`<div class="calendar-day-header-col"><?=$master_nickname?></div>`).appendTo('.calendar-day-header-row');
-        $.each(body_cols,function(i,el){
-
-            if($(el).attr('data-worker') === '<?=$artist_id?>'){
-                $(this).attr('style','display:block !important');
-                $(this).addClass('break');
-            }
-        })
     }else{
         $.each(day_item, function(i,el){
             $(el).find('.item-group-wrap').css({'flex-direction':'column'})
