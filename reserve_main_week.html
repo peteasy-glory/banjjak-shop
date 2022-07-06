@@ -984,6 +984,7 @@ if(count($arr_holiday)>0){
                                                 $week_list_count ++;
                                                 unset($crw);
                                                 unset($div_class);
+                                                unset($status);
                                                 //해당 일자에 tb_private_holiday 데이터가 있는지 확인다. 2020-02-24 james
                                                 $nowdate = date("Y-m-d",strtotime($first_date." +".$cnt." day"));//현재 날짜
                                                 $nowdatetime = strtotime($nowdate." ".$thisTime); //현재날짜시간
