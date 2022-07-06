@@ -548,7 +548,7 @@ $await_cnt = $gram[0]['cnt'];
 
 <!-- container -->
 <section id="container"> 
-	<!-- page-body -->    
+	<!-- page-body -->
 	<div class="page-body">
 
         <div class="common-bottom-ui left" style="position:fixed;bottom:74px;">
@@ -703,12 +703,13 @@ $await_cnt = $gram[0]['cnt'];
                                         foreach ((array) $data['artist'] as $artist_key => $artist) {
                                             unset($crw);
                                             unset($div_class);
+                                            unset($status);
                                             $cur_time = $thisTime;
                                             //해당 일자에 tb_private_holiday 데이터가 있는지 확인다. 2020-02-24 james
 
 
                                             $nowdate = date('Y-m-d',strtotime($selected_date));//현재 날짜
-                                            $nowdatetime = strtotime($nowdate." ".$thisTime); //현재날짜시간
+                                            $nowdatetime = date('YmdHi',strtotime($nowdate." ".$thisTime)); //현재날짜시간
 
 //                                            $crw = cant_reservation_day($connection, $artist_id, $artist['name'], $nowdate); //날짜만으로 예약금지 일자 검색
                                             $crw =null; //날짜만으로 예약금지 일자 검색
@@ -717,8 +718,8 @@ $await_cnt = $gram[0]['cnt'];
                                             }else{
                                                 foreach ($CantReservationDay as $val){
                                                     if(trim($val['worker']) == $artist['name']
-                                                        && strtotime($val['start_datetime']) <= $nowdatetime
-                                                        && strtotime($val['end_datetime']) > $nowdatetime
+                                                        && date('YmdHi',strtotime($val['start_datetime'])) <= $nowdatetime
+                                                        && date('YmdHi',strtotime($val['end_datetime'])) > $nowdatetime
                                                     ){
                                                         $crw = $val;
                                                         break;
@@ -730,7 +731,7 @@ $await_cnt = $gram[0]['cnt'];
                                             $thisTimeFrom = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_close.':00')))));
 
 
-                                            if(strtotime($crw['start_datetime']) <= $nowdatetime && strtotime($crw['end_datetime']) > $nowdatetime){
+                                            if(date('YmdHi',strtotime($crw['start_datetime'])) <= $nowdatetime && date('YmdHi',strtotime($crw['end_datetime'])) > $nowdatetime){
                                                 $div_class = 'break';
                                                 $status = '예약금지';
                                             }
@@ -845,6 +846,7 @@ $await_cnt = $gram[0]['cnt'];
 
 
                                     ?>
+
 
 									<div class="calendar-day-body-col <?=$div_class?> time_payment"
                                          data-worker2="<?= $artist['nicname'] ?>"
@@ -1522,7 +1524,7 @@ $(function(){
         thisTimeEnd   = $(this).attr('data-time-from');
 
 
-        if($(this).find(".calendar-week-time-item").length==0){
+        if($(this).find(".calendar-week-time-item").length==0 && $(this).data('status') !=='예약금지'){
             $("#reserveCalendarPop2 .con-title").text(thisWorker2);
             $("#reserveCalendarPop2 .msg-txt-date").text(thisDate);
             $("#reserveCalendarPop2 .msg-txt-time").text(thisTime);
