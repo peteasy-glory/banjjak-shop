@@ -62,7 +62,7 @@ $que = "SELECT count(is_no_show) AS nscnt
         FROM tb_payment_log 
         WHERE artist_id = '".$artist_id."'
             AND is_no_show = 1
-            AND is_cancel = 0
+            #AND is_cancel = 0
             AND cellphone = '".$pay['cellphone']."'
             ";
 $res = sql_query($que);
