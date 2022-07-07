@@ -1,12 +1,15 @@
 <?php    
-	$client_id = 'com.gopet.banjjak';
+	$client_id = 'com.banjjakpet.banjjak';
 	// 20210524 이전 - valid_client 에러 발생
 	//$client_secret = 'eyJraWQiOiIzVlpLVTNTNDJVIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjAzMzMzNjY0LCJleHAiOjE2MTg4ODU2NjQsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uZ29wZXQuYmFuamphayJ9.UaY4hkWwh9tliHhlLp2pbPHT5EU1gss-3skjUAG7SOi-tJT6j4KuPhXB_XP0yhuzq_0xm7CXp-_dt9lSDJD1Cw';
 	
 	// 20210525 by migo
 //	$client_secret = 'eyJraWQiOiIzVlpLVTNTNDJVIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjIxOTA4MzcxLCJleHAiOjE2Mzc0NjAzNzEsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uZ29wZXQuYmFuamphayJ9.bXehtr2ys9Vr96uaT9yWbViSTFrcuPtjYgF7SlSktz1V_nKFXf1w8IbdJCR9wJYR2jkvn09MMoiyT14h6qysRQ';
 
-    $client_secret = 'eyJraWQiOiI5MzRKQTVBNlIzIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjM5NjI3MzAzLCJleHAiOjE2NTUxNzkzMDMsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uZ29wZXQuYmFuamphayJ9.NRGB5QvPPSOZ8JShzc1b_QNaO1tbXTxQzO9Shjbd1YZb9cj3X3n1ZzfOcmr1GsIky5CoeulttN7tRuycENIU3Q';
+    //$client_secret = 'eyJraWQiOiI5MzRKQTVBNlIzIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjM5NjI3MzAzLCJleHAiOjE2NTUxNzkzMDMsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uZ29wZXQuYmFuamphayJ9.NRGB5QvPPSOZ8JShzc1b_QNaO1tbXTxQzO9Shjbd1YZb9cj3X3n1ZzfOcmr1GsIky5CoeulttN7tRuycENIU3Q';
+
+	// 20220707 갱신 6개월 뒤 만료
+	$client_secret = 'eyJraWQiOiJCQTJRNTgyNFNHIiwiYWxnIjoiRVMyNTYifQ.eyJpc3MiOiI3U01TUEo2RDhQIiwiaWF0IjoxNjU3MTY4MzUzLCJleHAiOjE2NzI3MjAzNTMsImF1ZCI6Imh0dHBzOi8vYXBwbGVpZC5hcHBsZS5jb20iLCJzdWIiOiJjb20uYmFuampha3BldC5iYW5qamFrIn0.cJjU_JYgQDCNiqzN78dAzU1Gu-63usXz-2YpD6zim8uzXLpeV-ZnyhaTnOtwU_ZPAeUiZH5UoiaB8mnAokjJww';
 
 	$redirect_uri = 'https://partner.banjjakpet.com/login/apple_callback';
 	//echo $_REQUEST['code'];

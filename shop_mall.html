@@ -38,7 +38,7 @@ $md_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$md_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+    WHERE a.is_delete = '1' AND {$md_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY IFNULL(a.update_dt, a.reg_dt) desc";
 $md_item_array = sql_fetch_array($md_item_sql);
 
 // 베스트 쇼핑템
@@ -48,7 +48,7 @@ $best_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$best_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt desc";
+    WHERE a.is_delete = '1' AND {$best_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY IFNULL(a.update_dt, a.reg_dt) desc";
 $best_item_array = sql_fetch_array($best_item_sql);
 
 // new 쇼핑템
@@ -58,7 +58,7 @@ $new_item_sql = "
             SELECT product_no p_no, AVG(rating) rating_avg, COUNT(product_no) AS rating_cnt 
             FROM tb_item_review WHERE rating IS NOT NULL AND is_delete = '2' GROUP BY product_no
             ) b ON b.p_no = a.product_no
-    WHERE a.is_delete = '1' AND {$new_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY a.reg_dt DESC LIMIT 30";
+    WHERE a.is_delete = '1' AND {$new_item} = '1' AND a.is_shop = '1' AND a.is_view = '1' AND a.is_soldout = '1' ORDER BY IFNULL(a.update_dt, a.reg_dt) DESC LIMIT 30";
 $new_item_array = sql_fetch_array($new_item_sql);
 
 //돌아갈 url을 세션에 저장한다.

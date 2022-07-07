@@ -171,6 +171,7 @@ function login_process(){
 				if(data.data == "APP_GOPET_PARTNER_iOS"){
 					try {
 					window.webkit.messageHandlers.onAppLogin.postMessage('<?=$r_email ?>');
+                        location.href = "../home_main";
 					} catch(e) {
 						console.log(e);
 					}
@@ -366,6 +367,7 @@ function apple_join(){
 							if(tmp_url == "APP_GOPET_PARTNER_iOS"){
 								try {
 								window.webkit.messageHandlers.onAppLogin.postMessage('<?=$r_email ?>');
+                                    location.href = "../home_main";
 								} catch(e) {
 									console.log(e);
 								}

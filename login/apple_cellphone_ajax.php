@@ -68,11 +68,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 				if ($user_agent) {
 					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
 					if ($token_index > 0) {
-						$url = "APP_GOBEAUTY_iOS";
+						$url = "APP_GOPET_PARTNER_iOS";
 					}
 					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_AND");
 					if ($token_index > 0) {
-						$url = "APP_GOBEAUTY_AND";
+						$url = "APP_GOPET_PARTNER_AND";
 					}
 				}
 				if($url == ""){ // empty url
@@ -153,11 +153,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 					if ($user_agent) {
                         $token_index_partner = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
 						if ($token_index > 0 || $token_index_partner > 0) {
-							$url = "APP_GOBEAUTY_iOS";
+							$url = "APP_GOPET_PARTNER_iOS";
                         }
                         $token_index_partner = strpos($user_agent, "APP_GOPET_PARTNER_AND");
 						if ($token_index > 0 || $token_index_partner > 0 ) {
-							$url = "APP_GOBEAUTY_AND";
+							$url = "APP_GOPET_PARTNER_AND";
 						}
 					}
 					//if($url == ""){ // empty url
