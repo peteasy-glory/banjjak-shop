@@ -2100,6 +2100,23 @@ function show_alert(obj){
             $('#bigImg .msg-txt').html('<img src="'+img_pop+'">')
             popalert.open('bigImg');
         }
+
+
+
+        $(document).ready(function() {
+
+
+            $.each($('.calendar-drag-item-group'), function (i, el) {
+
+
+
+
+                if(el.innerText.replace(/ /gi,"") === "" ){
+                    $(el).remove();
+                }
+            })
+        })
+
 </script>
 
 
