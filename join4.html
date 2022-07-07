@@ -5,6 +5,17 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 
 ?>
 
+<script>
+
+    if(sessionStorage.getItem('check3') !== 'check'){
+
+        alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
+        location.href = "join1"
+    }
+
+</script>
+
+
 <!-- header -->
 <header id="header">	
 	<div class="header-left">
@@ -38,3 +49,12 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 	
 </body>
 </html>
+
+<script>
+
+
+    setTimeout(function(){
+
+        sessionStorage.clear()
+    },3000)
+</script>

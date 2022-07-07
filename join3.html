@@ -3,6 +3,18 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 ?>
 
+
+    <script>
+
+        if(sessionStorage.getItem('check2') !== 'check' ){
+
+            alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
+            location.href = "join1"
+        }
+
+    </script>
+
+
 <!-- header -->
 <header id="header">	
 	<div class="header-left">
@@ -69,7 +81,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="#" class="btn-page-bottom disabled" id="next_div">다음</a>
+		<a href="#" class="btn-page-bottom disabled" id="next_div" onclick="process_check3()">다음</a>
 	</div>
 	<!-- //page-bottom -->
 </section>
@@ -301,6 +313,10 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
                 check_pw_error2();
             });
         })
+        function process_check3(){
+
+            sessionStorage.setItem('check3','check');
+        }
 
     </script>
 
