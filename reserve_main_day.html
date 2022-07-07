@@ -1869,9 +1869,11 @@ function show_alert(obj){
 
         $('#header_bell').css('display','none');
 
-        if(await_cnt>0 && counselor_cnt == 0){
-            $('#approveOnly #a_cnt').text(await_cnt);
-            popalert.open('approveOnly');
+        if(sessionStorage.getItem('waiting') !== 'check'){
+            if(await_cnt>0 && counselor_cnt == 0){
+                $('#approveOnly #a_cnt').text(await_cnt);
+                popalert.open('approveOnly');
+            }
         }
         if(counselor_cnt>0 && await_cnt == 0){ // 첫이용상담
             $('#counselorOnly #c_cnt').text(counselor_cnt);
@@ -2033,6 +2035,11 @@ function show_alert(obj){
             $('#bigImg .msg-txt').html('<img src="'+img_pop+'">')
             popalert.open('bigImg');
         }
+
+    setTimeout(function(){
+
+        sessionStorage.clear();
+    },300)
 </script>
 
 

@@ -82,7 +82,7 @@ $_SESSION['backurl_wait'] = 'reserve_waiting';
 
                         <div class="reserve-calendar-list-data">
 
-                            <div class="reserve-calendar-list-items gray" onclick="location.href='./reserve_pay_management_1?reserve_approval_idx=<?php echo $rs['idx'];?>';">
+                            <div class="reserve-calendar-list-items gray" onclick="location.href='./reserve_main_day?ch=day&yy=<?php echo $rs['year']?>&mm=<?php echo $rs['month']?>&dd=<?php echo $rs['day'];?>'; waiting_check()">
                                 <div class="item-time">
                                     <div class="item-time-start"><em><?php echo ($rs['hour']<12)?'오전':'오후';?></em><strong><?php echo $rs['hour'];?>:<?php echo sprintf('%02d',$rs['minute']);?></strong></div>
                                     <div class="item-time-unit">~</div>
@@ -118,6 +118,12 @@ $_SESSION['backurl_wait'] = 'reserve_waiting';
         $('#header_bell').css('display','none');
         $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
     });
+
+    function waiting_check(){
+
+        sessionStorage.setItem('waiting','check');
+
+    }
 </script>
 </body>
 </html>
