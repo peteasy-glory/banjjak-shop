@@ -1821,7 +1821,7 @@ if(count($arr_holiday)>0){
 
             console.log(thisWorker2+':'+thisWorker)
 
-            if($(this).find(".calendar-week-time-item").length==0 ){
+            if($(this).find(".calendar-week-time-item").length==0 && $(this).data('status') !=='예약금지'){
                 $("#reserveCalendarPop2 .con-title").text(thisWorker2);
                 $("#reserveCalendarPop2 .msg-txt-date").text(thisDate);
                 $("#reserveCalendarPop2 .msg-txt-time").text(thisTime);
