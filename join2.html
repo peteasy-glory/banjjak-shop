@@ -1,6 +1,15 @@
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+
+$referer = explode("/",trim($_SERVER['HTTP_REFERER']));
+
+
+if(end($referer) != 'join1' ){
+
+    alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
+    echo "<script>location.href='join1'</script>";
+}
 ?>
 
 
