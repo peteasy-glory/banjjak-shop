@@ -1,18 +1,18 @@
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
+
+$referer = explode("/",trim($_SERVER['HTTP_REFERER']));
+
+
+if(end($referer) != 'join1' ){
+
+    alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
+    echo "<script>location.href='join1'</script>";
+}
 ?>
 
 
-<script>
-
-    if(sessionStorage.getItem('check1') !== 'check'){
-
-        alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
-        location.href = "join1"
-    }
-
-</script>
 
 <!-- header -->
 <header id="header">	
@@ -70,7 +70,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<button type="button" class="btn-page-bottom disabled submit_btn" onclick="process_check2()">다음</button>
+		<button type="button" class="btn-page-bottom disabled submit_btn" >다음</button>
 	</div>
 	<!-- //page-bottom -->
 </section>
@@ -159,10 +159,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 	    })
     })
 
-    function process_check2(){
-
-        sessionStorage.setItem('check2','check');
-    }
 </script>
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_no_gnb.php");
