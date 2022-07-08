@@ -7,7 +7,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 $referer = explode("/",trim($_SERVER['HTTP_REFERER']));
 
 
-if(end($referer) != 'join3' ){
+if(end($referer) != 'registration_2_process.php' ){
 
     alert('잘못된 접근입니다.\n회원가입 첫 화면으로 이동합니다.');
     echo "<script>location.href='join1'</script>";
@@ -18,7 +18,7 @@ if(end($referer) != 'join3' ){
 
 
 <!-- header -->
-<header id="header">	
+<header id="header">
 	<div class="header-left">
 		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
