@@ -1925,21 +1925,27 @@ function show_alert(obj){
         var await_cnt = '<?php echo $await_cnt;?>'; // 예약승인
         var counselor_cnt = '<?php echo $wait_count;?>'; // 상담
 
-        if(await_cnt>0 && counselor_cnt > 0){
-            $('#bothMsg #a1_cnt').text(await_cnt);
-            $('#bothMsg #c1_cnt').text(counselor_cnt);
-            popalert.open('bothMsg');
+        if(sessionStorage.getItem('waiting') !== 'check') {
+            if (await_cnt > 0 && counselor_cnt > 0) {
+                $('#bothMsg #a1_cnt').text(await_cnt);
+                $('#bothMsg #c1_cnt').text(counselor_cnt);
+                popalert.open('bothMsg');
+            }
         }
 
         $('#header_bell').css('display','none');
 
-        if(await_cnt>0 && counselor_cnt == 0){
-            $('#approveOnly #a_cnt').text(await_cnt);
-            popalert.open('approveOnly');
+        if(sessionStorage.getItem('waiting') !== 'check'){
+            if(await_cnt>0 && counselor_cnt == 0){
+                $('#approveOnly #a_cnt').text(await_cnt);
+                popalert.open('approveOnly');
+            }
         }
-        if(counselor_cnt>0 && await_cnt == 0){ // 첫이용상담
-            $('#counselorOnly #c_cnt').text(counselor_cnt);
-            popalert.open('counselorOnly');
+        if(sessionStorage.getItem('waiting') !== 'check') {
+            if (counselor_cnt > 0 && await_cnt == 0) { // 첫이용상담
+                $('#counselorOnly #c_cnt').text(counselor_cnt);
+                popalert.open('counselorOnly');
+            }
         }
 
         $('#btn_page_prev').prop('href','home_main')
@@ -2116,6 +2122,11 @@ function show_alert(obj){
                 }
             })
         })
+
+        setTimeout(function(){
+
+            sessionStorage.removeItem('waiting');
+        },300)
 
 </script>
 
