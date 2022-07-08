@@ -1284,11 +1284,11 @@ if(count($arr_holiday)>0){
                                                     <?php if($div_class == 'break'){ ?>
                                                         <?php
                                                         if($status == '정기휴일' && $thisTime == '09:00'){
-                                                            echo $status;
+                                                            echo '<span>'.$status.'</span>';
                                                         }
 
                                                         if($status == '예약금지' && substr($crw['start_datetime'],-5) == $thisTime){
-                                                            echo $status;
+                                                            echo '<span>'.$status.'</span>';
                                                         }
 
                                                         if($status == '휴게시간'){
