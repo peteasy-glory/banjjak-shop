@@ -1,6 +1,15 @@
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+// 입점신청을 했는지 여부 확인
+$sql = "
+			SELECT * FROM tb_request_artist WHERE customer_id = '" . $_SESSION['gobeauty_user_id'] . "'
+		";
+$result = mysqli_query($connection, $sql);
+$data["customer"] = mysqli_fetch_assoc($result);
+$member_cnt = mysqli_num_rows($result);
+
 ?>
 <!-- container -->
 <section id="container"> 
@@ -8,17 +17,27 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 	<div class="page-body">
 		
 		<div class="access-wait-wrap">
-			<!--h3 class="con-title">잠깐만요<br>입점 신청 후 오픈 대기 중입니다.</h3-->			
-			<!--h3 class="con-title">잠깐만요<br>권한부여 대기 중입니다.</h3-->	
-			
+            <?php if($data["customer"]["step"] == '5'){ // 입점신청한 고객일때 ?>
+			    <h3 class="con-title">잠깐만요<br>입점 신청 후 오픈 대기 중입니다.</h3>
+            <?php }else{ // 일반 고객일때(가입만 했을때) ?>
+                <h3 class="con-title"></h3>
+            <?php } ?>
+
 			<div class="access-info-list">
 				<div class="list-cell">
 					<div class="access-info-item">
 						<div class="item-subject">점주님이신가요?</div>
 						<div class="item-desc">입점 신청 후 사용하실 수 있습니다.</div>
-						<div class="item-btns"><a href="home_import_request_1" class="btn btn-purple">입점 신청하기</a></div>
+						<div class="item-btns">
+                            <?php if($data["customer"]["step"] != '5'){ // 일반 고객일때(가입만 했을때) ?>
+                                <a href="home_import_request_1" class="btn btn-purple">입점 신청하기</a>
+                            <?php }else{ // 입점신청한 고객일때 ?>
+                                <a href="#" class="btn btn-purple">입점 신청완료</a>
+                            <?php } ?>
+                        </div>
 					</div>
 				</div>
+                <?php if($data["customer"]["step"] != '5'){ // 일반 고객일때(가입만 했을때) ?>
 				<div class="list-cell">
 					<div class="access-info-item">
 						<div class="item-subject">직원이신가요?</div>
@@ -26,6 +45,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 						<div class="item-msg">상세설정 &gt; 권한설정에서 설정하실 수 있습니다.</div>
 					</div>
 				</div>
+                <?php } ?>
                 <div class="list-cell">
                     <div class="item-btns"><a href="data/logout_process.php" class="btn btn-purple">로그아웃</a></div>
                 </div>

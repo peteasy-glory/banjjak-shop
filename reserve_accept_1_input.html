@@ -493,21 +493,21 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                         <div class="grid-layout margin-12">
                                             <div class="grid-layout-inner">
                                                 <div class="grid-layout-cell grid-3">
-                                                    <select name="pet_year">
+                                                    <select name="pet_year" id="pet_year">
                                                         <?php for ($y = 2000; $y <= (int) date('Y'); $y++) { ?>
                                                             <option value="<?= $y ?>" <?= ($data["pet"]["year"] == $y) ? "selected" : ""; ?>><?= $y ?> 년</option>
                                                         <?php } ?>
                                                     </select>
                                                 </div>
                                                 <div class="grid-layout-cell grid-3">
-                                                    <select name="pet_month">
+                                                    <select name="pet_month" id="pet_month">
                                                         <?php for ($m = 1; $m <= 12; $m++) { ?>
                                                             <option value="<?= $m ?>" <?= ($data["pet"]["month"] == $m) ? "selected" : ""; ?>><?= $m ?> 월</option>
                                                         <?php } ?>
                                                     </select>
                                                 </div>
                                                 <div class="grid-layout-cell grid-3">
-                                                    <select name="pet_day">
+                                                    <select name="pet_day" id="pet_day">
                                                         <?php for ($d = 1; $d <= 31; $d++) { ?>
                                                             <option value="<?= $d ?>" <?= ($data["pet"]["day"] == $d) ? "selected" : ""; ?>><?= $d ?> 일</option>
                                                         <?php } ?>
