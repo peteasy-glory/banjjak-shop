@@ -17,12 +17,7 @@ $member_cnt = mysqli_num_rows($result);
 	<div class="page-body">
 		
 		<div class="access-wait-wrap">
-            <?php if($data["customer"]["step"] == '5'){ // 입점신청한 고객일때 ?>
-			    <h3 class="con-title">잠깐만요<br>입점 신청 후 오픈 대기 중입니다.</h3>
-            <?php }else{ // 일반 고객일때(가입만 했을때) ?>
-                <h3 class="con-title"></h3>
-            <?php } ?>
-
+            <div class="join-desc">환영합니다.<br>입점 또는 권한설정을 진행하세요.</div>
 			<div class="access-info-list">
 				<div class="list-cell">
 					<div class="access-info-item">
@@ -46,14 +41,16 @@ $member_cnt = mysqli_num_rows($result);
 					</div>
 				</div>
                 <?php } ?>
-                <div class="list-cell">
-                    <div class="item-btns"><a href="data/logout_process.php" class="btn btn-purple">로그아웃</a></div>
-                </div>
 			</div>
-			
+
 		</div>
 	</div>
 	<!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <div class="item-btns"><a href="data/logout_process.php" class="join-btn-logout">로그아웃</a></div>
+    </div>
+    <!-- //page-bottom -->
 </section>
 <!-- //container -->
 <script>

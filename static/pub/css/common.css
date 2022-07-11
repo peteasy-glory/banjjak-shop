@@ -1673,8 +1673,8 @@ h6.con-title {font-size:15px; line-height:20px;}
 .join-complete-inner .complete-desc + .complete-desc {margin-top:18px;}
 
 /* 권한 대기 */
-.access-wait-wrap {margin-top:96px;}
-.access-info-list {margin-top:40px;}
+/*.access-wait-wrap {margin-top:96px;}*/
+.access-info-list {margin-top:40px; height: 100%}
 .access-info-list .list-cell + .list-cell {margin-top:20px;}
 .access-info-item {padding:24px; border:1px solid #ebebeb; border-radius:16px; text-align:center;}
 .access-info-item .item-subject {font-size:18px; line-height:21px; font-weight:700;}
@@ -3772,6 +3772,23 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .ds_none{
 	display:none !important;
 }
+
+/*2022.07.07 회원가입 미권한자로그인 화면 수정 */
+.join-btn-logout {
+	display: block;
+	width: 100%;
+	background: #FDD94E;
+	font-size: 18px;
+	font-weight: 700;
+	text-align: center;
+	padding: 20px 5px 20px 5px;
+	box-sizing: border-box;
+}
+
+.item-img {
+	margin: 96px 0 15px 0;
+}
+
 
 
 /*========================================
