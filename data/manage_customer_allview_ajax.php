@@ -23,13 +23,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					$order_qy = " ORDER BY a.cnt DESC ";
 				}else if($r_search_btn == "4"){
 					$order_qy = " ORDER BY a.type DESC, a.pet_type ASC ";
-				}else if($r_search_btn == "5"){
-					$order_qy = " ORDER BY a.grade_ord ASC ";
 				}
 			}
-
-			//$limit_st = ($_POST["limit_st"] && $_POST["limit_st"] != "")? $_POST["limit_st"] : 0;
-			//$limit_fi = ($_POST["limit_fi"] && $_POST["limit_fi"] != "")? $_POST["limit_fi"] : 0;
 
 			$sql = "
 				SELECT *
@@ -119,19 +114,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = pl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						IFNULL((
-							SELECT b.grade_name FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						), (SELECT grade_name FROM tb_grade_of_shop WHERE artist_id = '".$r_artist_id."' AND grade_ord = 2)) as grade_name,
-						IFNULL((
-							SELECT b.grade_ord FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						),2) as grade_ord
+						) as user_reserve
 					FROM tb_payment_log AS pl
 						LEFT OUTER JOIN tb_artist_customer_list AS acl ON pl.pet_seq = acl.pet_seq
 						LEFT OUTER JOIN tb_mypet AS mp ON pl.pet_seq = mp.pet_seq
@@ -224,19 +207,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = hpl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						IFNULL((
-							SELECT b.grade_name FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						), (SELECT grade_name FROM tb_grade_of_shop WHERE artist_id = '".$r_artist_id."' AND grade_ord = 2)) as grade_name,
-						IFNULL((
-							SELECT b.grade_ord FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						),2) as grade_ord
+						) as user_reserve
 					FROM tb_hotel_payment_log AS hpl
 						INNER JOIN tb_mypet AS mp ON hpl.pet_seq = mp.pet_seq
 					WHERE hpl.artist_id = '".$r_artist_id."'
@@ -327,19 +298,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								AND artist_id = '".$r_artist_id."'
 								AND cellphone = ppl.cellphone
 							LIMIT 0 , 1
-						) as user_reserve,
-						IFNULL((
-							SELECT b.grade_name FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						), (SELECT grade_name FROM tb_grade_of_shop WHERE artist_id = '".$r_artist_id."' AND grade_ord = 2)) as grade_name,
-						IFNULL((
-							SELECT b.grade_ord FROM tb_grade_of_customer a
-							INNER JOIN tb_grade_of_shop b ON a.grade_idx = b.idx
-							WHERE a.customer_id = if(mp.customer_id != '', mp.customer_id, mp.tmp_seq)
-							AND b.artist_id = '".$r_artist_id."'
-						),2) as grade_ord
+						) as user_reserve
 					FROM tb_playroom_payment_log AS ppl
 						INNER JOIN tb_mypet AS mp ON ppl.pet_seq = mp.pet_seq
 					WHERE ppl.artist_id = '".$r_artist_id."'
@@ -348,7 +307,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					GROUP BY ppl.cellphone
 				) AS a
 				".$order_qy."
-				
 			";
 
 			$result = mysqli_query($connection, $sql);
@@ -423,6 +381,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 									AND pl.product_type = 'B'
 									AND pl.customer_id != ''
 									AND (pl.pet_seq != '' OR pl.pet_seq != '0')
+									AND data_delete = 0
 								GROUP BY pl.customer_id
 
 								UNION ALL
@@ -452,6 +411,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 											AND pl.product_type = 'B'
 											AND pl.cellphone != ''
 											AND (pl.pet_seq != '' OR pl.pet_seq != '0')
+											AND data_delete = 0
 										GROUP BY pl.cellphone
 
 										UNION ALL
