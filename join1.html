@@ -103,7 +103,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="#" class="btn-page-bottom disabled" id="next_img">다음</a>
+		<a href="#" class="btn-page-bottom disabled" id="next_img" onclick="process_check1()">다음</a>
 	</div>
 	<!-- //page-bottom -->
 </section>
@@ -193,9 +193,14 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header.php");
             $("#checkall").prop("checked", false);
         }
     }
+    function process_check1(){
 
+
+        sessionStorage.setItem('check1','check');
+    }
 
 </script>
+
 
 
 <?
