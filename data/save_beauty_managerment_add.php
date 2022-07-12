@@ -198,6 +198,16 @@ if($row['cnt']>0){//있으면 업데이트 한다.
     $sql .= "update_time                = NOW() ";
     //echo $sql."<br>";
     mysqli_query($connection,$sql) or die(mysqli_error());
+
+    $que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type2']}'";
+    $res = mysqli_query($connection, $que);
+    $row = mysqli_fetch_assoc($res);
+    //echo $row['cnt'];
+
+    if($row['cnt']>0){//있으면 업데이트 한다.
+        $que = "DELETE FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$is_dog}' AND second_type = '{$_POST['product_second_type2']}'";
+        $res = mysqli_query($connection, $que);
+    }
 }
 
 $returl_url = 'set_beauty_management';
