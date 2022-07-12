@@ -15,29 +15,22 @@ $member_cnt = mysqli_num_rows($result);
 <section id="container"> 
 	<!-- page-body -->    
 	<div class="page-body">
-		
-		<div class="access-wait-wrap">
-            <?php if($data["customer"]["step"] == '5'){ // 입점신청한 고객일때 ?>
-			    <h3 class="con-title">잠깐만요<br>입점 신청 후 오픈 대기 중입니다.</h3>
-            <?php }else{ // 일반 고객일때(가입만 했을때) ?>
-                <h3 class="con-title"></h3>
-            <?php } ?>
 
+
+        <?php if($data["customer"]["step"] != '5'){ // 일반 고객일때(가입만 했을때) ?>
+		<div class="access-wait-wrap">
+            <div class="join-desc">환영합니다.<br>입점 또는 권한설정을 진행하세요.</div>
 			<div class="access-info-list">
 				<div class="list-cell">
 					<div class="access-info-item">
 						<div class="item-subject">점주님이신가요?</div>
 						<div class="item-desc">입점 신청 후 사용하실 수 있습니다.</div>
 						<div class="item-btns">
-                            <?php if($data["customer"]["step"] != '5'){ // 일반 고객일때(가입만 했을때) ?>
                                 <a href="home_import_request_1" class="btn btn-purple">입점 신청하기</a>
-                            <?php }else{ // 입점신청한 고객일때 ?>
-                                <a href="#" class="btn btn-purple">입점 신청완료</a>
-                            <?php } ?>
                         </div>
 					</div>
 				</div>
-                <?php if($data["customer"]["step"] != '5'){ // 일반 고객일때(가입만 했을때) ?>
+
 				<div class="list-cell">
 					<div class="access-info-item">
 						<div class="item-subject">직원이신가요?</div>
@@ -45,15 +38,32 @@ $member_cnt = mysqli_num_rows($result);
 						<div class="item-msg">상세설정 &gt; 권한설정에서 설정하실 수 있습니다.</div>
 					</div>
 				</div>
-                <?php } ?>
-                <div class="list-cell">
-                    <div class="item-btns"><a href="data/logout_process.php" class="btn btn-purple">로그아웃</a></div>
-                </div>
+
 			</div>
-			
+
 		</div>
+        <?php }else{ //입점신청한 고객일 때 ?>
+            <div class="access-wait-wrap-add">
+                <div class="access-info-list-add">
+                    <div class="access-list-cell">
+                        <div class="access-info-item-add" style="border: none;">
+                            <div class="item-img-add"><img src="/static/pub/images/icon/icon-today-visual-2.png" style="width: 120px; height: 80px;" alt=""></div>
+                            <div class="item-subject-add"><span id="shop_name_target"><?php echo $data['customer']['offline_shop_name']?></span> 점주님</div>
+                            <div class="item-desc-add">입점신청이 완료 되었습니다.<br>오픈 대기 상태로 승인 완료 후 이용 가능합니다 .</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        <?php } ?>
 	</div>
 	<!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <div class="item-btns"><a href="data/logout_process.php" class="join-btn-logout">로그아웃</a></div>
+    </div>
+    <!-- //page-bottom -->
 </section>
 <!-- //container -->
 <script>

@@ -178,7 +178,7 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
         var selected_top = top_region.options[top_region.selectedIndex].value;
         var post_data = 'top_region=' + encodeURI(selected_top);
         $.ajax({
-            url: '/data/get_middle_region',
+            url: '/data/get_middle_region.php',
             data: post_data,
             type: 'POST',
             success: function(data) {
@@ -246,7 +246,7 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
         double_chk = false;
         $.ajax({
             type: "POST",
-            url: 'data/save_regist',
+            url: 'data/save_regist.php',
             data: post_data,
             // dataType: "JSON",
             success: function(data) {
@@ -254,6 +254,7 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
                  const result = $.trim(data);
                  if(result == "success"){
                     location.href = "home_import_request_4";
+
                     //alert("성공이다");
                  }else{
                      alert("이미 입점신청이 완료되었습니다.");

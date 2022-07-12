@@ -814,6 +814,17 @@ $await_cnt = $gram[0]['cnt'];
                                                 foreach ($GetReservationChkDay as $val){
                                                     if(trim($val['reservation_date']) == str_replace("-","",$nowdate).str_replace(":","",$thisTime)
                                                          && trim($val['worker']) == $artist['name']){
+
+
+                                                        $que_noshow = "SELECT count(is_no_show) AS nscnt 
+                                                            FROM tb_payment_log 
+                                                            WHERE artist_id = '".$artist_id."'
+                                                                AND is_no_show = 1
+                                                                #AND is_cancel = 0
+                                                                AND cellphone = '".$val['cellphone']."'
+                                                                ";
+                                                        $res_noshow = sql_query($que_noshow);
+                                                        $nscnt = sql_fetch($res_noshow);
                                                         $chk_rev[] = $val;
                                                         //array_splice($chk_rev, 150, 2);
                                                         break;
@@ -932,7 +943,7 @@ $await_cnt = $gram[0]['cnt'];
                                                             <div class="item-name-cate">
                                                                 <div class="item-thumb-add item-thumb-add-2" onclick="show_img_pop(this)" style="display:none;"><img src="<?=$img_pet_thumb?>" alt=""></div>
                                                                 <div class="item-name-cate-2">
-                                                        <div class="item-name"><?php echo ($chk_rev[$a]['is_await']=='0')?'승인대기':$chk_rev[$a]['pet_name']; ?></div>
+                                                                    <div class="item-name item-name-noshow"><?php echo ($chk_rev[$a]['is_await']=='0')?'승인대기':$chk_rev[$a]['pet_name']; ?><?php if($nscnt['nscnt'] != 0){ ?><div class="item-noshow"><img src="images/noshow@2x.png" alt=""><?php echo $nscnt['nscnt'];?>회</div><?php }?></div>
                                                         <div class="item-cate"><?php echo '('.$chk_rev[$a]['pet_type'].')'; ?></div>
                                                                 </div>
                                                          <?php
@@ -1494,7 +1505,7 @@ $(function(){
         $.ajax({
             async: false,
             type: 'post',
-            url: './data/data_set_private_holiday_cancel',
+            url: './data/data_set_private_holiday_cancel.php',
             data: {'aid':artist_id, 'wid':worker_id, 'idx':phseq},
             dataType: 'json',
             error: function() {},
@@ -1964,6 +1975,7 @@ function show_alert(obj){
     if(row_length === 2){
 
 
+
         $.each(day_item, function(i,el){
 
             $(el).find('.item-name').css({'font-size':'16px'});
@@ -2089,6 +2101,10 @@ function show_alert(obj){
         })
 
     }else{
+
+
+        $('.item-noshow').css('display','none');
+
         $.each(day_item, function(i,el){
             $(el).find('.item-group-wrap').css({'flex-direction':'column'})
             $(el).find('.item-thumb-add').css({'display':'none'});
