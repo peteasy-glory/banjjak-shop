@@ -1,0 +1,54 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+
+// 입점신청을 했는지 여부 확인
+$sql = "
+			SELECT * FROM tb_request_artist WHERE customer_id = '" . $_SESSION['gobeauty_user_id'] . "'
+		";
+$result = mysqli_query($connection, $sql);
+$data["customer"] = mysqli_fetch_assoc($result);
+$member_cnt = mysqli_num_rows($result);
+
+?>
+
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		
+		<div class="access-wait-wrap-add">
+			<div class="access-info-list-add">
+				<div class="access-list-cell">
+					<div class="access-info-item-add" style="border: none;">
+                        <div class="item-img-add"><img src="/static/pub/images/icon/icon-today-visual-2.png" style="width: 120px; height: 80px;" alt=""></div>
+                        <div class="item-subject-add"><span id="shop_name_target"></span> 점주님</div>
+						<div class="item-desc-add">입점신청이 완료 되었습니다.<br>오픈 대기 상태로 승인 완료 후 이용 가능합니다 .</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <div class="item-btns"><a href="data/logout_process.php" class="join-btn-logout">로그아웃</a></div>
+    </div>
+    <!-- //page-bottom -->
+</section>
+<!-- //container -->
+<script>
+
+
+    let shop_name = sessionStorage.getItem('shop_name');
+    let shop_name_target = document.getElementById('shop_name_target');
+
+    console.log(shop_name);
+    $(shop_name_target).append(shop_name)
+
+    $(".header-left").css("display","none");
+</script>
+<?
+$footer_menu = false;
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>
