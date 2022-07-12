@@ -3786,6 +3786,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	font-size:10px;
 	justify-content: center;
 	align-items: center;
+	margin-left:3px;
 
 }
 .item-noshow img{

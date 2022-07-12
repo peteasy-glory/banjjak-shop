@@ -253,7 +253,7 @@ $business_photo = (isset($_GET["business_photo"]) && $_GET["business_photo"] != 
                  console.log(data);
                  const result = $.trim(data);
                  if(result == "success"){
-                     let shop_name = document.getElementById('shop_name').innerText;
+                     let shop_name = $('#shop_name').val();
                      sessionStorage.setItem('shop_name',shop_name);
                     location.href = "home_import_request_4";
 
