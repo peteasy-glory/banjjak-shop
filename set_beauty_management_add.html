@@ -205,9 +205,34 @@ for($j=0;$j<count($option_chk_name);$j++){
                                                 <option value="대형견미용" <?php echo ('대형견미용'==$second_type)?'selected':'';?>>대형견미용</option>
                                                 <option value="특수견미용" <?php echo ('특수견미용'==$second_type)?'selected':'';?>>특수견미용</option>
                                                 <option value="추가공통옵션" <?php echo ('추가공통옵션'==$second_type)?'selected':'';?>>추가공통옵션</option>
-                                                <option value="직접입력" <?php echo ($_GET['second_type']=='직접입력')?'selected':'';?>>직접입력</option>
+                                                <option value="직접입력"
+                                                    <?php
+                                                        //echo ($_GET['second_type']=='직접입력')?'selected':'';
+                                                        if($second_type != "소형견미용" && $second_type != "중형견미용" && $second_type != "대형견미용" && $second_type != "특수견미용" && $second_type != "추가공통옵션"){
+                                                            echo "selected";
+                                                        }
+                                                    ?>
+                                                >직접입력</option>
                                             </select>
-                                            <input type="text" name="product_second_type2" id="product_second_type2" value="<?php echo (isset($_GET['direct_title']))?$_GET['direct_title']:$data["product_dog_static"][0]['direct_title'];?>" style="display:<?php echo (trim($_GET['second_type'])=='직접입력')?'block':'none';?>; margin-top:5px;" maxlength="20" >
+                                            <?php
+                                            // 직접입력칸 value, 노출여부 구하기
+                                            if(isset($_GET['direct_title']) && $_GET['direct_title'] != ''){
+                                                $direct_title = $_GET['direct_title'];
+                                            }else if($second_type != "소형견미용" && $second_type != "중형견미용" && $second_type != "대형견미용" && $second_type != "특수견미용" && $second_type != "추가공통옵션"){
+                                                $direct_title = $second_type;
+                                            }else{
+                                                $direct_title = $data["product_dog_static"][0]['direct_title'];
+                                            }
+
+                                            if(trim($_GET['second_type'])=='직접입력'){
+                                                $direct_dsiplay = 'block';
+                                            }else if($second_type != "소형견미용" && $second_type != "중형견미용" && $second_type != "대형견미용" && $second_type != "특수견미용" && $second_type != "추가공통옵션"){
+                                                $direct_dsiplay = 'block';
+                                            }else{
+                                                $direct_dsiplay = 'none';
+                                            }
+                                            ?>
+                                            <input type="text" name="product_second_type2" id="product_second_type2" value="<?php echo $direct_title;?>" style="display:<?php echo $direct_dsiplay;?>; margin-top:5px;" maxlength="20" >
                                         </div>
                                     </div>
                                 </div>
