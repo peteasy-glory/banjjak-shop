@@ -52,6 +52,24 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
             <!-- //set-teacher-wrap -->
         </div>
         <!-- //page-body -->
+
+        <!--  대표미용사 퇴사/취소 불가 -->
+        <article id="never_main" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">대표 미용사는 퇴사/취소 처리가 불가능합니다.<br/><br/>닉네임을 수정하여 사용해주세요.</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <!-- //대표미용사 퇴사/취소 불가 -->
+
         <!--  예약거부 -->
         <article id="goout" class="layer-pop-wrap">
             <div class="layer-pop-parent">
@@ -433,7 +451,12 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                 $('#goout').data('main',is_main);
                 $('#goout').data('out',is_out);
 
-                popalert.open('goout');
+                if(name == artist_id){
+                    popalert.open('never_main');
+                }else{
+                    popalert.open('goout');
+                }
+
             }
         });
 
@@ -570,41 +593,45 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                     buttonFail: "취소",
                     message: "숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.<br/><br/>해당 미용사를 숨김처리 하시겠습니까?"
                 }).done(function(){*/
-                if(confirm("숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.\n해당 미용사를 숨김처리 하시겠습니까?")) {
-                    $.ajax({
-                        url: 'data/manage_artist_ajax.php',
-                        data: {
-                            mode: "set_update_artist_list",
-                            artist_id: artist_id,
-                            name: name,
-                            is_view: (is_view == '1') ? '2' : '1'
-                        },
-                        type: 'POST',
-                        dataType: 'JSON',
-                        success: function (data) {
-                            if (data.code == "000000") {
-                                //console.log(data.data);
-                                /*$.MessageBox({
-                                    buttonDone: "확인",
-                                    message: "숨김처리 되었습니다."
-                                }).done(function () {*/
-                                popalert.open('confirmOnlyOkReload','숨김처리 되었습니다.');
+                if(name == artist_id) {
+                    popalert.open('never_main');
+                }else{
+                    if(confirm("숨김처리한 미용사는 예약스케줄 표에 나타나지 않습니다.\n해당 미용사를 숨김처리 하시겠습니까?")) {
+                        $.ajax({
+                            url: 'data/manage_artist_ajax.php',
+                            data: {
+                                mode: "set_update_artist_list",
+                                artist_id: artist_id,
+                                name: name,
+                                is_view: (is_view == '1') ? '2' : '1'
+                            },
+                            type: 'POST',
+                            dataType: 'JSON',
+                            success: function (data) {
+                                if (data.code == "000000") {
+                                    //console.log(data.data);
+                                    /*$.MessageBox({
+                                        buttonDone: "확인",
+                                        message: "숨김처리 되었습니다."
+                                    }).done(function () {*/
+                                    popalert.open('confirmOnlyOkReload','숨김처리 되었습니다.');
 
-                                    //get_artist_list();
-                                //});
-                            } else {
-                                popalert.open('confirmOnlyOkReload',data.code);
+                                        //get_artist_list();
+                                    //});
+                                } else {
+                                    popalert.open('confirmOnlyOkReload',data.code);
 
+                                }
+                            },
+                            error: function (xhr, status, error) {
+                                //alert(error + "네트워크에러");
+                                if (xhr.status != 0) {
+                                    alert("code = " + xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                                }
                             }
-                        },
-                        error: function (xhr, status, error) {
-                            //alert(error + "네트워크에러");
-                            if (xhr.status != 0) {
-                                alert("code = " + xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
-                            }
-                        }
-                    });
-                    //});
+                        });
+                        //});
+                    }
                 }
             }
         });
@@ -716,23 +743,23 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 												<div class="item-info">닉네임 : ${v.nicname}</div>
 											</div>
 										</div>`;
-                        if(v.artist_id == v.name) {
+                            if(v.artist_id == v.name) {
                                 html2 += `<div class="item-state">
                                                 <div class="label label-outline-purple middle">대표미용사</div>
                                         </div>`;
-                                        }
-								html2 += `		<div class="item-state"><div class="${__is_txt}">${__is_out}${_is_view_txt}</div></div>
-										<button type="button" class="btn-accordion-menu"></button>
-									</div>
-									<div class="accordion-content">
-										<div class="card-teacher-body">
-											<div class="schedule-day-list">
-												${time_html}
-											</div>
-											<div class="btn-basic-action">
-												<div class="grid-layout basic btn-grid-group">
-													<div class="grid-layout-inner">
-														<div class="grid-layout-cell flex-1"><a href="set_teacher_add?seq=${v.seq}" class="btn btn-outline-gray btn-middle-size btn-round">수정</a></div>
+                            }
+                            html2 += `		<div class="item-state"><div class="${__is_txt}">${__is_out}${_is_view_txt}</div></div>
+                                    <button type="button" class="btn-accordion-menu"></button>
+                                </div>
+                                <div class="accordion-content">
+                                    <div class="card-teacher-body">
+                                        <div class="schedule-day-list">
+                                            ${time_html}
+                                        </div>
+                                        <div class="btn-basic-action">
+                                            <div class="grid-layout basic btn-grid-group">
+                                                <div class="grid-layout-inner">
+                                                    <div class="grid-layout-cell flex-1"><a href="set_teacher_add?seq=${v.seq}" class="btn btn-outline-gray btn-middle-size btn-round">수정</a></div>
                             `;
                             if(v.is_out == 1) {
                                 html2 += `
