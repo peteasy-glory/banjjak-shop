@@ -11,16 +11,76 @@
             <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : <?= $wait_count ?></button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_waiting';">예약 승인 대기 : <?php echo $await_cnt; ?></button>
-            <!--<button type="button" onclick="location.href='reserve_time_sale_step1_3'" class="btn-float-menu">빈시간 판매하기</button>-->
+            <button type="button" class="btn-float-menu" onclick="popalert.open('setting_main')">적절한 문구</button>
+            <button type="button" class="btn-float-menu" onclick="popalert.open('setting_main2')">적절한 문구2</button>
         </div>
     </div>
 </div>
+
+<!-- 해당페이지 첫화면으로 변경 -->
+<article id="setting_main" class="layer-pop-wrap" style="z-index: 100002;">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt">해당 페이지를 예약관리 첫 화면으로 변경하시겠습니까?</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick=" set_reserve_main();">변경</button>
+                    <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>
+
+<article id="setting_main2" class="layer-pop-wrap" style="z-index: 100002;">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt">예약관리 첫 화면으로 변경합니다.</div>
+                    <div>
+                        <br>
+                        <input type="radio" name="reserve_main" value="0" <?php echo ($reserve_main == 0)? "checked":"" ?>> 월
+                        <input type="radio" name="reserve_main" value="1" <?php echo ($reserve_main == 1)? "checked":"" ?>> 주
+                        <input type="radio" name="reserve_main" value="2" <?php echo ($reserve_main == 2)? "checked":"" ?>> 일
+                    </div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick=" set_reserve_main2();">변경</button>
+                    <button type="button" class="btn btn-confirm" onclick="popalert.close();">취소</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</article>
+
+<!-- 설정 완료 -->
+<article id="setting_main_ok" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt">변경되었습니다.</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
 
 <article id="approveOnly" class="layer-pop-wrap">
     <div class="layer-pop-parent">
         <div class="layer-pop-children">
             <div class="pop-data alert-pop-data">
-                <div class="pop-body type-3">
+                <div class="pop-body">
                     <div class="msg-txt">승인대기중인 예약 <span id="a_cnt">0</span>건 </div>
                     <div class="msg-txt">대기리스트를 확인해주세요.</div>
                 </div>
@@ -54,7 +114,7 @@
         <div class="layer-pop-children">
             <div class="pop-data alert-pop-data">
 
-                <div class="pop-body type-3">
+                <div class="pop-body">
                     <div class="msg-txt">승인대기중인 예약 <span id="a1_cnt">0</span>건 </div>
                     <div class="msg-txt">상담대기중인 예약 <span id="c1_cnt">0</span>건 </div>
                     <div class="msg-txt">대기리스트를 확인해주세요.</div>
@@ -68,3 +128,51 @@
         </div>
     </div>
 </article>
+<script>
+    function set_reserve_main(){
+        var change_reserve_main = (<?=$change_reserve_main?>)? '<?=$change_reserve_main?>': '0';
+        console.log(change_reserve_main);
+        $.ajax({
+            type: 'post',
+            url: '/data/data_set_reserve_main.php',
+            data: {
+                customer_id : "<?=$artist_id?>",
+                reserve_main : change_reserve_main
+            },
+            dataType: 'json',
+            error: function(xhr,error) {
+                console.log(xhr+ '' +error)
+            },
+            success: function(json) {
+                console.log(json);
+            }
+        });
+        popalert.close();
+        popalert.open('setting_main_ok');
+        $('.reserve-calendar-float-menu, .page-cover').removeClass('actived')
+    }
+
+    function set_reserve_main2(){
+        var change_reserve_main = $('input[name=reserve_main]:checked').val();
+        console.log(change_reserve_main);
+
+        $.ajax({
+            type: 'post',
+            url: '/data/data_set_reserve_main.php',
+            data: {
+                customer_id : "<?=$artist_id?>",
+                reserve_main : change_reserve_main
+            },
+            dataType: 'json',
+            error: function(xhr,error) {
+                console.log(xhr+ '' +error)
+            },
+            success: function(json) {
+                console.log(json);
+            }
+        });
+        popalert.close();
+        popalert.open('setting_main_ok');
+        $('.reserve-calendar-float-menu, .page-cover').removeClass('actived')
+    }
+</script>

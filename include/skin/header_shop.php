@@ -40,6 +40,27 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
 	$update_time = $shop_datas->update_time;
 	$is_finish_open_magic = $shop_datas->is_finish_open_magic;
 	//$open_magin_step = $shop_datas->open_magin_step;
+    $reserve_main = $shop_datas->reserve_main;
+
+    // 예약관리 첫 페이지 구하기
+    if($reserve_main == 0){
+        $reserve_main_page = 'reserve_main_month';
+    }else if($reserve_main == 1){
+        $reserve_main_page = 'reserve_main_week';
+    }else if($reserve_main == 2){
+        $reserve_main_page = 'reserve_main_day';
+    }
+
+    // 페이지별 넣을 값 생성
+    if(strpos($_SERVER['PHP_SELF'],'reserve_main_month') !== false){
+        $change_reserve_main = 0;
+    }
+    if(strpos($_SERVER['PHP_SELF'],'reserve_main_week') !== false){
+        $change_reserve_main = 1;
+    }
+    if(strpos($_SERVER['PHP_SELF'],'reserve_main_day') !== false){
+        $change_reserve_main = 2;
+    }
 
 
 	//----- 상담 대기 건수 조회
