@@ -14,7 +14,7 @@
 			<div class="page-bottom">
 				<div class="common-navigation">
 					<a href="/home_main" class="btn-navigation-item navigation-1 <?=$bottomActived[0]?>"><div class="icon"></div><div class="txt">홈</div></a>
-					<a href="reserve_main_week" class="btn-navigation-item navigation-6 <?=$bottomActived[1]?>" ><div class="icon"></div><div class="txt">예약관리</div></a>
+					<a href="<?=$reserve_main_page?>" class="btn-navigation-item navigation-6 <?=$bottomActived[1]?>" ><div class="icon"></div><div class="txt">예약관리</div></a>
 					<a href="customer_inquiry" class="btn-navigation-item navigation-7 <?=$bottomActived[2]?>" ><div class="icon"></div><div class="txt">고객관리</div></a>
 					<a href="shop_main" class="btn-navigation-item navigation-8 <?=$bottomActived[3]?>"><div class="icon"></div><div class="txt">샵관리</div></a>
 					<a href="set_main" class="btn-navigation-item navigation-9 <?=$bottomActived[4]?>"><div class="icon"></div><div class="txt">설정</div></a>
