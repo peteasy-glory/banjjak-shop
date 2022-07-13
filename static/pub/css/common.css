@@ -3856,13 +3856,16 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	margin-top:20px;
 }
 .radio-btn-vertical{
-	vertical-align: sub;
-	width:20px;
-	height:20px;
-	margin-right:10px;
+	vertical-align: baseline;
+	width:15px;
+	height:23px;
+	margin-right:5px;
 	margin-left:10px;
 }
 
+.radio-btn-label{
+	margin-right:10px;
+}
 
 .radio-btn-wrap input[type='radio']:checked{
 

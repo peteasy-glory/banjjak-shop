@@ -26,9 +26,9 @@
                     <div class="msg-txt">예약관리 첫 화면 설정</div>
                     <div class="radio-btn-wrap">
                         <br>
-                        <div><input type="radio" class="radio-btn-vertical" style="margin-left:0px" name="reserve_main" value="0" <?php echo ($reserve_main == 0)? "checked":"" ?>><label for="reserve_main" >월</label></div>
-                        <div><input type="radio" class="radio-btn-vertical" name="reserve_main" value="1" <?php echo ($reserve_main == 1)? "checked":"" ?>><label for="reserve_main" >주</label></div>
-                        <div><input type="radio" class="radio-btn-vertical" name="reserve_main" value="2" <?php echo ($reserve_main == 2)? "checked":"" ?>><label for="reserve_main" >일</label></div>
+                        <div><input type="radio" class="radio-btn-vertical" name="reserve_main" value="0" <?php echo ($reserve_main == 0)? "checked":"" ?>><label for="reserve_main" class="radio-btn-label" >월</label></div>
+                        <div><input type="radio" class="radio-btn-vertical" name="reserve_main" value="1" <?php echo ($reserve_main == 1)? "checked":"" ?>><label for="reserve_main" class="radio-btn-label" >주</label></div>
+                        <div><input type="radio" class="radio-btn-vertical" name="reserve_main" value="2" <?php echo ($reserve_main == 2)? "checked":"" ?>><label for="reserve_main" class="radio-btn-label">일</label></div>
                     </div>
                 </div>
                 <div class="pop-footer">
