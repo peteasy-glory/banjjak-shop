@@ -3872,6 +3872,17 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	accent-color: #6840b1;
 }
 
+/*2022.07.14 새로운 아이템 강조 점*/
+.new-item:before{
+
+	content:'\f111';
+	font-family: "Font Awesome 5 Free";
+	font-weight: 600;
+	font-size:3px;
+	color: red;
+	margin-right:5px;
+}
+
 
 /*========================================
 @ PC버전
