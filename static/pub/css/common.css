@@ -3872,11 +3872,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	accent-color: #6840b1;
 }
 
-.msg-txt{
-	width:100%;
-	display:flex;
-	justify-content: center;
-}
+
 /*========================================
 @ PC버전
 ========================================*/

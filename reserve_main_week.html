@@ -1114,7 +1114,7 @@ if(count($arr_holiday)>0){
 
                                                 ?>
 
-                                                <div class="calendar-week-body-col <?=$div_class?> <?php if(!in_array($star_date_time,$res_time['datetime_time'])){ echo 'time_payment';} ?>
+                                                <div class="calendar-week-body-col <?= $status =='예약금지'? 'break2' : "" ?> <?=$div_class?> <?php if(!in_array($star_date_time,$res_time['datetime_time'])){ echo 'time_payment';} ?>
 
 <!--                                                       "
 
@@ -1677,7 +1677,7 @@ if(count($arr_holiday)>0){
         //https://github.com/SortableJS/Sortable
 
         $('.calendar-week-body-col').each(function(){
-            if( !$(this).hasClass('time')){
+            if(!$(this).hasClass('break2') && !$(this).hasClass('time')){
                 //휴무가 아닐 경우 드래그앤 드롭 가능 처리
                 var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0] , {
                     group : 'shared',
