@@ -25,8 +25,23 @@ $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}"
 $tpl = sql_fetch_array($que);
 
 //해당 날짜에 시작 시간을 가져온다.
-$que = "SELECT * FROM tb_payment_log WHERE CONCAT(year,'-',month,'-',day) = '{$move_date}' AND artist_id = '{$user_id}' AND is_cancel = '0' 
-        AND worker = '{$_POST['log_worker']}' AND NOT payment_log_seq = '{$payment_log_seq}' ORDER BY CONCAT(year,'-',month,'-',DAY,' ',HOUR,':',minute)
+$que = "
+    SELECT hour, to_hour, minute, to_minute FROM tb_payment_log 
+    WHERE CONCAT(year,'-',month,'-',DAY) = '{$move_date}' 
+    AND artist_id = '{$user_id}' 
+    AND is_cancel = '0' 
+    AND worker = '{$_POST['log_worker']}' 
+    AND NOT payment_log_seq = '{$payment_log_seq}' 
+    
+    union
+    
+    SELECT start_hour hour, end_hour to_hour, start_minute minute, end_minute to_minute FROM tb_private_holiday 
+    WHERE customer_id = '{$user_id}'
+    AND worker = '{$_POST['log_worker']}' 
+    AND TYPE = 'notall'
+    AND CONCAT(start_year,'-',start_month,'-',start_day) = '{$move_date}' 
+    
+    ORDER BY CONCAT(HOUR,':',MINUTE)
         ";
 //echo $que;
 $tpl1 = sql_fetch_array($que);
@@ -43,6 +58,10 @@ $ed_min = intval(date('i',strtotime($_POST['log_move_start_time'])+(1800*$time_e
 $this_start_time = strtotime($_POST['log_move_start_time']); // 바뀔예약 시작시간
 $this_end_time = strtotime($ed_hour.":".$ed_min);  // 바뀔예약 종료시간
 
+$pay_type = $tpl[0]['status'];
+if(trim($pay_type) == "R1"){
+    $json['0'] = "R1";
+}
 
 $result_end_time = 0; // reTime 일때 종료시간
 if(count($tpl1)>0){ // 해당 날짜에 예약 있을 때
@@ -73,7 +92,10 @@ if(count($tpl1)>0){ // 해당 날짜에 예약 있을 때
     $json['4'] = "keep";
 }
 
-if($json['1'] == "fail"){
+if($json['0'] == "R1") {
+    $json['flag'] = false;
+    $json['result'] = "견주가 앱을 통해 직접 예약한 경우 예약자 본인이 변경/취소 가능합니다.";
+}else if($json['1'] == "fail"){
     $json['flag'] = false;
     $json['result'] = "이미 다른 예약이 잡힌 시간이라 변경이 불가합니다.";
 }else if($json['2'] == "reTime"){
