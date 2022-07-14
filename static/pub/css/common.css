@@ -3881,7 +3881,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	content:'\2e';
 	font-family: "Font Awesome 5 Free";
 	font-weight: 600;
-	color: red;
+	color: #ff4848;
 	transform:rotate(180deg);
 	font-size:30px;
 }
