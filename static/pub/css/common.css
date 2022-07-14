@@ -3878,12 +3878,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 }
 .new-item:after{
 
-	content:'\2e';
+	content: '．';
 	font-family: "Font Awesome 5 Free";
 	font-weight: 600;
 	color: #ff4848;
-	transform:rotate(180deg);
-	font-size:30px;
+	transform: rotate(180deg);
+	font-size: 30px;
+	margin-left: -10px;
+	margin-right: -10px;
+}
 }
 
 
