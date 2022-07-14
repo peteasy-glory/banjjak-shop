@@ -3847,6 +3847,30 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	text-align: center;
 }
 
+/*2022.07.13 예약관리 첫 화면 설정 */
+
+.radio-btn-wrap{
+	display:flex;
+	width:100%;
+	justify-content:center;
+	margin-top:20px;
+}
+.radio-btn-vertical{
+	vertical-align: baseline;
+	width:15px;
+	height:23px;
+	margin-right:5px;
+	margin-left:10px;
+}
+
+.radio-btn-label{
+	margin-right:10px;
+}
+
+.radio-btn-wrap input[type='radio']:checked{
+
+	accent-color: #6840b1;
+}
 
 
 /*========================================
@@ -3918,7 +3942,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	.page-body .page-footer {margin:32px 0 0 0;}
 	.reserve-calendar-float {bottom:0; padding:20px;}
 
-	.page-bottom {max-width:1020px; box-sizing:content-box; padding:0 40px 50px 40px; margin:0;}
+	.page-bottom {max-width:1020px; box-sizing:content-box; padding:0 40px 50px 40px; margin:0 auto;}
 	.join-complete + .page-bottom {margin-top:50px;}
 	.page-banner-data {max-width:360px; margin:0 auto;}
 	.import-request-slider {max-width:360px; margin:0 auto;}
