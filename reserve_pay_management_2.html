@@ -47,6 +47,16 @@ $payment_log_seq = $_GET['payment_log_seq'];
 $backurl = urldecode($_GET['backurl']);
 $backurl_4_gallery = urlencode("/pet/shop/view_payment_customer_info_pc.php?payment_log_seq={$payment_log_seq}&thisTimeStart={$thisTimeStart}&thisTimeEnd={$thisTimeEnd}");	// 갤러리용 backurl
 
+// 승인대기 건 resrve_pay_management_1 로 보내기
+$grade_que = "SELECT * FROM tb_grade_reserve_approval_mgr WHERE payment_log_seq = {$payment_log_seq} AND is_approve = 0";
+$grade_result = mysqli_query($connection, $grade_que);
+$grade_rows = mysqli_fetch_object($grade_result);
+$grade_idx = $grade_rows->idx;
+$grade_cnt = mysqli_num_rows($grade_result);
+if($grade_cnt > 0){
+    echo "<script>location.replace('reserve_pay_management_1?reserve_approval_idx=".$grade_idx."')</script>";
+}
+
 //결제 정보 구하기
 $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}";
 $res = sql_query($que);
@@ -1119,7 +1129,7 @@ if(empty($grade[0]['grade_name'])){
                                 </div>
                             </div>
                         </div>
-                        <div class="basic-data-group vsmall"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round only-change-time" data-seq="<?php echo $pay['payment_log_seq'];?>">시간만 변경</button></div>
+                        <div class="basic-data-group vsmall"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round only-change-time" data-seq="<?php echo $pay['payment_log_seq'];?>" data-status="<?php echo $pay['status'];?>">시간만 변경</button></div>
                         <div class="form-bottom-info" style="font-size:13px !important;">*시간 변경만 하는 경우 시간선택 후 변경을 눌러주세요.</div>
                     </div>
 
@@ -3292,7 +3302,13 @@ if(empty($grade[0]['grade_name'])){
         //시간만 변경
         //특이사항 저장
         $(document).on('click','.only-change-time',function(){
-            popalert.open('only_change_time');
+            var status = $('.only-change-time').data('status');
+            //popalert.open('only_change_time');
+            if(status == "R1"){
+                pop.open('neverCancel');
+            }else{
+                popalert.open('only_change_time');
+            }
         });
 
         function set_change_time(){
@@ -3320,7 +3336,7 @@ if(empty($grade[0]['grade_name'])){
 
         //날짜 미용사 변경
         $(document).on('click','.change-rev',function(){
-            var status = $('.cancel-rev').data('status');
+            var status = $('.change-rev').data('status');
             //popalert.open('change_rev');
             if(status == "R1"){
                 pop.open('neverCancel');

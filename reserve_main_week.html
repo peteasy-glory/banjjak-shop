@@ -1752,7 +1752,7 @@ if(count($arr_holiday)>0){
             $.ajax({
                 async: false,
                 type: 'post',
-                url: 'data/data_set_change_work',
+                url: 'data/data_set_change_work.php',
                 data: data_form,
                 dataType: 'json',
                 error: function(xhr,error) {
@@ -1911,14 +1911,10 @@ if(count($arr_holiday)>0){
             for (var t = timeStart; t < timeEnd; t += (60 * 30)) {
                 var obj_res_time_option = $('<option></option>');
                 var obj_date = new Date(t * 1000);
-                let obj_date_getHours = obj_date.getHours();
-                if(obj_date_getHours > 12){
 
-                    obj_date_getHours -= 12;
-                }
 
                 var val_date = '';
-                val_date += (String(obj_date_getHours).length == 1 ? '0' : '') + obj_date_getHours;
+                val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
                 val_date += ':';
                 val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
@@ -1936,12 +1932,7 @@ if(count($arr_holiday)>0){
                 var obj_res_time_option2 = $('<option></option>');
                 var obj_date = new Date(t * 1000);
                 var val_date = '';
-                let obj_date_getHours = obj_date.getHours();
-                if(obj_date_getHours > 12){
-
-                    obj_date_getHours -= 12;
-                }
-                val_date += (String(obj_date_getHours).length == 1 ? '0' : '') + obj_date_getHours;
+                val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
                 val_date += ':';
                 val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
