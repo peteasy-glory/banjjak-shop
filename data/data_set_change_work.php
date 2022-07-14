@@ -143,7 +143,7 @@ if($json['flag'] == true){
         $talk = new Allimtalk();
         //$talkBtnLink = "https://shop.gopet.kr/reserve_pay_management_2?payment_log_seq=".$pay[0]['payment_log_seq'];
         $talk->cellphone = $tpl[0]['cellphone'];
-        $talkBtnLink = "http://gopet.kr/pet/reservation/?payment_log_seq=".$payment_log_seq;
+        $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$payment_log_seq;
         $talkResult = $talk->sendUpdateNotice_new($customerName, $petName, $shopName, $date, $changeDate, $talkBtnLink);
 
     }
