@@ -1677,7 +1677,7 @@ if(count($arr_holiday)>0){
         //https://github.com/SortableJS/Sortable
 
         $('.calendar-week-body-col').each(function(){
-            if(!$(this).hasClass('break') && !$(this).hasClass('time')){
+            if( !$(this).hasClass('time')){
                 //휴무가 아닐 경우 드래그앤 드롭 가능 처리
                 var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0] , {
                     group : 'shared',
@@ -1911,8 +1911,14 @@ if(count($arr_holiday)>0){
             for (var t = timeStart; t < timeEnd; t += (60 * 30)) {
                 var obj_res_time_option = $('<option></option>');
                 var obj_date = new Date(t * 1000);
+                let obj_date_getHours = obj_date.getHours();
+                if(obj_date_getHours > 12){
+
+                    obj_date_getHours -= 12;
+                }
+
                 var val_date = '';
-                val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
+                val_date += (String(obj_date_getHours).length == 1 ? '0' : '') + obj_date_getHours;
                 val_date += ':';
                 val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
@@ -1922,6 +1928,7 @@ if(count($arr_holiday)>0){
                 obj_res_time_option.appendTo(obj_res_time);
             }
 
+
             // 끝시간
             var obj_res_time2 = obj_form_time.find('select[name="ph_end_time"]');
             obj_res_time2.empty();
@@ -1929,7 +1936,12 @@ if(count($arr_holiday)>0){
                 var obj_res_time_option2 = $('<option></option>');
                 var obj_date = new Date(t * 1000);
                 var val_date = '';
-                val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
+                let obj_date_getHours = obj_date.getHours();
+                if(obj_date_getHours > 12){
+
+                    obj_date_getHours -= 12;
+                }
+                val_date += (String(obj_date_getHours).length == 1 ? '0' : '') + obj_date_getHours;
                 val_date += ':';
                 val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
@@ -2334,7 +2346,7 @@ if(count($arr_holiday)>0){
 
 
             if(el.innerText.replace(/ /gi,"") === "" ){
-                $(el).remove();
+                $(el).css('flex','0');
             }
         })
 
