@@ -859,7 +859,7 @@ $await_cnt = $gram[0]['cnt'];
                                                     ?>
 
 
-                                                    <div class="calendar-day-body-col <?=$div_class?> time_payment"
+                                                    <div class="calendar-day-body-col <?= $status =='예약금지'? 'break2' : "" ?>  <?=$div_class?> time_payment"
                                                          data-worker2="<?= $artist['nicname'] ?>"
                                                          data-worker="<?= $artist['name'] ?>"
                                                          data-date="<?= $nowdate ?>"
