@@ -3873,20 +3873,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 }
 
 /*2022.07.14 새로운 아이템 강조 점*/
-.new-item{
-	margin-left:2px;
-}
-.new-item:after{
 
-	content: '．';
-	font-family: "Font Awesome 5 Free";
-	font-weight: 600;
-	color: #ff4848;
-	transform: rotate(180deg);
-	font-size: 30px;
-	margin-left: -10px;
-	margin-right: -10px;
-}
 
 
 

@@ -11,7 +11,8 @@
             <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : <?= $wait_count ?></button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_waiting';">예약 승인 대기 : <?php echo $await_cnt; ?></button>
-            <button type="button" class="btn-float-menu new-item" onclick="popalert.open('setting_main')">예약관리 화면설정</button>
+            <button type="button" class="btn-float-menu new-item" onclick="popalert.open('setting_main')">예약관리 화면설정<img src="images/new_item.png" alt="" style="margin-bottom:13px; margin-left:3px;"></button>
+
         </div>
     </div>
 </div>
