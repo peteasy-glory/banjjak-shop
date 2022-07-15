@@ -227,9 +227,9 @@
                         // setCookie_popup('guide_beauty_shop ', 'Y', 1);
                         $(this).dialog("close");
                     },
-                    "오늘 그만보기": function() {
+                    "다시 보지 않기": function() {
                         // location.href = "mypage_notice_view?notice_seq=19";
-                        setCookie_popup('guide_beauty_shop_reserve', 'Y', 1);
+                        setCookie_popup('guide_beauty_shop_reserve', 'Y', 100);
                         $(this).dialog("close");
                     }
                 },
