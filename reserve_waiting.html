@@ -84,9 +84,9 @@ $_SESSION['backurl_wait'] = 'reserve_waiting';
 
                             <div class="reserve-calendar-list-items gray" onclick="location.href='./reserve_main_day?ch=day&yy=<?php echo $rs['year']?>&mm=<?php echo $rs['month']?>&dd=<?php echo $rs['day'];?>'; waiting_check()">
                                 <div class="item-time">
-                                    <div class="item-time-start"><em><?php echo ($rs['hour']<12)?'오전':'오후';?></em><strong><?php echo $rs['hour'];?>:<?php echo sprintf('%02d',$rs['minute']);?></strong></div>
+                                    <div class="item-time-start"><em><?php echo ($rs['hour']<12)?'오전':'오후';?></em><strong><?php echo $rs['hour']>12? $rs['hour']-12:$rs['hour'];?>:<?php echo sprintf('%02d',$rs['minute']);?></strong></div>
                                     <div class="item-time-unit">~</div>
-                                    <div class="item-time-end"><em><?php echo ($rs['to_hour']<12)?'오전':'오후';?></em><strong><?php echo $rs['to_hour'];?>:<?php echo sprintf('%02d',$rs['to_minute']);?></strong></div>
+                                    <div class="item-time-end"><em><?php echo ($rs['to_hour']<12)?'오전':'오후';?></em><strong><?php echo$rs['to_hour']>12? $rs['to_hour']-12:$rs['to_hour'];?>:<?php echo sprintf('%02d',$rs['to_minute']);?></strong></div>
                                 </div>
                                 <div class="item-info">
                                     <div class="item-name">

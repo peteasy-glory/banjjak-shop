@@ -838,7 +838,7 @@ if(empty($grade[0]['grade_name'])){
                             $st_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']);
                             $fi_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['to_hour'].':'.$pay['to_minute']);
                             ?>
-                            <div class="text-list-cell"><div class="item-title unit">시간</div><div class="item-data"><?=date('H:i',$st_date) ?> ~ <?=date('H:i',$fi_date) ?></div></div>
+                            <div class="text-list-cell"><div class="item-title unit">시간</div><div class="item-data"><?=date('h:i',$st_date) ?> ~ <?=date('h:i',$fi_date) ?></div></div>
                         </div>
                     </div>
                 </div>
