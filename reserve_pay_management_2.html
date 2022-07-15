@@ -1106,7 +1106,7 @@ if(empty($grade[0]['grade_name'])){
                                             $rev_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']);
                                             for($i=strtotime($start_date);$i<=(strtotime($end_date)-1800);$i+=1800){
                                                 ?>
-                                                <option value="<?php echo $i;?>" <?php echo ($i == $rev_date)?'selected':''; ?>><?php echo date('H:i',$i);?></option>
+                                                <option value="<?php echo $i;?>" <?php echo ($i == $rev_date)?'selected':''; ?>><?php echo date('h:i',$i);?></option>
                                             <?php } ?>
                                         </select>
                                     </div>
@@ -1122,7 +1122,7 @@ if(empty($grade[0]['grade_name'])){
                                             $rev_date = strtotime($pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['to_hour'].':'.$pay['to_minute']);
                                             for($i=(strtotime($start_date)+1800);$i<=strtotime($end_date);$i+=1800){
                                                 ?>
-                                                <option value="<?php echo $i;?>" <?php echo ($i == $rev_date)?'selected':''; ?>><?php echo date('H:i',$i);?></option>
+                                                <option value="<?php echo $i;?>" <?php echo ($i == $rev_date)?'selected':''; ?>><?php echo date('h:i',$i);?></option>
                                             <?php } ?>
                                         </select>
                                     </div>

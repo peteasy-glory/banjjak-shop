@@ -702,7 +702,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                 dataType: 'JSON',
                 success: function(data) {
                     if(data.code == "000000"){
-                        //console.log(data.data);
+                        console.log(data.data);
                         artist_list = data.data;
 
                         var html = '';
@@ -721,6 +721,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                             var __is_txt = (v.is_out == '1' || v.is_view == 1)? 'txt' : '';
                             var __is_txt = (v.is_main == '1')? 'label label-outline-purple middle' : __is_txt;
                             var time_html	= "";
+
+                            // console.log(time_start_arr)
 
 
 
