@@ -1,6 +1,6 @@
 <style>
-    .ui-dialog { padding: 0px; }
-    .ui-dialog .ui-dialog-content { padding: 0px; }
+    .ui-dialog { padding: 0px;  z-index: 5000 !important;}
+    .ui-dialog .ui-dialog-content { padding: 0px;  }
     .ui-dialog-titlebar { display: none; }
     .ui-widget-overlay { background-color: rgba(0, 0, 0, 0.8); opacity: 1; }
     .ui-dialog-buttonset { width: 100%; }
@@ -24,25 +24,7 @@
 </style>
 
 
-<div id="popup_wrap">
-    <div class="custom-modal-content">
-        <div class="popup_img">
-            <div class="swiper-container_front swiper-container">
-                <div class="swiper-wrapper" id="popup-wraper">
-                    <div class="swiper-slide">
-                        <a href="javascript:location.href='mypage_notice_view?notice_seq=24';">
-                            <img src="/images/banner/reserve_main.jpg" />
-                        </a>
-                    </div>
-                </div>
-                <!-- Add Arrows -->
-                <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
-                <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
-                <div class="swiper-pagination_front"></div>
-            </div>
-        </div>
-    </div>
-</div>
+
 
 <div class="reserve-calendar-float">
     <div class="reserve-calendar-float-cell">
@@ -156,6 +138,27 @@
         </div>
     </div>
 </article>
+
+<div id="popup_wrap">
+    <div class="custom-modal-content">
+        <div class="popup_img">
+            <div class="swiper-container_front swiper-container">
+                <div class="swiper-wrapper" id="popup-wraper">
+                    <div class="swiper-slide">
+                        <a href="javascript:location.href='mypage_notice_view?notice_seq=24';">
+                            <img src="/images/banner/reserve_main.jpg" />
+                        </a>
+                    </div>
+                </div>
+                <!-- Add Arrows -->
+                <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="swiper-pagination_front"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 
     function set_reserve_main(){
