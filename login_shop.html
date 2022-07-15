@@ -118,17 +118,23 @@ $(document).ready(function(){
 	$(".login").click(function(){
 		$("#cs_login_all").submit();	
 	});
-	
-	$( "input[name=check]:checkbox").click( function (){ 
+
+	$( "input[name=check]:checkbox").click( function (){
 		if ($("input[name=check]:checkbox" ).is( ":checked")){
 			$("#remember").val("on");
 		} else { 
 			$("#remember").val("");
 		} 
 	});
-})	
-	
-	
+})
+
+$(document).keyup(function(){
+    if (window.event.keyCode == 13) {
+        $("#cs_login_all").submit();
+    }
+})
+
+
 	
 // 상품결제 데이터
 var order_step = getCookie("order_step");
