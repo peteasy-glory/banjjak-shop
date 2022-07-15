@@ -1534,11 +1534,18 @@ $await_cnt = $gram[0]['cnt'];
                 thisTimeStart   = $(this).attr('data-time-to');
                 thisTimeEnd   = $(this).attr('data-time-from');
 
+                let thisTimes = thisTime.split(':');
+                if(thisTimes[0] > 12){
+                    thisTimes[0] -= 12
+                }
+
+                let thisTime12 = `${String(thisTimes[0]).length === 1 ? '0':''}${thisTimes[0]}:${thisTimes[1]}`
+
 
                 if($(this).find(".calendar-week-time-item").length==0 && $(this).data('status') !=='예약금지'){
                     $("#reserveCalendarPop2 .con-title").text(thisWorker2);
                     $("#reserveCalendarPop2 .msg-txt-date").text(thisDate);
-                    $("#reserveCalendarPop2 .msg-txt-time").text(thisTime);
+                    $("#reserveCalendarPop2 .msg-txt-time").text(thisTime12);
 
                     $('#ph_worker').val(thisWorker);
 
@@ -1593,12 +1600,23 @@ $await_cnt = $gram[0]['cnt'];
                 for (var t = timeStart; t < timeEnd; t += (60 * 30)) {
                     var obj_res_time_option = $('<option></option>');
                     var obj_date = new Date(t * 1000);
+
+                    let obj_date_getHours = obj_date.getHours();
+                    if(obj_date_getHours > 12){
+
+                        obj_date_getHours -= 12;
+                    }
+
+
+
+                    let view_date = `${String(obj_date_getHours).length == 1 ? '0' : ''}${obj_date_getHours}:${String(obj_date.getMinutes()).length == 1 ? '0' : ''}${obj_date.getMinutes()}`
+
                     var val_date = '';
                     val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
                     val_date += ':';
                     val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
-                    obj_res_time_option.val(val_date).text(val_date).attr('data-timestamp', t);
+                    obj_res_time_option.val(val_date).text(view_date).attr('data-timestamp', t);
                     if (val_date == thisTime) obj_res_time_option.prop('selected', true); // 선택된 시간을 선택한다.
                     obj_res_time_option.appendTo(obj_res_time);
                 }
@@ -1609,12 +1627,23 @@ $await_cnt = $gram[0]['cnt'];
                 for (var t = timeStart + (60 * 30); t <= timeEnd; t += (60 * 30)) {
                     var obj_res_time_option2 = $('<option></option>');
                     var obj_date = new Date(t * 1000);
+
+                    let obj_date_getHours = obj_date.getHours();
+                    if(obj_date_getHours > 12){
+
+                        obj_date_getHours -= 12;
+                    }
+
+
+
+                    let view_date = `${String(obj_date_getHours).length == 1 ? '0' : ''}${obj_date_getHours}:${String(obj_date.getMinutes()).length == 1 ? '0' : ''}${obj_date.getMinutes()}`
+
                     var val_date = '';
                     val_date += (String(obj_date.getHours()).length == 1 ? '0' : '') + obj_date.getHours();
                     val_date += ':';
                     val_date += (String(obj_date.getMinutes()).length == 1 ? '0' : '') + obj_date.getMinutes();
 
-                    obj_res_time_option2.val(val_date).text(val_date).attr('data-timestamp', t);
+                    obj_res_time_option2.val(val_date).text(view_date).attr('data-timestamp', t);
                     obj_res_time_option2.appendTo(obj_res_time2);
                 }
 
