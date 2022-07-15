@@ -1,3 +1,49 @@
+<style>
+    .ui-dialog { padding: 0px; }
+    .ui-dialog .ui-dialog-content { padding: 0px; }
+    .ui-dialog-titlebar { display: none; }
+    .ui-widget-overlay { background-color: rgba(0, 0, 0, 0.8); opacity: 1; }
+    .ui-dialog-buttonset { width: 100%; }
+    .ui-dialog .ui-dialog-buttonpane { padding: 0px !important; margin-top: 0px; }
+    .ui-widget.ui-widget-content { border: 0px; }
+    .ui-dialog .ui-dialog-buttonpane button { display: inline-block; width: 50%; height: 50px; padding: 0px; margin: 0px; border: 0px; background-color: #222; padding: 0px !important; margin: 0px !important; border-radius: 0px; border: 0px; font-size: 14px; color:white}
+
+    #popup_wrap { display: none; }
+    #popup_wrap .custom-modal-content { margin: 0px auto; width: 100%; }
+    #popup_wrap .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
+    #popup_wrap .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important; }
+    #popup_wrap .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important }
+    #popup_wrap .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap .swiper-wrapper { height: auto; }
+    #popup_wrap .swiper-slide {  }
+    #popup_wrap .swiper-slide img { width: 100%; height: auto; vertical-align: top; }
+    #popup_wrap .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
+    #popup_wrap .swiper-pagination-bullet { margin: 0px 5px; }
+    #popup_wrap .swiper-pagination-bullet-active { background-color: #999; }
+</style>
+
+
+<div id="popup_wrap">
+    <div class="custom-modal-content">
+        <div class="popup_img">
+            <div class="swiper-container_front swiper-container">
+                <div class="swiper-wrapper" id="popup-wraper">
+                    <div class="swiper-slide">
+                        <a href="javascript:location.href='mypage_notice_view?notice_seq=24';">
+                            <img src="/images/banner/reserve_main.jpg" />
+                        </a>
+                    </div>
+                </div>
+                <!-- Add Arrows -->
+                <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="swiper-pagination_front"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="reserve-calendar-float">
     <div class="reserve-calendar-float-cell">
         <button onclick="location.href='reserve_main_day';" type="button" class="btn-reserve-calendar-today"><span
@@ -11,7 +57,7 @@
             <button type="button" class="btn-float-menu" onclick="location.href='customer_pet_new';">신규등록</button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_advice_list_1';">상담 승인 대기 : <?= $wait_count ?></button>
             <button type="button" class="btn-float-menu" onclick="location.href='reserve_waiting';">예약 승인 대기 : <?php echo $await_cnt; ?></button>
-            <button type="button" class="btn-float-menu new-item" onclick="popalert.open('setting_main')">예약관리 화면설정<img src="images/new_item.png" alt="" style="margin-bottom:13px; margin-left:3px;"></button>
+            <button type="button" class="btn-float-menu new-item" onclick="popalert.open('setting_main')">예약관리 화면설정<img src="images/new_item2.png" alt="" style="margin-bottom:13px; margin-left:3px;max-width:5px !important;"></button>
 
         </div>
     </div>
@@ -135,4 +181,85 @@
         popalert.open('setting_main_ok');
         $('.reserve-calendar-float-menu, .page-cover').removeClass('actived')
     }
+
+
+    function getCookie_popup(name) {
+        var obj = name + "=";
+        var x = 0;
+        while (x <= document.cookie.length) {
+            var y = (x + obj.length);
+            if (document.cookie.substring(x, y) == obj) {
+                if ((endOfCookie = document.cookie.indexOf(";", y)) == -1)
+                    endOfCookie = document.cookie.length;
+                return unescape(document.cookie.substring(y, endOfCookie));
+            }
+            x = document.cookie.indexOf(" ", x) + 1;
+            if (x == 0)
+                break;
+        }
+        return "";
+    }
+    function setCookie_popup(name, value, expiredays) {
+        var todayDate = new Date();
+        todayDate.setDate(todayDate.getDate() + expiredays);
+        document.cookie = name + '=' + escape(value) + '; path=/; expires=' + todayDate.toGMTString() + '; SameSite=None; Secure';
+    }
+
+    $(document).ready(function(){
+        if (getCookie_popup('guide_beauty_shop_reserve') != 'Y') {
+            $("#popup_wrap").dialog({
+                modal: true,
+                title: "",
+                autoOpen: true,
+                //maxWidth: "96%",
+                //minHeight: Number($(window).height()) - 40,
+                //width: 'auto',
+                //height: 'auto',
+                autoSize: false,
+                resize: 'auto',
+                resizable: false,
+                draggable: false,
+                buttons: {
+                    '닫기': function() {
+                        // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                        $(this).dialog("close");
+                    },
+                    "오늘 그만보기": function() {
+                        // location.href = "mypage_notice_view?notice_seq=19";
+                        setCookie_popup('guide_beauty_shop_reserve', 'Y', 1);
+                        $(this).dialog("close");
+                    }
+                },
+                open: function(event, ui) {
+                    // swiper2.update();
+                    $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                    $(event.target).parent().css('top', '50%'); // dialog fixed
+                    $(event.target).parent().css('left', '50%'); // dialog fixed
+                    $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                    // $('.ui-dialog').position({ my: "center", at: "center", of: window });
+                },
+                close: function() {
+                }
+            });
+        }
+    });
+
+
+    let popup_swiper_reserve = new Swiper('.swiper-container_front', {
+
+        direction:'horizontal',
+        slidesPerView:1,
+
+        observer:true,
+        observeParents:true,
+
+        navigation:{
+            nextEl:".prev",
+            prevEl:".next",
+        },
+        watchOverflow:true,
+
+
+    });
+
 </script>
