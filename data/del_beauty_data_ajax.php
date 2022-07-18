@@ -15,7 +15,7 @@ switch($clear['mode']){
     case 'dogDelOne'://강아지 미용 삭제
         $json['flag'] = true;
         $data = explode('|',$_POST['type']);
-        $que = "DELETE FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$data[0]}' AND second_type = '{$data[1]}'";
+        $que = "DELETE FROM tb_product_dog_static WHERE customer_id = '{$user_id}' AND first_type = '{$data[0]}' AND second_type = '{$data[1]}' AND direct_title = '{$data[2]}'";
         //echo $que."<p>";
         $res = sql_query($que);
         if(!$res){

@@ -438,7 +438,7 @@ if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0][
                                         <div class="grid-layout btn-grid-group">
                                             <div class="grid-layout-inner">
                                                 <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round" onclick="location.href='./set_beauty_management_add?direct_title=<?php echo ($rs['direct_title']!='')?$rs['direct_title']:'';?>&backurl=set_beauty_management&second_type=<?php echo ($rs['direct_title']!='')?'직접입력':$rs['second_type'];?>'">수정</a></div>
-                                                <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round btn-del-beauty" data-type="<?php echo '개|'.$rs['second_type'];?>">삭제</a></div>
+                                                <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-gray btn-middle-size btn-round btn-del-beauty" data-type="<?php echo '개|'.$rs['second_type'].'|'.$rs['direct_title'];?>">삭제</a></div>
                                             </div>
                                         </div>
                                     </div>
