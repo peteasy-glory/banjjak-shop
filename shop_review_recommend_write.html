@@ -124,7 +124,7 @@ if ($rows = mysqli_fetch_object($result)) {
 </section>
 <!-- //container -->
 <script>
-        $(document).ready(function(){
+    $(document).ready(function(){
         $('.btn-submit').on('click',function(){
             if($('#memo').val() == ''){
                 popalert.open('talkExam');
@@ -133,7 +133,16 @@ if ($rows = mysqli_fetch_object($result)) {
             popalert.open('talkExam1');
 
         });
-        })
+    })
+
+    $('#memo').keyup(function(){
+       if($(this).val() != ''){
+           $('.btn-submit').removeClass('disabled');
+       }else{
+           $('.btn-submit').addClass('disabled');
+       }
+    });
+
     $(document).ready(function(){
         $('#header_bell').css('display','none');
         $('#btn_page_prev').prop('href','shop_review_list')
