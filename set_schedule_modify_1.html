@@ -181,7 +181,7 @@ if($row["is_sunday"]==1){
 				</div>
 				<div class="form-check-group">
 					<div class="form-check-inner">
-						<div class="check-cell"><label class="form-radiobox"><input type="radio" name="time2" class="time-schedule" value="1" <?php echo ($data["is_time_type"]==1)?'checked':'';?>><span class="form-check-icon"><em>자유시간제</em></span></label></div>
+						<div class="check-cell"><label class="form-radiobox"><input type="radio" name="time2" class="time-schedule" value="1" <?php echo ($data["is_time_type"]==1 || $data["is_time_type"]=='')?'checked':'';?>><span class="form-check-icon"><em>자유시간제</em></span></label></div>
 						<div class="check-cell"><label class="form-radiobox"><input type="radio" name="time2" class="time-schedule" value="2" <?php echo ($data["is_time_type"]==2)?'checked':'';?>><span class="form-check-icon"><em>타임제</em></span></label></div>
 					</div>
 				</div>
