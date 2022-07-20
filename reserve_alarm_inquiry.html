@@ -241,9 +241,13 @@ if ($payment_log_seq != "" && $cellphone != "") {
 </section>
 <!-- //container -->
 <script>
-    $(document).ready(function() {
-        $('#btn_page_prev').prop('href', '<?=$_SESSION['backurl2']?>');
-    });
+    //$(document).ready(function() {
+    //    $('#btn_page_prev').prop('href', '<?//=$_SESSION['backurl2']?>//');
+    //});
+    $('#btn_page_prev').on("click",function (){
+        history.back(); return false;
+    })
+
 </script>
 </body>
 </html>
