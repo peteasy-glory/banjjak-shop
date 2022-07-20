@@ -19,6 +19,9 @@ $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
 
 
+unset($_SESSION['backurl1']);
+$_SESSION['backurl1'] = 'customer_all_inquiry1';
+
 $shop_title	= "전체고객조회";
 $header_right	= '
 	

@@ -4327,11 +4327,13 @@ if(empty($grade[0]['grade_name'])){
             //}else{
             //    $('#btn_page_prev').prop('href','<?php //echo $_SESSION['backurl1'];?>//');
             //}
-            $('#btn_page_prev').on("click",function (){
-                history.back(); return false;
-            })
+            // $('#btn_page_prev').on("click",function (){
+            //     history.back(); return false;
+            // })
 
+            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
 
+            if(window.history.inclues)
             $('input[name="cat_weight"]').each(function(index){
                 if($(this).is(':checked')==true){
                     $('.kg_'+(index-1)).css('display','block');
