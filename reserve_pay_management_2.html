@@ -953,7 +953,7 @@ if(empty($grade[0]['grade_name'])){
                                         AND etc_memo != ''
                                         AND pet_seq = '{$pay["pet_seq"]}'   
                                         AND DATE_FORMAT(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT('".$this_time."','%Y-%m-%d') 
-                                        ORDER BY  CONCAT(year,'-',month,'-',day) DESC
+                                        ORDER BY  DATE_FORMAT(CONCAT(year,'-',month,'-',day),'%Y-%m-%d') DESC
                                 ";
                 //echo $sql;
                 $arr = sql_fetch_array($sql);
@@ -986,7 +986,7 @@ if(empty($grade[0]['grade_name'])){
                 <!-- 이전 미용 -->
                 <?php
                 //echo $que;
-                $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$pay['pet_seq']} AND artist_id = '{$artist_id}' AND cellphone = '{$pay['cellphone']}' AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 AND approval = 1 AND DATE_FORMAT(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT('".$this_time."','%Y-%m-%d') ORDER BY  CONCAT(year,'-',month,'-',day) DESC  ";
+                $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$pay['pet_seq']} AND artist_id = '{$artist_id}' AND cellphone = '{$pay['cellphone']}' AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 AND approval = 1 AND DATE_FORMAT(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT('".$this_time."','%Y-%m-%d') ORDER BY  DATE_FORMAT(CONCAT(year,'-',month,'-',day),'%Y-%m-%d') DESC  ";
                 $arr = sql_fetch_array($que);
                 if(count($arr)>0) {
                     foreach ($arr as $arr) {
