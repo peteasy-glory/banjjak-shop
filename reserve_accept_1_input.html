@@ -34,12 +34,17 @@ $data = array(); // all_data
 $crypto = new Crypto();
 if ($customer_cellphone && $customer_cellphone != "") {
     $where_qy = "";
+    if(strpos($customer_id, '신규등록') === false){
+        $where_id = "WHERE id = '{$customer_id}' ";
+    }else{
+        $where_id = "WHERE cellphone = '{$customer_cellphone}' ";
+    }
     // 회원 데이터 호출(정회원)
     $cellphone_encode = $crypto->encode($customer_cellphone, $access_key, $secret_key);
     $sql = "
 		SELECT *
 		FROM tb_customer
-		WHERE id = '" . $customer_id . "' 
+		".$where_id."
 			and nickname not like 'cellp_%'
 	";	// 20210705 by migo - cellp 제외 조건
 //    echo $sql."<p>";
@@ -664,7 +669,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                         <div class="form-item-data type-2">
                                             <div class="form-datepicker-group">
                                                 <div class="form-datepicker">
-                                                    <select name="from_time">
+                                                    <select name="from_time" id="from_time">
                                                         <?php
 
                                                             // 이전 타임 미용 및 휴무 있는지 확인
@@ -2063,6 +2068,10 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
         //알람없이 저장
         $(document).on('click','#no_alarm_save_btn',function(){
+            if($('#to_time').val()-$('#from_time').val() <= 0){
+                alert("미용 시간을 확인해주세요.");
+                return false;
+            }
             console.log('알람없이 저장');
             $('#alarm_yn').val('N');
             $('#reserveCalendarPop2').find('.msg-txt').text('미용 예약 하루 전 알림은 발송 하시겠습니까?');
@@ -2072,6 +2081,10 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
         //저장
         $(document).on('click','#alarm_save_btn',function(){
+            if($('#to_time').val()-$('#from_time').val() <= 0){
+                alert("미용 시간을 확인해주세요.");
+                return false;
+            }
             console.log('알람 저장')
             $('#alarm_yn').val('Y');
             $('#reserveCalendarPop2').find('.msg-txt').text('미용 예약 하루 전 알림도 발송 하시겠습니까?');
