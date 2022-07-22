@@ -267,7 +267,8 @@ $another_reserve = 0;
 								<div class="flex-table-data-inner">
 									<?php echo $beauty_info[3]; ?>
 								</div>
-								<div class="flex-table-data-side"><a href="customer_alarm_inquiry?cellphone=<?php echo $phone;?>" class="font-color-purple font-underline btn-text">알림톡 발송 조회</a></div>
+								<div class="flex-table-data-side"><a href="customer_alarm_inquiry?cellphone=<?php echo $phone;?>" class="btn-side btn btn-msmall-size btn-inline btn-border-radius-16 btn-bg-yellow" style="right:0 !important;">알림톡 발송 조회</a></div>
+
 							</div>
 						</div>
 					</div>
@@ -1202,9 +1203,11 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
             });
 
             $('#header_bell').css('display','none');
-            $('#btn_page_prev').on("click",function (){
-                history.back(); return false;
-            })
+            // $('#btn_page_prev').on("click",function (){
+            //     history.back(); return false;
+            // })
+
+            $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
 
         });
 
