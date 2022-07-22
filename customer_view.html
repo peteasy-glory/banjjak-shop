@@ -17,8 +17,8 @@ $yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
 $mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
 $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
-unset($_SESSION['backurl1']);
-$_SESSION['backurl1'] = 'customer_inquiry?q='.$_GET['q'];
+//unset($_SESSION['backurl1']);
+//$_SESSION['backurl1'] = 'customer_inquiry?q='.$_GET['q'];
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'customer_view?customer_cellphone='.$_GET['customer_cellphone'].'&pet_seq='.$_GET['pet_seq'];
 
