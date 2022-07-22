@@ -43,6 +43,32 @@
 					}
 				}
 
+				// onapplogin 네이티브 호출 ////////////////////
+				$user_agent = $_SERVER['HTTP_USER_AGENT'];
+				if ($user_agent) {
+					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_iOS");
+					if ($token_index > 0) { ?>
+
+						<script>
+							window.webkit.messageHandlers.onAppLogin.postMessage('<?=$id?>');
+							location.reload();
+						</script>
+
+					<?php	}
+				}
+				if ($user_agent) {
+					$token_index = strpos($user_agent, "APP_GOPET_PARTNER_AND");
+					if ($token_index > 0) { ?>
+
+						<script>
+							window.Android.onAppLogin('<?=$id?>');
+							location.reload();
+						</script>
+
+					<?php	}
+				}
+				// onapplogin 네이티브 호출 ////////////////////
+
 				cookie_save($id,$master_key_name);
 
 			}
