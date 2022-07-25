@@ -948,7 +948,7 @@ $await_cnt = $gram[0]['cnt'];
                                                                                     </div>
                                                                                     <?php
                                                                                     if($chk_rev[$a]['status'] == 'R1'){
-                                                                                        $pay_price = number_format($chk_rev[$a]['total_price']);
+                                                                                        $pay_price = number_format($chk_rev[$a]['total_price']+$chk_rev[$a]['spend_point']);
                                                                                     }else{
                                                                                         $pay_price = number_format($chk_rev[$a]['local_price']+$chk_rev[$a]['local_price_cash']);
                                                                                     }
