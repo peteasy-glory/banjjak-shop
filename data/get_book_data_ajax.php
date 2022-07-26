@@ -910,7 +910,7 @@ switch($clear['mode']){
             $json['error'] = '예약신청이 취소되었습니다.';
         }
 
-        $que = "UPDATE tb_grade_reserve_approval_mgr SET is_approve = '{$_POST['type']}' WHERE idx = {$_POST['no']} ";
+        $que = "UPDATE tb_grade_reserve_approval_mgr SET is_approve = '{$_POST['type']}', mod_date = NOW() WHERE idx = {$_POST['no']} ";
         $res = sql_query($que);
         if($_POST['type'] == '3'){
             $que = "

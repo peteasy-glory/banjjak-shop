@@ -1859,24 +1859,28 @@ if(empty($grade[0]['grade_name'])){
             }
         });
 
+        var double_chk = true;
         $(document).on('click','.apporval-reserve',function(){
-            var idx = $(this).data('mgr');
-            var gubun = $(this).data('type');
-            var customer_id = "<?=$pay["customer_id"]?>";
-            $.ajax({
-                type : 'post',
-                url : './data/get_book_data_ajax.php',
-                data : {'mode':'reserveStatusChange','no':idx,'type':gubun,'customer_id':customer_id},
-                dataType : 'json',
-                success : function(json){
-                    if(json.flag == true){
-                        popalert.open('confirmOnlyOkLink',json.error);
-
-                        return false;
+            if(double_chk == true){
+                double_chk = false;
+                var idx = $(this).data('mgr');
+                var gubun = $(this).data('type');
+                var customer_id = "<?=$pay["customer_id"]?>";
+                $.ajax({
+                    type : 'post',
+                    url : './data/get_book_data_ajax.php',
+                    data : {'mode':'reserveStatusChange','no':idx,'type':gubun,'customer_id':customer_id},
+                    dataType : 'json',
+                    success : function(json){
+                        double_chk = true;
+                        if(json.flag == true){
+                            popalert.open('confirmOnlyOkLink',json.error);
+                            return false;
+                        }
+                        alert(json.error);
                     }
-                    alert(json.error);
-                }
-            });
+                });
+            }
         });
 
         function go_url(){
