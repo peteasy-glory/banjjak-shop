@@ -61,7 +61,7 @@ if($row[0]['cnt']>0) {
     $que .= "res_time_off = '{$btime}', ";
     $que .= "res_time_cnt = '', ";
     $que .= "res_time_off_yn = 'y', ";
-    $que .= "reg_date = NOW()";
+    $que .= "reg_date = NOW(), update_date = NOW()";
 }
 //echo $que;
 sql_query($que);
