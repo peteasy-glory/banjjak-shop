@@ -177,7 +177,8 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
 						ELSE '매장접수(카)'
 					end
 				) AS pay_type
-                , IF(pay_type = 'card' or pay_type = 'bank', IFNULL(total_price, 0) - IFNULL(spend_point, 0) + IFNULL(add_price, 0), IFNULL(local_price, 0)) AS card
+                #, IF(pay_type = 'card' or pay_type = 'bank', IFNULL(total_price, 0) + IFNULL(spend_point, 0) + IFNULL(add_price, 0), IFNULL(local_price, 0)) AS card
+                , IF(pay_type = 'card' or pay_type = 'bank', if(IFNULL(local_price, 0) + IFNULL(local_price_cash, 0) < 1,IFNULL(total_price, 0) + IFNULL(spend_point, 0) + IFNULL(add_price, 0), IFNULL(local_price, 0)),IFNULL(local_price, 0) ) AS card
 				, IFNULL(local_price_cash, 0) AS cash
                 #, IFNULL(IF(pay_type = 'card' or pay_type = 'bank', IFNULL(total_price, 0) - IFNULL(spend_point, 0) + IFNULL(add_price, 0), if(local_price_cash>0 OR add_price_cash>0,if(add_price='',0,IFNULL(add_price, 0)),IFNULL(local_price, 0))), 0) AS card
                 #, IFNULL(if(local_price_cash > 0, local_price_cash, add_price_cash), 0) AS cash
