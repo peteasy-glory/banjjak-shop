@@ -983,35 +983,40 @@ if(count($arr_holiday)>0){
                                                 TFunc::console("week_list_count: " . $week_list_count);
                                                 $week_list_count ++;
                                                 unset($crw);
-                                                unset($div_class);
-                                                unset($status);
+                                                $div_class = "";
+                                                $status = "";
                                                 //해당 일자에 tb_private_holiday 데이터가 있는지 확인다. 2020-02-24 james
                                                 $nowdate = date("Y-m-d",strtotime($first_date." +".$cnt." day"));//현재 날짜
                                                 $nowdatetime = strtotime($nowdate." ".$thisTime); //현재날짜시간
 
 //                                                $crw1 = cant_reservation_week($connection, $artist_id, $worker, $nowdate); //날짜만으로 예약금지 일자 검색
                                                 $crw =null; //날짜만으로 예약금지 일자 검색
-                                                if (count($CantReservationWeek) < 1){
-                                                    $crw = null;
-                                                }else{
-                                                    foreach ($CantReservationWeek as $val){
-                                                        if($val['start_datetime'] <= $nowdate." ".$thisTime
-                                                            && $val['end_datetime'] > $nowdate." ".$thisTime){
-                                                            $crw = $val;
-                                                            break;
-                                                        }
+                                                if($CantReservationWeek != ''){
+                                                    if (count($CantReservationWeek) < 1){
                                                         $crw = null;
+                                                    }else{
+                                                        foreach ($CantReservationWeek as $val){
+                                                            if($val['start_datetime'] <= $nowdate." ".$thisTime
+                                                                && $val['end_datetime'] > $nowdate." ".$thisTime){
+                                                                $crw = $val;
+                                                                break;
+                                                            }
+                                                            $crw = null;
+                                                        }
                                                     }
                                                 }
+
                                                 $thisTimeTo = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_open.':00')))));
                                                 $thisTimeFrom = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_close.':00')))));
 
 
-
-                                                if(strtotime($crw['start_datetime']) <= $nowdatetime && strtotime($crw['end_datetime']) > $nowdatetime){
-                                                    $div_class = 'break';
-                                                    $status = '예약금지';
+                                                if($crw != null){
+                                                    if(strtotime($crw['start_datetime']) <= $nowdatetime && strtotime($crw['end_datetime']) > $nowdatetime){
+                                                        $div_class = 'break';
+                                                        $status = '예약금지';
+                                                    }
                                                 }
+
 
                                                 // 휴게시간 확인
                                                 $crwn = null;
@@ -1050,9 +1055,11 @@ if(count($arr_holiday)>0){
                                                 }
                                                 $today_disp = date('w',strtotime($nowdate));
 
-                                                if(in_array($today_disp,$crwn)) {
-                                                    $div_class = 'break';
-                                                    $status = '정기휴일';
+                                                if($crwn != ''){
+                                                    if(in_array($today_disp,$crwn)) {
+                                                        $div_class = 'break';
+                                                        $status = '정기휴일';
+                                                    }
                                                 }
 
                                                 if(!in_array($today_disp,$holiday)){
@@ -1079,9 +1086,12 @@ if(count($arr_holiday)>0){
 
 
 
-
+                                                $prseq = "";
                                                 if($div_class == 'break'){
-                                                    $prseq = $crw['ph_seq'];
+                                                    if($crw != ''){
+                                                        $prseq = $crw['ph_seq'];
+                                                    }
+
                                                 }
 
                                                 $day_link   = "?ch=day&yy={$yy}&mm={$mm}&dd=".(int) date('d', strtotime($key))."&backurl=" . urlencode($_SERVER['PHP_SELF']);
@@ -1093,6 +1103,7 @@ if(count($arr_holiday)>0){
 
 //                                                $chk_rev1 = get_reservation_chk($user_id, $worker_id, date('Y-n-j',strtotime($nowdate)),$thisTime);
                                                 $chk_rev = [];
+                                                $chk_log_seq = 0;
                                                 if (count($GetReservationChk) < 1){
                                                     $chk_rev = null;
                                                 }else{
@@ -1100,10 +1111,12 @@ if(count($arr_holiday)>0){
                                                         if(trim($val['reservation_date']) == str_replace("-","",$nowdate).str_replace(":","",$thisTime)){
                                                             $chk_rev[] = $val;
                                                             //array_splice($chk_rev, 150, 2);
+                                                            $chk_log_seq = $chk_rev[0]['payment_log_seq'];
                                                             break;
                                                         }
                                                         $chk_rev = null;
                                                     }
+
                                                 }
 
                                                 if($chk_rev){
@@ -1127,10 +1140,9 @@ if(count($arr_holiday)>0){
                                                      data-hour="<?= substr($thisTime,0,2) ?>"
                                                      data-minute="<?= substr($thisTime,3,2) ?>"
                                                      data-rowspan="" data-time="<?= $thisTime ?>"
-                                                     date-session-id="<?= $session_id[$firstTime] ?>"
                                                      data-phseq="<?=$prseq?>"
                                                      data-status="<?php echo $status;?>"
-                                                     data-pay="<?php echo $chk_rev[0]['payment_log_seq'];?>"
+                                                     data-pay="<?php echo $chk_log_seq;?>"
                                                     data-time-w="<?php echo $today_disp;?>"
                                                 >
 
@@ -1142,12 +1154,6 @@ if(count($arr_holiday)>0){
                                                                 $cnt = 0;
                                                             } else {
                                                                 $cnt++;
-                                                            }
-                                                            ?>
-                                                            <?=$reserv_text?>
-                                                            <?php
-                                                            if($h == $time_open && $t30 == 0){
-                                                                echo $holiday_1;
                                                             }
                                                             ?>
                                                             <?php
