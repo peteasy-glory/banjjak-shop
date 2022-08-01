@@ -284,8 +284,8 @@ function cookie_save($uid,$master_key_name){
 	$hash = hash('sha256', $master_key_name.$uid);
 	//setcookie("auto_login_uid",$uid,time()+(86400*7),"/",".".$_SERVER['HTTP_HOST']."; samesite=strict");
 	//setcookie("user_hash",$hash,time()+(86400*7),"/",".".$_SERVER['HTTP_HOST']."; samesite=strict");
-    setcookie('auto_login_uid', $uid, ['expires'=>time()+(86400*7), 'path'=>'/', 'domain'=>'.'.$_SERVER['HTTP_HOST'], 'samesite' => 'strict']);
-    setcookie('user_hash', $hash, ['expires'=>time()+(86400*7), 'path'=>'/', 'domain'=>'.'.$_SERVER['HTTP_HOST'], 'samesite' => 'strict']);
+    setcookie('auto_login_uid', $uid, ['expires'=>time()+(86400*30), 'path'=>'/', 'domain'=>'.'.$_SERVER['HTTP_HOST'], 'samesite' => 'strict']);
+    setcookie('user_hash', $hash, ['expires'=>time()+(86400*30), 'path'=>'/', 'domain'=>'.'.$_SERVER['HTTP_HOST'], 'samesite' => 'strict']);
 }
 
 function img_link_change($url){
