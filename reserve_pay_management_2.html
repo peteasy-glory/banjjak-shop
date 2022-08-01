@@ -4057,7 +4057,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'savePayResult','card':card,'cash':cash,'seq':seq},
                 dataType: 'json',
                 error: function() {
@@ -4065,7 +4065,7 @@ if(empty($grade[0]['grade_name'])){
                 },
                 success: function(json) {
                     popalert.open('confirmOnlyOkReload',json.error);
-                    location.reload();
+                    //location.reload();
                 }
             });
         });

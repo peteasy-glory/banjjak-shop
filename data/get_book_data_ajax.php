@@ -542,14 +542,17 @@ switch($clear['mode']){
         $total = str_replace(",","",$_POST['total']);
         if(!$card){
             $card = 0;
+            $pay_type = "pay_type = 'pos-cash', ";
         }
 
         if(!$cash){
             $cash = 0;
+            $pay_type = "pay_type = 'pos-card', ";
         }
         $que = "UPDATE tb_payment_log SET ";
         $que .= "local_price          = '{$card}', ";
         $que .= "local_price_cash     = '{$cash}', ";
+        $que .= $pay_type;
         $que .= "update_time        = NOW() ";
         $que .= " WHERE payment_log_seq = '{$_POST['seq']} '";
         //echo $que;
