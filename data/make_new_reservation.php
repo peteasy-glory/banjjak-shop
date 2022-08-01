@@ -297,7 +297,7 @@ if($_POST['pet_kind']=='dog') {
     }
 
     $etc_total_cnt = count($_POST['etc']);
-    if ($spa_total_cnt == 0) {
+    if ($etc_total_cnt == 0) {
         $product .= '0|';
     } else {
         $product .= $etc_total_cnt . '|';
