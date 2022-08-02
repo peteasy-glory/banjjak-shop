@@ -1931,14 +1931,15 @@ if(empty($grade[0]['grade_name'])){
 
                                                         unset($tmp_chk);
                                                         if($pet['type']=='dog') {
-                                                            $gd_start = $etc_start + ($beauty_info[$etc_start] + 1);
-                                                            $cp_start = $gd_start + $beauty_info[$etc_start + 1];
+                                                            //$gd_start = $etc_start + ($beauty_info[$etc_start] + 1);
+                                                            $cp_start = $etc_start + $beauty_info[$etc_start + 1];
                                                         } else {
                                                             $cp_start = $etc_start + ($beauty_info[$etc_start] + 1);
                                                         }
                                                         $a = $cp_start +1;
                                                         for($i=0;$i<$beauty_info[$cp_start];$i++){
                                                             $tmp_chk = explode(":",$beauty_info[($a+$i)]);
+                                                            echo $tmp_chk[0];
                                                             $cp_seq[] = $tmp_chk[0];
                                                             $cp_cnt[$tmp_chk[0]] = $tmp_chk[3];
                                                         }
