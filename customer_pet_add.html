@@ -50,7 +50,7 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->
-    <form action="./data/get_book_data_ajax" method="post" name="petFrm">
+    <form action="./data/get_book_data_ajax.php" method="post" name="petFrm">
         <input type="hidden" name="pet_seq" id="pet_seq" value="<?php echo $pet_seq;?>">
         <input type="hidden" name="payment_seq" id="pet_seq" value="<?php echo $_GET['payment_seq'];?>">
         <input type="hidden" name="backurl" value="<?php echo $_GET['backurl'];?>">
@@ -324,7 +324,7 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
         var petType = '<?php echo $data['pet']['type'];?>';
         $.ajax({
             type: 'get',
-            url: 'data/data_get_json_petkind_list',
+            url: 'data/data_get_json_petkind_list.php',
             data: 'type=' + pet_type,
             dataType: 'json',
             error: function() {
@@ -348,7 +348,7 @@ $mode_1 = (isset($_GET['payment_seq']))? "management" : "view";
     function get_pet_info(no){
         $.ajax({
             type : 'post',
-            url : './data/get_pet_info',
+            url : './data/get_pet_info.php',
             data : {'mode':'petInfo','no':no},
             dataType : 'json',
             success : function(json){

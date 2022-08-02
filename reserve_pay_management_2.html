@@ -3180,7 +3180,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
                 dataType: 'json',
                 error: function() {
@@ -3262,7 +3262,7 @@ if(empty($grade[0]['grade_name'])){
             var seq = $(this).data('seq');
             $.ajax({
                 type : 'post',
-                url : './data/pay_make_ajax',
+                url : './data/pay_make_ajax.php',
                 data : {'mode':'etc1','seq':seq,'memo':memo},
                 dataType : 'json',
                 success : function(json){
@@ -3285,7 +3285,7 @@ if(empty($grade[0]['grade_name'])){
             var tseq = $(this).data('tseq');
             $.ajax({
                 type : 'post',
-                url : './data/pay_make_ajax',
+                url : './data/pay_make_ajax.php',
                 data : {'mode':'etc2','cid':cid,'memo':memo, 'aid':aid, 'phone':phone, 'tseq':tseq},
                 dataType : 'json',
                 success : function(json){
@@ -3318,7 +3318,7 @@ if(empty($grade[0]['grade_name'])){
             popalert.close();
             $.ajax({
                 type : 'post',
-                url : './data/pay_make_ajax',
+                url : './data/pay_make_ajax.php',
                 data : {'mode':'onlyTimeChange','startTime':start_time,'endTime':end_time, 'seq':seq},
                 dataType : 'json',
                 success : function(json){
@@ -3388,7 +3388,7 @@ if(empty($grade[0]['grade_name'])){
         function get_pet_info(no){
             $.ajax({
                 type : 'post',
-                url : './data/get_pet_info',
+                url : './data/get_pet_info.php',
                 data : {'mode':'petInfo','no':no,'cellphone':'<?php echo $cellPhone;?>'},
                 dataType : 'json',
                 success : function(json){
@@ -3445,7 +3445,7 @@ if(empty($grade[0]['grade_name'])){
         function get_type_load(gt){
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getTypeSize','type':gt},
                 dataType : 'json',
                 success : function(json){
@@ -3516,7 +3516,7 @@ if(empty($grade[0]['grade_name'])){
                 }
                 $.ajax({
                     type : 'post',
-                    url : './data/get_book_data_ajax',
+                    url : './data/get_book_data_ajax.php',
                     data : {'mode':'useCoupon','cid':cid,'cnt':cnt,'payment_log':<?php echo $payment_log_seq;?>},
                     dataType : 'json',
                     success : function(json){
@@ -3572,7 +3572,7 @@ if(empty($grade[0]['grade_name'])){
         function get_type_load(gt){
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'getTypeSize','type':gt},
                 dataType : 'json',
                 success : function(json){
@@ -3629,7 +3629,7 @@ if(empty($grade[0]['grade_name'])){
             if(petType || serviceType || service){
                 $.ajax({
                     type: 'post',
-                    url: 'data/get_book_data_ajax',
+                    url: 'data/get_book_data_ajax.php',
                     data: {'mode':'getBeautyServiceData','petType':petType,'serviceType':serviceType,'service':service, 'payment_log':seq},
                     dataType: 'json',
                     error: function() {
@@ -3665,7 +3665,7 @@ if(empty($grade[0]['grade_name'])){
         function get_prev_beauty_info(){
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
                 dataType: 'json',
                 error: function() {
@@ -3851,7 +3851,7 @@ if(empty($grade[0]['grade_name'])){
             }
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'saveDiscount','seq':cid,'type':type,'num':num},
                 dataType: 'json',
                 error: function() {
@@ -3879,7 +3879,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'changeTotalPrice','price':currentVal, 'seq':seq},
                 dataType : 'json',
                 success : function(json){
@@ -3924,7 +3924,7 @@ if(empty($grade[0]['grade_name'])){
             $('#use_reserve').prop('disabled',true);
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'useReserve','cid':cid,'aid':aid,'tid':tid,'phone':phone,'price':price,'seq':seq,'type':type},
                 dataType: 'json',
                 error: function() {
@@ -3966,7 +3966,7 @@ if(empty($grade[0]['grade_name'])){
 
                 $.ajax({
                     type: 'post',
-                    url: 'data/get_book_data_ajax',
+                    url: 'data/get_book_data_ajax.php',
                     data: {'mode':'useReserveCancel','cid':cid,'aid':aid,'tid':tid,'phone':phone,'price':price,'seq':seq,'type':type},
                     dataType: 'json',
                     error: function() {
@@ -4057,7 +4057,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'savePayResult','card':card,'cash':cash,'seq':seq},
                 dataType: 'json',
                 error: function() {
@@ -4079,7 +4079,7 @@ if(empty($grade[0]['grade_name'])){
             }
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'savePayConfirm','seq':seq, 'con':con},
                 dataType: 'json',
                 error: function() {
@@ -4119,7 +4119,7 @@ if(empty($grade[0]['grade_name'])){
                 $.ajax({
                     type: 'post',
                     data: {'timer':chk_time,'payment_log_seq':seq},
-                    url: './data/send_notice_talk',
+                    url: './data/send_notice_talk.php',
                     dataType: 'json',
                     error: function(xhr, error) {
                         alert('알림톡 발송이 실패했습니다. '+xhr+' : '+error);
@@ -4149,7 +4149,7 @@ if(empty($grade[0]['grade_name'])){
             $.ajax({
                 type: 'post',
                 data: {'mode':'cancelRev', 'payment_log_seq': seq, 'tid':tid, 'cid':cid,'talk':msg},
-                url: './data/get_book_data_ajax',
+                url: './data/get_book_data_ajax.php',
                 dataType: 'json',
                 error: function (xhr, error) {
                     alert('알림톡 발송이 실패했습니다. ' + xhr + ' : ' + error);
@@ -4175,7 +4175,7 @@ if(empty($grade[0]['grade_name'])){
             $.ajax({
                 type: 'post',
                 data: {'mode':'changeReserve', 'payment_log_seq': seq, 'org_date':org_date},
-                url: './data/get_book_data_ajax',
+                url: './data/get_book_data_ajax.php',
                 dataType: 'json',
                 error: function (xhr, error) {
                     alert('알림톡 발송이 실패했습니다. ' + xhr + ' : ' + error);
