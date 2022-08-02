@@ -320,7 +320,7 @@ if($pet[0]['type']=='dog') {
             $product .= $tbc[0]['price'] . '|';
             //echo $coupon_data."<br>";
 
-            //$total_price +=$tbc[0]['price'];
+            $total_price +=$tbc[0]['price'];
         }
     }
 
