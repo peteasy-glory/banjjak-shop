@@ -3,6 +3,27 @@
 ?>
 
 	<script>
+        var user_id = localStorage.getItem('auto_login_uid');
+
+        if(user_id != ''){
+            $.ajax({
+                url: 'include/st_login.php',
+                data: {
+                    user_id: localStorage.getItem('auto_login_uid')
+                },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function(data) {
+
+                    //location.href="/home_main";
+                },
+                error: function(xhr, status, error) {
+                    if(xhr.status != 0){
+                    }
+                }
+            });
+        }
+
 		/*
 		$.MessageBox({
 			buttonDone      : "확인",

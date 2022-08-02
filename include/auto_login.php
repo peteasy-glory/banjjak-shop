@@ -70,6 +70,11 @@
 				// onapplogin 네이티브 호출 ////////////////////
 
 				cookie_save($id,$master_key_name);
+                ?>
+                <script>
+                    localStorage.setItem('auto_login_uid', '<?= $id?>');
+                </script>
+                <?php
 
 			}
 		}

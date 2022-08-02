@@ -209,32 +209,46 @@ if($pet[0]['type']=='dog') {
     $product .= '고양이|';
     $product .= $shop[0]['name'] . '|';
 
-    //미용 무게 추가가 선택되었을때
+    // 무게별 금액 구하기
     if(isset($_POST['cat_weight'])){
-        $product .= $_POST['cat_weight'].':'.$_POST['hair_kg'].'|';
-        $total_price += $_POST['hair_kg'];
+        $product .= '미용|'.$_POST['cat_weight'].':0|';
+
     } else {
-        $product .= 'all:0|';
+        if(empty($_POST['hair_kg'])){
+            $product .= '|:0|';
+        }else{
+            $product .= '|all:0|';
+        }
     }
-    //미용 단모/장모
-    $product .= $_POST['hair'].'|';
-    $total_price += explode(':',$_POST['hair'])[1];
-    //발톱
-    if(!empty($_POST['cat_toenail'])){
-        $product .= $_POST['cat_toenail'].'|';
+    if(!empty($_POST['hair_kg'])){
+        $product .= $_POST['hair_kg'].'|';
+        $total_price += explode(':',$_POST['hair_kg'])[1];
     } else {
         $product .= '|';
     }
+
+    //발톱
+    if(!empty($_POST['cat_toenail'])){
+        $product .= $_POST['cat_toenail'].'|';
+        $total_price += $_POST['cat_toenail'];
+    } else {
+        $product .= '|';
+    }
+
     //단모/장모 목욕
     $bath = explode(":",$_POST['cat_bath']);
     if($bath[0]=='단모'){
         $product .= $bath[1].'|';
-    } else if($bath[0]=='장모'){
+    } else {
+        $product .= '|';
+    }
+    if($bath[0]=='장모'){
         $product .= $bath[1].'|';
     } else {
         $product .= '|';
     }
     $total_price += $bath[1];
+
     //추가 서비스
     $etc_cnt = count($_POST['cat_etc']);
     $product .= $etc_cnt.'|';
@@ -242,6 +256,9 @@ if($pet[0]['type']=='dog') {
         $product .= $_POST['cat_etc'][$i].'|';
         $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
+
+    $product .= '0|'; //제품구매수
+    $product .= '0|'; //쿠폰구매수
 
 }
 
