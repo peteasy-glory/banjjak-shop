@@ -1932,7 +1932,7 @@ if(empty($grade[0]['grade_name'])){
                                                         unset($tmp_chk);
                                                         if($pet['type']=='dog') {
                                                             $gd_start = $etc_start + ($beauty_info[$etc_start] + 1);
-                                                            $cp_start = $gd_start + $beauty_info[$etc_start];
+                                                            $cp_start = $gd_start + $beauty_info[$etc_start + 1];
                                                         } else {
                                                             $cp_start = $etc_start + ($beauty_info[$etc_start] + 1);
                                                         }
@@ -2406,7 +2406,7 @@ if(empty($grade[0]['grade_name'])){
 
                                         ?>
                                         <div class="list-cell">
-                                            <div class="list-title"><?php echo $tmp[0];?></div>
+                                            <div class="list-title">쿠폰 : <?php echo $tmp[0];?></div>
                                             <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
                                         </div>
                                     <?php }} ?>
@@ -2420,8 +2420,8 @@ if(empty($grade[0]['grade_name'])){
 //                                                    print_r($tmp);
                                         ?>
                                         <div class="list-cell">
-                                            <div class="list-title">쿠폰 : <?php echo $tmp[0];?></div>
-                                            <div class="list-value"><?php $sum+=$tmp[1]; echo number_format($tmp[1]);?>원</div>
+                                            <div class="list-title"><?php echo $tmp[1];?> <?php echo $tmp[3]?>개</div>
+                                            <div class="list-value"><?php $sum+=$tmp[2]; echo number_format($tmp[2]*$tmp[3]);?>원</div>
                                         </div>
                                     <?php }} ?>
                             <?php } ?>
