@@ -865,7 +865,7 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
 
 
 
-                                                <div class="calendar-month-body-col <?=$rest_class?> <?=$day_class?> <?=$today_class?>" <?if($rest_class==""){?> onclick="location.href='reserve_main_day<?=$day_link?>'" style="cursor:pointer"<?}?>>
+                                                <div class="calendar-month-body-col <?=$rest_class?> <?=$day_class?> <?=$today_class?>" onclick="location.href='reserve_main_day<?=$day_link?>'" style="cursor:pointer">
                                                     <div class="calendar-col-inner">
                                                         <div class="calendar-day-value">
                                                             <?php
