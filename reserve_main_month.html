@@ -398,6 +398,7 @@ $ph_sql = "SELECT *, GROUP_CONCAT(A.worker ORDER BY A.worker ASC) AS worker
 		GROUP BY start_date, end_date, customer_id";
 //echo $ph_sql;
 $ph_result = mysqli_query($connection, $ph_sql);
+
 while ($ph_datas = mysqli_fetch_object($ph_result)) {
     $type = $ph_datas->type;
     $sy = $ph_datas->start_year;
@@ -429,6 +430,7 @@ while ($ph_datas = mysqli_fetch_object($ph_result)) {
             for ($index = $sd; $index <= $ed; $index++) {
                 array_push($private_all_holiday_array, $index);
             }
+
         }
     } else if ($type == "notall" || $type == "not") {
         array_push($private_notall_holiday_array, $sd);
@@ -747,8 +749,9 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                                     //$is_rest = true;
                                                 } else if ($i == $total_week && $j > $last_week) {
                                                     //echo " bgcolor='#ffffff' ";
-                                                } else if (in_array($day, $private_all_holiday_array)) {
-                                                    $rest_class =   "break";
+                                                } else if (in_array($day+1, $private_all_holiday_array)) {
+
+                                                    $rest_class =   "";
                                                     $rest_word = "임휴";
                                                     //$is_rest = true;
                                                 } else if (in_array($day+1, $private_notall_holiday_array)) {
@@ -993,40 +996,40 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
 
             //https://github.com/SortableJS/Sortable
 
-            $('.calendar-month-body-col').each(function() {
-                if (!$(this).hasClass('break')) {
-                    //휴무가 아닐 경우 드래그앤 드롭 가능 처리
-                    var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0], {
-                        group: 'shared',
-                        delay: 500,
-                        delayOnTouchOnly: true,
-                        ghostClass: 'guide',
-                        draggable: '.calendar-drag-item',
-                        onStart: function(evt) {
-                            //드래그 시작
-                            console.log('drag start');
-                        },
-                        onEnd: function(evt) {
-                            //드래그 끝
-                            console.log('drag end');
-                            //evt.to;    // 현재 아이템
-                            //evt.from;  // 이전 아이템
-                            //evt.oldIndex;  // 이전 인덱스값
-                            //evt.newIndex;  // 새로운 인덱스값
-                        },
-                        onUpdate: function(evt) {
-                            console.log('update');
-                        },
-                        onUpdate: function(evt) {
-                            console.log('onChange');
-                        },
-                        onRemove: function( /**Event*/ evt) {
-                            console.log('remove');
-                        }
-
-                    });
-                }
-            });
+            // $('.calendar-month-body-col').each(function() {
+            //     if (!$(this).hasClass('break')) {
+            //         //휴무가 아닐 경우 드래그앤 드롭 가능 처리
+            //         var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0], {
+            //             group: 'shared',
+            //             delay: 500,
+            //             delayOnTouchOnly: true,
+            //             ghostClass: 'guide',
+            //             draggable: '.calendar-drag-item',
+            //             onStart: function(evt) {
+            //                 //드래그 시작
+            //                 console.log('drag start');
+            //             },
+            //             onEnd: function(evt) {
+            //                 //드래그 끝
+            //                 console.log('drag end');
+            //                 //evt.to;    // 현재 아이템
+            //                 //evt.from;  // 이전 아이템
+            //                 //evt.oldIndex;  // 이전 인덱스값
+            //                 //evt.newIndex;  // 새로운 인덱스값
+            //             },
+            //             onUpdate: function(evt) {
+            //                 console.log('update');
+            //             },
+            //             onUpdate: function(evt) {
+            //                 console.log('onChange');
+            //             },
+            //             onRemove: function( /**Event*/ evt) {
+            //                 console.log('remove');
+            //             }
+            //
+            //         });
+            //     }
+            // });
 
 
 
