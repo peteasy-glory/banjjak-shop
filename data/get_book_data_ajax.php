@@ -856,12 +856,25 @@ switch($clear['mode']){
                 $pet1 = sql_fetch_array($que);
                 if(count($pet1)>0){
                     foreach($pet1 as $pet1){
-                        $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet1['pet_seq']}'";
-                        $pet_info = sql_fetch_array($que);
-                        if(!empty($pet_info[0]['name'])) {
-                            $pet_list .= '<div class="grid-layout-cell flex-auto">
+
+                        $cnt_que = "SELECT count(*) cnt 
+                            FROM tb_payment_log
+                            WHERE pet_seq = '{$pet1['pet_seq']}'	
+                            AND artist_id = '{$user_id}'					
+                                AND data_delete = '1'";
+                        //echo $que;
+                        $cnt_pet = sql_fetch_array($cnt_que);
+
+                        if($cnt_pet[0]['cnt'] > 0){
+
+                        }else{
+                            $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet1['pet_seq']}'";
+                            $pet_info = sql_fetch_array($que);
+                            if(!empty($pet_info[0]['name'])) {
+                                $pet_list .= '<div class="grid-layout-cell flex-auto">
                                         <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" value="' . $pet1['pet_seq'] . '" data-no="' . $pet1['pet_seq'] . '"><em>' . $pet_info[0][name] . '</em></label>
                                     </div>';
+                            }
                         }
 
                     }
