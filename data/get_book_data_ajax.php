@@ -390,7 +390,7 @@ switch($clear['mode']){
         $que .= "amount             = '-{$_POST['cnt']}', ";
         $que .= "balance            = '{$balance}', ";
         $que .= "customer_id        = '{$row['customer_id']}', ";
-        $que .= "tmp_seq            = '{$row['tmp_seq']}', ";
+        $que .= "tmp_seq            = NULLIF('{$row['tmp_seq']}',''), ";
         $que .= "artist_id          = '{$row['artist_id']}', ";
         $que .= "memo               = '매장 접수', ";
         $que .= "type               = 'U' ";
@@ -401,8 +401,8 @@ switch($clear['mode']){
         }
 
         //쿠폰내역 업데이트
-        $que = "UPDATE tb_coupon SET price = price - {$_POST['cnt']}, update_date = NOW() WHERE coupon_seq = {$row['coupon_seq']} ";
-        sql_query($que);
+            $que = "UPDATE tb_user_coupon SET given = given - {$_POST['cnt']}, use = use + {$_POST['cnt']}, update_date = NOW() WHERE coupon_seq = {$row['coupon_seq']} ";
+            sql_query($que);
 
         $json['cid'] = $cid;
         echo json_encode($json, JSON_UNESCAPED_UNICODE);

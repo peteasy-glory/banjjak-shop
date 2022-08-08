@@ -1968,7 +1968,7 @@ if(empty($grade[0]['grade_name'])){
                                                                 if($cp2['type']=='F'){
                                                                     ?>
                                                                     <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="cp1-1">
-                                                                            <input type="checkbox" name="cp[]" id="cp1-1" value="<?php echo $cp2['coupon_seq'];?>" <?php echo (in_array($cp2['coupon_seq'],$cp_seq))?'checked':'';?>><em><span><?php echo $cp2['name'];?></span><strong>+1<?php echo number_format($cp2['price']);?>원</strong></em></label></div>
+                                                                            <input type="checkbox" name="cp[]" id="cp1-1" value="<?php echo $cp2['coupon_seq'];?>" <?php echo (in_array($cp2['coupon_seq'],$cp_seq))?'checked':'';?>><em><span><?php echo $cp2['name'];?></span><strong>+<?php echo number_format($cp2['price']);?>원</strong></em></label></div>
                                                                 <?php }}} ?>
                                                     </div>
                                                 </div>
@@ -3539,7 +3539,7 @@ if(empty($grade[0]['grade_name'])){
                 }
                 $.ajax({
                     type : 'post',
-                    url : './data/get_book_data_ajax',
+                    url : './data/get_book_data_ajax.php',
                     data : {'mode':'useCoupon','cid':cid,'cnt':cnt,'payment_log':<?php echo $payment_log_seq;?>},
                     dataType : 'json',
                     success : function(json){
