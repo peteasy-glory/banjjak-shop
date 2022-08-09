@@ -68,7 +68,8 @@ sql_query($que);
 
 //예약 스케줄 운영방식 선택
 //스케줄 타입 업데이트
-$que = "UPDATE tb_shop SET is_time_type = '{$_POST['time2']}' WHERE customer_id = '{$user_id}'";
+$time_type = ($_POST['time2'] != '')? $_POST['time2'] : '1';
+$que = "UPDATE tb_shop SET is_time_type = '{$time_type}' WHERE customer_id = '{$user_id}'";
 sql_query($que);
 
 
