@@ -122,6 +122,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						AND pl.cellphone != ''
 						AND (pl.pet_seq != '' OR pl.pet_seq != '0')
 						AND pl.data_delete = '0'
+						AND pl.is_cancel = '0'
 					GROUP BY pl.cellphone
 					
 					UNION ALL
@@ -213,6 +214,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					WHERE hpl.artist_id = '".$r_artist_id."'
 						AND hpl.cellphone != ''
 						AND (hpl.pet_seq != '' OR hpl.pet_seq != '0')
+						AND hpl.is_delete = '2'
 					GROUP BY hpl.cellphone
 					
 					UNION ALL
@@ -304,6 +306,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					WHERE ppl.artist_id = '".$r_artist_id."'
 						AND ppl.cellphone != ''
 						AND (ppl.pet_seq != '' OR ppl.pet_seq != '0')
+						AND ppl.is_delete = '2'
 					GROUP BY ppl.cellphone
 				) AS a
 				".$order_qy."
