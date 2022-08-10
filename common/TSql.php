@@ -18,15 +18,25 @@ class TReserveSql extends TSql{
                                              ,CONCAT(end_year,'-',LPAD(end_month,'2','0'),'-',LPAD(end_day,'2','0'),' ',LPAD(end_hour,'2','0'),':',LPAD(end_minute,'2','0')) as end_datetime
                                             FROM tb_private_holiday 
                                             WHERE customer_id = '%s' 
-                                              AND CONCAT(start_year,LPAD(start_month,'2','0'),LPAD(start_day,'2','0')) = '%s'";
+                                              AND '%s' BETWEEN CONCAT(start_year,LPAD(start_month,'2','0'),LPAD(start_day,'2','0')) AND CONCAT(end_year,LPAD(end_month,'2','0'),LPAD(end_day,'2','0'))";
 
     private $SQL_CANT_RESERVATION_WEEK = "SELECT ph_seq
-                                             ,CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0'),' ',LPAD(start_hour,'2','0'),':',LPAD(start_minute,'2','0')) as start_datetime
-                                             ,CONCAT(end_year,'-',LPAD(end_month,'2','0'),'-',LPAD(end_day,'2','0'),' ',LPAD(end_hour,'2','0'),':',LPAD(end_minute,'2','0')) as end_datetime
-                                            FROM tb_private_holiday 
-                                            WHERE customer_id = '%s' AND worker = '%s' 
-                                              AND CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0')) >= '%s'
-                                              AND CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0')) <= '%s'";
+                                              ,CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0'),' ',LPAD(start_hour,'2','0'),':',LPAD(start_minute,'2','0')) as start_datetime
+                                              ,CONCAT(end_year,'-',LPAD(end_month,'2','0'),'-',LPAD(end_day,'2','0'),' ',LPAD(end_hour,'2','0'),':',LPAD(end_minute,'2','0')) as end_datetime
+                                             FROM tb_private_holiday 
+                                             WHERE customer_id = '%s' AND worker = '%s' 
+                                               AND 
+                                                    (
+                                                        (
+                                                            CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0')) >= '%s'
+                                                        AND CONCAT(start_year,'-',LPAD(start_month,'2','0'),'-',LPAD(start_day,'2','0')) <= '%s'
+                                                        )
+                                                or
+                                                    (
+                                                            CONCAT(end_year,'-',LPAD(end_month,'2','0'),'-',LPAD(end_day,'2','0')) >= '%s'
+                                                        AND CONCAT(end_year,'-',LPAD(end_month,'2','0'),'-',LPAD(end_day,'2','0')) <= '%s'
+                                                        )
+                                                    )";
 
     private $SQL_CANT_RESERVATION_WEEK_NOR = "SELECT * FROM tb_regular_holiday 
                                               WHERE customer_id = '%s'" ;
@@ -75,7 +85,7 @@ class TReserveSql extends TSql{
     }
 
     public function qry_cant_reservation_week($artistId, $worker, $firstDate, $lastDate){
-        $this->sql = sprintf($this->SQL_CANT_RESERVATION_WEEK, $artistId, $worker, $firstDate, $lastDate);
+        $this->sql = sprintf($this->SQL_CANT_RESERVATION_WEEK, $artistId, $worker, $firstDate, $lastDate, $firstDate, $lastDate);
         return $this->sql_fetch_array();
     }
 

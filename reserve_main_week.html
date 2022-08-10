@@ -991,10 +991,14 @@ if(count($arr_holiday)>0){
 
 //                                                $crw1 = cant_reservation_week($connection, $artist_id, $worker, $nowdate); //날짜만으로 예약금지 일자 검색
                                                 $crw =null; //날짜만으로 예약금지 일자 검색
+
+
                                                 if($CantReservationWeek != ''){
+
                                                     if (count($CantReservationWeek) < 1){
                                                         $crw = null;
                                                     }else{
+
                                                         foreach ($CantReservationWeek as $val){
                                                             if($val['start_datetime'] <= $nowdate." ".$thisTime
                                                                 && $val['end_datetime'] > $nowdate." ".$thisTime){
@@ -1004,6 +1008,8 @@ if(count($arr_holiday)>0){
                                                             $crw = null;
                                                         }
                                                     }
+                                                }else{
+//                                                    alert($CantReservationWeek);
                                                 }
 
                                                 $thisTimeTo = date('H:i', date2timestamp(strtotime(date('Y-m-d H:i', strtotime($nowdate . ' ' . $time_open.':00')))));
@@ -1012,6 +1018,7 @@ if(count($arr_holiday)>0){
 
                                                 if($crw != null){
                                                     if(strtotime($crw['start_datetime']) <= $nowdatetime && strtotime($crw['end_datetime']) > $nowdatetime){
+
                                                         $div_class = 'break';
                                                         $status = '예약금지';
                                                     }
