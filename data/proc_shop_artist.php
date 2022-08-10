@@ -12,7 +12,19 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 	$message = "";
     $json['flag'] = true;
 	if($type == "write"){
-		$sql = "INSERT INTO tb_shop_artist(customer_id, artist_id, name) VALUES('{$user_id}', '{$artist_id}', '{$artist_name}')";
+        $select_sql = "select * from tb_shop_artist where customer_id = '{$user_id}' and artist_id = '{$artist_id}'";
+        $select_result = mysqli_query($connection,$select_sql);
+        $select_num = mysqli_num_rows($select_result);
+        if($select_num>0){
+            $sql = "UPDATE tb_shop_artist SET 
+                        name = '{$artist_name}', 
+                        del_yn = 'N'
+                    WHERE artist_id = '{$artist_id}' 
+                    and customer_id = '{$user_id}'
+            ";
+        }else {
+            $sql = "INSERT INTO tb_shop_artist(customer_id, artist_id, name) VALUES('{$user_id}', '{$artist_id}', '{$artist_name}')";
+        }
 	}else if($type == "modify"){
 		$sql = "UPDATE tb_shop_artist SET name = '{$artist_name}' WHERE artist_seq = '{$artist_seq}' and del_yn = 'N'";
 	}else if($type == "delete"){

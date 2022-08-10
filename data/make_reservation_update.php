@@ -209,32 +209,46 @@ if($pet[0]['type']=='dog') {
     $product .= '고양이|';
     $product .= $shop[0]['name'] . '|';
 
-    //미용 무게 추가가 선택되었을때
+    // 무게별 금액 구하기
     if(isset($_POST['cat_weight'])){
-        $product .= $_POST['cat_weight'].':'.$_POST['hair_kg'].'|';
-        $total_price += $_POST['hair_kg'];
+        $product .= '미용|'.$_POST['cat_weight'].':0|';
+
     } else {
-        $product .= 'all:0|';
+        if(empty($_POST['hair_kg'])){
+            $product .= '|:0|';
+        }else{
+            $product .= '|all:0|';
+        }
     }
-    //미용 단모/장모
-    $product .= $_POST['hair'].'|';
-    $total_price += explode(':',$_POST['hair'])[1];
-    //발톱
-    if(!empty($_POST['cat_toenail'])){
-        $product .= $_POST['cat_toenail'].'|';
+    if(!empty($_POST['hair_kg'])){
+        $product .= $_POST['hair_kg'].'|';
+        $total_price += explode(':',$_POST['hair_kg'])[1];
     } else {
         $product .= '|';
     }
+
+    //발톱
+    if(!empty($_POST['cat_toenail'])){
+        $product .= $_POST['cat_toenail'].'|';
+        $total_price += $_POST['cat_toenail'];
+    } else {
+        $product .= '|';
+    }
+
     //단모/장모 목욕
     $bath = explode(":",$_POST['cat_bath']);
     if($bath[0]=='단모'){
         $product .= $bath[1].'|';
-    } else if($bath[0]=='장모'){
+    } else {
+        $product .= '|';
+    }
+    if($bath[0]=='장모'){
         $product .= $bath[1].'|';
     } else {
         $product .= '|';
     }
     $total_price += $bath[1];
+
     //추가 서비스
     $etc_cnt = count($_POST['cat_etc']);
     $product .= $etc_cnt.'|';
@@ -242,6 +256,8 @@ if($pet[0]['type']=='dog') {
         $product .= $_POST['cat_etc'][$i].'|';
         $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
+
+
 
 }
 
@@ -271,7 +287,7 @@ if($pet[0]['type']=='dog') {
             $sql1  = "INSERT INTO tb_user_coupon SET ";
             $sql1 .= "customer_id       = '{$_POST['customer_id']}', ";
             $sql1 .= "artist_id         = '{$_POST['artist_id']}', ";
-            $sql1 .= "tmp_seq           = '{$_POST['tmp_seq']}', ";
+            $sql1 .= "tmp_seq           = NULLIF('{$_POST['tmp_seq']}',''), ";
             $sql1 .= "payment_log_seq   = '{$_POST['seq']}', ";
             $sql1 .= "coupon_seq        = '{$_POST['cp'][$b]}', ";
             $sql1 .= "type              = '{$tbc[0]['type']}', ";
@@ -292,7 +308,7 @@ if($pet[0]['type']=='dog') {
             $sql3 .= "amount                = '{$tbc[0]['given']}', ";
             $sql3 .= "balance               = '{$tbc[0]['given']}', ";
             $sql3 .= "customer_id           = '{$_POST['customer_id']}', ";
-            $sql3 .= "tmp_seq               = '{$_POST['tmp_seq']}', ";
+            $sql3 .= "tmp_seq               = NULLIF('{$_POST['tmp_seq']}',''), ";
             $sql3 .= "artist_id             = '{$_POST['artist_id']}', ";
             $sql3 .= "memo                  = '쿠폰구매', ";
             $sql3 .= "type                  = 'N' ";
@@ -304,7 +320,7 @@ if($pet[0]['type']=='dog') {
             $product .= $tbc[0]['price'] . '|';
             //echo $coupon_data."<br>";
 
-            //$total_price +=$tbc[0]['price'];
+            $total_price +=$tbc[0]['price'];
         }
     }
 
@@ -400,5 +416,8 @@ if ($goods_cnt > 0) {
     $_SESSION['anchor'] = 'Y';
 ?>
 
-<script>parent.callback();</script>
+<script>
+    parent.callback();
+    //console.log('<?=$sql1?>');
+</script>
 <!--<script>location.href='../reserve_pay_management_2?payment_log_seq=<?php /*echo $clear['seq'];*/?>#service_tab';</script>-->

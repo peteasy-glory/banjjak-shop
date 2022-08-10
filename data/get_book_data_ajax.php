@@ -390,7 +390,7 @@ switch($clear['mode']){
         $que .= "amount             = '-{$_POST['cnt']}', ";
         $que .= "balance            = '{$balance}', ";
         $que .= "customer_id        = '{$row['customer_id']}', ";
-        $que .= "tmp_seq            = '{$row['tmp_seq']}', ";
+        $que .= "tmp_seq            = NULLIF('{$row['tmp_seq']}',''), ";
         $que .= "artist_id          = '{$row['artist_id']}', ";
         $que .= "memo               = '매장 접수', ";
         $que .= "type               = 'U' ";
@@ -401,8 +401,8 @@ switch($clear['mode']){
         }
 
         //쿠폰내역 업데이트
-        $que = "UPDATE tb_coupon SET price = price - {$_POST['cnt']}, update_date = NOW() WHERE coupon_seq = {$row['coupon_seq']} ";
-        sql_query($que);
+            $que = "UPDATE tb_user_coupon SET given = given - {$_POST['cnt']}, use = use + {$_POST['cnt']}, update_date = NOW() WHERE coupon_seq = {$row['coupon_seq']} ";
+            sql_query($que);
 
         $json['cid'] = $cid;
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
@@ -542,14 +542,17 @@ switch($clear['mode']){
         $total = str_replace(",","",$_POST['total']);
         if(!$card){
             $card = 0;
+            $pay_type = "pay_type = 'pos-cash', ";
         }
 
         if(!$cash){
             $cash = 0;
+            $pay_type = "pay_type = 'pos-card', ";
         }
         $que = "UPDATE tb_payment_log SET ";
         $que .= "local_price          = '{$card}', ";
         $que .= "local_price_cash     = '{$cash}', ";
+        $que .= $pay_type;
         $que .= "update_time        = NOW() ";
         $que .= " WHERE payment_log_seq = '{$_POST['seq']} '";
         //echo $que;
@@ -853,12 +856,25 @@ switch($clear['mode']){
                 $pet1 = sql_fetch_array($que);
                 if(count($pet1)>0){
                     foreach($pet1 as $pet1){
-                        $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet1['pet_seq']}'";
-                        $pet_info = sql_fetch_array($que);
-                        if(!empty($pet_info[0]['name'])) {
-                            $pet_list .= '<div class="grid-layout-cell flex-auto">
+
+                        $cnt_que = "SELECT count(*) cnt 
+                            FROM tb_payment_log
+                            WHERE pet_seq = '{$pet1['pet_seq']}'	
+                            AND artist_id = '{$user_id}'					
+                                AND data_delete = '1'";
+                        //echo $que;
+                        $cnt_pet = sql_fetch_array($cnt_que);
+
+                        if($cnt_pet[0]['cnt'] > 0){
+
+                        }else{
+                            $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pet1['pet_seq']}'";
+                            $pet_info = sql_fetch_array($que);
+                            if(!empty($pet_info[0]['name'])) {
+                                $pet_list .= '<div class="grid-layout-cell flex-auto">
                                         <label class="form-toggle-box"><input name="pet_no" class="pet-no" type="radio" value="' . $pet1['pet_seq'] . '" data-no="' . $pet1['pet_seq'] . '"><em>' . $pet_info[0][name] . '</em></label>
                                     </div>';
+                            }
                         }
 
                     }

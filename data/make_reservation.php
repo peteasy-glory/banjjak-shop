@@ -193,19 +193,28 @@ if($_POST['pet_kind']=='dog') {
     $product .= $_POST['pet_name'].'|';
     $product .= '고양이|';
     $product .= $_POST['shopName'] . '|';
+
+    // 무게별 금액 구하기
     if(!empty($_POST['cat_weight'])){
-        $product .= $_POST['cat_weight'].':'.$_POST['hair_kg'].'|';
-        $total_price += $_POST['hair_kg'];
+        $product .= '미용|'.$_POST['cat_weight'].':0|';
+
     } else {
-        $product .= 'all:0|';
+        $product .= '|all:0|';
     }
-    //미용 단모/장모
-    $product .= $_POST['hair'] . '|';
-    $total_price += explode(':',$_POST['hair'])[1];
+    if(!empty($_POST['hair_kg'])){
+        $product .= $_POST['hair_kg'].'|';
+        $total_price += explode(':',$_POST['hair_kg'])[1];
+    } else {
+        $product .= '|';
+    }
 
     if(!empty($_POST['cat_toenail'])){
         $product .= $_POST['cat_toenail'].'|';
+        $total_price += $_POST['cat_toenail'];
+    }else{
+        $product .= '|';
     }
+
     //단모목욕
     $bath = explode(":",$_POST['cat_bath']);
     if($bath[0]=='단모'){
@@ -226,6 +235,9 @@ if($_POST['pet_kind']=='dog') {
         $product .= $_POST['cat_etc'][$i].'|';
         $total_price += explode(':',$_POST['cat_etc'][$i])[1];
     }
+
+    $product .= '0|'; //제품구매수
+    $product .= '0|'; //쿠폰구매수
 
 
 //print_r($_POST);
