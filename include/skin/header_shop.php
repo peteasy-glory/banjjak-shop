@@ -111,8 +111,8 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 	<meta charset="utf-8">
 <!--	<meta name="viewport" content="width=device-width, initial-scale=1">-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0 , maximum-scale=1.0, user-scalable=no" />
-    <link rel="shortcut icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.ico">
-    <link rel="icon" type="image/x-icon" href="https://www.gopet.kr/pet/ico/favicon.png">
+    <link rel="shortcut icon" type="image/x-icon" href="https://image.banjjakpet.com/img/favicon_partner-64x64.ico">
+    <link rel="icon" type="image/x-icon" href="https://image.banjjakpet.com/img/favicon_partner-32x32.png">
 <!--    <meta name="viewport" content="user-scalable=no" />-->
 	<title>반짝</title>
 	<meta name="format-detection" content="telephone=no">
