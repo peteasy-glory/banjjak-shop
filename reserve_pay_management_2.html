@@ -1932,7 +1932,7 @@ if(empty($grade[0]['grade_name'])){
                                                         unset($tmp_chk);
                                                         if($pet['type']=='dog') {
                                                             //$gd_start = $etc_start + ($beauty_info[$etc_start] + 1);
-                                                            $cp_start = $etc_start + $beauty_info[$etc_start + 1];
+                                                            $cp_start = $etc_start + ($beauty_info[$etc_start] + 1);
                                                         } else {
                                                             $cp_start = $etc_start + ($beauty_info[$etc_start] + 1);
                                                         }
@@ -3203,7 +3203,7 @@ if(empty($grade[0]['grade_name'])){
 
             $.ajax({
                 type: 'post',
-                url: 'data/get_book_data_ajax',
+                url: 'data/get_book_data_ajax.php',
                 data: {'mode':'getBeautyKgsData','petType':petType,'serviceType':serviceType,'service':service},
                 dataType: 'json',
                 error: function() {
@@ -3652,7 +3652,7 @@ if(empty($grade[0]['grade_name'])){
             if(petType || serviceType || service){
                 $.ajax({
                     type: 'post',
-                    url: 'data/get_book_data_ajax',
+                    url: 'data/get_book_data_ajax.php',
                     data: {'mode':'getBeautyServiceData','petType':petType,'serviceType':serviceType,'service':service, 'payment_log':seq},
                     dataType: 'json',
                     error: function() {
