@@ -1754,6 +1754,11 @@ h6.con-title {font-size:15px; line-height:20px;}
 .common-bottom-ui.left {left:20px; right:auto;}
 .common-bottom-ui.right {right:20px; left:auto;}
 
+/* 이벤트 페이지 하단 */
+.common-event-bottom-ui {position:fixed; bottom:30px; right:20px; z-index:500;}
+.common-event-bottom-ui.left {left:20px; right:auto;}
+.common-event-bottom-ui.right {right:20px; left:auto;}
+
 /* 알람 리스트 */
 .alarm-list-wrap {}
 .alarm-list-wrap .list-cell + .list-cell {margin-top:16px; padding-top:16px; border-top:1px solid #f4f4f4;}
