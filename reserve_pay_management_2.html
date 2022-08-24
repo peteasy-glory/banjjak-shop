@@ -2487,7 +2487,8 @@ if(empty($grade[0]['grade_name'])){
                     SELECT * FROM (
                         SELECT a.*, b.name FROM tb_user_coupon a
                         LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq
-                        WHERE {$where_id}
+                        WHERE {$where_id} 
+                        AND a.given > a.use 
                         AND a.artist_id = '{$pay['artist_id']}'
                         ORDER BY a.user_coupon_seq desc
                     ) s
@@ -3532,6 +3533,7 @@ if(empty($grade[0]['grade_name'])){
         $(document).on('click','.use-coupon',function(){
             if(confirm('쿠폰을 사용하시겠습니까?')){
                 var cnt = $('#use_coupon option:selected').val();
+                var balance = $('#coupon_balance option:selected').val();
                 var cid = $('#coupon_name option:selected').val();
                 if(!cnt){
                     alert('쿠폰차감 횟수를 선택해주세요.');
@@ -3540,7 +3542,7 @@ if(empty($grade[0]['grade_name'])){
                 $.ajax({
                     type : 'post',
                     url : './data/get_book_data_ajax.php',
-                    data : {'mode':'useCoupon','cid':cid,'cnt':cnt,'payment_log':<?php echo $payment_log_seq;?>},
+                    data : {'mode':'useCoupon','cid':cid,'cnt':cnt,'balance':balance,'payment_log':<?php echo $payment_log_seq;?>},
                     dataType : 'json',
                     success : function(json){
                         console.log(json)

@@ -1617,30 +1617,11 @@ if ($customer_cellphone && $customer_cellphone != "") {
         }
 
         //쿠폰 정보 구하기
+
         function get_coupon(cusid){
-
-            $.ajax({
-                type : 'post',
-                url : './data/get_book_data_ajax.php',
-                data : {'mode':'getCoupon','cid':cusid},
-                dataType : 'json',
-                success : function(json){
-
-                    if(json.flag == true){
-                        if(!json.cnt){
-                            $('#coupon_div').css('display','none');
-                        } else {
-                            $('#coupon_name').empty().append(json.select_name);
-                            $('#coupon_div').css('display','block');
-                        }
-                        //$('#serviceType').empty().append(json.data);
-                        make_beauty_chk();
-                    }
-                }, error : function(xhr, error){
-                    console.log('error'+xhr)
-                }
-            });
+            make_beauty_chk();
         }
+
 
         //쿠폰 선택시
         $('#coupon_name').change(function(){
