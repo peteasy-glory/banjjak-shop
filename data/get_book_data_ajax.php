@@ -354,7 +354,7 @@ switch($clear['mode']){
                     $select1 .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
                 }
                 for($i=0;$i<=$row['balance'];$i++){
-                    $select2 .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
+                    $select2 .= '<option value="' . $i . '">' . $i . '</option>';
                 }
             } else {
                 for ($i = 0; $i <= 1500000; $i+=1000) {
@@ -363,7 +363,7 @@ switch($clear['mode']){
                     $select1 .= '<option value="' . $i . '" ' . $selected . '>' . number_format($i) . '</option>';
                 }
                 for($i=0;$i<=$row['balance'];$i+=1000){
-                    $select2 .= '<option value="' . $i . '" ' . $selected . '>' . number_format($i) . '</option>';
+                    $select2 .= '<option value="' . $i . '">' . number_format($i) . '</option>';
                 }
             }
         }
@@ -382,13 +382,13 @@ switch($clear['mode']){
         $res = sql_query($que);
         $row = sql_fetch($res);
 
-        $balance = $row['balance'] - $_POST['cnt'];
+        $balance = ($_POST['balance'] != '')? $_POST['balance'] : $row['balance'];
         $que  = "INSERT INTO tb_coupon_history SET ";
         $que .= "coupon_seq         = '{$row['coupon_seq']}', ";
         $que .= "user_coupon_seq    = '{$row['user_coupon_seq']}', ";
         $que .= "payment_log_seq    = '{$_POST['payment_log']}', ";
         $que .= "amount             = '-{$_POST['cnt']}', ";
-        $que .= "balance            = '{$balance}', ";
+        $que .= "balance            = '".($balance - $_POST['cnt'])."', ";
         $que .= "customer_id        = '{$row['customer_id']}', ";
         $que .= "tmp_seq            = NULLIF('{$row['tmp_seq']}',''), ";
         $que .= "artist_id          = '{$row['artist_id']}', ";
@@ -401,8 +401,8 @@ switch($clear['mode']){
         }
 
         //쿠폰내역 업데이트
-            $que = "UPDATE tb_user_coupon SET given = given - {$_POST['cnt']}, use = use + {$_POST['cnt']}, update_date = NOW() WHERE coupon_seq = {$row['coupon_seq']} ";
-            sql_query($que);
+            $que = "UPDATE tb_user_coupon SET given = {$balance}, tb_user_coupon.use = tb_user_coupon.use + {$_POST['cnt']}, update_date = NOW() WHERE user_coupon_seq = {$_POST['cid']} ";
+            $res = sql_query($que);
 
         $json['cid'] = $cid;
         echo json_encode($json, JSON_UNESCAPED_UNICODE);
@@ -1523,6 +1523,10 @@ switch($clear['mode']){
 
         //대표 번호를 변경한다.
         $que = "UPDATE tb_customer_family SET to_cellphone = '{$tel}' WHERE  artist_id = '{$user_id}' AND to_cellphone = '{$_POST['org']}' AND from_cellphone = '{$tel}'";
+        sql_query($que);
+
+        //고객 메모를 변경한다
+        $que = "UPDATE tb_shop_customer_memo SET cellphone = '{$tel}' WHERE cellphone = '{$_POST['org']}'";
         sql_query($que);
 
         $json['tel'] = $tel;
