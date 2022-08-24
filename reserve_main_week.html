@@ -2047,7 +2047,7 @@ if(count($arr_holiday)>0){
             $.ajax({
                 async: false,
                 type: 'post',
-                url: './data/data_set_private_holiday_cancel',
+                url: './data/data_set_private_holiday_cancel.php',
                 data: {'aid':artist_id, 'wid':worker_id, 'idx':phseq},
                 dataType: 'json',
                 error: function(request,status,error) {

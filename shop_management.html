@@ -104,7 +104,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                                     <?}else{?>
                                         <div style="display:block">
                                             <div class="picture-view">
-                                                <img src="<?="http://image.banjjakpet.com".img_link_change($photo2);?>" alt=""/>
+                                                <img src="<?="https://image.banjjakpet.com".img_link_change($photo2);?>" alt=""/>
                                                 <div class="add-label">사진첨부</div>
                                             </div>
                                         </div>
@@ -376,7 +376,7 @@ if ($shop_datas = mysqli_fetch_object($shop_result)) {
                               formData.append("toronclass", $("input[name=toronclass]").val());
                               formData.append("imgupfile", $("input[name=imgupfile]")[0].files[0]);*/
             $.ajax({
-                url: 'data/upload_artist_photo',
+                url: 'data/upload_artist_photo.php',
                 data: formData,
                 processData: false,
                 contentType: false,

@@ -236,7 +236,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 						<div class="txt-data-inner">
 							<div class="user-name"><?=$nickname?>님</div>
 							<div class="user-cate"><a href="/shop_main"><?=$name?></a></div>
-							<div class="user-btns"><a href="data/logout_process" class="btn-gnb-logout"><div class="icon icon-logout-gray"></div>로그아웃</a></div>
+							<div class="user-btns"><a href="data/logout_process.php" class="btn-gnb-logout"><div class="icon icon-logout-gray"></div>로그아웃</a></div>
 						</div>
 					</div>
 				</div>
