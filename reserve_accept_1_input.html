@@ -1707,6 +1707,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
         //서비스 선택시
         $(document).on('click','.service-type',function(){
+
             var petType = '';
             var serviceType = '';
             var service = $(this).val();
@@ -1757,6 +1758,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
         //강아지 사이즈 선택시 무게 값을 가져온다.
         $(document).on('click','.pet-size',function(){
 
+            document.getElementById('service1').click();
             var petType = '';
             var serviceType = '';
             var service = '';
@@ -1787,7 +1789,12 @@ if ($customer_cellphone && $customer_cellphone != "") {
                     }
                 });
             }
+
+
+
+
         });
+
         // });
 
         // 무게 키로당 추가금액 선택시
