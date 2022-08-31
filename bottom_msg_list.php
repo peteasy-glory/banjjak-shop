@@ -149,6 +149,12 @@
                             <img src="/images/banner/reserve_main.jpg" />
                         </a>
                     </div>
+                    <div class="swiper-slide">
+                        <a href="#" onclick="event.preventDefault();" style="cursor:default">
+                            <img src="https://image.banjjakpet.com/images/reservation_drag.jpg" alt="">
+                        </a>
+
+                    </div>
                 </div>
                 <!-- Add Arrows -->
                 <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
@@ -247,6 +253,16 @@
         }
     });
 
+    let slide_length = document.querySelector("#popup-wraper").children.length-1;
+
+    let random = Math.floor(Math.random()*10);
+
+    while(random > slide_length){
+
+        random = Math.floor(Math.random()*10);
+
+    }
+
 
     let popup_swiper_reserve = new Swiper('.swiper-container_front', {
 
@@ -261,6 +277,7 @@
             prevEl:".next",
         },
         watchOverflow:true,
+        initialSlide:random
 
 
     });
