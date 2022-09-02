@@ -274,7 +274,9 @@ if($pet[0]['type']=='dog') {
 
         if(!$_POST['tmp_seq'])  $_POST['tmp_seq'] = NULL;
 
-        $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
+        $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon 
+                        WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' 
+                          AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
         //echo $sql."<br>";
         $row = sql_fetch_array($sql);
     //        print_r($row);
@@ -282,7 +284,9 @@ if($pet[0]['type']=='dog') {
             $sql1 = "UPDATE tb_user_coupon SET ";
             $sql1 .= "given             = '".($tbc[0]['given']+$row[0]['given'])."', ";
             $sql1 .= "update_date       = NOW() ";
-            $sql1 .= " WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
+            $sql1 .= " WHERE customer_id = '{$_POST['customer_id']}' 
+                        AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' 
+                        AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
         } else {
             $sql1  = "INSERT INTO tb_user_coupon SET ";
             $sql1 .= "customer_id       = '{$_POST['customer_id']}', ";
@@ -421,3 +425,12 @@ if ($goods_cnt > 0) {
     //console.log('<?=$sql1?>');
 </script>
 <!--<script>location.href='../reserve_pay_management_2?payment_log_seq=<?php /*echo $clear['seq'];*/?>#service_tab';</script>-->
+
+
+"title": "MLB의 한일전 세기의 대결, <b>류현진<\/b>과 오타니가 만나다",
+    "link": "https:\/\/isllee.tistory.com\/676",
+    "description": "얼마 전 <b>류현진<\/b>과 오타니가 만나는 흔치 않은 경기에 곰배님은 오후 근무를 째고 (여전히 재택이지만)... <b>류현진<\/b> 선수의 저지를 입은 한국 분도 보이네요. 저지가 나와서 말인데, 예전에 컬투쇼에서 들었던... ",
+            "bloggername": "울랄라리와 팬더투어",
+            "bloggerlink": "https:\/\/isllee.tistory.com\/",
+            "postdate": "20220601"
+

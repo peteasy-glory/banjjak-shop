@@ -16,7 +16,8 @@ $uuid_result = mysqli_query($connection, $uuid_sql);
 if ($uuid_datas = mysqli_fetch_object($uuid_result)) {
 	$uuid = $uuid_datas->uuid;
 
-	$sql = "insert into tb_1vs1_pna (id,customer_id,email,title,request_main_type,request_sub_type,body,update_time) values ('".$uuid."','".$user_id."','".$email."','".$title."','".$type."','','".$body."',now());";
+	$sql = "insert into tb_1vs1_pna (id,customer_id,email,title,request_main_type,request_sub_type,body,update_time) 
+				values ('".$uuid."','".$user_id."','".$email."','".$title."','".$type."','','".$body."',now());";
 	$result = mysqli_query($connection,$sql);
 	if ($result) {
 		echo "접수 되었습니다.";

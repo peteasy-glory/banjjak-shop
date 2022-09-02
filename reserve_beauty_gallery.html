@@ -303,7 +303,7 @@ $ts = sql_fetch_array($que);
         //formData.append("prnt_title", _prnt_titl);
         console.log($("input[name=imgupfile]")[0].files[0])
         $.ajax({
-            url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
+            url: '/data/upload_user_photo_pet_gallery.php',	// 미용사진 갤러리 전용 업로드
             data: formData,
             processData: false,
             contentType: false,

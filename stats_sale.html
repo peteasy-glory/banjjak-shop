@@ -163,8 +163,6 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
 				, DATE_FORMAT(cancel_time, '%Y-%m-%d %H:%i' ) AS cancel_dt
 				, SUBSTRING_INDEX(SUBSTRING_INDEX(SUBSTRING_INDEX(product,'|',5),'|',-1), ':', 1) AS service
 				, product AS extra_service
-			    , payment_log_seq AS pls
-			    , pl.pet_seq AS b_pet_seq
 				, if(worker = '".$user_id."', '대표', worker) AS worker
 				, (
 					case
@@ -193,7 +191,9 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
 						AND payment_log_seq = pl.payment_log_seq
 						AND service_type = 'B'
 						AND type = 'R'
-				) AS use_reserve				
+				) AS use_reserve	
+				, payment_log_seq AS pls
+			    , pl.pet_seq AS b_pet_seq			
 			FROM tb_payment_log AS pl
 			WHERE is_cancel = 0
 				AND is_no_show = 0
