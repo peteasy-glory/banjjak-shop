@@ -785,6 +785,10 @@ h6.con-title {font-size:15px; line-height:20px;}
 .title-need {font-size:13px; line-height:19px;}
 .need {color:#FF4848 !important;}
 
+/* 22.09.02 역순 아이콘 추가 */
+.con-select {display: inline-flex; align-items: center;}
+.con-icon-reverse {padding: 10px 5px 10px 10px;}
+
 /* 텍스트 한줄 점 처리 */
 .ellipsis {max-width:100%; text-overflow:ellipsis; overflow:hidden; white-space:nowrap;}
 
