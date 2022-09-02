@@ -57,6 +57,8 @@ while($row = mysqli_fetch_assoc($result)){
             <div class="customer-all-inquiry">
                 <div class="con-title-group">
                     <h5 class="con-title"><strong>정렬방식</strong></h5>
+                    <div class="con-select">
+                    <div class="con-icon-reverse"><img src="https://image.banjjakpet.com/images/icon/icon_reverse.svg" alt=""> </div>
                     <select class="arrow" name="search_btn" id="search_tab">
                         <option value="1">최신순</option>
                         <option value="2">가나다순</option>
@@ -64,6 +66,7 @@ while($row = mysqli_fetch_assoc($result)){
                         <option value="4">견종별</option>
 <!--                        <option value="5">등급별</option>-->
                     </select>
+                    </div>
                 </div>
                 <!--<div class="customer-state-graph doughnut-graph">
                     <div class="graph-inner">
