@@ -1707,6 +1707,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
 
         //서비스 선택시
         $(document).on('click','.service-type',function(){
+
             var petType = '';
             var serviceType = '';
             var service = $(this).val();
@@ -1757,6 +1758,9 @@ if ($customer_cellphone && $customer_cellphone != "") {
         //강아지 사이즈 선택시 무게 값을 가져온다.
         $(document).on('click','.pet-size',function(){
 
+            document.getElementById('kgs_list').innerHTML = ' <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="weight1"><input type="radio" name="weight" id="weight1" value="" class="weight" checked=""><em><span>선택안함</span></em></label></div>'
+
+
             var petType = '';
             var serviceType = '';
             var service = '';
@@ -1787,7 +1791,12 @@ if ($customer_cellphone && $customer_cellphone != "") {
                     }
                 });
             }
+
+
+
+
         });
+
         // });
 
         // 무게 키로당 추가금액 선택시
@@ -2175,6 +2184,13 @@ if ($customer_cellphone && $customer_cellphone != "") {
             $('.cat-weight').css('display','none');
             $('.kg_'+g).css('display','block');
         }
+
+
+
+        $(document).ready(function(){
+
+
+        })
     </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/footer_shop.php");
