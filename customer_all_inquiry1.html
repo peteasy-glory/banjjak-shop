@@ -58,7 +58,7 @@ while($row = mysqli_fetch_assoc($result)){
                 <div class="con-title-group">
                     <h5 class="con-title"><strong>정렬방식</strong></h5>
                     <div class="con-select">
-                    <div class="con-icon-reverse"><img src="https://image.banjjakpet.com/images/icon/icon_reverse.svg" alt=""> </div>
+                    <div class="con-icon-reverse" onclick="change_order_by();"><img src="https://image.banjjakpet.com/images/icon/icon_reverse.svg" id="change_icon" alt=""> </div>
                     <select class="arrow" name="search_btn" id="search_tab">
                         <option value="1">최신순</option>
                         <option value="2">가나다순</option>
@@ -258,9 +258,26 @@ while($row = mysqli_fetch_assoc($result)){
             get_customer_list(artist_id, search_btn);
         });
 
+        function change_order_by(){
+            var num = $("#search_tab").val();
+            //console.log(num);
+            if(search_btn > 10){
+                search_btn = num;
+            }else{
+                search_btn = parseInt(num)+10;
+            }
+            //console.log(search_btn);
+            history.pushState(null, null, window.location.pathname+"?q="+search_btn);
+            get_customer_list(artist_id, search_btn);
+        }
+
         function get_customer_list(artist_id, search_btn){
             //$("#loading").css("display", "flex");
-
+            if(search_btn > 10){
+                $("#change_icon").attr("src","https://image.banjjakpet.com/images/icon/icon_reverse_on.svg");
+            }else{
+                $("#change_icon").attr("src","https://image.banjjakpet.com/images/icon/icon_reverse.svg");
+            }
             console.log(artist_id+':'+search_btn)
             $.ajax({
                 url: 'data/manage_customer_allview_ajax.php',
@@ -302,7 +319,7 @@ while($row = mysqli_fetch_assoc($result)){
                             if(v.payment_type == 'hotel'){ border_color = '#ffdae3'; }
                             if(v.payment_type == 'playroom'){ border_color = '#fef9e9'; }
 
-                            if(search_btn == "2"){ // 가나다순
+                            if(search_btn == "2" || search_btn == "12"){ // 가나다순
                                 code_cnt = String(pet_name).charAt(0).charCodeAt(0);
                                 if(hangul_code_arr[0] < code_cnt){
                                     $.each(hangul_code_arr, function(i, v2){
@@ -332,7 +349,7 @@ while($row = mysqli_fetch_assoc($result)){
                                         no_data++;
                                     }
                                 }
-                            }else if(search_btn == "4"){ // 견종별
+                            }else if(search_btn == "4" || search_btn == "14"){ // 견종별
                                 code_cnt = String(pet_type).charAt(0).charCodeAt(0);
                                 if(hangul_code_arr[0] < code_cnt){
                                     $.each(hangul_code_arr, function(i, v2){

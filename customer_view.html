@@ -131,24 +131,12 @@ if ($member_cnt == 0) { // (가회원)
 }
 // 펫 리스트 호출
 $sql = "
-		SELECT * FROM (
-			SELECT 
-				if(sum(pl.data_delete) > 0, NULL, mp.pet_seq) AS pet_seq,
-				if(sum(pl.data_delete) > 0, NULL, mp.name) AS name, 
-				if(sum(pl.data_delete) > 0, NULL, mp.photo) AS photo
-			FROM tb_mypet AS mp
-				LEFT OUTER JOIN (
-					SELECT * 
-					FROM tb_payment_log
-					WHERE artist_id = '" . $user_id . "'
-				) AS pl ON mp.pet_seq = pl.pet_seq
-				
-			WHERE 1=1 
-			AND mp.data_delete = '0'
-			" . $where_qy . "
-			GROUP BY mp.pet_seq
-		) AS past
-		WHERE past.pet_seq IS NOT NULL
+    SELECT a.pet_seq, a.name FROM tb_mypet a
+    INNER JOIN (
+        SELECT pet_seq FROM tb_payment_log WHERE artist_id = '{$user_id}'
+        AND cellphone = '{$phone}' AND data_delete = 0
+        GROUP BY pet_seq
+    ) b ON a.pet_seq = b.pet_seq
 	";
 //echo $sql."<p>";
 $result = mysqli_query($connection, $sql);
@@ -788,7 +776,7 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
                                                                                 //echo $que;
                                                                                 $row = sql_fetch_array($que);
                                                                             ?>
-                                                                            사용:<?php echo number_format($row[0]['use_reserve']);?> 누적:<?php echo number_format($row[0]['reserve']);?>
+                                                                            사용:<?php echo number_format($row[0]['use_reserve']);?> 누적:<?php echo number_format($row[0]['now_reserve']);?>
                                                                         </div>
                                                                     </div>
                                                                 </div>
