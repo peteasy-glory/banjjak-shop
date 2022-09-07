@@ -825,7 +825,7 @@ if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0][
             console.log(cmt)
             $.ajax({
                 type : 'post',
-                url : './data/save_beauty_option_ajax',
+                url : './data/save_beauty_option_ajax.php',
                 data : {'mode':'save','cmt':cmt},
                 dataType : 'json',
                 success : function(res){
@@ -875,7 +875,7 @@ if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0][
             }
             $.ajax({
                 type : 'post',
-                url : './data/get_book_data_ajax',
+                url : './data/get_book_data_ajax.php',
                 data : {'mode':'vat','type':type,'artist_id':artist_id},
                 dataType : 'json',
                 success : function(res){

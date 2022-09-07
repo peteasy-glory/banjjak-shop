@@ -8,6 +8,8 @@ $user_id = $_SESSION['gobeauty_user_id'];
 //print_r($_POST);
 $other_worktime = array(10,11,12,13,14);
 
+//$user_id = 'hptop111@pet.com';
+
 $que = "SELECT COUNT(*) AS cnt FROM tb_product_dog_worktime WHERE artist_id = '{$user_id}'";
 //echo $que."<br>";
 $res = mysqli_query($connection, $que);
