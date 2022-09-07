@@ -74,6 +74,14 @@ if(count($arr)>0){
     }
 }
 
+$sql = "
+    SELECT *
+    FROM tb_working_schedule
+    WHERE customer_id = '".$user_id."'
+"; // 영업시간
+$result = mysqli_query($connection,$sql);
+$row = mysqli_fetch_assoc($result);
+
 ?>
 
 <!-- container -->
@@ -129,30 +137,40 @@ if(count($arr)>0){
 								<div class="form-datepicker-group">
 									<div class="form-datepicker">
 										<select name="select_time_from[]" class="time-from" <?php echo (in_array($j,$rs['week']))?'':'disabled';?>>
-											<?for($i=9;$i<=19;$i++){
+											<?for($i=$row["working_start"];$i<=$row["working_end"];$i++){
 												$p_day	= "오전";
 												if($i>=12){
 													$p_day	= "오후";
 												}
 											?>
 											<option value="<?=sprintf('%02d',$i)?>:00" <?php echo ($rs['start'][$j][0]==sprintf('%02d',$i).':00')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:00</option>
-											<option value="<?=sprintf('%02d',$i)?>:30" <?php echo ($rs['start'][$j][0]==sprintf('%02d',$i).':30')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:30</option>
-											<?}?>
+                                                <?php
+                                                    if($i != $row["working_end"]){
+                                                  ?>
+                                                    <option value="<?=sprintf('%02d',$i)?>:30" <?php echo ($rs['start'][$j][0]==sprintf('%02d',$i).':30')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:30</option>
+                                                    <?php
+                                                }
+                                                }?>
 											
 										</select>
 									</div>
 									<div class="form-unit">~</div>
 									<div class="form-datepicker">
 										<select name="select_time_to[]" class="time-end" <?php echo (in_array($j,$rs['week']))?'':'disabled';?>>
-											<?for($i=9;$i<=19;$i++){
+											<?for($i=$row["working_start"];$i<=$row["working_end"];$i++){
 												$p_day	= "오전";
 												if($i>=12){
 													$p_day	= "오후";
 												}
 											?>
 											<option value="<?=sprintf('%02d',$i)?>:00" <?php echo ($rs['end'][$j][0]==sprintf('%02d',$i).':00')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:00</option>
-											<option value="<?=sprintf('%02d',$i)?>:30" <?php echo ($rs['end'][$j][0]==sprintf('%02d',$i).':30')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:30</option>
-											<?php } ?>
+                                            <?php
+                                                if($i != $row["working_end"]){
+                                                ?>
+                                                <option value="<?=sprintf('%02d',$i)?>:30" <?php echo ($rs['end'][$j][0]==sprintf('%02d',$i).':30')?'selected':'';?>><?=$p_day?> <?=sprintf('%02d',$i)?>:30</option>
+                                                    <?php
+                                                }
+                                            }?>
 										</select>
 									</div>
 								</div>
