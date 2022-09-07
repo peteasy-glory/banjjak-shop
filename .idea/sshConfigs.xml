@@ -3,7 +3,7 @@
   <component name="SshConfigs">
     <configs>
       <sshConfig authType="PASSWORD" host="175.126.123.165" id="67068f6d-1813-4ed2-b609-bf0a9cba0da0" port="22" nameFormat="DESCRIPTIVE" username="root" useOpenSSHConfig="true" />
-      <sshConfig host="15.164.54.42" id="396cda25-50c4-45f6-9261-7c396615a903" keyPath="C:\Users\EASYPET\Desktop\design.pem" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
+      <sshConfig host="15.164.54.42" id="396cda25-50c4-45f6-9261-7c396615a903" keyPath="D:\peteasy\design.pem" port="22" nameFormat="DESCRIPTIVE" username="ubuntu" useOpenSSHConfig="true" />
     </configs>
   </component>
 </project>

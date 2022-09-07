@@ -9,7 +9,11 @@ $get_tc_id = $_GET['get_tc_id'];
 
 $artist_name = "";
 
-$payment_log_sql = "UPDATE tb_payment_log SET approval=2 WHERE payment_log_seq='{$get_pl_seq}'";
+$re_sql ="";
+
+//$payment_log_sql = "UPDATE tb_payment_log SET approval=2 WHERE payment_log_seq='{$get_pl_seq}'";
+// 12시간 지난 자동 취소시 첫이용상담 중복 요청 허용 수정으로 인해 해당 고객의 모든 첫이용상담 데이터 update by.glory 20220902
+$payment_log_sql = "UPDATE tb_payment_log SET approval=2 WHERE artist_id = '{$user_id}' AND customer_id = '{$get_tc_id}' AND approval != 1 AND product_type = 'B' and data_delete = 0";
 $payment_log_result = mysqli_query($connection, $payment_log_sql);
 // error_log('----- $payment_log_sql : ' . $payment_log_sql);
 
@@ -23,7 +27,7 @@ if ($shop_info_rows = mysqli_fetch_object($shop_info_result)) {
 if ($get_tc_id != null && $get_tc_id != "") {
     $message = "이제 [".$artist_name."]에서 원하시는 시간에 예약하실 수 있습니다.";
     $path = "https://customer.banjjakpet.com/reserve_view?artist_id=".$user_id;
-    $image = "http://gopet.kr/pet/images/app_logo.png";
+    $image = "";
     a_push($get_tc_id, "반짝, 상담 신청 결과 알림", $message, $path, $image, "customer");
 }
 ?>

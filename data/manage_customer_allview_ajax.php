@@ -23,6 +23,14 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					$order_qy = " ORDER BY a.cnt DESC ";
 				}else if($r_search_btn == "4"){
 					$order_qy = " ORDER BY a.type DESC, a.pet_type ASC ";
+				}else if($r_search_btn == "11"){
+					$order_qy = " ORDER BY a.update_time2 ASC ";
+				}else if($r_search_btn == "12"){
+					$order_qy = " ORDER BY a.pet_name DESC ";
+				}else if($r_search_btn == "13"){
+					$order_qy = " ORDER BY a.cnt ASC ";
+				}else if($r_search_btn == "14"){
+					$order_qy = " ORDER BY a.type DESC, a.pet_type DESC ";
 				}
 			}
 
