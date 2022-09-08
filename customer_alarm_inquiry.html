@@ -45,7 +45,7 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
             $plus_query .= "
 				UNION
 				SELECT *, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$test." WHERE recipient_num = '".$cellphone."'
-				AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044')
+				AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003')
 				AND DATE_FORMAT(date_client_req, '%Y-%m-%d')
 					BETWEEN DATE_FORMAT('".$startDate."', '%Y-%m-%d')
 					AND DATE_FORMAT('".$endDate."', '%Y-%m-%d')
@@ -59,7 +59,7 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
     // 상세내역
     $query = "
 		SELECT *, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$startYearMonth." WHERE recipient_num = '".$cellphone."'
-		AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044')
+		AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003')
 		AND DATE_FORMAT(date_client_req, '%Y-%m-%d')
 			BETWEEN DATE_FORMAT('".$startDate."', '%Y-%m-%d')
 			AND DATE_FORMAT('".$endDate."', '%Y-%m-%d')
@@ -149,13 +149,19 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
                                     switch($value["template_code"]){
                                         case "1000004530_14040" : $template_code = "예약<br>알림";
                                             break;
+                                        case "1000004530_20001" : $template_code = "예약<br>알림";
+                                            break;
                                         case "1000004530_14041" : $template_code = "예약<br>변경<br>알림";
+                                            break;
+                                        case "1000004530_20002" : $template_code = "예약<br>변경<br>알림";
                                             break;
                                         case "1000004530_14042" : $template_code = "미용<br>종료<br>알림";
                                             break;
                                         case "1000004530_14042_1" : $template_code = "미용<br>종료<br>알림";
                                             break;
                                         case "1000004530_14043" : $template_code = "전날<br>알림";
+                                            break;
+                                        case "1000004530_20003" : $template_code = "전날<br>알림";
                                             break;
                                         case "1000004530_14044" : $template_code = "예약<br>취소<br>알림";
                                             break;
