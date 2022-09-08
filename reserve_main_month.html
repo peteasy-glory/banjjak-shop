@@ -879,7 +879,7 @@ while ($o_rows = mysqli_fetch_assoc($o_result)) {
                                                             <div class="state"><?php echo $rest_word; ?></div>
                                                         </div>
                                                         <?php $wait_day = ($day < 10)? "0".$day : $day; ?>
-                                                        <?php if($tgram[$await_day.'-'.$wait_day]['cnt']>0){?>
+                                                        <?php if($tgram[$await_day.'-'.$wait_day]['cnt']>0 && $day_print == true){?>
                                                             <div class="calendar-month-day-item wait"> 대기 <?php echo $tgram[$await_day.'-'.$wait_day]['cnt'];?>건</div>
                                                         <?php } ?>
                                                         <div class="calendar-drag-item-group">
