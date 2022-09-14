@@ -735,7 +735,7 @@ if($data['product_cat'][0]['in_shop_product'] == '1' && $data['product_cat'][0][
             if(confirm('정말로 데이터를 삭제하시겠습니까? 한번삭제한 데이터는 복구할 수 없습니다.')){
                 $.ajax({
                     type : 'post',
-                    url : './data/del_dog_option',
+                    url : './data/del_dog_option.php',
                     dataType : 'json',
                     success : function(res){
                         if(res.flag == true){

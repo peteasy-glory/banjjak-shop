@@ -485,7 +485,7 @@ $data['product_coupon_cmt'][] = $row;
             var no = $(this).data('no');
             $.ajax({
                 type : 'post',
-                url : './data/save_coupon_add',
+                url : './data/save_coupon_add.php',
                 data : {'mode':'deleteOne','no':no},
                 dataType : 'json',
                 success : function(data){
