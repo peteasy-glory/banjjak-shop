@@ -338,9 +338,9 @@ switch($clear['mode']){
         //$que = "SELECT * FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE history_seq = {$_POST['cid']}";
         //$que = "SELECT * FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.user_coupon_seq = {$_POST['cid']} ORDER BY a.history_seq DESC LIMIT 1";
         if($_POST['cid'] != ''){
-            $que = "SELECT * FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.user_coupon_seq = {$_POST['cid']} ORDER BY a.history_seq DESC LIMIT 1";
+            $que = "SELECT a.history_seq, a.balance, a.user_coupon_seq, b.type FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.user_coupon_seq = {$_POST['cid']} ORDER BY a.history_seq DESC LIMIT 1";
         }else{
-            $que = "SELECT * FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.payment_log_seq = {$_POST['payment_log']} ORDER BY a.history_seq DESC LIMIT 1";
+            $que = "SELECT a.history_seq, a.balance, a.user_coupon_seq, b.type FROM tb_coupon_history a LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq WHERE a.payment_log_seq = {$_POST['payment_log']} ORDER BY a.history_seq DESC LIMIT 1";
         }
         //echo $que;
         $res = sql_query($que);
@@ -348,7 +348,7 @@ switch($clear['mode']){
         if($row['history_seq']){
             //echo $row['balance'];
             if($row['type'] == 'C') {
-                for ($i = 0; $i <= 20; $i++) {
+                for ($i = 0; $i <= $row['balance']; $i++) {
                     $selected = '';
                     if ($i == $row['balance']) $selected = 'selected';
                     $select1 .= '<option value="' . $i . '" ' . $selected . '>' . $i . '</option>';
@@ -357,7 +357,7 @@ switch($clear['mode']){
                     $select2 .= '<option value="' . $i . '">' . $i . '</option>';
                 }
             } else {
-                for ($i = 0; $i <= 1500000; $i+=1000) {
+                for ($i = 0; $i <= $row['balance']; $i+=1000) {
                     $selected = '';
                     if ($i == $row['balance']) $selected = 'selected';
                     $select1 .= '<option value="' . $i . '" ' . $selected . '>' . number_format($i) . '</option>';
@@ -401,7 +401,7 @@ switch($clear['mode']){
         }
 
         //쿠폰내역 업데이트
-            $que = "UPDATE tb_user_coupon SET given = {$balance}, tb_user_coupon.use = tb_user_coupon.use + {$_POST['cnt']}, update_date = NOW() WHERE user_coupon_seq = {$_POST['cid']} ";
+            $que = "UPDATE tb_user_coupon SET tb_user_coupon.use = tb_user_coupon.use + {$_POST['cnt']}, update_date = NOW() WHERE user_coupon_seq = {$_POST['cid']} ";
             $res = sql_query($que);
 
         $json['cid'] = $cid;

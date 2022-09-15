@@ -2489,6 +2489,7 @@ if(empty($grade[0]['grade_name'])){
                         LEFT JOIN tb_coupon b ON a.coupon_seq = b.coupon_seq
                         WHERE {$where_id} 
                         AND a.given > a.use 
+                        AND a.del_yn = 'N'
                         AND a.artist_id = '{$pay['artist_id']}'
                         ORDER BY a.user_coupon_seq desc
                     ) s
@@ -3138,6 +3139,7 @@ if(empty($grade[0]['grade_name'])){
     <!-- //container -->
     <iframe src="" name="hiddenFrame" style="display:none;" frameborder="0"></iframe>
     <script>
+        var pay_status = '<?=$pay['status']?>';
 
         // 고양이 미용 선택 선택시 선택해제(완전 래퍼)
         var beforeChecked = -1;
@@ -4082,6 +4084,10 @@ if(empty($grade[0]['grade_name'])){
             var seq = $(this).data('seq');
             var card = $('#use_card').val();
             var cash = $('#use_cash').val();
+            if(pay_status == 'R1'){
+                alert('사전 결제완료 미용은 변경이 불가합니다.');
+                return false;
+            }
 
             $.ajax({
                 type: 'post',
