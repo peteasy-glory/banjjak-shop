@@ -681,6 +681,7 @@ $await_cnt = $gram[0]['cnt'];
 
                                     <?php for ($t = $data['schedule']['working_start']; $t < $data['schedule']['working_end']; $t++) { ?>
                                         <?php
+
                                         for ($t30 = 0; $t30 < 60; $t30 += 30) {
                                             $css_line = $t30 == 30 ? "line_solid" : '';
                                             $thisTime = sprintf('%02d', $t) . ":" . sprintf('%02d', $t30); // 현재 시간
