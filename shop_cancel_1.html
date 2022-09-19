@@ -157,7 +157,7 @@ if($order_num != ""){
                         var option = JSON.parse(v.option_data);
                         var img_link = (v.file_path == '' || v.file_path == null)? v.goodsRepImage : "https://image.banjjakpet.com"+img_link_change(v.file_path);
                         var _chk_val = v.iplp_seq+'_'+i;
-
+                        var product_price = parseInt(v.product_price);
 
                         html += '<div class="shop-cart-list-cell">';
                         html += '    <div class="shop-cart-items">';
@@ -178,8 +178,11 @@ if($order_num != ""){
                             html += '                            <div class="item-option-division">/</div>';
                             html += '                            <div>'+v_.amount+'개</div>';
                             html += '                        </div>';
+                            if(v.is_use_option == '2' || v.is_use_group_option == '2'){
+                                product_price += parseInt(v_.value);
+                            }
                         });
-                        html += '                        <div class="item-price">'+v.product_price+'원</div>';
+                        html += '                        <div class="item-price">'+product_price+'원</div>';
                         html += '                    </div>';
                         html += '                </div>';
                         html += '            </div>';
