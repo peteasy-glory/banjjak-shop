@@ -584,7 +584,7 @@ if($mode){
 
         if($where_qy != ""){	// is_delete - 삭제여부(1-미삭제, 2-삭제)
             $sql = "
-                    SELECT a.*, b.product_name, c.file_path, b.goodsRepImage FROM tb_item_payment_log_product a
+                    SELECT a.*, b.product_name, c.file_path, b.goodsRepImage, b.is_use_option, b.is_use_group_option FROM tb_item_payment_log_product a
                     LEFT JOIN tb_item_list b ON b.product_no = a.product_no
                     LEFT JOIN tb_file c ON c.f_seq = b.product_img
 					WHERE a.is_delete = '1'
