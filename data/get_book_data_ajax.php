@@ -1672,7 +1672,7 @@ switch($clear['mode']){
         $tp_cnt = 0;
         $que = "SELECT * FROM tb_payment_log WHERE pet_seq = {$_POST['pet']} AND artist_id = '{$_SESSION['gobeauty_user_id']}' AND cellphone = '{$_POST['cellphone']}' 
                                        AND is_no_show = 0 AND data_delete = 0 AND is_cancel = 0 AND approval = 1 
-                                       AND CONCAT(year,'-',month,'-',day) < DATE_FORMAT(NOW(),'%Y-%c-%e') ORDER BY  year desc , month desc , day DESC ";
+                                       AND date_format(CONCAT(year,'-',month,'-',DAY),'%Y-%m-%d') < DATE_FORMAT(NOW(),'%Y-%m-%d') ORDER BY  year desc , month desc , day DESC ";
         //echo $que;
         $arr = sql_fetch_array($que);
         $cnt =  count($arr);
