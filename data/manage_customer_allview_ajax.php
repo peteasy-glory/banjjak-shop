@@ -330,27 +330,30 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 			$r_artist_id = ($_POST["artist_id"] && $_POST["artist_id"] != "")? $_POST["artist_id"] : "";
 			
 			$sql = "
-				SELECT a.cellphone, COUNT(*) AS cnt
-				FROM (
-					SELECT pl.cellphone, COUNT(*) AS cnt
-					FROM tb_payment_log AS pl
-					WHERE pl.artist_id = '".$r_artist_id."'
-                        #AND pl.product_type = 'B'
-                        AND pl.data_delete = 0 
-						AND pl.cellphone != ''
-						AND (pl.pet_seq != '' OR pl.pet_seq != '0')
-					GROUP BY pl.cellphone
-
-					UNION ALL
-
-					SELECT hpl.cellphone, COUNT(*) AS cnt
-					FROM tb_hotel_payment_log AS hpl
-					WHERE hpl.artist_id = '".$r_artist_id."'
-						AND hpl.cellphone != ''
-						AND (hpl.pet_seq != '' OR hpl.pet_seq != '0')
-					GROUP BY hpl.cellphone
-				) AS a
-				GROUP BY a.cellphone
+					SELECT A.cellphone
+	FROM
+	(
+		(
+			SELECT cellphone 
+			FROM tb_payment_log
+			WHERE data_delete = 0 AND artist_id = '{$r_artist_id}'
+			GROUP BY cellphone
+		)
+		UNION
+		(
+			SELECT cellphone
+			FROM tb_hotel_payment_log
+			WHERE is_delete = 2 AND artist_id = '{$r_artist_id}'
+			GROUP BY cellphone
+		)
+		UNION
+		(
+			SELECT cellphone
+			FROM tb_playroom_payment_log
+			WHERE is_delete = 2 AND artist_id = '{$r_artist_id}'
+			GROUP BY cellphone
+		)
+	) A
 			";
 			$result = mysqli_query($connection, $sql);
 			$data = mysqli_num_rows($result);
@@ -379,65 +382,30 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 			$r_artist_id = ($_POST["artist_id"] && $_POST["artist_id"] != "")? $_POST["artist_id"] : "";
 
 			$sql = "
-				SELECT a.cnt + b.cnt AS cnt
-				FROM (
-					SELECT IFNULL(SUM(a.cnt), 0) AS cnt
-					FROM (			
-						SELECT mp.customer_id, COUNT(*) AS cnt
-						FROM tb_mypet AS mp
-							INNER JOIN (
-								SELECT pl.customer_id
-								FROM tb_payment_log AS pl
-								WHERE pl.artist_id = '".$r_artist_id."'
-									AND pl.product_type = 'B'
-									AND pl.customer_id != ''
-									AND (pl.pet_seq != '' OR pl.pet_seq != '0')
-									AND data_delete = 0
-								GROUP BY pl.customer_id
-
-								UNION ALL
-
-								SELECT hpl.customer_id
-								FROM tb_hotel_payment_log AS hpl
-								WHERE hpl.artist_id = '".$r_artist_id."'
-									AND hpl.customer_id != ''
-									AND (hpl.pet_seq != '' OR hpl.pet_seq != '0')
-								GROUP BY hpl.customer_id
-							) AS pl ON mp.customer_id = pl.customer_id
-						GROUP BY mp.customer_id
-					) AS a
-				) AS a,
-				(
-					SELECT IFNULL(SUM(b.cnt), 0) AS cnt
-					FROM (			
-						SELECT mp.tmp_seq, COUNT(*) AS cnt
-						FROM tb_mypet AS mp
-							INNER JOIN (
-								SELECT tmp_seq
-								FROM tb_tmp_user AS tu
-									INNER JOIN (
-										SELECT pl.cellphone
-										FROM tb_payment_log AS pl
-										WHERE pl.artist_id = '".$r_artist_id."'
-											AND pl.product_type = 'B'
-											AND pl.cellphone != ''
-											AND (pl.pet_seq != '' OR pl.pet_seq != '0')
-											AND data_delete = 0
-										GROUP BY pl.cellphone
-
-										UNION ALL
-
-										SELECT hpl.cellphone
-										FROM tb_hotel_payment_log AS hpl
-										WHERE hpl.artist_id = '".$r_artist_id."'
-											AND hpl.cellphone != ''
-											AND (hpl.pet_seq != '' OR hpl.pet_seq != '0')
-										GROUP BY hpl.cellphone
-									) AS pl ON tu.cellphone = pl.cellphone
-							) AS tu ON mp.tmp_seq = tu.tmp_seq
-						GROUP BY mp.tmp_seq
-					) AS b
-				) AS b
+				SELECT COUNT(*) cnt
+	FROM
+	(
+		(
+			SELECT pet_seq 
+			FROM tb_payment_log
+			WHERE data_delete = 0 AND artist_id = '{$r_artist_id}'
+			GROUP BY pet_seq
+		)
+		UNION
+		(
+			SELECT pet_seq
+			FROM tb_hotel_payment_log
+			WHERE is_delete = 2 AND artist_id = '{$r_artist_id}'
+			GROUP BY pet_seq
+		)
+		UNION
+		(
+			SELECT pet_seq
+			FROM tb_playroom_payment_log
+			WHERE is_delete = 2 AND artist_id = '{$r_artist_id}'
+			GROUP BY pet_seq
+		)
+	) A
 			";
 			
 			$result = mysqli_query($connection, $sql);

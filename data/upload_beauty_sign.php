@@ -15,7 +15,7 @@ if($r_tmp_yn == "N"){
 	$filename = "tmp_".$r_tmp_seq;
 }
 // 사용자 이미지 업로드 디렉토리 생성
-make_user_directory($upload_static_directory2.$sign_directory2, $r_artist_id);
+//make_user_directory($upload_static_directory2.$sign_directory2, $r_artist_id);
 
 if($r_sign_image != ""){
 	// folder create
