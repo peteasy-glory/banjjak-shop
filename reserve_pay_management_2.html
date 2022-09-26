@@ -2493,7 +2493,7 @@ if(empty($grade[0]['grade_name'])){
                         AND a.artist_id = '{$pay['artist_id']}'
                         ORDER BY a.user_coupon_seq desc
                     ) s
-                    GROUP BY s.coupon_seq
+                    #GROUP BY s.coupon_seq
                 ";
                 //echo $que1;
                 $cop = sql_fetch_array($que1);

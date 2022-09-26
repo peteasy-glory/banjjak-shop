@@ -274,16 +274,16 @@ if($pet[0]['type']=='dog') {
 
         if(!$_POST['tmp_seq'])  $_POST['tmp_seq'] = NULL;
 
-        $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
-        //echo $sql."<br>";
-        $row = sql_fetch_array($sql);
-    //        print_r($row);
-        if ($row[0]['cnt'] > 0) {
-            $sql1 = "UPDATE tb_user_coupon SET ";
-            $sql1 .= "given             = '".($tbc[0]['given']+$row[0]['given'])."', ";
-            $sql1 .= "update_date       = NOW() ";
-            $sql1 .= " WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
-        } else {
+//        $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
+//        //echo $sql."<br>";
+//        $row = sql_fetch_array($sql);
+//    //        print_r($row);
+//        if ($row[0]['cnt'] > 0) {
+//            $sql1 = "UPDATE tb_user_coupon SET ";
+//            $sql1 .= "given             = '".($tbc[0]['given']+$row[0]['given'])."', ";
+//            $sql1 .= "update_date       = NOW() ";
+//            $sql1 .= " WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
+//        } else {
             $sql1  = "INSERT INTO tb_user_coupon SET ";
             $sql1 .= "customer_id       = '{$_POST['customer_id']}', ";
             $sql1 .= "artist_id         = '{$_POST['artist_id']}', ";
@@ -295,7 +295,7 @@ if($pet[0]['type']=='dog') {
             $sql1 .= "given             = '{$tbc[0]['given']}', ";
             $sql1 .= "reg_date          = NOW() ";
 
-        }
+//        }
         //echo $sql1."<p>";
         $result = sql_query($sql1);
         $id = mysqli_insert_id($connection);
