@@ -604,124 +604,7 @@ if(empty($grade[0]['grade_name'])){
                     <?php
                 }
                 ?>
-                <!-- 예약자 정보 -->
-                <div class="basic-data-group" style="margin-top:15px;">
-                    <div class="con-title-group con-title-group-add" >
-                        <h4 class="con-title">예약자 정보</h4>
-                        <div style="width:95px;">
-                        <?php if($nscnt['nscnt'] > 0){ ?>
-                            <div class="label label-outline-pink label-noshow">NO SHOW <?php echo $nscnt['nscnt'];?>회</div>
-                        <?php } ?></div>
-                        <div style="width:95px; margin-right:20px;">
-                        <?php if($pay['is_no_show']!=1){?>
 
-
-                                <a href="javascript:;" class="btn btn-red btn-middle-size btn-round set-noshow">노쇼 등록</a>
-                        <?php }else if($pay['is_no_show']=1){ ?>
-
-                                <a href="javascript:;" class="btn btn-middle-size  btn-round cancel-noshow">노쇼 취소</a>
-                        <?php } ?>
-                        </div>
-                    </div>
-                    <div class="flex-table type-2">
-
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">등급</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <div class="user-grade-item">
-                                            <?php
-                                            if($grade[0]['grade_ord'] == 1){
-                                                echo '<div class="icon icon-grade-vip"></div>';
-                                            }else if($grade[0]['grade_ord'] == 2){
-                                                echo '<div class="icon icon-grade-normal"></div>';
-                                            }else{
-                                                echo '<div class="icon icon-grade-normalb"></div>';
-                                            }
-                                            ?>
-                                            <div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
-                                        </div>
-                                        <!--
-                                        <div class="user-grade-item">
-                                            <div class="icon icon-grade-normal"></div>
-                                            <div class="icon-grade-label">Normal</div>
-                                        </div>
-                                        <div class="user-grade-item">
-                                            <div class="icon icon-grade-normalb"></div>
-                                            <div class="icon-grade-label">Normal_B</div>
-                                        </div>
-                                        -->
-                                    </div>
-                                    <div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-table-cell">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title"><div class="txt">연락처</div></div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner">
-                                        <?php echo $pay['cellphone'];?>
-                                    </div>
-                                    <div class="flex-table-data-side">
-                                        <div class="btn-ui-group">
-                                            <a href="tel:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
-                                            <a href="sms:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex-table-cell no-padding">
-                            <div class="flex-table-item">
-                                <div class="flex-table-title" style="display:flex; align-item: center; flex-direction:column;">
-                                    <div class="txt">보조 연락처</div>
-                                    <div class="call_edit" onclick="popalert.open('numberAddPop')"><span>편집</span></div>
-                                </div>
-                                <div class="flex-table-data">
-                                    <div class="flex-table-data-inner" style="flex-direction: column; align-items: normal">
-                                        <?php for($i=0;$i<count($tel_f['title']);$i++){ ?>
-                                            <div class="flex-table-item middle">
-                                                <div class="flex-table-data">
-                                                    <div class="flex-table-data-inner">
-                                                        <div class="flex-table-txt"><em><?php echo $tel_f['title'][$i];?></em><?php echo add_hyphen($tel_f['tel'][$i]);?></div>
-                                                    </div>
-
-
-                                                    <div class="flex-table-data-side">
-                                                        <div class="btn-ui-group">
-                                                            <a href="tel:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
-                                                            <a href="sms:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        <?php } ?>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group-cell middle" style="margin-top:30px;">
-                        <div class="form-group-item">
-                            <div class="form-item-label mg-bt-12">
-                                견주관련 메모
-                                <span class="form-input-info margin">(고객에게는 노출되지 않습니다.)</span>
-                            </div>
-                            <div class="form-item-data">
-                                <textarea name="etc2_memo" id="etc2_memo" cols="30" rows="10"><?php echo $scm[0]['memo'];?></textarea>
-
-                            </div>
-                            <div class="form-item-data type-8">
-                                <button type="button" class="pc-mg-bt-20 btn btn-outline-purple btn-middle-size btn-round save-etc2 ft-size-17" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <!-- //예약자 정보 -->
                 <!-- 예약동물 정보 -->
                 <div class="basic-data-group">
                     <div class="con-title-group con-title-group-add">
@@ -937,6 +820,125 @@ if(empty($grade[0]['grade_name'])){
                     </div>
                 </div>
                 <!-- //예약동물 정보 -->
+
+                <!-- 예약자 정보 -->
+                <div class="basic-data-group" style="margin-top:30px;">
+                    <div class="con-title-group con-title-group-add" >
+                        <h4 class="con-title">예약자 정보</h4>
+                        <div style="width:95px;">
+                            <?php if($nscnt['nscnt'] > 0){ ?>
+                                <div class="label label-outline-pink label-noshow">NO SHOW <?php echo $nscnt['nscnt'];?>회</div>
+                            <?php } ?></div>
+                        <div style="width:95px; margin-right:20px;">
+                            <?php if($pay['is_no_show']!=1){?>
+
+
+                                <a href="javascript:;" class="btn btn-red btn-middle-size btn-round set-noshow">노쇼 등록</a>
+                            <?php }else if($pay['is_no_show']=1){ ?>
+
+                                <a href="javascript:;" class="btn btn-middle-size  btn-round cancel-noshow">노쇼 취소</a>
+                            <?php } ?>
+                        </div>
+                    </div>
+                    <div class="flex-table type-2">
+
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">등급</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <div class="user-grade-item">
+                                            <?php
+                                            if($grade[0]['grade_ord'] == 1){
+                                                echo '<div class="icon icon-grade-vip"></div>';
+                                            }else if($grade[0]['grade_ord'] == 2){
+                                                echo '<div class="icon icon-grade-normal"></div>';
+                                            }else{
+                                                echo '<div class="icon icon-grade-normalb"></div>';
+                                            }
+                                            ?>
+                                            <div class="icon-grade-label"><?php echo $grade[0]['grade_name'];?></div>
+                                        </div>
+                                        <!--
+                                        <div class="user-grade-item">
+                                            <div class="icon icon-grade-normal"></div>
+                                            <div class="icon-grade-label">Normal</div>
+                                        </div>
+                                        <div class="user-grade-item">
+                                            <div class="icon icon-grade-normalb"></div>
+                                            <div class="icon-grade-label">Normal_B</div>
+                                        </div>
+                                        -->
+                                    </div>
+                                    <div class="flex-table-data-side"><button type="button" class="btn-data-modify set-grade">편집</button></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title"><div class="txt">연락처</div></div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner">
+                                        <?php echo $pay['cellphone'];?>
+                                    </div>
+                                    <div class="flex-table-data-side">
+                                        <div class="btn-ui-group">
+                                            <a href="tel:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                            <a href="sms:<?php echo $pay['cellphone'];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex-table-cell no-padding">
+                            <div class="flex-table-item">
+                                <div class="flex-table-title" style="display:flex; align-item: center; flex-direction:column;">
+                                    <div class="txt">보조 연락처</div>
+                                    <div class="call_edit" onclick="popalert.open('numberAddPop')"><span>편집</span></div>
+                                </div>
+                                <div class="flex-table-data">
+                                    <div class="flex-table-data-inner" style="flex-direction: column; align-items: normal">
+                                        <?php for($i=0;$i<count($tel_f['title']);$i++){ ?>
+                                            <div class="flex-table-item middle">
+                                                <div class="flex-table-data">
+                                                    <div class="flex-table-data-inner">
+                                                        <div class="flex-table-txt"><em><?php echo $tel_f['title'][$i];?></em><?php echo add_hyphen($tel_f['tel'][$i]);?></div>
+                                                    </div>
+
+
+                                                    <div class="flex-table-data-side">
+                                                        <div class="btn-ui-group">
+                                                            <a href="tel:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-tel">전화하기</button></a>
+                                                            <a href="sms:<?php echo $tel_f['tel'][$i];?>"><button type="button" class="btn-data-message">메시지보내기</button></a>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group-cell middle" style="margin-top:30px;">
+                        <div class="form-group-item">
+                            <div class="form-item-label mg-bt-12">
+                                견주관련 메모
+                                <span class="form-input-info margin">(고객에게는 노출되지 않습니다.)</span>
+                            </div>
+                            <div class="form-item-data">
+                                <textarea name="etc2_memo" id="etc2_memo" cols="30" rows="10"><?php echo $scm[0]['memo'];?></textarea>
+
+                            </div>
+                            <div class="form-item-data type-8">
+                                <button type="button" class="pc-mg-bt-20 btn btn-outline-purple btn-middle-size btn-round save-etc2 ft-size-17" data-cid="<?php echo $cus['id'];?>" data-aid="<?php echo $pay['artist_id'];?>" data-phone="<?php echo $pay['cellphone'];?>" data-tseq="<?php echo $cus['tmp_seq'];?>">저장</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <!-- //예약자 정보 -->
 
                 <!--이전 특이사항 -->
                 <?php
