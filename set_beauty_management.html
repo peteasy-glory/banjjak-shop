@@ -73,7 +73,7 @@ $memo = sql_fetch($rs);
 // 기본 요금제 호출 - 강아지
 $sql = "
 	SELECT * 
-	FROM tb_product_dog_common
+	FROM tb_product_dog_static
 	WHERE customer_id = '".$user_id."'
 ";
 $result = mysqli_query($connection, $sql);
