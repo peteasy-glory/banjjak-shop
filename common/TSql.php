@@ -58,8 +58,8 @@ class TReserveSql extends TSql{
                                                     SELECT  CONCAT(year,'-',LPAD(month, '2','0'),'-',LPAD(day, '2','0'),' ',LPAD(hour, '2','0'),':',LPAD(minute, '2','0')
                                                                 , '<br>', etc_memo, '<br>') AS grpMemo
                                                     FROM tb_payment_log 
-                                                    WHERE cellphone = '%s' AND artist_id = '%s'
-                                                        AND CONCAT(year,LPAD(month, '2','0'),LPAD(day, '2','0'),LPAD(hour, '2','0'),LPAD(minute, '2','0')) <= '%s'
+                                                    WHERE pet_seq = '%s' AND artist_id = '%s'
+                                                        AND CONCAT(year,LPAD(month, '2','0'),LPAD(day, '2','0'),LPAD(hour, '2','0'),LPAD(minute, '2','0')) < '%s'
                                                         AND TRIM(etc_memo) != ''
                                                     ORDER BY year DESC , month DESC , day DESC, hour DESC, minute DESC LIMIT 3
                                                 ) A";//ORDER BY payment_log_seq DESC  LIMIT 3

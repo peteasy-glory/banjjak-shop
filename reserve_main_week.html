@@ -734,7 +734,7 @@ $GetReservationChk = $reserve_sql->qry_get_reservation_chk($artist_id, $worker, 
 if(TFunc::checkPC() == "PC") {
     $memo_count = 0;
     foreach ($GetReservationChk as $val){
-        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['cellphone'], $artist_id, $val['reservation_date']);
+        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['pet_seq'], $artist_id, $val['reservation_date']);
         $GetReservationChk[$memo_count]['etc_memo'] = $tmp_memo[0]['before_memo'];
         $memo_count ++;
     }
