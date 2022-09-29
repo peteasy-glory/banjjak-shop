@@ -78,9 +78,15 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
 
 <!-- header -->
 <header id="header">
-    <div class="header-left">
-        <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
-    </div>
+    <?php
+    if($_SESSION['partner_pc'] != 1){
+    ?>
+        <div class="header-left">
+            <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+        </div>
+    <?php
+    }
+    ?>
     <div class="page-title">반짝 복지몰</div>
     <div class="header-right">
         <a href="shop_search_list" class="btn-page-ui btn-page-search"><div class="icon icon-size-24 icon-page-search">검색</div></a>
