@@ -461,7 +461,7 @@ if ($customer_cellphone && $customer_cellphone != "") {
                                             <div style="display:block" id="is_dog">
                                                 <select  name="pet_type" id="pet_type_dog">
                                                 <?php
-                                                $que = "SELECT * FROM tb_pet_type WHERE type = 'dog' ORDER BY name ASC ";
+                                                $que = "SELECT * FROM tb_pet_type WHERE type = 'dog' ORDER BY name = '기타' ASC, name ASC ";
                                                 //echo $que;
                                                 $arr = sql_fetch_array($que);
                                                 foreach($arr as $list){

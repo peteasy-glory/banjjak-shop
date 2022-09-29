@@ -91,7 +91,7 @@ $sql = " SELECT
             tb_pet_type pet
         WHERE 
             pet.type = 'dog'
-            AND pet.enable_flag=1 ORDER BY /*type_seq ASC,*/ name ASC
+            AND pet.enable_flag=1 ORDER BY /*type_seq ASC,*/ name = '기타' ASC, name ASC
     ";
 
 $pk = sql_fetch_array($sql);
@@ -103,7 +103,7 @@ $sql = " SELECT
             tb_pet_type pet
         WHERE 
             pet.type = 'cat'
-            AND pet.enable_flag=1 ORDER BY type_seq ASC, name ASC
+            AND pet.enable_flag=1 ORDER BY name = '기타' ASC, name ASC
     ";
 $cat = sql_fetch_array($sql);
 
