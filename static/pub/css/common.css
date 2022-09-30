@@ -317,6 +317,7 @@ html.fix {overflow:hidden;}
 .icon-set-menu-10 {width:36px; height:36px; background-image:url(../images/icon/icon-set-menu-10.png);}
 .icon-set-menu-11 {width:36px; height:36px; background-image:url(../images/icon/icon-set-menu-11.png);}
 .icon-set-menu-12 {width:36px; height:36px; background-image:url(../images/icon/icon-set-menu-12.png);}
+.icon-set-menu-13 {width:36px; height:36px; background-image:url(../images/icon/icon-set-menu-13.png);}
 .icon-set-menu-setting {width:36px; height:36px; background-image:url(../images/icon/icon-set-menu-setting.png);}
 .icon-share-middle-black {width:24px; height:24px; background-image:url(../images/icon/icon-share-middle-black.png);}
 .icon-close-small-black {width:16px; height:16px; background-image:url(../images/icon/10-ic-16-close@2x.png);}
@@ -4090,5 +4091,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	.shop-gate-picture-select .list-inner > .list-cell {width:14.28%;}
 	.master-portfolio-list .list-inner > li {width:14.28%;}
 	.set-hotel-shop-add .shop-gate-picture-select .list-inner > .list-cell {width:14.28%;}
+
+}
+
+
+
+
+#deposit_input{
+	background: url(/images/won.png) no-repeat;
+	background-size:25px;
+	background-position: right 17px center;
 
 }
