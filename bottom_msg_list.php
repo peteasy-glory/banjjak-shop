@@ -21,6 +21,19 @@
     #popup_wrap .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
     #popup_wrap .swiper-pagination-bullet { margin: 0px 5px; }
     #popup_wrap .swiper-pagination-bullet-active { background-color: #999; }
+    #popup_wrap2 { display: none; }
+    #popup_wrap2 .custom-modal-content { margin: 0px auto; width: 100%; }
+    #popup_wrap2 .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
+    #popup_wrap2 .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important; }
+    #popup_wrap2 .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap2 .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important }
+    #popup_wrap2 .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap2 .swiper-wrapper { height: auto; }
+    #popup_wrap2 .swiper-slide {  }
+    #popup_wrap2 .swiper-slide img { width: 100%; height: auto; vertical-align: top; }
+    #popup_wrap2 .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
+    #popup_wrap2 .swiper-pagination-bullet { margin: 0px 5px; }
+    #popup_wrap2 .swiper-pagination-bullet-active { background-color: #999; }
 </style>
 
 

@@ -591,12 +591,13 @@ $another_reserve = 0;
                                         #AND is_cancel = 0 
                                         AND approval = 1
                                         AND etc_memo != ''
-                                        AND pet_seq = '{$_GET['pet_seq']}'   
-                                        AND CONCAT(year,'-',month,'-',day) < DATE_FORMAT(NOW(),'%Y-%c-%e')
+                                        AND pet_seq = '{$_GET['pet_seq']}'
+                                        And Date_format(concat(year,'-',month,'-',day), '%y-%m-%d') < date_format(now(), '%y-%m-%d')
                                         ORDER BY  CONCAT(year,'-',month,'-',day) DESC
                                 ";
-                            //echo $sql;
+//                            echo $sql;
                             $arr = sql_fetch_array($sql);
+//                            echo $arr;
                             if(count($arr)>0){
                             foreach($arr as $rs){
                             ?>

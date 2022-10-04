@@ -1,0 +1,429 @@
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+
+
+$shop_title	= "예약금 설정";
+$header_right	= '';
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+?>
+<!-- container -->
+<section id="container">
+    <!-- page-body -->
+    <div class="page-body">
+        <!-- set-save-money -->
+        <div class="set-save-money"  id="shop_reserve">
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">예약금</h4>
+                </div>
+                <div class="form-group vmiddle">
+                    <div class="form-group-cell middle">
+                        <div class="form-group-item">
+                            <div class="form-item-data type-2">
+                                <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center;">
+                                    <input type="number" placeholder="최소 예약금은 1천원" min="0" id="deposit_input"><label style="margin-left:10px;"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">결제기한 설정</h4>
+                </div>
+                <div class="basic-data-group vvsmall2">
+                    <div class="form-group-item">
+                        <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px;">
+                            <select class="percent" id="deposit_time">
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">계좌입력</h4>
+                </div>
+                <div class="basic-data-group vvsmall2">
+                    <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center">
+                        <label style="margin-right:20px; min-width:80px;">은행명</label>
+                        <select class="percent" id="deposit_bank">
+
+                        </select>
+
+
+                    </div>
+                    <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center">
+
+                        <label style="margin-right:20px; min-width:80px">계좌번호</label>
+                        <input type="text" placeholder='" - " 포함'  type="number" min="0" id="deposit_bank_account">
+
+                    </div>
+                </div>
+            </div>
+            <div class="basic-data-group">
+                <div class="con-title-group">
+                    <h4 class="con-title">예약금 결제관리</h4>
+                </div>
+                <div class="basic-data-group vvsmall2">
+                    <div class="form-group-item">
+                        <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
+
+                            <span>수동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" checked onclick="return false;"><span class="bar"></span></label>
+                        </div>
+                        <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
+
+                            <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '열심히 오픈 준비중입니다. \n 조금만 기다려 주세요.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- //set-save-money -->
+    </div>
+    <!-- //page-body -->
+    <!-- page-bottom -->
+    <div class="page-bottom">
+        <!--
+        //	비활성화시
+        // - a태그는 disabled 클래스 추가
+        // - button 태그는 disabled 속성 추가
+        -->
+        <a href="#" class="btn-page-bottom deposit_btn" onclick="deposit_save(artist_id)">저장하기</a>
+    </div>
+    <!-- //page-bottom -->
+</section>
+<!-- //container -->
+
+<article id="reserveAcceptMsg1" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt" id="msg1_txt"></div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+<article id="reserveAcceptMsg2" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt" id="msg2_txt"></div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="location.reload()">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
+
+<script>
+    var artist_id = "<?=$artist_id ?>";
+
+
+    $(document).ready(function(){
+
+        $('#btn_page_prev').prop('href','set_main');
+
+        setInputFilter(document.getElementById("deposit_input"), function(value) {
+            return /^\d*\.?\d*$/.test(value);
+        })
+
+        for(let i=30; i<=1440; i+=30){
+            document.getElementById('deposit_time').innerHTML += `<option value=${i}>${minutes_to_hour(i)} 이내</option>`
+        }
+
+        get_deposit(artist_id);
+    })
+
+
+    function minutes_to_hour(minutes){
+
+        let hours = Math.floor(minutes/60);
+        let min = minutes%60;
+
+
+        return `${hours !== 0 ? hours : ''}${hours !== 0 ? '시간 ':''}${min !== 0 ? min : ''}${min !== 0 ? '분' :''}`
+
+    }
+
+    let banks = [
+        {
+            code : '003',
+            name : '기업은행'
+        },{
+            code : '004',
+            name : '국민은행'
+        },{
+            code : '011',
+            name : '농협중앙회회'
+        },{
+            code : '012',
+            name : '단위농협'
+        },{
+            code : '020',
+            name : '우리은행'
+        },{
+            code : '031',
+            name : '대구은행'
+        },{
+            code : '005',
+            name : '외환은행'
+        },{
+            code : '023',
+            name : 'SC제일은행'
+        },{
+            code : '032',
+            name : '부산은행'
+        },{
+            code : '045',
+            name : '새마을금고'
+        },{
+            code : '027',
+            name : '한국씨티은행'
+        },{
+            code : '034',
+            name : '광주은행'
+        },{
+            code : '039',
+            name : '경남은행'
+        },{
+            code : '007',
+            name : '수협'
+        },{
+            code : '048',
+            name : '신협'
+        },{
+            code : '037',
+            name : '전북은행'
+        },{
+            code : '035',
+            name : '제주은행'
+        },{
+            code : '064',
+            name : '산림조합'
+        },{
+            code : '071',
+            name : '우체국'
+        },{
+            code : '081',
+            name : '하나은행'
+        },{
+            code : '088',
+            name : '신한은행'
+        },{
+            code : '090',
+            name : '카카오뱅크'
+        },{
+            code : '209',
+            name : '동양종금증권'
+        },{
+            code : '243',
+            name : '한국투자증권'
+        },{
+            code : '240',
+            name : '삼성증권'
+        },{
+            code : '230',
+            name : '미래에셋'
+        },{
+            code : '247',
+            name : '우리투자증권'
+        },{
+            code : '218',
+            name : '현대증권'
+        },{
+            code : '266',
+            name : 'SK증권'
+        },{
+            code : '278',
+            name : '신한금융투자'
+        },{
+            code : '262',
+            name : '하이증권'
+        },{
+            code : '263',
+            name : 'HMC증권'
+        },{
+            code : '267',
+            name : '대신증권'
+        },{
+            code : '270',
+            name : '하나대투증권'
+        },{
+            code : '279',
+            name : '동부증권'
+        },{
+            code : '280',
+            name : '유진증권'
+        },{
+            code : '287',
+            name : '메리츠증권'
+        },{
+            code : '291',
+            name : '신영증권'
+        },{
+            code : '238',
+            name : '대우증권'
+        }
+
+    ]
+
+
+
+    banks.forEach(function(el){
+
+        document.getElementById('deposit_bank').innerHTML += `<option value="${el.name}" data-code="${el.code}">${el.name}</option>`
+    })
+
+
+
+    function setInputFilter(textbox, inputFilter) {
+        ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+            textbox.addEventListener(event, function() {
+                if (inputFilter(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                } else if (this.hasOwnProperty("oldValue")) {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                } else {
+                    this.value = "";
+                }
+            });
+        });
+    }
+
+
+    function deposit_save(id){
+
+
+        if(parseInt(document.getElementById('deposit_input').value) < 1000){
+
+            document.getElementById('msg1_txt').innerText = '최소 예약금은 1,000원 입니다.';
+            pop.open('reserveAcceptMsg1');
+            return;
+        }
+
+        $.ajax({
+
+            url:'/data/api.php',
+            type:'post',
+            data:{
+
+                mode:'deposit_save',
+                artist_id:id,
+                reserve_price:document.getElementById('deposit_input').value,
+                deadline:document.getElementById('deposit_time').value,
+                bank_name:document.getElementById('deposit_bank').value,
+                account_num:document.getElementById('deposit_bank_account').value
+            },success:function(res) {
+                console.log(res)
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+
+                    document.getElementById('msg2_txt').innerText = '저장되었습니다.'
+                    pop.open('reserveAcceptMsg2');
+
+                }
+
+
+            }
+
+        })
+
+
+    }
+
+    function get_deposit(id){
+
+
+        $.ajax({
+
+            url:'/data/api.php',
+            type:'post',
+            data:{
+
+                mode:'shop_reserve_get',
+                login_id:id,
+            },success:function(res) {
+                console.log(res)
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+                    console.log(body)
+
+
+                    document.getElementById('deposit_input').value = body[0].reserve_price;
+
+
+                    for(let i=0; i<document.getElementById('deposit_time').options.length; i++){
+
+                        if(body[0].deadline == document.getElementById('deposit_time').options[i].value){
+
+                            document.getElementById('deposit_time').options[i].selected = true;
+
+                        }
+                    }
+
+                    for(let i=0; i<document.getElementById('deposit_bank').options.length; i++){
+
+                        if(body[0].bank_name == document.getElementById('deposit_bank').options[i].value){
+
+                            document.getElementById('deposit_bank').options[i].selected = true;
+
+                        }
+                    }
+
+                    document.getElementById('deposit_bank_account').value = body[0].account_num;
+                }
+
+
+            }
+
+        })
+
+    }
+
+</script>
+<?
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

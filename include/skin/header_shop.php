@@ -299,6 +299,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 						<div class="list-cell" id="set_right"><a href="set_right" class="btn-single-item arrow"><div class="txt">권한 설정<div class="tag-item">접수 권한</div></div></a></div>
 						<div class="list-cell" id="set_teacher"><a href="set_teacher" class="btn-single-item arrow"><div class="txt">미용사 관리</div></a></div>
 						<div class="list-cell" id="set_beauty_management"><a href="set_beauty_management" class="btn-single-item arrow"><div class="txt">판매 상품 관리</div></a></div>
+                        <div class="list-cell" id="set_deposit"><a href="set_deposit" class="btn-single-item arrow"><div class="txt">예약금 설정</div></a></div>
 						<div class="list-cell" id="set_save_money"><a href="set_save_money" class="btn-single-item arrow"><div class="txt">적립금 설정</div></a></div>
 						<div class="list-cell" id="set_pay_type"><a href="set_pay_type" class="btn-single-item arrow"><div class="txt">결제 방식</div></a></div>
 					</div>
