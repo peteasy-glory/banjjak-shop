@@ -284,7 +284,7 @@ class Allimtalk{
             ."\n- 예약일시 : {$date}"
             ."\n\n2. 예약금 입금계좌"
             ."\n- 예약금 : {$pay}"
-            ."\n- {$bankName} / {$accountNum}"
+            ."\n- ".addslashes($bankName)." / ".addslashes($accountNum)
             ."\n- 결제기한 : {$deadLine}"
             ."\n\n▶ 결제기한 경과시 예약은 자동취소 되오니 기한 내 꼭 입금부탁드립니다.";
 

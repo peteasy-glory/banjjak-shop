@@ -321,6 +321,7 @@ if($chk_cnt < 1) {
     //$reservationTime = strtotime($_POST['year'].'-'.$_POST['month'].'-'.$_POST['day'].' '.$from_hour.':'.$from_min);
     $reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
 
+
     if ($reservationTime > $now && $_POST['alarm_yn'] == "Y" && $_POST['is_reserve_pay'] == '0') {
         $talk = new Allimtalk();
 
@@ -334,8 +335,33 @@ if($chk_cnt < 1) {
         $talkDate .= date("H시 i분", $reservationTime);
         $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$id;
         $talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
-    }else if($reservationTime > $now && $_POST['alarm_yn'] == "Y" && $_POST['is_reserve_pay'] == '1'){
+    }else if($reservationTime > $now  && $_POST['is_reserve_pay'] == '1'){
+        $talk2 = new Allimtalk();
 
+        $talk2->cellphone = $_POST['cellPhone'];
+
+
+
+        $week_arr = ['일', '월', '화', '수', '목', '금', '토'];
+        $talkDate = date("Y년 m월 d일", $reservationTime);
+        $talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";
+        $talkDate .= date("H시 i분", $reservationTime);
+
+        $date = $_POST['reserve_deposit_time_'];
+        $year = substr($date,0,4);
+        $month = substr($date,5,2);
+        $date_ = substr($date,8,2);
+        $hour = substr($date,11,2);
+        $min = substr($date,14,2);
+        $_date = $year.'년 '.$month.'월 '.$date_.'일 '.$hour.'시 '.$min.'분';
+
+
+        $pay = $_POST['deposit_input'].'원';
+
+
+
+        $talkBtnLink = "";
+        $talkResult = $talk2->sendReservePay($_POST['pet_name'],$_POST['shopName'],$pay,$talkDate,$_POST['bank_name'],$_POST['bank_account'],$_date);
 
     }
 }
