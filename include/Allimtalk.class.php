@@ -273,4 +273,22 @@ class Allimtalk{
         return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
     }
 
+    // 예약금 안내
+    public function sendReservePay($petName, $shopName, $pay, $date, $bankName, $accountNum, $deadLine){
+        $templateNo = "20016_2";
+        $message =
+            "{$petName} 보호자님"
+            ."\n{$shopName}에서 {$petName} 미용예약 확정을 위한 예약금 입금 안내를 드립니다."
+            ."\n\n저희 {$shopName}에서는 예약금 {$pay} 입금 후에 예약이 확정됩니다."
+            ."\n\n1. 예약내용"
+            ."\n- 예약일시 : {$date}"
+            ."\n\n2. 예약금 입금계좌"
+            ."\n- 예약금 : {$pay}"
+            ."\n- {$bankName} / {$accountNum}"
+            ."\n- 결제기한 : {$deadLine}"
+            ."\n\n▶ 결제기한 경과시 예약은 자동취소 되오니 기한 내 꼭 입금부탁드립니다.";
+
+        return $this->sendMessage($templateNo, $message);
+    }
+
 }
