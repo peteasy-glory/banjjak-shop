@@ -1217,6 +1217,7 @@ if(count($arr_holiday)>0){
                                                                             <?php
                                                                                 $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$chk_rev[$a]['payment_log_seq']}";
                                                                                 $paq = sql_fetch_array($que);
+//                                                                                echo print_r($paq[0]);
                                                                             if(!empty($binfo[3]) && $binfo[3]!='all:0'){
                                                                                 ?>
                                                                                 <div class="item-cash">
@@ -1258,6 +1259,12 @@ if(count($arr_holiday)>0){
                                                                             <?php } else { ?>
                                                                                 <div class="item-master" style="left:0"><div class="icon icon-reservation-selfadd"></div></div>
                                                                             <?php }} ?>
+                                                                            <?php if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 0){
+
+                                                                                echo '<div class="deposit-icon">예</div>';
+                                                                           }else if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 1){
+                                                                                echo '<div class="deposit-icon-fin">예</div>';
+                                                                            } ?>
                                                                     </div>
                                                                     <!-- 해당 일자 일정 표시 끝-->
                                                                     <?php
@@ -2355,6 +2362,21 @@ if(count($arr_holiday)>0){
         })
 
 
+        Array.from(document.getElementsByClassName('deposit-icon')).forEach(function(el){
+
+            if(el.parentElement.offsetHeight > 120){
+
+                el.style.display = 'flex'
+            }
+        })
+
+        Array.from(document.getElementsByClassName('deposit-icon-fin')).forEach(function(el){
+
+            if(el.parentElement.offsetHeight > 120){
+
+                el.style.display = 'flex'
+            }
+        })
 
     })
 

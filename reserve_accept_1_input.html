@@ -2271,6 +2271,9 @@ if ($customer_cellphone && $customer_cellphone != "") {
                 alert("미용 시간을 확인해주세요.");
                 return false;
             }
+            document.getElementById('notice_check').checked = false;
+            document.getElementById('alarm_yn').value = 'N'
+            document.getElementById('notice_check_span').innerText ='미발송'
             console.log('알람없이 저장');
             pop.open('reserveCalendarPop11');
             //document.f.submit();
@@ -2282,6 +2285,9 @@ if ($customer_cellphone && $customer_cellphone != "") {
                 alert("미용 시간을 확인해주세요.");
                 return false;
             }
+            document.getElementById('notice_check').checked = true;
+            document.getElementById('alarm_yn').value = 'Y'
+            document.getElementById('notice_check_span').innerText ='발송'
             console.log('알람 저장')
             pop.open('reserveCalendarPop11');
             //document.f.submit();

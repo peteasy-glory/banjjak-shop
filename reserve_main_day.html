@@ -1031,6 +1031,12 @@ $await_cnt = $gram[0]['cnt'];
                                                                                 <?php } else { ?>
                                                                                     <div class="item-master" style="left:0"><div class="icon icon-reservation-selfadd"></div></div>
                                                                                 <?php }} ?>
+                                                                                <?php if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 0){
+
+                                                                                    echo '<div class="deposit-icon">예</div>';
+                                                                                }else if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 1){
+                                                                                    echo '<div class="deposit-icon-fin">예</div>';
+                                                                                } ?>
                                                                             </div>
                                                                             <div class="item-memo"><?php echo $chk_rev[$a]['etc_memo']?></div>
                                                                         </div>
@@ -2138,6 +2144,21 @@ $await_cnt = $gram[0]['cnt'];
                 }
             })
 
+            Array.from(document.getElementsByClassName('deposit-icon')).forEach(function(el){
+
+                if(el.parentElement.parentElement.parentElement.offsetHeight > 120 && el.parentElement.parentElement.parentElement.offsetWidth > 70){
+
+                    el.style.display = 'flex'
+                }
+            })
+
+            Array.from(document.getElementsByClassName('deposit-icon-fin')).forEach(function(el){
+                if(el.parentElement.parentElement.parentElement.offsetHeight > 120 && el.parentElement.parentElement.parentElement.offsetWidth > 70){
+
+                    el.style.display = 'flex'
+                }
+            })
+
 
 
         })
@@ -2147,6 +2168,8 @@ $await_cnt = $gram[0]['cnt'];
 
             sessionStorage.removeItem('waiting');
         },300)
+
+
 
     </script>
 

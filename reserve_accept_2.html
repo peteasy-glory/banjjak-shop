@@ -387,6 +387,44 @@ $cat = sql_fetch_array($sql);
                                 </div>
                             </div>
 
+                            <div class="basic-data-group">
+                                <div class="con-title-group" style="justify-content: flex-start;">
+                                    <h4 class="con-title">예약금 안내발송</h4>
+                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick="deposit_toggle(artist_id); if(this.checked === true){document.getElementById('is_reserve_pay').value = 1;}else{document.getElementById('is_reserve_pay').value=0;}"><span class="bar"></span></label>
+
+                                </div>
+                                <div class="form-group" id="deposit_form_1" style="display:none;">
+                                    <div class="grid-layout margin-14-17">
+                                        <div class="grid-layout-inner">
+                                            <div class="grid-layout-cell grid-2">
+                                                <div class="form-group-item">
+                                                    <div class="form-item-label">예약금</div>
+                                                    <div class="form-item-data type-2">
+                                                        <div class="form-datepicker-group">
+                                                            <div class="form-datepicker">
+                                                                <input type="number" name="deposit_input" placeholder="최소 예약금은 1천원" min="0" value="0" class="deposit_input" style="max-width:150px;" id="reserve_deposit_input">
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="grid-layout-cell grid-2">
+                                                <div class="form-group-item">
+                                                    <div class="form-item-label">결제기한 설정</div>
+                                                    <div class="form-item-data type-2">
+                                                        <div class="form-datepicker-group">
+                                                            <div class="form-datepicker">
+                                                                <select id="reserve_deposit_time" name="reserve_deposit_time" value="" style="max-width:150px;">
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
                             <div class="basic-data-group" id="is_dog" style="display:block" >
                                 <div class="con-title-group">
@@ -967,8 +1005,8 @@ $cat = sql_fetch_array($sql);
             <div class="page-bottom">
                 <div class="grid-layout btn-grid-group">
                     <div class="grid-layout-inner">
-                        <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round" id="no_alarm_save_btn">알림없이 등록</a></div>
-                        <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round" id="alarm_save_btn">등록</a></div>
+                        <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round reserve_regist_btn" id="reserve_regist_1">알림없이 등록</a></div>
+                        <div class="grid-layout-cell grid-2"><a href="javascript:;" class="btn btn-outline-purple btn-middle-size btn-round reserve_regist_btn" id="reserve_regist_2">등록</a></div>
                     </div>
                 </div>
             </div>
@@ -1032,6 +1070,153 @@ $cat = sql_fetch_array($sql);
                         <div class="pop-footer">
                             <button type="button" class="btn btn-confirm btn-reserv-block" onclick="popalert.close();">확인</button>
 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="deposit_confirm" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">먼저 예약금 설정을 해주세요. <br> 지금 설정하시겠습니까?</div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-cf" onclick="pop.open('deposit_set'); pop.close('deposit_confirm')">확인</button>
+                            <button type="button" class="btn btn-confirm btn-cc" onclick="document.getElementById('deposit_btn').checked = false; pop.close();">취소</button>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </article>
+
+
+        <article id="deposit_set" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data middle" >
+                        <div class="pop-body" style="flex-direction: row">
+
+                            <div class="set-save-money"  id="shop_reserve">
+                                <div class="basic-data-group">
+                                    <div class="con-title-group">
+                                        <h4 class="con-title">예약금</h4>
+                                    </div>
+                                    <div class="form-group vmiddle">
+                                        <div class="form-group-cell middle">
+                                            <div class="form-group-item">
+                                                <div class="form-item-data type-2" style="margin-top:0px; padding-top:0px;">
+                                                    <div class="form-item-data type-2" style="margin-top:0px; padding-top:0px; display: flex; align-items: center;">
+                                                        <input type="number" placeholder="최소 예약금은 1천원" min="0" id="deposit_input"><label style="margin-left:10px;"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="basic-data-group" style="margin-top:20px;">
+                                    <div class="con-title-group">
+                                        <h4 class="con-title">결제기한 설정</h4>
+                                    </div>
+                                    <div class="basic-data-group vvsmall2">
+                                        <div class="form-group-item">
+                                            <div class="form-item-data type-2" style="margin-top:0px; padding-top:0px;">
+                                                <select class="percent" id="deposit_time">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="basic-data-group" style="margin-top:20px;">
+                                    <div class="con-title-group">
+                                        <h4 class="con-title">계좌입력</h4>
+                                    </div>
+                                    <div class="basic-data-group vvsmall2">
+                                        <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center">
+                                            <label style="margin-right:20px; min-width:80px;">은행명</label>
+                                            <select class="percent" id="deposit_bank">
+
+                                            </select>
+
+
+                                        </div>
+                                        <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center">
+
+                                            <label style="margin-right:20px; min-width:80px">계좌번호</label>
+                                            <input type="text" placeholder='" - " 포함'  type="number" min="0" id="deposit_bank_account">
+
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="basic-data-group" style="margin-top:20px;">
+                                    <div class="con-title-group">
+                                        <h4 class="con-title">예약금 결제관리</h4>
+                                    </div>
+                                    <div class="basic-data-group vvsmall2">
+                                        <div class="form-group-item">
+                                            <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
+
+                                                <span>수동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" checked onclick="return false;"><span class="bar"></span></label>
+                                            </div>
+                                            <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
+
+                                                <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '열심히 오픈 준비중입니다. \n 조금만 기다려 주세요.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" style="background:#fdd94e;" onclick="deposit_save(artist_id); document.getElementById('deposit_set').classList.remove('actived'); document.getElementById('deposit_confirm').classList.remove('actived'); document.getElementById('deposit_btn').checked = false;">저장</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="reserveAcceptMsg1" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt" id="msg1_txt"></div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="pop.close(); pop.close('reserveCalendarPop11')">확인</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </article>
+        <article id="reserveCalendarPop11" class="layer-pop-wrap">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="toggle-wrap">
+                                <div class="msg-txt">예약접수 알림</div>
+                                <label for="switch-toggle" class="form-switch-toggle" style="margin-left:5px; margin-right:10px;"><input type="checkbox" id="notice_check" onclick="if(this.checked===true){document.getElementById('notice_check_span').innerText = '발송'; document.getElementById('alarm_yn').value = 'Y';}else{document.getElementById('notice_check_span').innerText ='미발송';document.getElementById('alarm_yn').value = 'N'}"><span class="bar"></span></label>
+                                <span  class="notice_span" id="notice_check_span">미발송</span>
+
+                            </div>
+                            <div class="toggle-wrap" id="deposit_notice" style="display:none;">
+                                <div class="msg-txt">예약금 안내</div>
+                                <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px; margin-right:10px;"><input type="checkbox" checked id="deposit_check" onclick="if(this.checked===true){document.getElementById('deposit_check_span').innerText = '발송'; document.getElementById('deposit_check').value ='Y'}else{document.getElementById('deposit_check_span').innerText ='미발송'; document.getElementById('deposit_check').value ='N'} "><span class="bar"></span></label>
+                                <span class="notice_span" id="deposit_check_span">발송</span>
+                            </div>
+                            <div class="toggle-wrap">
+                                <div class="msg-txt">하루전 알림</div>
+                                <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px; margin-right:10px;"><input type="checkbox" checked id="yesterday_check" onclick="if(this.checked===true){document.getElementById('yesterday_check_span').innerText = '발송'; document.getElementById('befor_day_alarm_yn').value ='Y'}else{document.getElementById('yesterday_check_span').innerText ='미발송'; document.getElementById('befor_day_alarm_yn').value = 'N'}"><span class="bar"></span></label>
+                                <span  class="notice_span" id="yesterday_check_span">발송</span>
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm btn-reserv-block" onclick="confirm_send_reserv()">확인</button>
+                            <button type="button" class="btn btn-confirm btn-reserv-send" onclick="pop.close()">취소</button>
                         </div>
                     </div>
                 </div>
@@ -1556,7 +1741,7 @@ $cat = sql_fetch_array($sql);
             }
         }
         //알람없이 저장
-        $(document).on('click','#no_alarm_save_btn',function(){
+        $(document).on('click','#reserve_regist_1',function(){
             /*if($('#cellphone').val() == ''){
                 popalert.open('reserveCalendarPop22')
                 $('#cellphone').focus();
@@ -1586,15 +1771,15 @@ $cat = sql_fetch_array($sql);
                 alert('몸무게를 선택해 주세요.')
                 return false;
             }
-
-            $('#alarm_yn').val('N');
-            $('#reserveCalendarPop2').find('.msg-txt').text('미용 예약 하루 전 알림은 발송 하시겠습니까?');
-            pop.open('reserveCalendarPop2');
+            document.getElementById('notice_check').checked = false;
+            document.getElementById('alarm_yn').value = 'N'
+            document.getElementById('notice_check_span').innerText ='미발송'
+            pop.open('reserveCalendarPop11');
             //document.f.submit();
         });
 
         //저장
-        $(document).on('click','#alarm_save_btn',function(){
+        $(document).on('click','#reserve_regist_2',function(){
             if($('#id_use_yn').val() == 'y' || $('#cellphone').val() == ''){
                 alert('전화번호를 확인해주세요.');
                 $('#cellphone').focus();
@@ -1619,10 +1804,11 @@ $cat = sql_fetch_array($sql);
                 alert('몸무게를 선택해 주세요.')
                 return false;
             }
-            
-            $('#alarm_yn').val('Y');
-            $('#reserveCalendarPop2').find('.msg-txt').text('미용 예약 하루 전 알림도 발송 하시겠습니까?');
-            pop.open('reserveCalendarPop2');
+
+            document.getElementById('notice_check').checked = true;
+            document.getElementById('alarm_yn').value = 'Y'
+            document.getElementById('notice_check_span').innerText ='발송'
+            pop.open('reserveCalendarPop11');
             //document.f.submit();
         });
 
