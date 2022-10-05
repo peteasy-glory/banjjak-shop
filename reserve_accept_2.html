@@ -120,8 +120,11 @@ $cat = sql_fetch_array($sql);
             <input type="hidden" name="customer_id" id="customer_id" value="">
             <input type="hidden" name="coupon_seq" id="coupon_seq" value="">
             <input type="hidden" name="alarm_yn" id="alarm_yn" value="Y">
+            <input type="hidden" name="deposit_check" id="deposit_check" value="Y">
+            <input type="hidden" name="is_reserve_pay" id="is_reserve_pay" value="0">
             <input type="hidden" name="befor_day_alarm_yn" id="befor_day_alarm_yn" value="Y">
             <input type="hidden" name="backurl" id="alarm_yn" value="<?php echo $backurl;?>">
+            <input type="hidden" name="reserve_deposit_time_" id="reserve_deposit_time_" value="">
             <input type="hidden" name="id_use_yn" id="id_use_yn" value="y">
             <input type="hidden" name="pet_seq" id="pet_seq" value="">
 
@@ -1040,6 +1043,19 @@ $cat = sql_fetch_array($sql);
     <!-- //container -->
     <script>
 
+        let artist_id = `<?=$shop_id?>`
+        for(let i=30; i<=1440; i+=30){
+            document.getElementById('reserve_deposit_time').innerHTML += `<option value=${i}>${minutes_to_hour(i)} 이내</option>`
+        }
+
+        for(let i=30; i<=1440; i+=30){
+            document.getElementById('deposit_time').innerHTML += `<option value=${i}>${minutes_to_hour(i)} 이내</option>`
+        }
+        bank_names.forEach(function(el){
+
+            document.getElementById('deposit_bank').innerHTML += `<option value="${el.name}" data-code="${el.code}">${el.name}</option>`
+        })
+
         // 고양이 미용 선택 선택시 선택해제(완전 래퍼)
         var beforeChecked = -1;
         $("input[name='hair']").click(function(){
@@ -1065,8 +1081,7 @@ $cat = sql_fetch_array($sql);
         });
 
         var keep_going = true;
-        function confirm_send_reserv(msg){
-            $('#befor_day_alarm_yn').val(msg);
+        function confirm_send_reserv(){
             pop.close();
             if(keep_going == true){
                 document.f.submit();
@@ -1732,6 +1747,22 @@ $cat = sql_fetch_array($sql);
             $('.cat-weight').css('display','none');
             $('.kg_'+g).css('display','block');
         }
+
+        $(document).ready(function(){
+
+            document.getElementById('reserve_deposit_time').addEventListener('change',function(){
+
+                let time = parseInt(document.getElementById('reserve_deposit_time').value);
+
+                let deposit_time = new Date();
+
+                deposit_time.setMinutes(deposit_time.getMinutes()+time);
+
+
+                document.getElementById('reserve_deposit_time_').value = `${deposit_time.getFullYear()}-${fill_zero(deposit_time.getMonth()+1)}-${fill_zero(deposit_time.getDate())} ${fill_zero(deposit_time.getHours())}:${fill_zero(deposit_time.getMinutes())}:${fill_zero(deposit_time.getSeconds())}`
+            })
+
+        })
     </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/footer_shop.php");

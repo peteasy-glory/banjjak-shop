@@ -301,7 +301,11 @@ if($chk_cnt < 1) {
     $que .= "product            = '{$product}', ";
     $que .= "reserve_yn         = '{$_POST['alarm_yn']}', ";
     $que .= "a_day_ago_yn       = '{$_POST['befor_day_alarm_yn']}', ";
-    $que .= "buy_time           = NOW() ";
+    $que .= "buy_time           = NOW(), ";
+    $que .= "is_reserve_pay           = {$_POST['is_reserve_pay']}, ";
+    $que .= "reserve_pay_price           = {$_POST['deposit_input']}, ";
+    $que .= "reserve_pay_deadline           = '{$_POST['reserve_deposit_time_']}' ";
+
     //echo $que . "<br>";
     $product_res = sql_query($que);
     $id = mysqli_insert_id($connection);

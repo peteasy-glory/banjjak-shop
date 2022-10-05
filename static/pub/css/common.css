@@ -4103,3 +4103,23 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	background-position: right 17px center;
 
 }
+
+.deposit_input{
+	background: url(/images/won.png) no-repeat;
+	background-size:25px;
+	background-position: right 17px center;
+
+}
+.toggle-wrap{
+
+	display: flex;
+	align-items: center;
+	align-content: center;
+	justify-content: space-between;
+	width: 80%;
+	margin-bottom: 12px;
+}
+
+.notice_span{
+	width: 40px;
+}

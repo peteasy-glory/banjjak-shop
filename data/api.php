@@ -60,6 +60,13 @@ if($r_mode) {
 
         $return_data = array("code"=>"000000","data"=>$result);
 
+    }else if($r_mode === 'get_deposit'){
+
+        $artist_id = $_POST['artist_id'];
+
+        $result = $api -> get('/partner/reserve/shop-reserve/'.$artist_id);
+
+        $return_data = array("code"=>"000000","data"=>$result);
     }
 }
 
