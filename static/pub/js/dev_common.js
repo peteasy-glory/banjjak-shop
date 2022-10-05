@@ -618,3 +618,47 @@ function fill_zero(time){
 
 	return time;
 }
+
+function deposit_finish(target){
+
+	let payment_idx = target.getAttribute('data-payment_idx');
+
+	$.ajax({
+
+		url:'/data/api.php',
+		type:'post',
+		data:{
+			mode:'deposit_finish',
+			payment_log_seq:payment_idx,
+		},
+		success:function(res) {
+			let response = JSON.parse(res);
+			let head = response.data.head;
+			let body = response.data.body;
+			if (head.code === 401) {
+				pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+			} else if (head.code === 200) {
+				console.log(body)
+
+				target.checked = true;
+				let date_ = new Date();
+				document.getElementById('pay_deposit_title').innerText = '예약금 입금완료';
+				document.getElementById('pay_deposit_title').classList.add('actived');
+				document.getElementById('pay_deposit_date').innerText = `(입금처리 : ${date_.getFullYear()}. ${fill_zero(date_.getMonth()+1)}. ${fill_zero(date_.getDate())}. ${am_pm_check(date_.getHours())}시 ${fill_zero(date_.getMinutes())}분)`
+
+			}
+		}
+	})
+}
+function am_pm_check(hours){
+
+	if(hours > 12){
+		hours = `오후 ${(hours-12).toString().length <2 ? '0' : ''}${hours-12}`
+	}else if(hours === 12){
+		hours = `오후 ${hours}`
+	}else{
+		hours = `오전 ${hours}`
+	}
+
+	return hours;
+}

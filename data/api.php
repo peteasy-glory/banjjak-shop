@@ -67,6 +67,18 @@ if($r_mode) {
         $result = $api -> get('/partner/reserve/shop-reserve/'.$artist_id);
 
         $return_data = array("code"=>"000000","data"=>$result);
+    }else if($r_mode === 'deposit_finish') {
+
+
+        $payment_log_seq = $_POST['payment_log_seq'];
+
+        $data = array('payment_log_seq' => $payment_log_seq);
+
+        $data_json = json_encode($data);
+
+        $result = $api->put('/partner/reserve/payment-reserve', $data_json);
+
+        $return_data = array("code" => "000000", "data" => $result);
     }
 }
 

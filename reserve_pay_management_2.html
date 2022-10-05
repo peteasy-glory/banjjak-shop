@@ -595,6 +595,8 @@ if(empty($grade[0]['grade_name'])){
 
             </div>
             <div class="reserve-pay-management">
+
+
                 <?php
                 if($pay['status'] == 'R1' && ($pay['total_price']+$pay['spend_point']) > 0){
                     ?>
@@ -603,7 +605,39 @@ if(empty($grade[0]['grade_name'])){
                     </div>
                     <?php
                 }
+
                 ?>
+                
+                <?php 
+                
+                if($pay['is_reserve_pay'] == 1 && $pay['reserve_pay_yn'] == 0){
+
+                    echo '<div class="pay-card-content-0" id="pay_card_content_0">
+                                            <div class="pay-deposit-box">
+                                                <div class="pay-deposit-title" id="pay_deposit_title">예약금 미입금</div>
+
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" id="pay_deposit_btn" data-payment_idx="'.$pay['payment_log_seq'].'" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                            </div>
+                                            <div class="pay-deposit-date" id="pay_deposit_date">
+                                            </div>
+                                        </div>';
+                }else if($pay['is_reserve_pay'] == 1 && $pay['reserve_pay_yn'] == 1){
+                    echo '<div class="pay-card-content-0" id="pay_card_content_0">
+                                            <div class="pay-deposit-box">
+                                                <div class="pay-deposit-title actived" id="pay_deposit_title">예약금 입금완료</div>
+
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" checked id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                            </div>
+                                            <div class="pay-deposit-date" id="pay_deposit_date">'.$pay['reserve_pay_confirm_time'].'
+                                            
+                                            </div>
+                                        </div>';
+
+                }
+                ?>
+
+
+
 
                 <!-- 예약동물 정보 -->
                 <div class="basic-data-group">
@@ -2739,6 +2773,16 @@ if(empty($grade[0]['grade_name'])){
 
                                     </div>
                                 <?php } ?>
+
+                                <?php
+                                if($pay['is_reserve_pay'] == 1 && $pay['reserve_pay_yn'] == 1){
+                                    ?>
+                                    <div class="list-cell">
+                                        <div class="list-title"><strong style="color: #ff4848">예약금 선입금</strong></div>
+                                        <div class="list-value"><strong style="color: #ff4848">(-)<span id="total_reserve_price" style="color: #ff4848"><?php echo ($pay['reserve_pay_price']>0)?number_format($pay['reserve_pay_price']):'0';?></span>원</strong></div>
+
+                                    </div>
+                                <?php } ?>
                             </div>
                         </div>
                         <div class="receipt-buy-detail result-price">
@@ -2748,8 +2792,9 @@ if(empty($grade[0]['grade_name'])){
                                     <div class="list-value font-color-red"><strong id="total_pay_price_disp">
                                             <?php
                                             $t1 = ($sum+$vat)-str_replace(",","",$discount_price)-$pay['reserve_point'];
+                                            $t2 = ($pay['reserve_pay_price']>0) ? $pay['reserve_pay_price'] : 0;
                                             //echo number_format($t1);
-                                            echo number_format($pay['local_price']+$pay['local_price_cash']);
+                                            echo number_format($pay['local_price']+$pay['local_price_cash']-$t2);
                                             ?>
                                             원</strong></div>
                                     <input type="hidden" name="total_pay_price" id="total_pay_price" value="<?php echo $t1;?>" size="3">

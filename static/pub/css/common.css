@@ -4161,3 +4161,30 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	align-items: center;
 	font-weight: 500;
 }
+
+.pay-deposit-box{
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+
+
+}
+
+.pay-deposit-title{
+	margin-left:20px;
+	color:#ff4848;
+	font-size:17px;
+	font-weight:700;
+}
+
+.pay-deposit-title.actived{
+	color:#6840b1
+}
+
+.pay-deposit-date{
+	display:flex;
+	font-size: 15px;
+	justify-content: flex-end;
+	margin-right: 20px;
+	margin-top: 10px;
+}
