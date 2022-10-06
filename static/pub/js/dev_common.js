@@ -622,7 +622,20 @@ function fill_zero(time){
 function deposit_finish(target){
 
 	let payment_idx = target.getAttribute('data-payment_idx');
+	let allim = target.getAttribute('data-allim');
 
+	let beauty_date = target.getAttribute('data-date');
+	let cellphone = target.getAttribute('data-cellphone');
+	let name = target.getAttribute('data-pet_name');
+
+	let year = target.getAttribute('data-year');
+	let month = target.getAttribute('data-month');
+	let day = target.getAttribute('data-day');
+
+	let hour = target.getAttribute('data-hour');
+	let min = target.getAttribute('data-min');
+
+	let shop_name = target.getAttribute('data-shop_name');
 	$.ajax({
 
 		url:'/data/api.php',
@@ -639,7 +652,39 @@ function deposit_finish(target){
 				pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
 			} else if (head.code === 200) {
 				console.log(body)
+				if(allim == 1){
 
+					document.getElementById('pay_deposit_btn').setAttribute('data-allim','0')
+					let message = `반려생활의 단짝, 반짝에서 ${cellphone.slice(-4)}님의 ${name} 미용예약 내용을 알려드립니다.\n` +
+						'\n' +
+						`- 예약펫샵 : ${shop_name}\n` +
+						`- 예약일시 : ${year}년 ${month}월 ${day}일 ${hour}시 ${min}분\n` +
+						'\n' +
+						'예약내용 상세확인과 예약은\n' +
+						'반려생활의 단짝, 반짝에서도 가능합니다.';
+
+
+
+					$.ajax({
+
+						url:'/data/api.php',
+						type:'post',
+						data:{
+
+							mode:'reserve_regist_allim',
+							cellphone:cellphone,
+							message:message,
+							payment_idx:body.idx,
+
+
+						},success:function(res){
+
+
+
+						}
+					})
+
+				}
 				target.checked = true;
 				let date_ = new Date();
 				document.getElementById('pay_deposit_title').innerText = '예약금 입금완료';

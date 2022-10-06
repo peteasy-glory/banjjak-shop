@@ -18,8 +18,6 @@ $yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
 $mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
 $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
-
-
 $shop_title	= "작업 / 결제관리";
 $header_right	= '
 	
@@ -239,6 +237,10 @@ if(empty($grade[0]['grade_name'])){
     $grade[0]['grade_name'] = $gd[1]['grade_name']; // 값 없을때 vip로 보이게
     $grade[0]['grade_ord'] = $gd[1]['grade_ord']; // 값 없을때 1(vip)로 주기
 }
+
+$que = "SELECT * FROM tb_shop WHERE customer_id = '{$artist_id}'";
+$res = sql_query($que);
+$r = sql_fetch($res);
 
 
 ?>
@@ -606,9 +608,12 @@ if(empty($grade[0]['grade_name'])){
                     <?php
                 }
 
+
                 ?>
                 
-                <?php 
+                <?php
+
+                $pet_name = explode('|',$pay['product'])[0];
                 
                 if($pay['is_reserve_pay'] == 1 && $pay['reserve_pay_yn'] == 0){
 
@@ -616,19 +621,33 @@ if(empty($grade[0]['grade_name'])){
                                             <div class="pay-deposit-box">
                                                 <div class="pay-deposit-title" id="pay_deposit_title">예약금 미입금</div>
 
-                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" id="pay_deposit_btn" data-payment_idx="'.$pay['payment_log_seq'].'" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" id="pay_deposit_btn" data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="1" data-shop_name="'.$r['name'].'" onclick="deposit_finish(this)"><span class="bar"></span></label>
                                             </div>
                                             <div class="pay-deposit-date" id="pay_deposit_date">
                                             </div>
                                         </div>';
                 }else if($pay['is_reserve_pay'] == 1 && $pay['reserve_pay_yn'] == 1){
+
+                    $confirm_year = substr($pay['reserve_pay_confirm_time'],0,4);
+                    $confirm_month = substr($pay['reserve_pay_confirm_time'],5,2);
+                    $confirm_date = substr($pay['reserve_pay_confirm_time'],8,2);
+                    $confirm_hour = substr($pay['reserve_pay_confirm_time'],11,2);
+                    if($confirm_hour > 12){
+                        $confirm_hour1 = '오후 '.(intval($confirm_hour)-12);
+                    }else if($confirm_hour == 12){
+                        $confirm_hour1 = '오후 '.$confirm_hour;
+                    }else{
+                        $confirm_hour1 = '오전 '.$confirm_hour;
+                    }
+                    $confirm_min = substr($pay['reserve_pay_confirm_time'],14,2);
+
                     echo '<div class="pay-card-content-0" id="pay_card_content_0">
                                             <div class="pay-deposit-box">
                                                 <div class="pay-deposit-title actived" id="pay_deposit_title">예약금 입금완료</div>
 
-                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" checked id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" checked data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="0"  data-shop_name="'.$r['name'].'" id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
                                             </div>
-                                            <div class="pay-deposit-date" id="pay_deposit_date">'.$pay['reserve_pay_confirm_time'].'
+                                            <div class="pay-deposit-date" id="pay_deposit_date">(입금처리 : '.$confirm_year.'. '.$confirm_month.'. '.$confirm_date.'. '.$confirm_hour1.'시 '.$confirm_min.'분)
                                             
                                             </div>
                                         </div>';
