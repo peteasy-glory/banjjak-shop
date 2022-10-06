@@ -37,8 +37,19 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					<div class="grid-layout-cell grid-2"><a href="set_right" class="btn-set-main-menu"><div class="txt">권한 설정</div><div class="icon icon-set-menu-2"></div></a></div>
 					<div class="grid-layout-cell grid-2"><a href="set_teacher" class="btn-set-main-menu"><div class="txt">미용사 관리</div><div class="icon icon-set-menu-3"></div></a></div>
 					<div class="grid-layout-cell grid-2"><a href="set_beauty_management" class="btn-set-main-menu"><div class="txt">상품 관리</div><div class="icon icon-set-menu-4"></div></a></div>
-					<div class="grid-layout-cell grid-2"><a href="set_deposit" class="btn-set-main-menu"><div class="txt">예약금 설정</div><div class="icon icon-set-menu-13"></div></a></div>
-					<div class="grid-layout-cell grid-2"><a href="set_save_money" class="btn-set-main-menu"><div class="txt">적립금 설정</div><div class="icon icon-set-menu-5"></div></a></div>
+
+                    <?php
+                    if($user_id =='itseokbeom@gmail.com'){
+
+
+
+                    ?>
+                        <div class="grid-layout-cell grid-2"><a href="set_deposit" class="btn-set-main-menu"><div class="txt">예약금 설정</div><div class="icon icon-set-menu-13"></div></a></div>
+                            <?php }?>
+
+                    <div class="grid-layout-cell grid-2"><a href="javascript:pop.open('deposit_pop')" class="btn-set-main-menu"><div class="txt">예약금 설정</div><div class="icon icon-set-menu-13"></div></a></div>
+
+                    <div class="grid-layout-cell grid-2"><a href="set_save_money" class="btn-set-main-menu"><div class="txt">적립금 설정</div><div class="icon icon-set-menu-5"></div></a></div>
 					<div class="grid-layout-cell grid-2"><a href="set_pay_type" class="btn-set-main-menu"><div class="txt">결제 방식</div><div class="icon icon-set-menu-6"></div></a></div>
                     <div class="grid-layout-cell grid-2"><a href="set_notice" class="btn-set-main-menu"><div class="txt">알림 / 표시 관리</div><div class="icon icon-set-menu-setting"></div></a></div>
 				</div>

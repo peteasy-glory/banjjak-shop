@@ -4840,6 +4840,412 @@ $r = sql_fetch($res);
 
 
 
+        function deposit_toggle(id){
+
+
+
+
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+
+                    mode:'get_deposit',
+                    artist_id:id
+                },success:function(res) {
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+                        console.log(body)
+
+                        if(body.length >0){
+                            if(document.getElementById('deposit_form_1').style.display === 'none'){
+
+                                document.getElementById('deposit_form_1').style.display = 'block'
+                            }else{
+
+                                document.getElementById('deposit_form_1').style.display = 'none';
+                            }
+
+
+                            document.getElementById('reserve_deposit_input').value = body[0].reserve_price
+
+                            for(let i=0; i<document.getElementById('reserve_deposit_time').options.length; i++){
+
+                                if(body[0].deadline == document.getElementById('reserve_deposit_time').options[i].value){
+
+                                    document.getElementById('reserve_deposit_time').options[i].selected = true;
+                                    document.getElementById('reserve_deposit_time').dispatchEvent(new Event('change'))
+                                }
+
+                            }
+
+                            if(document.getElementById('deposit_btn').checked === true){
+                                document.getElementById('deposit_notice').style.display = 'flex';
+                            }else{
+                                document.getElementById('deposit_notice').style.display = 'none';
+                            }
+
+
+                            document.getElementById('reserve_deposit_input').setAttribute('data-bank',`${body[0].bank_name}`)
+                            document.getElementById('reserve_deposit_input').setAttribute('data-account',`${body[0].account_num}`)
+                        }else{
+
+                            pop.open('deposit_confirm')
+
+                        }
+
+
+
+                    }
+                }
+
+            })
+
+
+
+        }
+
+        function minutes_to_hour(minutes){
+
+            let hours = Math.floor(minutes/60);
+            let min = minutes%60;
+
+
+            return `${hours !== 0 ? hours : ''}${hours !== 0 ? '시간 ':''}${min !== 0 ? min : ''}${min !== 0 ? '분' :''}`
+
+        }
+
+
+        var bank_names = [
+            {
+                code : '003',
+                name : '기업은행'
+            },{
+                code : '004',
+                name : '국민은행'
+            },{
+                code : '011',
+                name : '농협중앙회회'
+            },{
+                code : '012',
+                name : '단위농협'
+            },{
+                code : '020',
+                name : '우리은행'
+            },{
+                code : '031',
+                name : '대구은행'
+            },{
+                code : '005',
+                name : '외환은행'
+            },{
+                code : '023',
+                name : 'SC제일은행'
+            },{
+                code : '032',
+                name : '부산은행'
+            },{
+                code : '045',
+                name : '새마을금고'
+            },{
+                code : '027',
+                name : '한국씨티은행'
+            },{
+                code : '034',
+                name : '광주은행'
+            },{
+                code : '039',
+                name : '경남은행'
+            },{
+                code : '007',
+                name : '수협'
+            },{
+                code : '048',
+                name : '신협'
+            },{
+                code : '037',
+                name : '전북은행'
+            },{
+                code : '035',
+                name : '제주은행'
+            },{
+                code : '064',
+                name : '산림조합'
+            },{
+                code : '071',
+                name : '우체국'
+            },{
+                code : '081',
+                name : '하나은행'
+            },{
+                code : '088',
+                name : '신한은행'
+            },{
+                code : '090',
+                name : '카카오뱅크'
+            },{
+                code : '209',
+                name : '동양종금증권'
+            },{
+                code : '243',
+                name : '한국투자증권'
+            },{
+                code : '240',
+                name : '삼성증권'
+            },{
+                code : '230',
+                name : '미래에셋'
+            },{
+                code : '247',
+                name : '우리투자증권'
+            },{
+                code : '218',
+                name : '현대증권'
+            },{
+                code : '266',
+                name : 'SK증권'
+            },{
+                code : '278',
+                name : '신한금융투자'
+            },{
+                code : '262',
+                name : '하이증권'
+            },{
+                code : '263',
+                name : 'HMC증권'
+            },{
+                code : '267',
+                name : '대신증권'
+            },{
+                code : '270',
+                name : '하나대투증권'
+            },{
+                code : '279',
+                name : '동부증권'
+            },{
+                code : '280',
+                name : '유진증권'
+            },{
+                code : '287',
+                name : '메리츠증권'
+            },{
+                code : '291',
+                name : '신영증권'
+            },{
+                code : '238',
+                name : '대우증권'
+            }
+
+        ]
+
+
+        function deposit_save(id){
+
+
+            if(parseInt(document.getElementById('deposit_input').value) < 1000){
+
+                document.getElementById('msg1_txt').innerText = '최소 예약금은 1,000원 입니다.';
+                pop.open('reserveAcceptMsg1');
+                return;
+            }
+
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+
+                    mode:'deposit_save',
+                    artist_id:id,
+                    reserve_price:document.getElementById('deposit_input').value,
+                    deadline:document.getElementById('deposit_time').value,
+                    bank_name:document.getElementById('deposit_bank').value,
+                    account_num:document.getElementById('deposit_bank_account').value
+                },success:function(res) {
+                    console.log(res)
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+
+
+                        pop.close('deposit_set')
+                    }
+
+
+                }
+
+            })
+
+
+        }
+
+        function get_deposit(id){
+
+
+
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+
+                    mode:'shop_reserve_get',
+                    login_id:id,
+                },success:function(res) {
+                    console.log(res)
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+                        console.log(body)
+
+
+                        document.getElementById('deposit_input').value = body[0].reserve_price;
+
+
+                        for(let i=0; i<document.getElementById('deposit_time').options.length; i++){
+
+                            if(body[0].deadline == document.getElementById('deposit_time').options[i].value){
+
+                                document.getElementById('deposit_time').options[i].selected = true;
+
+                            }
+                        }
+
+                        for(let i=0; i<document.getElementById('deposit_bank').options.length; i++){
+
+                            if(body[0].bank_name == document.getElementById('deposit_bank').options[i].value){
+
+                                document.getElementById('deposit_bank').options[i].selected = true;
+
+                            }
+                        }
+
+                        document.getElementById('deposit_bank_account').value = body[0].account_num;
+                    }
+
+
+                }
+
+            })
+
+        }
+
+
+        function fill_zero(time){
+
+            if(time.toString().length < 2){
+
+                time = `0${time}`
+            }else{
+                time = time;
+            }
+
+            return time;
+        }
+
+        function deposit_finish(target){
+
+            if(target.checked === true){
+                target.disabled = true;
+            }
+            let payment_idx = target.getAttribute('data-payment_idx');
+            let allim = target.getAttribute('data-allim');
+
+            let beauty_date = target.getAttribute('data-date');
+            let cellphone = target.getAttribute('data-cellphone');
+            let name = target.getAttribute('data-pet-name');
+
+            let year = target.getAttribute('data-year');
+            let month = target.getAttribute('data-month');
+            let day = target.getAttribute('data-day');
+
+            let hour = target.getAttribute('data-hour');
+            let min = target.getAttribute('data-min');
+
+            let shop_name = target.getAttribute('data-shop_name');
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+                    mode:'deposit_finish',
+                    payment_log_seq:payment_idx,
+                },
+                success:function(res) {
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+                        console.log(body)
+                        if(allim == 1){
+
+                            document.getElementById('pay_deposit_btn').setAttribute('data-allim','0')
+                            let message = `반려생활의 단짝, 반짝에서 ${cellphone.slice(-4)}님의 ${name} 미용예약 내용을 알려드립니다.\n` +
+                                '\n' +
+                                `- 예약펫샵 : ${shop_name}\n` +
+                                `- 예약일시 : ${year}년 ${month}월 ${day}일 ${hour}시 ${min}분\n` +
+                                '\n' +
+                                '예약내용 상세확인과 예약은\n' +
+                                '반려생활의 단짝, 반짝에서도 가능합니다.';
+
+
+
+                            $.ajax({
+
+                                url:'/data/api.php',
+                                type:'post',
+                                data:{
+
+                                    mode:'reserve_regist_allim',
+                                    cellphone:cellphone,
+                                    message:message,
+                                    payment_idx:body.idx,
+
+
+                                },success:function(res){
+
+
+
+                                }
+                            })
+
+                        }
+                        target.checked = true;
+                        let date_ = new Date();
+                        document.getElementById('pay_deposit_title').innerText = '예약금 입금완료';
+                        document.getElementById('pay_deposit_title').classList.add('actived');
+                        document.getElementById('pay_deposit_date').innerText = `(입금처리 : ${date_.getFullYear()}. ${fill_zero(date_.getMonth()+1)}. ${fill_zero(date_.getDate())}. ${am_pm_check(date_.getHours())}시 ${fill_zero(date_.getMinutes())}분)`
+
+                    }
+                }
+            })
+        }
+        function am_pm_check(hours){
+
+            if(hours > 12){
+                hours = `오후 ${(hours-12).toString().length <2 ? '0' : ''}${hours-12}`
+            }else if(hours === 12){
+                hours = `오후 ${hours}`
+            }else{
+                hours = `오전 ${hours}`
+            }
+
+            return hours;
+        }
+
 
 
 
