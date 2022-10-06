@@ -11,8 +11,8 @@ $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_
 
 
 
-//$api = new TRestAPI("https://partnerapi.banjjakpet.com:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
-$api = new TRestAPI("http://stg-partnerapi.banjjakpet.com:8080","Token 55dda3818c897ef163b09a13d37199a7d211b6d2");
+$api = new TRestAPI("https://partnerapi.banjjakpet.com:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
+//$api = new TRestAPI("http://stg-partnerapi.banjjakpet.com:8080","Token 55dda3818c897ef163b09a13d37199a7d211b6d2");
 //$api2 = new TRestAPI("http://192.168.20.216:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
 
 
