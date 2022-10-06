@@ -621,7 +621,7 @@ $r = sql_fetch($res);
                                             <div class="pay-deposit-box">
                                                 <div class="pay-deposit-title" id="pay_deposit_title">예약금 미입금</div>
 
-                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" id="pay_deposit_btn" data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="1" data-shop_name="'.$r['name'].'" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" id="pay_deposit_btn" data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="1" data-shop_name="'.$r['name'].'" data-reserve_pay_price="'.$pay['reserve_pay_price'].'" data-deadline="'.$pay['reserve_pay_deadline'].'" onclick="deposit_finish(this)"><span class="bar"></span></label>
                                             </div>
                                             <div class="pay-deposit-date" id="pay_deposit_date">
                                             </div>
@@ -645,7 +645,7 @@ $r = sql_fetch($res);
                                             <div class="pay-deposit-box">
                                                 <div class="pay-deposit-title actived" id="pay_deposit_title">예약금 입금완료</div>
 
-                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" disabled checked data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="0"  data-shop_name="'.$r['name'].'" id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" checked data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="0"  data-shop_name="'.$r['name'].'" data-reserve_pay_price="'.$pay['reserve_pay_price'].'" data-deadline="'.$pay['reserve_pay_deadline'].'"  id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
                                             </div>
                                             <div class="pay-deposit-date" id="pay_deposit_date">(입금처리 : '.$confirm_year.'. '.$confirm_month.'. '.$confirm_date.'. '.$confirm_hour1.'시 '.$confirm_min.'분)
                                             
@@ -3205,6 +3205,8 @@ $r = sql_fetch($res);
     <!-- //container -->
     <iframe src="" name="hiddenFrame" style="display:none;" frameborder="0"></iframe>
     <script>
+
+        var artist_id = '<?= $artist_id?>'
         var bank_names = [
             {
                 code : '003',
@@ -5110,29 +5112,33 @@ $r = sql_fetch($res);
                     } else if (head.code === 200) {
                         console.log(body)
 
+                        //
+                        // document.getElementById('deposit_input').value = body[0].reserve_price;
+                        //
+                        //
+                        // for(let i=0; i<document.getElementById('deposit_time').options.length; i++){
+                        //
+                        //     if(body[0].deadline == document.getElementById('deposit_time').options[i].value){
+                        //
+                        //         document.getElementById('deposit_time').options[i].selected = true;
+                        //
+                        //     }
+                        // }
+                        //
+                        // for(let i=0; i<document.getElementById('deposit_bank').options.length; i++){
+                        //
+                        //     if(body[0].bank_name == document.getElementById('deposit_bank').options[i].value){
+                        //
+                        //         document.getElementById('deposit_bank').options[i].selected = true;
+                        //
+                        //     }
+                        // }
+                        //
+                        // document.getElementById('deposit_bank_account').value = body[0].account_num;
 
-                        document.getElementById('deposit_input').value = body[0].reserve_price;
+                        document.getElementById('pay_deposit_btn').setAttribute('data-bank',body[0].bank_name);
+                        document.getElementById('pay_deposit_btn').setAttribute('data-account',body[0].account_num);
 
-
-                        for(let i=0; i<document.getElementById('deposit_time').options.length; i++){
-
-                            if(body[0].deadline == document.getElementById('deposit_time').options[i].value){
-
-                                document.getElementById('deposit_time').options[i].selected = true;
-
-                            }
-                        }
-
-                        for(let i=0; i<document.getElementById('deposit_bank').options.length; i++){
-
-                            if(body[0].bank_name == document.getElementById('deposit_bank').options[i].value){
-
-                                document.getElementById('deposit_bank').options[i].selected = true;
-
-                            }
-                        }
-
-                        document.getElementById('deposit_bank_account').value = body[0].account_num;
                     }
 
 
@@ -5141,6 +5147,11 @@ $r = sql_fetch($res);
             })
 
         }
+
+        $(document).ready(function(){
+
+            get_deposit(artist_id);
+        })
 
 
         function fill_zero(time){
@@ -5157,9 +5168,13 @@ $r = sql_fetch($res);
 
         function deposit_finish(target){
 
+            let reserve_pay_yn = 0;
             if(target.checked === true){
-                target.disabled = true;
+                reserve_pay_yn = 1;
+            }else if(target.checked ===false){
+                reserve_pay_yn =0;
             }
+
             let payment_idx = target.getAttribute('data-payment_idx');
             let allim = target.getAttribute('data-allim');
 
@@ -5175,6 +5190,13 @@ $r = sql_fetch($res);
             let min = target.getAttribute('data-min');
 
             let shop_name = target.getAttribute('data-shop_name');
+
+            let reserve_pay_price = target.getAttribute('data-reserve_pay_price');
+            let deadline = target.getAttribute('data-deadline').replace(' ','T');
+            let deadline_date = new Date(deadline);
+            let bank = target.getAttribute('data-bank');
+            let account = target.getAttribute('data-account');
+
             $.ajax({
 
                 url:'/data/api.php',
@@ -5182,6 +5204,7 @@ $r = sql_fetch($res);
                 data:{
                     mode:'deposit_finish',
                     payment_log_seq:payment_idx,
+                    reserve_pay_yn:reserve_pay_yn,
                 },
                 success:function(res) {
                     let response = JSON.parse(res);
@@ -5191,7 +5214,7 @@ $r = sql_fetch($res);
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
                         console.log(body)
-                        if(allim == 1){
+                        if(reserve_pay_yn == 1){
 
                             document.getElementById('pay_deposit_btn').setAttribute('data-allim','0')
                             let message = `반려생활의 단짝, 반짝에서 ${cellphone.slice(-4)}님의 ${name} 미용예약 내용을 알려드립니다.\n` +
@@ -5223,13 +5246,58 @@ $r = sql_fetch($res);
                                 }
                             })
 
-                        }
-                        target.checked = true;
-                        let date_ = new Date();
-                        document.getElementById('pay_deposit_title').innerText = '예약금 입금완료';
-                        document.getElementById('pay_deposit_title').classList.add('actived');
-                        document.getElementById('pay_deposit_date').innerText = `(입금처리 : ${date_.getFullYear()}. ${fill_zero(date_.getMonth()+1)}. ${fill_zero(date_.getDate())}. ${am_pm_check(date_.getHours())}시 ${fill_zero(date_.getMinutes())}분)`
+                        }else{
+                            let message = `${name} 보호자님\n` +
+                                `${shop_name}에서 ${name} 미용예약 확정을 위한 예약금 입금 안내를 드립니다.\n` +
+                                '\n' +
+                                `저희 ${shop_name}에서는 예약금 ${reserve_pay_price}원 입금 후에 예약이 확정됩니다.\n` +
+                                '\n' +
+                                '1. 예약내용\n' +
+                                `- 예약일시 : ${year}년 ${month}월 ${day}일 ${hour}시 ${min}분\n` +
+                                '\n' +
+                                '2. 예약금 입금계좌\n' +
+                                `- 예약금 : ${reserve_pay_price}원\n` +
+                                `- ${bank} / ${account}\n` +
+                                `- 결제기한 : ${deadline_date.getFullYear()}년 ${fill_zero(deadline_date.getMonth()+1)}월 ${fill_zero(deadline_date.getDate())}일 ${am_pm_check(deadline_date.getHours())}시 ${fill_zero(deadline_date.getMinutes())}분\n` +
+                                '\n' +
+                                '▶ 결제기한 경과시 예약은 자동취소 되오니 기한 내 꼭 입금부탁드립니다. '
 
+                            $.ajax({
+
+                                url:'/data/api.php',
+                                type:'post',
+                                data:{
+
+                                    mode:'deposit_allim',
+                                    cellphone:cellphone,
+                                    message:message,
+
+
+                                },success:function(res){
+
+
+
+                                }
+                            })
+
+                        }
+
+                        let date_ = new Date();
+                        if(reserve_pay_yn == 0){
+                            target.checked = false;
+                            document.getElementById('pay_deposit_title').innerText = '예약금 미입금';
+                            document.getElementById('pay_deposit_title').classList.remove('actived');
+                            document.getElementById('pay_deposit_date').style.display = 'none';
+                            document.getElementById('pay_deposit_date').innerText = '';
+
+                        }else{
+                            target.checked = true;
+                            document.getElementById('pay_deposit_title').innerText = '예약금 입금완료';
+                            document.getElementById('pay_deposit_title').classList.add('actived');
+                            document.getElementById('pay_deposit_date').style.display = 'flex';
+                            document.getElementById('pay_deposit_date').innerText = `(입금처리 : ${date_.getFullYear()}. ${fill_zero(date_.getMonth()+1)}. ${fill_zero(date_.getDate())}. ${am_pm_check(date_.getHours())}시 ${fill_zero(date_.getMinutes())}분)`
+
+                        }
                     }
                 }
             })

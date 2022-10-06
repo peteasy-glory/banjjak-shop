@@ -11,8 +11,8 @@ $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_
 
 
 
-$api = new TRestAPI("https://partnerapi.banjjakpet.com:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
-//$api = new TRestAPI("http://stg-partnerapi.banjjakpet.com:8080","Token 55dda3818c897ef163b09a13d37199a7d211b6d2");
+//$api = new TRestAPI("https://partnerapi.banjjakpet.com:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
+$api = new TRestAPI("http://stg-partnerapi.banjjakpet.com:8080","Token 55dda3818c897ef163b09a13d37199a7d211b6d2");
 //$api2 = new TRestAPI("http://192.168.20.216:8080","Token 2156d1824c98f27a1f163a102cf742002b15e624");
 
 
@@ -71,8 +71,9 @@ if($r_mode) {
 
 
         $payment_log_seq = $_POST['payment_log_seq'];
+        $reserve_pay_yn = $_POST['reserve_pay_yn'];
 
-        $data = array('payment_log_seq' => $payment_log_seq);
+        $data = array('payment_log_seq' => $payment_log_seq,'reserve_pay_yn'=>intval($reserve_pay_yn));
 
         $data_json = json_encode($data);
 
@@ -98,6 +99,25 @@ if($r_mode) {
         $return_data = array("code"=>"000000","data"=>$data);
 
 
+    }else if($r_mode === 'deposit_allim'){
+
+        $cellphone = $_POST['cellphone'];
+        $message = $_POST['message'];
+        $tem_code = "1000004530_20016_2";
+        $btn_link = '';
+
+        $data = array(
+
+            'cellphone'=>$cellphone,
+            'message'=>$message,
+            'tem_code'=>$tem_code,
+            'btn_link'=>$btn_link
+        );
+
+        $data_json = json_encode($data);
+        $result = $api ->post('/partner/allim/send',$data_json);
+
+        $return_date = array("code"=>"000000","data"=>$result);
     }
 }
 
