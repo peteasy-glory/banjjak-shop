@@ -2833,7 +2833,7 @@ $r = sql_fetch($res);
                             <div class="form-change-wrap">
                                 <div class="form-change-item">
                                     <div class="form-change-label"><strong>카드</strong> (단위:원)</div>
-                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format($pay['local_price']);?>">
+                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])-intval($pay['reserve_pay_price']));?>">
                                     </div>
                                 </div>
                                 <button type="button" class="btn-data-change">전환하기</button>

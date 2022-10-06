@@ -382,7 +382,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
             <input type="hidden" name="customer_id" id="customer_id" value="">
             <input type="hidden" name="coupon_seq" id="coupon_seq" value="">
             <input type="hidden" name="alarm_yn" id="alarm_yn" value="Y">
-            <input type="hidden" name="deposit_check" id="deposit_check" value="Y">
+            <input type="hidden" name="deposit_check" id="deposit_check_" value="Y">
             <input type="hidden" name="is_reserve_pay" id="is_reserve_pay" value="0">
             <input type="hidden" name="befor_day_alarm_yn" id="befor_day_alarm_yn" value="Y">
             <input type="hidden" name="reserve_deposit_time_" id="reserve_deposit_time_" value="">
@@ -1628,7 +1628,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                             </div>
                             <div class="toggle-wrap" id="deposit_notice" style="display:none;">
                                 <div class="msg-txt">예약금 안내</div>
-                                <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px; margin-right:10px;"><input type="checkbox" checked id="deposit_check" onclick="if(this.checked===true){document.getElementById('deposit_check_span').innerText = '발송'; document.getElementById('deposit_check').value ='Y'}else{document.getElementById('deposit_check_span').innerText ='미발송'; document.getElementById('deposit_check').value ='N'} "><span class="bar"></span></label>
+                                <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px; margin-right:10px;"><input type="checkbox" checked id="deposit_check"  onclick="if(this.checked===true){document.getElementById('deposit_check_span').innerText = '발송'; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('deposit_check_span').innerText ='미발송'; document.getElementById('deposit_check_').value ='N'} "><span class="bar"></span></label>
                                 <span class="notice_span" id="deposit_check_span">발송</span>
                             </div>
                             <div class="toggle-wrap">

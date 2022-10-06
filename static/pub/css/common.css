@@ -4188,3 +4188,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	margin-right: 20px;
 	margin-top: 10px;
 }
+
+.deposit_input::placeholder{
+	font-size:10px;
+}
