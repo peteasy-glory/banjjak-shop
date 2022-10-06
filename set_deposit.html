@@ -131,15 +131,15 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
     </div>
 </article>
 
-<article id="reserveAcceptMsg2" class="layer-pop-wrap">
+<article id="reserveDepositPop" class="layer-pop-wrap">
     <div class="layer-pop-parent">
         <div class="layer-pop-children">
             <div class="pop-data alert-pop-data">
                 <div class="pop-body">
-                    <div class="msg-txt" id="msg2_txt"></div>
+                    <div class="msg-txt" id="deposit_txt"></div>
                 </div>
                 <div class="pop-footer">
-                    <button type="button" class="btn btn-confirm" onclick="location.reload()">확인</button>
+                    <button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
                 </div>
             </div>
         </div>
@@ -440,9 +440,9 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                 if (head.code === 401) {
                     pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                 } else if (head.code === 200) {
+                    document.getElementById('deposit_txt').innerText = '저장되었습니다.';
+                    pop.open('reserveDepositPop');
 
-
-                    pop.close('deposit_set')
                 }
 
 
