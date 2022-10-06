@@ -79,6 +79,25 @@ if($r_mode) {
         $result = $api->put('/partner/reserve/payment-reserve', $data_json);
 
         $return_data = array("code" => "000000", "data" => $result);
+    }else if($r_mode === 'reserve_regist_allim'){
+
+
+        $cellphone = $_POST['cellphone'];
+        $message = $_POST['message'];
+        $tem_code = "1000004530_20001";
+        $payment_idx = $_POST['payment_idx'];
+
+        $btn_link = "{\"button\":[{\"name\":\"예약정보\",\"type\":\"WL\",\"url_pc\":\"\",\"url_mobile\":\"https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$payment_idx."\"}]}";
+
+        $data = array('cellphone'=>$cellphone,'message'=>$message,'tem_code'=>$tem_code,'btn_link'=>$btn_link);
+
+        $data_json = json_encode($data);
+
+        $result = $api -> post('/partner/allim/send',$data_json);
+
+        $return_data = array("code"=>"000000","data"=>$data);
+
+
     }
 }
 

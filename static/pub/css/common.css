@@ -4128,38 +4128,38 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 	width: 20px;
 	height: 20px;
-	bottom: 0px;
-	right: 24px;
+	bottom: 3px;
+	right: 28px;
 	position: absolute;
 	max-width: 48px;
 	border-radius: 50px;
-	border: 1px solid black;
-	font-size: 14px;
+	border: 1px solid #e8e8e8;
+	font-size: 12px;
 	background: #fff;
 	color: #666;
 	display: none;
 	justify-content: center;
 	align-items: center;
-	font-weight: 500;
+	font-weight: 300;
 }
 
 .deposit-icon-fin{
 
-	width: 20px;
-	height: 20px;
-	bottom: 0px;
-	right: 24px;
+	width: 18px;
+	height: 18px;
+	bottom: 3px;
+	right: 28px;
 	position: absolute;
 	max-width: 48px;
 	border-radius: 50px;
-	border: 1px solid black;
-	font-size: 14px;
+	/*border: 1px solid #e8e8e8;*/
+	font-size: 12px;
 	background: #ff4848;
 	color: #fff;
 	display: none;
 	justify-content: center;
 	align-items: center;
-	font-weight: 500;
+	font-weight: 300;
 }
 
 .pay-deposit-box{
