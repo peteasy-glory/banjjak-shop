@@ -621,12 +621,15 @@ function fill_zero(time){
 
 function deposit_finish(target){
 
+	if(target.checked === true){
+		target.disabled = true;
+	}
 	let payment_idx = target.getAttribute('data-payment_idx');
 	let allim = target.getAttribute('data-allim');
 
 	let beauty_date = target.getAttribute('data-date');
 	let cellphone = target.getAttribute('data-cellphone');
-	let name = target.getAttribute('data-pet_name');
+	let name = target.getAttribute('data-pet-name');
 
 	let year = target.getAttribute('data-year');
 	let month = target.getAttribute('data-month');

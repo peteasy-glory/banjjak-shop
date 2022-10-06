@@ -645,7 +645,7 @@ $r = sql_fetch($res);
                                             <div class="pay-deposit-box">
                                                 <div class="pay-deposit-title actived" id="pay_deposit_title">예약금 입금완료</div>
 
-                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" checked data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="0"  data-shop_name="'.$r['name'].'" id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
+                                                <label for="switch-toggle" class="form-switch-toggle" style="margin-right:20px;"><input type="checkbox" disabled checked data-payment_idx="'.$pay['payment_log_seq'].'" data-cellphone="'.$pay['cellphone'].'" data-pet-name="'.$pet_name.'" data-year="'.$pay['year'].'" data-month="'.$pay['month'].'" data-day="'.$pay['day'].'" data-hour="'.$pay['hour'].'" data-min="'.$pay['minute'].'" data-allim="0"  data-shop_name="'.$r['name'].'" id="pay_deposit_btn" onclick="deposit_finish(this)"><span class="bar"></span></label>
                                             </div>
                                             <div class="pay-deposit-date" id="pay_deposit_date">(입금처리 : '.$confirm_year.'. '.$confirm_month.'. '.$confirm_date.'. '.$confirm_hour1.'시 '.$confirm_min.'분)
                                             
