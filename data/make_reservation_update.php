@@ -371,7 +371,6 @@ if ($goods_cnt > 0) {
         }
     }
 
-
     for ($i = 0; $i < count($_POST['feed']); $i++) {
         if ($_POST['feed_chkbox'][$i] == 'y') {
             $product .= $_POST['feed_seq'][$i] . ':';

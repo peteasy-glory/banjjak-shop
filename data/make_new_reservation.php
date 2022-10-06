@@ -444,7 +444,6 @@ if($chk_cnt < 1) {
 
 
 
-
         $week_arr = ['일', '월', '화', '수', '목', '금', '토'];
         $talkDate = date("Y년 m월 d일", $reservationTime);
         $talkDate .= "(".$week_arr[date("w", $reservationTime)].") ";

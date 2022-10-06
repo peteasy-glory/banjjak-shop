@@ -322,6 +322,7 @@ if($chk_cnt < 1) {
     $reservationTime = strtotime("$year-$month-$day $from_hour:$from_min");
 
 
+
     if ($reservationTime > $now && $_POST['alarm_yn'] == "Y" && $_POST['is_reserve_pay'] == '0') {
         $talk = new Allimtalk();
 
@@ -336,6 +337,7 @@ if($chk_cnt < 1) {
         $talkBtnLink = "https://customer.banjjakpet.com/allim/reserve_info?payment_log_seq=".$id;
         $talkResult = $talk->sendReservationNotice_new($talkCustomerName, $_POST['pet_name'], $_POST['shopName'], $talkDate, $talkBtnLink);
     }else if($reservationTime > $now  && $_POST['deposit_check'] == 'Y'){
+
         $talk2 = new Allimtalk();
 
         $talk2->cellphone = $_POST['cellPhone'];
