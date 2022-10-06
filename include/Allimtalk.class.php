@@ -291,4 +291,17 @@ class Allimtalk{
         return $this->sendMessage($templateNo, $message);
     }
 
+    // 예약금 미입금 취소안내
+    public function sendReservePayCancel($petName, $shopName, $date, $deadLine){
+        $templateNo = "20017";
+        $message =
+            "{$petName} 보호자님"
+            ."\n{$shopName}에서 {$petName} 미용 예약이"
+            ."\n예약금 입금시간 초과로 취소되었음을 안내드립니다."
+            ."\n\n- 취소예약 : {$date}"
+            ."\n- 결제기한 : {$deadLine}";
+
+        return $this->sendMessage($templateNo, $message);
+    }
+
 }

@@ -10,6 +10,6 @@ $que = "
     AND reserve_pay_yn = 0
     AND reserve_pay_deadline< DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')
 ";
-$result = mysqli_query($connection,$que);
+//$result = mysqli_query($connection,$que);
 
 ?>
