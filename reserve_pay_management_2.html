@@ -2812,10 +2812,10 @@ $r = sql_fetch($res);
                                     <div class="list-title font-color-purple"><strong>최종 결제액</strong></div>
                                     <div class="list-value font-color-red"><strong id="total_pay_price_disp">
                                             <?php
-                                            $t1 = ($sum+$vat)-str_replace(",","",$discount_price)-$pay['reserve_point'];
+                                            $t1 = ($sum+$vat-$pay['reserve_point'])-str_replace(",","",$discount_price);
                                             $t2 = ($pay['reserve_pay_price']>0) ? $pay['reserve_pay_price'] : 0;
                                             //echo number_format($t1);
-                                            echo number_format($pay['local_price']+$pay['local_price_cash']-$t2);
+                                            echo number_format($pay['local_price']+$pay['local_price_cash']+$vat-$t2);
                                             ?>
                                             원</strong></div>
                                     <input type="hidden" name="total_pay_price" id="total_pay_price" value="<?php echo $t1;?>" size="3">
@@ -2835,7 +2835,7 @@ $r = sql_fetch($res);
                             <div class="form-change-wrap">
                                 <div class="form-change-item">
                                     <div class="form-change-label"><strong>카드</strong> (단위:원)</div>
-                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])-intval($pay['reserve_pay_price']));?>">
+                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])+$vat-intval($pay['reserve_pay_price']));?>">
                                     </div>
                                 </div>
                                 <button type="button" class="btn-data-change">전환하기</button>
