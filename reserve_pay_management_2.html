@@ -56,9 +56,20 @@ if($grade_cnt > 0){
 }
 
 //결제 정보 구하기
-$que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}";
+$que = "
+    SELECT a.*, b.idx as diary_idx, b.update_time as diary_time FROM tb_payment_log a
+    LEFT JOIN tb_diary_mgr b on a.payment_log_seq = b.payment_log_seq
+    WHERE a.payment_log_seq = {$payment_log_seq}
+        
+";
 $res = sql_query($que);
 $pay = sql_fetch($res);
+//print_r($pay);
+/*
+알림장 변수
+    $pay['diary_idx'] => 없으면 미작성
+    $pay['diary_time'] => 알림장 작성 시간
+*/
 
 $thisday = $pay['year']."-".$pay['month']."-".$pay['day'];
 $w_day = date('w',strtotime($thisday)); // 해당 미용 요일
