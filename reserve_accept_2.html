@@ -400,10 +400,12 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                                 </div>
                             </div>
 
-                            <div class="basic-data-group">
-                                <div class="con-title-group" style="justify-content: flex-start;">
+                            <div class="basic-data-group allimi-wrap-bg-gray" style="width:100vw; left:-20px;padding:20px;">
+                                <div class="con-title-group" style="justify-content: flex-start; background: transparent">
                                     <h4 class="con-title">예약금 안내발송</h4>
-                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick="deposit_toggle(artist_id); if(this.checked === true){document.getElementById('is_reserve_pay').value = 1; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('is_reserve_pay').value=0; document.getElementById('deposit_check_').value ='N'}"><span class="bar"></span></label>
+                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick=deposit_background(this);deposit_toggle(artist_id); if(this.checked === true){document.getElementById('is_reserve_pay').value = 1; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('is_reserve_pay').value=0; document.getElementById('deposit_check_').value ='N'}"><span class="bar"></span></label>
+
+                                    <div class="grid-layout-cell grid-4" style="margin-left:20px;"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="popalert.open('depositExam');">미리보기</button></div>
 
                                 </div>
                                 <div class="form-group" id="deposit_form_1" style="display:none;">
@@ -1203,6 +1205,24 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                             <button type="button" class="btn btn-confirm" onclick="pop.close(); pop.close('reserveCalendarPop11')">확인</button>
                         </div>
                     </div>
+                </div>
+            </div>
+        </article>
+        <article id="depositExam" class="layer-pop-wrap" style="z-index: 100002;">
+            <div class="layer-pop-parent">
+                <div class="layer-pop-children">
+
+                    <div class="pop-data alert-pop-data">
+                        <div class="pop-body">
+                            <div class="msg-txt">
+                                <img src="/images/exam_deposit.jpg" alt="">
+                            </div>
+                        </div>
+                        <div class="pop-footer">
+                            <button type="button" class="btn btn-confirm" onclick="popalert.close();">확인</button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </article>
@@ -2088,6 +2108,20 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
 
 
 
+        function deposit_background(target){
+
+            if(target.checked === true){
+
+                target.parentElement.parentElement.parentElement.classList.add('allimi-wrap-bg-purple')
+                target.parentElement.parentElement.parentElement.classList.remove('allimi-wrap-bg-gray')
+            }else{
+                target.parentElement.parentElement.parentElement.classList.add('allimi-wrap-bg-gray')
+                target.parentElement.parentElement.parentElement.classList.remove('allimi-wrap-bg-purple')
+            }
+
+
+        }
+
         function deposit_toggle(id){
 
 
@@ -2110,15 +2144,9 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     } else if (head.code === 200) {
                         console.log(body)
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        if(body.length >0 && body[0].reserve_price !==0 ){
-=======
+
                         if(body.length >0 && body[0].reserve_price !== 0){
->>>>>>> 7e9665949b335df8ee190f91a4dbea8c88ed3ddf
-=======
-                        if(body.length >0 && body[0].reserve_price !== 0){
->>>>>>> 7e9665949b335df8ee190f91a4dbea8c88ed3ddf
+
                             if(document.getElementById('deposit_form_1').style.display === 'none'){
 
                                 document.getElementById('deposit_form_1').style.display = 'block'

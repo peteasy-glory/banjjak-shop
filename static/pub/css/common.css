@@ -4192,3 +4192,13 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .deposit_input::placeholder{
 	font-size:10px;
 }
+
+.allimi-wrap-bg-purple{
+
+	background: #EEE7FA;
+}
+
+.allimi-wrap-bg-gray{
+
+	background: #F4F4F4;
+}
