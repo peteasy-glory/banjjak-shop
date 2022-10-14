@@ -304,4 +304,16 @@ class Allimtalk{
         return $this->sendMessage($templateNo, $message);
     }
 
+    // 알림장발송
+    public function sendDiary($petName, $shopName, $btnLink){
+        $templateNo = "20018";
+        $btnName = "알리미 보기";
+        $message =
+            "{$petName} 보호자님 안녕하세요."
+            ."\n{$shopName}에서 {$petName}의 컨디션과 활동에 대한 알리미가 도착했어요."
+            ."\n\n아래 알리미보기 버튼을 눌러 확인해보세요.";
+
+        return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
+    }
+
 }

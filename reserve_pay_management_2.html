@@ -56,9 +56,20 @@ if($grade_cnt > 0){
 }
 
 //결제 정보 구하기
-$que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$payment_log_seq}";
+$que = "
+    SELECT a.*, b.idx as diary_idx, b.update_time as diary_time FROM tb_payment_log a
+    LEFT JOIN tb_diary_mgr b on a.payment_log_seq = b.payment_log_seq
+    WHERE a.payment_log_seq = {$payment_log_seq}
+        
+";
 $res = sql_query($que);
 $pay = sql_fetch($res);
+//print_r($pay);
+/*
+알림장 변수
+    $pay['diary_idx'] => 없으면 미작성
+    $pay['diary_time'] => 알림장 작성 시간
+*/
 
 $thisday = $pay['year']."-".$pay['month']."-".$pay['day'];
 $w_day = date('w',strtotime($thisday)); // 해당 미용 요일
@@ -2812,10 +2823,10 @@ $r = sql_fetch($res);
                                     <div class="list-title font-color-purple"><strong>최종 결제액</strong></div>
                                     <div class="list-value font-color-red"><strong id="total_pay_price_disp">
                                             <?php
-                                            $t1 = ($sum+$vat)-str_replace(",","",$discount_price)-$pay['reserve_point'];
+                                            $t1 = ($sum+$vat-$pay['reserve_point'])-str_replace(",","",$discount_price);
                                             $t2 = ($pay['reserve_pay_price']>0) ? $pay['reserve_pay_price'] : 0;
                                             //echo number_format($t1);
-                                            echo number_format($pay['local_price']+$pay['local_price_cash']-$t2);
+                                            echo number_format($pay['local_price']+$pay['local_price_cash']+$vat-$t2);
                                             ?>
                                             원</strong></div>
                                     <input type="hidden" name="total_pay_price" id="total_pay_price" value="<?php echo $t1;?>" size="3">
@@ -2835,7 +2846,7 @@ $r = sql_fetch($res);
                             <div class="form-change-wrap">
                                 <div class="form-change-item">
                                     <div class="form-change-label"><strong>카드</strong> (단위:원)</div>
-                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])-intval($pay['reserve_pay_price']));?>">
+                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])+$vat-intval($pay['reserve_pay_price']));?>">
                                     </div>
                                 </div>
                                 <button type="button" class="btn-data-change">전환하기</button>
@@ -3218,7 +3229,7 @@ $r = sql_fetch($res);
                 name : '국민은행'
             },{
                 code : '011',
-                name : '농협중앙회회'
+                name : '농협중앙회'
             },{
                 code : '012',
                 name : '단위농협'
@@ -5244,6 +5255,7 @@ $r = sql_fetch($res);
                                 },success:function(res){
 
 
+                                    location.reload();
 
                                 }
                             })
@@ -5277,7 +5289,7 @@ $r = sql_fetch($res);
 
                                 },success:function(res){
 
-
+                                    location.reload();
 
                                 }
                             })

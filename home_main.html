@@ -527,19 +527,21 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 
 
                                 $que1 = "
-                                SELECT * FROM tb_payment_log 
-                                WHERE artist_id = '" . $user_id . "' 
-                                AND year = '" . $yy . "' 
-                                AND month = '" . intval($mm) . "' 
-                                AND day = '" . $dd . "'
-                                AND worker = '" . $pl1['worker'] . "'
-                                AND is_cancel = 0
-                                AND is_no_show = 0      
-                                ORDER BY hour ASC                         
+                                SELECT a.*, b.idx as diary_idx, b.update_time as diary_time FROM tb_payment_log a
+                                LEFT JOIN tb_diary_mgr b on a.payment_log_seq = b.payment_log_seq
+                                WHERE a.artist_id = '" . $user_id . "' 
+                                AND a.year = '" . $yy . "' 
+                                AND a.month = '" . intval($mm) . "' 
+                                AND a.day = '" . $dd . "'
+                                AND a.worker = '" . $pl1['worker'] . "'
+                                AND a.is_cancel = 0
+                                AND a.is_no_show = 0      
+                                ORDER BY a.hour ASC                         
                             ";
                                 //echo $que1;
                                 $pl = sql_fetch_array($que1);
                                 foreach($pl as $pl){
+                                    //print_r($pl);
                                     $beauty_info = explode("|",$pl['product']);
 
                                     $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pl['pet_seq']}'";
@@ -561,6 +563,12 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                     if($tm[0]['pet_type'] == '기타'){
                                         $yellow_type = $tm[0]['pet_type2'];
                                     }
+
+                                    /*
+                                    알림장 변수
+                                        $pl['diary_idx'] => 없으면 미작성
+                                        $pl['diary_time'] => 알림장 작성 시간
+                                    */
                                     ?>
                                     <div class="list-cell">
                                         <div class="customer-card-item">

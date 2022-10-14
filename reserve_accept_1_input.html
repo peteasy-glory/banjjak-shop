@@ -1587,7 +1587,11 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                                             </div>
                                             <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
 
+<<<<<<< HEAD
                                                 <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '준비 중 입니다.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
+=======
+                                                <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '준비중입니다.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
+>>>>>>> 7e9665949b335df8ee190f91a4dbea8c88ed3ddf
                                             </div>
                                         </div>
                                     </div>
@@ -1661,7 +1665,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                 name : '국민은행'
             },{
                 code : '011',
-                name : '농협중앙회회'
+                name : '농협중앙회'
             },{
                 code : '012',
                 name : '단위농협'
@@ -2571,7 +2575,11 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     } else if (head.code === 200) {
                         console.log(body)
 
+<<<<<<< HEAD
                         if(body.length >0 && body[0].reserve_price !==0 ){
+=======
+                        if(body.length >0 && body[0].reserve_price !== 0){
+>>>>>>> 7e9665949b335df8ee190f91a4dbea8c88ed3ddf
                             if(document.getElementById('deposit_form_1').style.display === 'none'){
 
                                 document.getElementById('deposit_form_1').style.display = 'block'

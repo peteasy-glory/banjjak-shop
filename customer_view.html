@@ -226,6 +226,21 @@ $user_beauty_cnt = $row["beauty_cnt"];
 $user_hotel_cnt = $row["hotel_cnt"];
 $user_play_cnt = $row["play_cnt"];
 $another_reserve = 0;
+
+// 알림장 최근 발송 시간 가져오기
+$que = "
+	SELECT update_time AS diary_recent_time FROM tb_diary_mgr WHERE cellphone = '".$phone."'
+	AND artist_id = '".$user_id."'
+	ORDER BY update_time DESC LIMIT 1;
+        
+";
+$res = sql_query($que);
+$diary_recent_time = sql_fetch($res)['diary_recent_time'];
+/*
+알림장 변수
+    $diary_recent_time => 최근 발송시간(없으면 발송이력 0)
+*/
+
 ?>
 
 <!-- container -->
