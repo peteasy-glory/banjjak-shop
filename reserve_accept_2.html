@@ -2110,11 +2110,8 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     } else if (head.code === 200) {
                         console.log(body)
 
-<<<<<<< HEAD
                         if(body.length >0 && body[0].reserve_price !==0 ){
-=======
-                        if(body.length >0 && body[0].reserve_price !== 0){
->>>>>>> 7e9665949b335df8ee190f91a4dbea8c88ed3ddf
+
                             if(document.getElementById('deposit_form_1').style.display === 'none'){
 
                                 document.getElementById('deposit_form_1').style.display = 'block'
@@ -2378,6 +2375,78 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
             return hours;
         }
 
+
+        var pop = {
+
+            element : null,
+            elementArr : [],
+            isActive : false,
+            zIndex : 99999,
+
+            init : function(){
+                //팝업 컨텐츠 외 영역 클릭시 닫기 이벤트
+                $(document).on('click' , '.layer-pop-wrap' , function(e){
+                    if(pop.isActive){
+                        if($(e.target).parents('.pop-data').length == 0){
+                            pop.close();
+                        }
+                    }
+                });
+            },
+
+            // 팝업 열기
+            open : function( _id , _item ){
+                pop.isActive = true;
+                $('html').addClass('fix');
+                this.element = $('#' + _id);
+                this.element.addClass('actived').css({ 'z-index' : pop.zIndex });
+                this.elementArr.push(this.element);
+                pop.zIndex += 1;
+            },
+
+            //팝업 닫기
+            close : function( _item ){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+                /*
+                if(_item){
+                    $(_item).parents('.layer-pop-wrap').removeClass('actived');
+                }else{
+                    this.element.removeClass('actived');
+                }
+                */
+                if(_item){
+                    $element= $(_item);
+                    $element.removeClass('actived');
+                }else{
+                    $element =pop.elementArr[pop.elementArr.length - 1];
+                    $element.removeClass('actived');
+                }
+                pop.elementArr.pop();
+
+
+            },
+
+            change : function(){
+
+            },
+
+            close2: function(_item){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+
+                if(_item){
+
+                    document.getElementById(`${_item}`).classList.remove('actived');
+                }else{
+                    pop.elementArr.pop();
+                }
+
+
+            }
+        };
     </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/footer_shop.php");
