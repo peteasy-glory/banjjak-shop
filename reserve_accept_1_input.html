@@ -1523,7 +1523,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                 <div class="layer-pop-children">
                     <div class="pop-data alert-pop-data middle" >
                         <div class="pop-body" style="flex-direction: row">
-
+                            <button type="button" class="btn-pop-close" onclick="pop.close2('deposit_set'); pop.close2('deposit_confirm'); document.getElementById('deposit_btn').checked = false;">닫기</button>
                             <div class="set-save-money"  id="shop_reserve">
                                 <div class="basic-data-group">
                                     <div class="con-title-group">
@@ -1583,11 +1583,11 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                                         <div class="form-group-item">
                                             <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
 
-                                                <span>수동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" checked onclick="return false;"><span class="bar"></span></label>
+                                                <span>수동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox"><span class="bar"></span></label>
                                             </div>
                                             <div class="form-item-data type-2" style="margin-top:0px; padding-top:10px; display: flex; align-items: center; justify-content: space-between">
+                                                <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '준비 중 입니다.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
 
-                                                <span>자동</span><label for="switch-toggle" class="form-switch-toggle"><input type="checkbox" onclick="event.preventDefault(); document.getElementById('msg1_txt').innerText = '준비중입니다.'; pop.open('reserveAcceptMsg1') "><span class="bar"></span></label>
                                             </div>
                                         </div>
                                     </div>
@@ -2571,6 +2571,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     } else if (head.code === 200) {
                         console.log(body)
 
+
                         if(body.length >0 && body[0].reserve_price !== 0){
                             if(document.getElementById('deposit_form_1').style.display === 'none'){
 
@@ -2834,6 +2835,78 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
 
             return hours;
         }
+
+        var pop = {
+
+            element : null,
+            elementArr : [],
+            isActive : false,
+            zIndex : 99999,
+
+            init : function(){
+                //팝업 컨텐츠 외 영역 클릭시 닫기 이벤트
+                $(document).on('click' , '.layer-pop-wrap' , function(e){
+                    if(pop.isActive){
+                        if($(e.target).parents('.pop-data').length == 0){
+                            pop.close();
+                        }
+                    }
+                });
+            },
+
+            // 팝업 열기
+            open : function( _id , _item ){
+                pop.isActive = true;
+                $('html').addClass('fix');
+                this.element = $('#' + _id);
+                this.element.addClass('actived').css({ 'z-index' : pop.zIndex });
+                this.elementArr.push(this.element);
+                pop.zIndex += 1;
+            },
+
+            //팝업 닫기
+            close : function( _item ){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+                /*
+                if(_item){
+                    $(_item).parents('.layer-pop-wrap').removeClass('actived');
+                }else{
+                    this.element.removeClass('actived');
+                }
+                */
+                if(_item){
+                    $element= $(_item);
+                    $element.removeClass('actived');
+                }else{
+                    $element =pop.elementArr[pop.elementArr.length - 1];
+                    $element.removeClass('actived');
+                }
+                pop.elementArr.pop();
+
+
+            },
+
+            change : function(){
+
+            },
+
+            close2: function(_item){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+
+                if(_item){
+
+                    document.getElementById(`${_item}`).classList.remove('actived');
+                }else{
+                    pop.elementArr.pop();
+                }
+
+
+            }
+        };
     </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/footer_shop.php");
