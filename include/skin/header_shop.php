@@ -367,13 +367,29 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 		<a href="#" class="btn-page-ui btn-page-prev" id="btn_page_prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
 	<?php  } ?>
-	<div class="page-title"><?=$shop_title?></div>
+	<div class="page-title" <?php if(isset($allimi_history)){if($allimi_history===true){echo 'style = flex-direction : row;';}}?>><?=$shop_title?>
+
+        <?php
+
+        if(isset($allimi_history)) {
+
+            if($allimi_history === true){
+                echo '<div class="allimi-title-right" style="cursor: pointer" id="allimi_history_btn" onclick="pop.open(\'allimi_history\');" >
+                                        <img src="/static/pub/images/icon/NoPath@2x.png" alt="">
+                                        <span>히스토리</span>
+                                    </div>';
+            }
+        }
+        ?>
+
+    </div>
 	<!-- //20220110 수정 -->
     <div class="reserve-state-bar" id="empty_time_bar" style="display:none;">
         <div class="bar" style="width:33.33%"></div>
     </div>
 	<?php
     if(isset($header_right)) {
+
 
         echo $header_right;
         if ($pos !== false) {
@@ -383,6 +399,8 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                     </div>
                 </div>';
         }
+
+
     }else if(isset($reserve_waiting)){
         if ($pos1 !== false) {
             echo '<div class="header-right">

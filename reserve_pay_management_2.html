@@ -1253,6 +1253,39 @@ $r = sql_fetch($res);
                             </div>
                         </div>
                     </div>
+                    <div class="item-diary">
+                        <?php if($pay['diary_idx'] === null){?>
+
+                            <div class="diary-not-exist" data-cellphone="<?=$pay['cellphone']?>" data-pet_seq="<?=$pay['pet_seq']?>" data-payment_idx="<?=$pay['payment_log_seq']?>" data-date="<?= $pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']?>" data-pet_name="<?=explode('|',$pay['product'])[0]?>" onclick="location.href ='/allimi_send_payment?cellphone=<?=$pay['cellphone']?>&pet_seq=<?=$pay['pet_seq']?>&payment_idx=<?=$pay['payment_log_seq']?>&year=<?=$pay['year']?>&month=<?=$pay['month']?>&day=<?=$pay['day']?>&hour=<?=$pay['hour']?>&minute=<?=$pay['minute']?>&pet_name=<?=explode('|',$pay['product'])[0]?>'">알리미 보내기</div>
+
+                        <?php }else{
+                            $diary_time = explode(' ',$pay['diary_time'])[0];
+                            $diary_year = explode('-',$diary_time)[0];
+                            $diary_month = explode('-',$diary_time)[1];
+                            $diary_day = explode('-',$diary_time)[2];
+
+                            $diary_time2 = explode(' ',$pay['diary_time'])[1];
+                            $diary_hour = explode(':',$diary_time2)[0];
+                            $diary_minute = explode(':',$diary_time2)[1];
+
+                            if(intval($diary_hour) > 12){
+                                $diary_hour = '오후 '.(intval($diary_hour)-12);
+
+                            }else if(intval($diary_hour) == 12){
+                                $diary_hour = '오후 '.intval($diary_hour);
+                            }else{
+                                $diary_hour = '오전 '.intval($diary_hour);
+                            }
+
+
+                            ?>
+
+
+
+                            <div class="diary-exist" data-cellphone="<?=$pay['cellphone']?>" data-pet_seq="<?=$pay['pet_seq']?>" data-payment_idx="<?=$pay['payment_log_seq']?>" data-date="<?= $pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']?>" data-pet_name="<?=explode('|',$pay['product'])[0]?>">알리미 발송완료</div>
+                            <div class="diary-date"><span>(<?=$diary_year?>. <?=$diary_month?>. <?=$diary_day?>. <?=$diary_hour?>시 <?=$diary_minute?>분)</span></div>
+                        <?php }?>
+                    </div>
                 </div>
             </form>
             <!-- 서비스 정보 변경 -->
