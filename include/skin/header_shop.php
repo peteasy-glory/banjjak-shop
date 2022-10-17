@@ -374,7 +374,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
         if(isset($allimi_history)) {
 
             if($allimi_history === true){
-                echo '<div class="allimi-title-right" style="cursor: pointer" id="allimi_history_btn" onclick="pop.open(\'allimi_history\');" >
+                echo '<div class="allimi-title-right" style="cursor: pointer" id="allimi_history_btn" onclick="pop.open(\'allimi_history\'); allimi_open_history(this);" >
                                         <img src="/static/pub/images/icon/NoPath@2x.png" alt="">
                                         <span>히스토리</span>
                                     </div>';

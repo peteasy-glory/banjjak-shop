@@ -8,7 +8,14 @@ function allimi_btn_event(){
             Array.from(document.getElementsByClassName('allimi-check-list')).forEach(function(el_){
                 el_.style.display = 'none';
 
+
             })
+
+            Array.from(document.getElementsByClassName('allimi-check-title')).forEach(function(e){
+
+                e.classList.remove('actived');
+            })
+            el.classList.add('actived');
             // Array.from(document.getElementsByClassName('allimi-check-title')).forEach(function(_el){
             //     _el.classList.remove('actived');
             // })
@@ -321,7 +328,7 @@ function allimi_date_select(target,id){
 function allimi_open_gallery(){
 
 
-    document.getElementById('allimi-right-title').innerText = '미용 갤러리';
+    // document.getElementById('allimi-right-title').innerText = '미용 갤러리';
     document.getElementById('allimi_gallery').style.display = 'flex';
 
     document.getElementById('allimi_defalut').style.opacity = '0';
@@ -366,6 +373,7 @@ function allimi_open_history(target){
 
         },
         success:function(res) {
+            console.log(res)
             let response = JSON.parse(res);
             let head = response.data.head;
             let body = response.data.body;
@@ -405,7 +413,7 @@ function allimi_open_history(target){
 
     })
 
-    document.getElementById('allimi-right-title').innerText = '알리미 발송이력';
+    // document.getElementById('allimi-right-title').innerText = '알리미 발송이력';
     // document.getElementById('allimi_history').style.display = 'flex';
     //
     // document.getElementById('allimi_defalut').style.opacity = '0';
@@ -485,6 +493,13 @@ function allimi_history_change(target){
 
     })
 
+}
+
+function img_link_change(img){
+    var img 	= img.replace("/pet/images", "/images");
+    var img 	= img.replace("/pet/upload", "/upload");
+
+    return "https://image.banjjakpet.com"+img;
 }
 
 function allimi_open_preview(target,id,bool){
@@ -739,7 +754,7 @@ function allimi_open_preview(target,id,bool){
     document.getElementById('allimi_preview_self').innerText = self_text;
 
 
-    document.getElementById('allimi-right-title').innerText = '알리미 미리보기';
+    // document.getElementById('allimi-right-title').innerText = '알리미 미리보기';
 
 
 
@@ -982,12 +997,15 @@ function allimi_select_photo(target,bool){
 
     if(bool){
 
-        document.getElementById('allimi_gallery_wrap').innerHTML = `<div class="allimi-gallery-cell allimi-gallery-cell-icon" style="cursor:pointer;" data-payment_idx="${payment_idx}" data-cellphone="${cellphone}" data-pet_name="${pet_name}" data-pet_seq="${pet_seq}" onclick="pop.open('allimi_gallery');">
-                                                                            <img src="/static/pub/images/icon/photo_icon.png" alt="">
-                                                                            <span class="allimi-gallery-span">사진첨부</span>
-                                                                        </div>`
+        document.getElementById('allimi_gallery_wrap').innerHTML = `<div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="pop.open('allimi_gallery')">
+                                                                        <img src="/static/pub/images/icon/photo_icon.png" alt="">
+                                                                        <span class="allimi-gallery-span">사진첨부</span>
+                                                                    </div>`
     }else{
-
+        // document.getElementById('allimi_gallery_wrap').innerHTML = `<div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="allimi_select_pet_pop()">
+        //                                                                 <img src="/static/pub/images/icon/photo_icon.png" alt="">
+        //                                                                 <span class="allimi-gallery-span">사진첨부</span>
+        //                                                             </div>`
 
     }
 
@@ -1555,7 +1573,7 @@ function allimi_select_pet_pop_confirm(id){
 
     console.log(target);
     allimi_get_gallery(target,id);
-    allimi_open_gallery();
+    pop.open('allimi_gallery');
     pop.close2('allimi_select_pet');
 
 }
@@ -1579,23 +1597,24 @@ function allimi_get_history_one(payment_idx,id){
             } else if (head.code === 200) {
                 console.log(body);
 
-                document.getElementById('allimi-right-title').innerText = '알리미 미리보기';
+                // document.getElementById('allimi-right-title').innerText = '알리미 미리보기';
 
-                document.getElementById('allimi_preview').style.display = 'flex';
-                document.getElementById('allimi_defalut').style.opacity = '0';
-                document.getElementById('allimi_history').style.opacity = '0';
-
-
-                document.getElementById('allimi_gallery').style.opacity = '0';
-
-                setTimeout(function(){
-                    document.getElementById('allimi_preview').style.opacity = '1';
-                    document.getElementById('allimi_defalut').style.display ='none';
-                    document.getElementById('allimi_gallery').style.display ='none';
-                    document.getElementById('allimi_history').style.display ='none';
-
-
-                },200)
+                pop.open('allimi_preview');
+                // document.getElementById('allimi_preview').style.display = 'flex';
+                // document.getElementById('allimi_defalut').style.opacity = '0';
+                // document.getElementById('allimi_history').style.opacity = '0';
+                //
+                //
+                // document.getElementById('allimi_gallery').style.opacity = '0';
+                //
+                // setTimeout(function(){
+                //     document.getElementById('allimi_preview').style.opacity = '1';
+                //     document.getElementById('allimi_defalut').style.display ='none';
+                //     document.getElementById('allimi_gallery').style.display ='none';
+                //     document.getElementById('allimi_history').style.display ='none';
+                //
+                //
+                // },200)
 
                 document.getElementById('allimi_preview_name').innerText = body.pet_name;
 

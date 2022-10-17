@@ -22,6 +22,7 @@ $shop_title	= "알리미 작성";
 $header_right	= '
 	
 ';
+$header_menu =false;
 $allimi_history = true;
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
@@ -42,6 +43,7 @@ $day = (isset($_GET['day'])) ? $_GET['day'] : '';
 $hour = (isset($_GET['hour'])) ? $_GET['hour'] : '';
 $minute = (isset($_GET['minute'])) ? $_GET['minute'] : '';
 $pet_name = (isset($_GET['pet_name'])) ? $_GET['pet_name'] : '';
+$type = (isset($_GET['type'])) ? $_GET['type'] : '';
 
 if(intval($hour) > 12){
     $am_pm_hour = '오후 '.(intval($hour)-12);
@@ -81,7 +83,17 @@ $sh = sql_fetch_array($que);
                                 <strong>이용일</strong>
                             </div>
                             <div class="allimi-body-cell-value">
+                                <?php if($type === '1'){?>
+                                    <div class="allimi-date-select-wrap">
+                                        <select class="allimi-date-select" id="allimi_date_select" data-cellphone="<?=$cellphone?>" onchange="allimi_date_select(this,'<?=$artist_id?>')">
+
+
+                                        </select>
+
+                                    </div>
+                                <?php }else{?>
                                 <span id="allimi_date"><?=$beauty_date?></span>
+                                <?php }?>
                             </div>
                             <div class="allimi-body-cell-icon">
                                 <!--                                                <img src="/static/images/icon/10_ic-24-calendar@2x.png" alt="">-->
@@ -110,7 +122,7 @@ $sh = sql_fetch_array($que);
                         <div class="allimi-body-cell">
 
                             <div class="allimi-gallery-wrap" id="allimi_gallery_wrap">
-                                <div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="pop.open('allimi_gallery')">
+                                <div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="<?php if($type==='1'){?>allimi_select_pet_pop()<?php }else{?>pop.open('allimi_gallery')<?php }?>">
                                     <img src="/static/pub/images/icon/photo_icon.png" alt="">
                                     <span class="allimi-gallery-span">사진첨부</span>
                                 </div>
@@ -436,7 +448,7 @@ $sh = sql_fetch_array($que);
 
                                 <div class="allimi-right-wrap">
                                     <div class="allimi-title-box" style="justify-content: center">
-                                        <div class="allimi-title" id="allimi-right-title">
+                                        <div class="allimi-title">
                                             미용 갤러리
                                         </div>
                                     </div>
@@ -450,7 +462,14 @@ $sh = sql_fetch_array($que);
 
 
                                         <div class="allimi-gallery-footer">
+                                            <?php if($type === '1'){?>
+                                                <div class="allimi-footer-cell cell-fill-purple" style="width:100%; margin-bottom:30px; margin-top:30px;" id="allimi_select_photo" onclick="allimi_select_photo(this,false)">사진 선택 완료</div>
+
+
+                                            <?php }else{?>
                                             <div class="allimi-footer-cell cell-fill-purple" style="width:100%; margin-bottom:30px; margin-top:30px;" id="allimi_select_photo" onclick="allimi_select_photo(this,true)">사진 선택 완료</div>
+
+                                            <?php }?>
 
                                             <span>이미지는 최대 25개까지 등록할 수 있습니다.</span>
                                             <span>gif,png,jpg,jpeg 형식의 이미지만 등록됩니다.</span>
@@ -471,8 +490,14 @@ $sh = sql_fetch_array($que);
 
                         <div class="pop-data alert-pop-data">
                             <div class="pop-body">
-                                <div class="allimi-right-body-history" id="allimi_history">
+                                <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_history'); ">닫기</button>
+                                <div class="allimi-right-body-history" id="allimi_history" style="margin-top:30px">
 
+                                    <div class="allimi-title-box" style="justify-content: center">
+                                        <div class="allimi-title">
+                                            알리미 발송이력
+                                        </div>
+                                    </div>
                                     <div class="allimi-history-wrap">
 
                                         <select class="allimi-body-title" id="allimi_history_select" onchange="allimi_history_change(this);">
@@ -498,6 +523,12 @@ $sh = sql_fetch_array($que);
                                 <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_preview'); ">닫기</button>
 
                                 <div class="allimi-right-body-preview" id="allimi_preview">
+
+                                    <div class="allimi-title-box" style="justify-content: center">
+                                        <div class="allimi-title">
+                                            알리미 미리보기
+                                        </div>
+                                    </div>
 
                                     <div class="allimi-preview-wrap">
                                         <div class="allimi-preview-title">
@@ -579,6 +610,27 @@ $sh = sql_fetch_array($que);
                 </div>
             </article>
 
+
+            <article id="allimi_select_pet" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body" >
+                                <div class="msg-txt" id="msg4_txt">사진을 가져올 펫을 선택해주세요.</div>
+
+                                <div class="allimi-select-pet-list-wrap" id="allimi_select_pet_list">
+
+
+                                </div>
+                            </div>
+                            <div class="pop-footer">
+                                <button type="button" class="btn btn-confirm " onclick="allimi_select_pet_pop_confirm('<?=$artist_id?>')">확인</button>
+                                <button type="button" class="btn btn-confirm" onclick="pop.close2('allimi_select_pet');">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
 
             <!--            -->
 <!--            <div class="allimi-right-wrap">-->
@@ -694,15 +746,64 @@ $sh = sql_fetch_array($que);
         $(document).ready(function(){
             allimi_btn_event();
 
+            <?php if($type==='1'){?>
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+                    mode:'get_diary_date',
+                    artist_id:'<?=$artist_id?>',
+                    cellphone:'<?=$cellphone?>',
+                },
+                success:function(res) {
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+
+                        if(body.length === undefined){
+                            body = [body];
+                        }
+                        console.log(body)
+                        if(body.length>0){
+
+                            let week = ['일','월','화','수','목','금','토'];
+                            body.forEach(function(el){
+
+                                let beauty_date = new Date(`${el.beauty_date.substr(0,4)}`,`${el.beauty_date.substr(4,2)}`,`${el.beauty_date.substr(6,2)}`);
+
+
+
+                                document.getElementById('allimi_date_select').innerHTML += `<option value="${el.beauty_date}">${beauty_date.getFullYear()}년 ${beauty_date.getMonth()}월 ${beauty_date.getDate()}일 (${week[beauty_date.getDay()]})</option>`
+                            })
+                        }
+
+                        setTimeout(function(){
+
+                            document.getElementById('allimi_date_select').dispatchEvent(new Event('change'));
+                        },200);
+
+                    }
+                }
+            })
+
+            <?php }?>
         })
 
         $(document).ready(function(){
 
             document.getElementById('allimi_history_btn').setAttribute('data-artist_id','<?=$artist_id?>');
             document.getElementById('allimi_history_btn').setAttribute('data-cellphone','<?=$cellphone?>');
+            <?php if($type === '1'){?>
+            document.getElementById('allimi_history_btn').setAttribute('data-pet_seq','0');
+            <?php }else{?>
             document.getElementById('allimi_history_btn').setAttribute('data-pet_seq','<?=$pet_seq?>');
+            <?php }?>
 
-
+            document.getElementById('btn_page_prev').setAttribute('onclick','history.back()')
         })
 
 
@@ -808,6 +909,21 @@ $sh = sql_fetch_array($que);
 
             }
         };
+
+
+        function fill_zero(time){
+
+            if(time.toString().length < 2){
+
+                time = `0${time}`
+            }else{
+                time = time;
+            }
+
+            return time;
+        }
+
+
     </script>
 
 <?php

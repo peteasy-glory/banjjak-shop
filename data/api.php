@@ -131,7 +131,7 @@ if($r_mode) {
         $cellphone = $_POST['cellphone'];
         $pet_seq = $_POST['pet_seq'];
 
-        $data = array('artist_id'=>$artist_id,'cellphone'=>$cellphone,'pet_seq'=>$pet_seq);
+        $data = array('artist_id'=>'pettester@peteasy.kr','cellphone'=>'01053906571','pet_seq'=>'178344');
 
         $data_json = json_encode($data);
 

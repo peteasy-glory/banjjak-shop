@@ -4253,7 +4253,19 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 .allimi-title{
 	font-size:18px;
-	font-weight: 500;
+	font-weight: 700;
+}
+.allimi-check-title.actived{
+
+	background: url('/static/pub/images/icon/10-ic-16-upside@2x.png') no-repeat;
+	background-size:13px;
+	background-position: calc(100% - 20px);
+}
+
+.allimi-check-title{
+	background: url('/static/pub/images/icon/10-ic-16-downside@2x.png') no-repeat;
+	background-size:13px;
+	background-position: calc(100% - 20px);
 }
 .allimi-title-right{
 	font-size:14px;
@@ -4993,12 +5005,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 }
 
 .allimi-date-select-wrap{
-	width:70%;
-	margin-left:30px;
+	width:100%;
+	height:60px !important;
 
 
 }
 
+.allimi-date-select{
+	height:60px !important;
+}
 .allimi-select-pet-list-wrap{
 	display:flex;
 	justify-content: space-between;
