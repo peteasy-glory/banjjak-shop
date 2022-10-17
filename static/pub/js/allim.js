@@ -1172,7 +1172,7 @@ function allimi_get_gallery2(id){
 
     document.getElementById('allimi_gallery_list').innerHTML = `<div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>`
 
-    console.log(id)
+
 
     $.ajax({
 
