@@ -383,6 +383,16 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                     </div>
                 </div>';
         }
+
+        if(isset($header_notice)){
+            if($header_notice == true){
+                echo '<div class="header-right">
+                    <div class="label-group">
+                        <div class="label-add-purple"><em>공지사항</em></div>
+                    </div>
+                </div>';
+            }
+        }
     }else if(isset($reserve_waiting)){
         if ($pos1 !== false) {
             echo '<div class="header-right">
