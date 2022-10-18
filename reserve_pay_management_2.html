@@ -1254,6 +1254,7 @@ $r = sql_fetch($res);
                         </div>
                     </div>
                     <div class="item-diary">
+
                         <?php if($pay['diary_idx'] === null){?>
 
                             <div class="diary-not-exist" data-cellphone="<?=$pay['cellphone']?>" data-pet_seq="<?=$pay['pet_seq']?>" data-payment_idx="<?=$pay['payment_log_seq']?>" data-date="<?= $pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']?>" data-pet_name="<?=explode('|',$pay['product'])[0]?>" onclick="location.href ='/allimi_send_payment?cellphone=<?=$pay['cellphone']?>&pet_seq=<?=$pay['pet_seq']?>&payment_idx=<?=$pay['payment_log_seq']?>&year=<?=$pay['year']?>&month=<?=$pay['month']?>&day=<?=$pay['day']?>&hour=<?=$pay['hour']?>&minute=<?=$pay['minute']?>&pet_name=<?=explode('|',$pay['product'])[0]?>'">알리미 보내기</div>

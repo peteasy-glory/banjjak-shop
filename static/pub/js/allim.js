@@ -353,6 +353,8 @@ function allimi_open_history(target){
                 }
                 console.log(body)
                 if(body.length > 0){
+                    document.getElementById('allimi_history_none').style.display = 'none';
+
                     document.getElementById('allimi_history_select').style.display = 'flex';
                     document.getElementById('allimi_history_select').innerHTML =`<option data-pet_seq="0" data-artist_id="${artist_id}" data-cellphone="${cellphone}">전체보기</option>`
 
@@ -373,7 +375,7 @@ function allimi_open_history(target){
                     })
                 }else{
                     document.getElementById('allimi_history_select').style.display = 'none';
-
+                    document.getElementById('allimi_history_none').style.display = 'block';
                 }
             }
         }

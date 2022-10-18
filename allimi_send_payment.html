@@ -509,6 +509,10 @@ $sh = sql_fetch_array($que);
                                         <div class="allimi-history-list" id="allimi_history_list">
 
                                         </div>
+                                        <div class="allimi-history-none" style="display:none;" id="allimi_history_none">
+                                            <img src="/static/pub/images/img-illust-3@2x.png" alt="">
+                                            <div class="item-info">발송된 알리미 내역이 없습니다.</div>
+                                        </div>
                                     </div>
 
                                 </div>
@@ -763,7 +767,7 @@ $sh = sql_fetch_array($que);
         //안드에서 업로드가 끝나면 무조건 호출..
         function uploadEnd(fileName) {
             // var filename = $("input[name=imgupfile]")[0].files[0].name;
-            var newfilename = GetPhotoFilename('pet_gallery', '<?= ($customer_user_id != null && $customer_user_id != "") ? $customer_user_id : "tmp_$customer_tmp_seq" ?>', fileName);
+            var newfilename = GetPhotoFilename('pet_gallery', '<?=$artist_id?>', fileName);
             var formData = new FormData();
             formData.append("myfile", fileName);
             formData.append("filepath", newfilename);
@@ -778,8 +782,9 @@ $sh = sql_fetch_array($que);
                 cache: false,
                 type: 'POST',
                 success: function(data) {
-
+                    allimi_get_gallery2('<?=$artist_id?>');
                     if(data != "Fail") { // 성공
+
                         location.reload();
 
                     } else {
