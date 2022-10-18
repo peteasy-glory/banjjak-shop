@@ -24,6 +24,8 @@ $_SESSION['backurl2'] = 'home_main';
 
 $shop_title	= "MY SHOP";
 $header_menu	= true;
+$header_right = '';
+$header_notice = true;
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
@@ -603,6 +605,39 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                                 <a href="tel:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">통화하기</a>
                                                 <a href="sms:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">문자하기</a>
                                             </div>
+                                            <div class="item-diary">
+                                                <?php if($pl['diary_idx'] === null){?>
+
+                                                    <div class="diary-not-exist" data-cellphone="<?=$pl['cellphone']?>" data-pet_seq="<?=$pl['pet_seq']?>" data-payment_idx="<?=$pl['payment_log_seq']?>" data-date="<?= $pl['year'].'-'.$pl['month'].'-'.$pl['day'].' '.$pl['hour'].':'.$pl['minute']?>" data-pet_name="<?=explode('|',$pl['product'])[0]?>" onclick="location.href ='/allimi_send_payment?cellphone=<?=$pl['cellphone']?>&pet_seq=<?=$pl['pet_seq']?>&payment_idx=<?=$pl['payment_log_seq']?>&year=<?=$pl['year']?>&month=<?=$pl['month']?>&day=<?=$pl['day']?>&hour=<?=$pl['hour']?>&minute=<?=$pl['minute']?>&pet_name=<?=explode('|',$pl['product'])[0]?>'">알리미 보내기</div>
+
+                                            <?php }else{
+                                                    $diary_time = explode(' ',$pl['diary_time'])[0];
+                                                    $diary_year = explode('-',$diary_time)[0];
+                                                    $diary_month = explode('-',$diary_time)[1];
+                                                    $diary_day = explode('-',$diary_time)[2];
+
+                                                    $diary_time2 = explode(' ',$pl['diary_time'])[1];
+                                                    $diary_hour = explode(':',$diary_time2)[0];
+                                                    $diary_minute = explode(':',$diary_time2)[1];
+
+                                                    if(intval($diary_hour) > 12){
+                                                        $diary_hour = '오후 '.(intval($diary_hour)-12);
+
+                                                    }else if(intval($diary_hour) == 12){
+                                                        $diary_hour = '오후 '.intval($diary_hour);
+                                                    }else{
+                                                        $diary_hour = '오전 '.intval($diary_hour);
+                                                    }
+
+
+                                                    ?>
+
+
+
+                                                    <div class="diary-exist" data-cellphone="<?=$pl['cellphone']?>" data-pet_seq="<?=$pl['pet_seq']?>" data-payment_idx="<?=$pl['payment_log_seq']?>" data-date="<?= $pl['year'].'-'.$pl['month'].'-'.$pl['day'].' '.$pl['hour'].':'.$pl['minute']?>" data-pet_name="<?=explode('|',$pl['product'])[0]?>">알리미 발송완료</div>
+                                                    <div class="diary-date"><span>(<?=$diary_year?>. <?=$diary_month?>. <?=$diary_day?>. <?=$diary_hour?>시 <?=$diary_minute?>분)</span></div>
+                                            <?php }?>
+                                            </div>
                                         </div>
                                     </div>
                                 <?}}?>
@@ -772,9 +807,12 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
             </div>
         </div>
 
-
     </section>
+
+
     <!-- //container -->
+
+    <script src="/static/pub/js/allim.js"></script>
     <script>
 
         let mql = window.matchMedia("screen and (min-width: 1025px)");

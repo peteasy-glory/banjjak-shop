@@ -2142,12 +2142,16 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     if (head.code === 401) {
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
+<<<<<<< HEAD
                         console.log(body)
 
 <<<<<<< HEAD
 =======
 
 >>>>>>> 641cccd54eb4888f6a810c053e548705c7043f78
+=======
+
+>>>>>>> 66bb7d344fabeeb6c12095698ff0f4f7bcae69a6
                         if(body.length >0 && body[0].reserve_price !== 0){
 
                             if(document.getElementById('deposit_form_1').style.display === 'none'){

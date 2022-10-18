@@ -367,7 +367,22 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 		<a href="#" class="btn-page-ui btn-page-prev" id="btn_page_prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
 	</div>
 	<?php  } ?>
-	<div class="page-title"><?=$shop_title?></div>
+	<div class="page-title" <?php if(isset($allimi_history)){if($allimi_history===true){echo 'style = flex-direction : row;';}}?>><?=$shop_title?>
+
+        <?php
+
+        if(isset($allimi_history)) {
+
+            if($allimi_history === true){
+                echo '<div class="allimi-title-right" style="cursor: pointer" id="allimi_history_btn" onclick="pop.open(\'allimi_history\'); allimi_open_history(this);" >
+                                        <img src="/static/pub/images/icon/NoPath@2x.png" alt="">
+                                        <span>히스토리</span>
+                                    </div>';
+            }
+        }
+        ?>
+
+    </div>
 	<!-- //20220110 수정 -->
     <div class="reserve-state-bar" id="empty_time_bar" style="display:none;">
         <div class="bar" style="width:33.33%"></div>
@@ -375,13 +390,23 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 	<?php
     if(isset($header_right)) {
 
-        echo $header_right;
+
         if ($pos !== false) {
             echo '<div class="header-right">
                     <div class="label-group">
                         <div class="label-add-purple"><em>승인대기</em></div>
                     </div>
                 </div>';
+        }
+
+
+        if(isset($header_notice)){
+            if($header_notice == true){
+                echo '<div class="header-right header-notice-wrap" onclick="location.href=`/mypage_notice_list`">
+                    <img src="/static/pub/images/icon/btn-top-noti@2x.png">
+                    <img src="images/new_item2.png" alt="" style="margin-bottom:25px; margin-left:-5px;max-width:5px !important;">
+                </div>';
+            }
         }
     }else if(isset($reserve_waiting)){
         if ($pos1 !== false) {
