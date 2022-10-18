@@ -376,13 +376,13 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
     if(isset($header_right)) {
 
         echo $header_right;
-        if ($pos !== false) {`
+        if ($pos !== false) {
             echo '<div class="header-right">
                     <div class="label-group">
                         <div class="label-add-purple"><em>승인대기</em></div>
                     </div>
                 </div>';
-        }`
+        }
 
         if(isset($header_notice)){
             if($header_notice == true){
