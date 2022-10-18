@@ -4905,6 +4905,21 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	align-items: flex-start;
 }
 
+.before-dot{
+	position: relative;
+}
+
+.before-dot::before{
+	position: absolute;
+	content :'';
+	width:5px;
+	height: 5px;
+	top:8px;
+	left:-10px;
+	background : url('/static/pub/images/icon/black_dot.png') no-repeat;
+	background-size:5px 5px;
+}
+
 .allimi-preview-info{
 	border:1px solid #ebebeb;
 	border-radius: 10px;
