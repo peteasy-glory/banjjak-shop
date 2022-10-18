@@ -350,7 +350,7 @@ function allimi_open_history(target){
                 }
                 console.log(body)
                 if(body.length > 0){
-
+                    document.getElementById('allimi_history_select').style.display = 'flex';
                     document.getElementById('allimi_history_select').innerHTML =`<option data-pet_seq="0" data-artist_id="${artist_id}" data-cellphone="${cellphone}">전체보기</option>`
 
                     document.getElementById('allimi_history_select').dispatchEvent(new Event('change'));
@@ -368,6 +368,9 @@ function allimi_open_history(target){
 
                         document.getElementById('allimi_history_select').innerHTML += `<option data-cellphone="${cellphone}" data-artist_id="${artist_id}" data-pet_seq="${el.pet_seq}" >${el.name}</option>`
                     })
+                }else{
+                    document.getElementById('allimi_history_select').style.display = 'none';
+
                 }
             }
         }
@@ -874,7 +877,7 @@ function allimi_get_gallery(target,id){
     let cellphone = target.getAttribute('data-cellphone');
     let pet_name = target.getAttribute('data-pet_name');
 
-    document.getElementById('allimi_gallery_list').innerHTML = `<div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>`
+    document.getElementById('allimi_gallery_list').innerHTML = `<div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="file_view()"><span><em>이미지 추가</em></span></a></div>`
 
     document.getElementById('allimi_imgupfile_wrap').innerHTML = '';
     document.getElementById('allimi_imgupfile_wrap').innerHTML = `<input type="file" accept="image/*" name="allimi_imgupfile" id="allimi_addimgfile">`
@@ -1132,7 +1135,7 @@ function allimi_get_gallery2(id){
     let cellphone = target.getAttribute('data-cellphone');
     let pet_name = target.getAttribute('data-pet_name');
 
-    document.getElementById('allimi_gallery_list').innerHTML = `<div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>`
+    document.getElementById('allimi_gallery_list').innerHTML = `<div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="file_view()"><span><em>이미지 추가</em></span></a></div>`
 
 
 

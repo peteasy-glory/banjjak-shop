@@ -458,8 +458,7 @@ $sh = sql_fetch_array($que);
                                     <div class="allimi-right-body-gallery" id="allimi_gallery">
 
                                         <div class="allimi-gallery-list" id="allimi_gallery_list">
-                                            <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>
-                                            <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>
+                                            <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="file_view()"><span><em>이미지 추가</em></span></a></div>
 
                                         </div>
                                         <div style="display:block;position:absolute;top:-150px;" id="allimi_imgupfile_wrap"><input type="file" accept="image/*" name="allimi_imgupfile" id="allimi_addimgfile"></div>
@@ -651,106 +650,6 @@ $sh = sql_fetch_array($que);
                 </div>
             </article>
 
-            <!--            -->
-<!--            <div class="allimi-right-wrap">-->
-<!--                <div class="allimi-title-box" style="justify-content: center">-->
-<!--                    <div class="allimi-title" id="allimi-right-title">-->
-<!---->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="allimi-right-body-default" id="allimi_defalut">-->
-<!--                    <img src="/static/images/ic_dog00_b.png" alt="">-->
-<!--                </div>-->
-<!--                <div class="allimi-right-body-gallery" id="allimi_gallery">-->
-<!---->
-<!--                    <div class="allimi-gallery-list" id="allimi_gallery_list">-->
-<!--                        <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>-->
-<!---->
-<!--                    </div>-->
-<!--                    <div style="display:block;position:absolute;top:-150px;" id="allimi_imgupfile_wrap"><input type="file" accept="image/*" name="allimi_imgupfile" id="allimi_addimgfile"></div>-->
-<!---->
-<!---->
-<!--                    <div class="allimi-gallery-footer">-->
-<!--                        <div class="allimi-footer-cell cell-fill-purple" style="width:100%; margin-bottom:30px; margin-top:30px;" id="allimi_select_photo" onclick="allimi_select_photo(this,true)">사진 선택 완료</div>-->
-<!---->
-<!--                        <span>이미지는 최대 25개까지 등록할 수 있습니다.</span>-->
-<!--                        <span>gif,png,jpg,jpeg 형식의 이미지만 등록됩니다.</span>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--                <div class="allimi-right-body-preview" id="allimi_preview">-->
-<!---->
-<!--                    <div class="allimi-preview-wrap">-->
-<!--                        <div class="allimi-preview-title">-->
-<!--                                        <span class="allimi-preview-name" id="allimi_preview_name">-->
-<!---->
-<!--                                        </span>-->
-<!--                            <span class="allimi-preview-date" id="allimi_preview_date">-->
-<!---->
-<!--                                        </span>-->
-<!--                        </div>-->
-<!--                        <div class="allimi-preview-gallery" id="allimi_preview_gallery">-->
-<!---->
-<!--                            <div class="swiper-container allimi-swiper-container">-->
-<!--                                <div class="swiper-wrapper" id="allimi-preview-swiper">-->
-<!---->
-<!--                                </div>-->
-<!--                                <div class="next allimi-next" id="allimi_next"><i class="left-arrow""></i></div>-->
-<!--                                <div class="prev allimi-prev" id="allimi_prev"><i class="right-arrow"></i></div>-->
-<!--                                <div class="swiper-pagination allimi-pagination"></div>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!---->
-<!--                        <div class="allimi-preview-info">-->
-<!--                            <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">미용 다이어리</span></div>-->
-<!---->
-<!--                            <div class="allimi-preview-info-content">-->
-<!--                                <ul>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_attitude_wrap"><strong>미용예절</strong><br><span id="allimi_preview_attitude"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_tangle_wrap"><strong>엉킴(부위)</strong><br>T<span id="allimi_preview_tangle"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_bath_wrap"><strong>목욕/드라이</strong><br><span id="allimi_preview_bath"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_skin_wrap"><strong>피부</strong><br><span id="allimi_preview_skin"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_condition_wrap"><strong>컨디션</strong><br><span id="allimi_preview_condition"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_dislike_wrap"><strong>싫어했던 부위</strong><br><span id="allimi_preview_dislike"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_self_wrap"><strong>미용 후 전달사항</strong><br><span id="allimi_preview_self" style="white-space: pre-line"></span></li>-->
-<!--                                    <li class="list-style-basic" id="allimi_preview_none"><strong>알림 내용이 없습니다.</strong></li>-->
-<!---->
-<!--                                </ul>-->
-<!--                            </div>-->
-<!---->
-<!--                        </div>-->
-<!---->
-<!---->
-<!--                        <div class="allimi-preview-info" style="margin-bottom:30px;">-->
-<!--                            <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">샵 정보</span></div>-->
-<!---->
-<!--                            <div class="allimi-preview-info-content" style="padding-left:20px;">-->
-<!---->
-<!--                                <div class="allimi-preview-shop-title"><span id="allimi_preview_shop_title"></span></div>-->
-<!--                                <div class="allimi-preview-shop-phone">연락처<span id="allimi_preview_shop_phone"></span></div>-->
-<!--                                <div class="allimi-preview-shop-address">샵 위치<span id="allimi_preview_shop_address"></span></div>-->
-<!--                                <div class="allimi-preview-shop-map" id="allimi_preview_shop_map"></div>-->
-<!--                            </div>-->
-<!---->
-<!--                        </div>-->
-<!--                        <div class="blank-space"></div>-->
-<!--                    </div>-->
-<!---->
-<!--                </div>-->
-<!---->
-<!--                <div class="allimi-right-body-history" id="allimi_history">-->
-<!---->
-<!--                    <div class="allimi-history-wrap">-->
-<!---->
-<!--                        <select class="allimi-body-title" id="allimi_history_select" onchange="allimi_history_change(this);">-->
-<!--                        </select>-->
-<!---->
-<!--                        <div class="allimi-history-list" id="allimi_history_list">-->
-<!---->
-<!--                        </div>-->
-<!--                    </div>-->
-<!---->
-<!--                </div>-->
-<!--            </div>-->
 
 
 
@@ -851,6 +750,80 @@ $sh = sql_fetch_array($que);
 
 
         });
+
+
+        function galleryup() {
+            window.Android.openGallery();
+        }
+
+        function cameraup() {
+            window.Android.openCamera();
+        }
+
+        //안드에서 업로드가 끝나면 무조건 호출..
+        function uploadEnd(fileName) {
+            // var filename = $("input[name=imgupfile]")[0].files[0].name;
+            var newfilename = GetPhotoFilename('pet_gallery', '<?= ($customer_user_id != null && $customer_user_id != "") ? $customer_user_id : "tmp_$customer_tmp_seq" ?>', fileName);
+            var formData = new FormData();
+            formData.append("myfile", fileName);
+            formData.append("filepath", newfilename);
+            formData.append("pet_seq", _pet_seq);
+            formData.append("payment_log_seq", _payment_log_seq);
+            formData.append("artist_id", _artist_id);
+            $.ajax({
+                url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                type: 'POST',
+                success: function(data) {
+
+                    if(data != "Fail") { // 성공
+                        location.reload();
+
+                    } else {
+                        alert('미용사진 업로드에 실패하였습니다.');
+                        //rv = false;
+                    }
+
+                },
+                error: function(xhr, status, error) {
+                    alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                }
+            });
+        }
+
+        function file_view(){
+            var is_android = checkMobile();
+            if(is_android == true){
+                galleryup();
+            } else {
+                $("#allimi_addimgfile").click();
+
+            }
+        }
+
+
+        function checkMobile(){
+
+            var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+
+            if ( varUA.indexOf('android') > -1) {
+                //안드로이드
+                return true;
+            } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+                //IOS
+                return 'ios';
+            } else {
+                //아이폰, 안드로이드 외
+                return 'other';
+            }
+
+        }
 
         function img_link_change(img){
             var img 	= img.replace("/pet/images", "/images");
