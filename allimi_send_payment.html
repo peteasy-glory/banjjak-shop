@@ -751,7 +751,7 @@ $sh = sql_fetch_array($que);
 
 
             <?php if($type==='1'){?>
-            document.getElementById('allimi_pet_btn').click();
+
             $.ajax({
 
                 url:'/data/api.php',
@@ -795,6 +795,9 @@ $sh = sql_fetch_array($que);
                 }
             })
 
+            <?php }else{ ?>
+
+            document.getElementById('allimi_pet_btn').click();
             <?php }?>
         })
 
