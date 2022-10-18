@@ -18,6 +18,7 @@ if($type == 0){
 $notice_title = $rows->title;
 $date = ($rows->update_time && $rows->update_time != "")? $rows->update_time : $rows->reg_dt;
 $photo = img_link_change($rows->file1);
+$notice = $rows->notice;
 
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
@@ -63,6 +64,7 @@ if ($artist_flag === true) {
         </div>
         <div class="board-view-detail">
             <img src="https://image.banjjakpet.com<?=$photo?>" alt="" onclick="<?php if($notice_seq == 25){echo "location.href='https://partner-pc.banjjakpet.com/?partner_pc=$artist_id'";}?>" style="<?php if($notice_seq == 25){echo 'cursor:pointer';}?>"/>
+            <?= nl2br($notice) ?>
         </div>
     </div>
     <!-- //page-body -->

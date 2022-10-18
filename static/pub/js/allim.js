@@ -1,3 +1,6 @@
+var re_pet_seq = '';
+var re_payment_log_seq = '';
+
 function siblings(el,i){
 
     return [...el.parentElement.children][i];
@@ -887,7 +890,8 @@ function allimi_get_gallery(target,id){
     document.getElementById('allimi_open_gallery').setAttribute('data-pet_name',pet_name);
 
 
-
+    re_payment_log_seq = payment_idx;
+    re_pet_seq = pet_seq;
     console.log(id)
 
     $.ajax({

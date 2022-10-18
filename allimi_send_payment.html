@@ -767,9 +767,9 @@ $sh = sql_fetch_array($que);
             var formData = new FormData();
             formData.append("myfile", fileName);
             formData.append("filepath", newfilename);
-            formData.append("pet_seq", _pet_seq);
-            formData.append("payment_log_seq", _payment_log_seq);
-            formData.append("artist_id", _artist_id);
+            formData.append("pet_seq", re_pet_seq);
+            formData.append("payment_log_seq", re_payment_log_seq);
+            formData.append("artist_id", '<?=$artist_id?>');
             $.ajax({
                 url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
                 data: formData,
