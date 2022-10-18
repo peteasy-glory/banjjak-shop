@@ -403,7 +403,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                             <div class="basic-data-group allimi-wrap-bg-gray" style="width:100vw; left:-20px;padding:20px;">
                                 <div class="con-title-group" style="justify-content: flex-start; background: transparent">
                                     <h4 class="con-title">예약금 안내발송</h4>
-                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick=deposit_background(this);deposit_toggle(artist_id); if(this.checked === true){document.getElementById('is_reserve_pay').value = 1; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('is_reserve_pay').value=0; document.getElementById('deposit_check_').value ='N'}"><span class="bar"></span></label>
+                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick=deposit_toggle(artist_id,this); if(this.checked === true){document.getElementById('is_reserve_pay').value = 1; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('is_reserve_pay').value=0; document.getElementById('deposit_check_').value ='N'}"><span class="bar"></span></label>
 
                                     <div class="grid-layout-cell grid-4" style="margin-left:20px;"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="popalert.open('depositExam');">미리보기</button></div>
 
@@ -2110,20 +2110,24 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
 
         function deposit_background(target){
 
-            if(target.checked === true){
+            if(target.checked === false){
 
                 target.parentElement.parentElement.parentElement.classList.add('allimi-wrap-bg-purple')
                 target.parentElement.parentElement.parentElement.classList.remove('allimi-wrap-bg-gray')
+                target.checked =true;
             }else{
                 target.parentElement.parentElement.parentElement.classList.add('allimi-wrap-bg-gray')
                 target.parentElement.parentElement.parentElement.classList.remove('allimi-wrap-bg-purple')
+                target.checked = false;
             }
 
 
         }
 
-        function deposit_toggle(id){
+        function deposit_toggle(id,target){
 
+
+            event.preventDefault()
 
 
 
@@ -2175,6 +2179,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
 
                             document.getElementById('reserve_deposit_input').setAttribute('data-bank',`${body[0].bank_name}`)
                             document.getElementById('reserve_deposit_input').setAttribute('data-account',`${body[0].account_num}`)
+                            deposit_background(target);
                         }else{
 
                             pop.open('deposit_confirm')
@@ -2236,9 +2241,12 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     if (head.code === 401) {
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
+                        document.getElementById('deposit_btn').checked = false;
 
-
-                        pop.close('deposit_set')
+                        document.getElementById('msg1_txt').innerText = '저장되었습니다.'
+                        pop.open('reserveAcceptMsg1');
+                        pop.close2('deposit_set')
+                        pop.close2('deposit_confirm')
                     }
 
 
