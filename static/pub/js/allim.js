@@ -1,3 +1,8 @@
+function siblings(el,i){
+
+    return [...el.parentElement.children][i];
+
+}
 
 function allimi_btn_event(){
 
@@ -5,62 +10,19 @@ function allimi_btn_event(){
 
         el.addEventListener('click',function(){
 
-            Array.from(document.getElementsByClassName('allimi-check-list')).forEach(function(el_){
-                el_.style.display = 'none';
+            if(el.classList.contains('actived')){
+                document.getElementById(`${el.getAttribute('id')}`).parentElement.children[1].style.display = 'none';
+                el.classList.remove('actived');
 
+            }else{
 
-            })
-
-            Array.from(document.getElementsByClassName('allimi-check-title')).forEach(function(e){
-
-                e.classList.remove('actived');
-            })
-            el.classList.add('actived');
-            // Array.from(document.getElementsByClassName('allimi-check-title')).forEach(function(_el){
-            //     _el.classList.remove('actived');
-            // })
-            // el.classList.add('actived');
-
-
-
-
-            if(el.getAttribute('id') === 'attitude_btn'){
-
-                if(document.getElementById('check_list_attitude').style.display === 'none'){
-                    document.getElementById('check_list_attitude').style.display = 'inline-flex';
-                }
-            }else if(el.getAttribute('id') === 'tangle_btn'){
-                if(document.getElementById('check_list_tangle').style.display === 'none'){
-                    document.getElementById('check_list_tangle').style.display = 'inline-flex';
-                }
-
-            }else if(el.getAttribute('id')==='bath_btn'){
-                if(document.getElementById('check_list_bath').style.display === 'none'){
-                    document.getElementById('check_list_bath').style.display = 'inline-flex';
-
-                }
-
-            }else if(el.getAttribute('id')==='skin_btn'){
-                if(document.getElementById('check_list_skin').style.display === 'none'){
-                    document.getElementById('check_list_skin').style.display = 'inline-flex';
-
-                }
-            }else if(el.getAttribute('id')==='condition_btn'){
-                if(document.getElementById('check_list_condition').style.display === 'none'){
-                    document.getElementById('check_list_condition').style.display = 'inline-flex';
-
-                }
-            }else if(el.getAttribute('id')==='dislike_btn'){
-                if(document.getElementById('check_list_dislike').style.display === 'none'){
-                    document.getElementById('check_list_dislike').style.display = 'inline-flex';
-
-                }
-            }else if(el.getAttribute('id')==='self_btn'){
-                if(document.getElementById('check_list_self').style.display === 'none'){
-                    document.getElementById('check_list_self').style.display = 'inline-flex';
-
-                }
+                el.classList.add('actived');
+                siblings(el,1).style.display = 'inline-flex';
             }
+
+
+
+
 
         })
     })
@@ -600,13 +562,13 @@ function allimi_open_preview(target,id,bool){
 
     let attitude_text, tangle_text,bath_text,skin_text,condition_text,dislike_text,self_text;
 
-    document.getElementById('allimi_preview_attitude_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_tangle_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_bath_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_skin_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_condition_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_dislike_wrap').style.display ='list-item';
-    document.getElementById('allimi_preview_self_wrap').style.display ='list-item';
+    document.getElementById('allimi_preview_attitude_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_tangle_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_bath_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_skin_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_condition_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_dislike_wrap').style.display ='flex';
+    document.getElementById('allimi_preview_self_wrap').style.display ='flex';
 
     document.getElementById('allimi_preview_gallery').style.display = 'block';
     tangle_text ='';
@@ -736,7 +698,7 @@ function allimi_open_preview(target,id,bool){
 
     if(attitude_text === '' && tangle_text === '' && bath_text ==='' && skin_text === '' && condition_text === '' && dislike_text === '' && self_text === ''){
 
-        document.getElementById('allimi_preview_none').style.display = 'list-item';
+        document.getElementById('allimi_preview_none').style.display = 'flex';
 
     }else{
 
@@ -1692,7 +1654,7 @@ function allimi_get_history_one(payment_idx,id){
 
                 if(none_count === 8){
 
-                    document.getElementById('allimi_preview_none').style.display = 'list-item';
+                    document.getElementById('allimi_preview_none').style.display = 'flex';
                 }
 
 

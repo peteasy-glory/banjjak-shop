@@ -4899,8 +4899,10 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 }
 
 .list-style-basic{
-	list-style: disc;
 	margin-bottom:10px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
 }
 
 .allimi-preview-info{
@@ -4910,7 +4912,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	margin-top:30px;
 }
 .allimi-preview-info-content{
-	padding-left:40px;
+	padding-left:20px;
 	padding-top:20px;
 	padding-right:20px;
 }
