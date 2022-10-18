@@ -4195,7 +4195,6 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 
 
-
 .allimi-container{
 
 	position: relative;
@@ -5056,7 +5055,27 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 }
 
 
-.allimi-history-cell-wrap{
+.allimi-history-cell-wrap {
 	display: flex;
-	margin-top:20px;
+	margin-top: 20px;
 }
+
+.allimi-wrap-bg-purple{
+
+	background: #EEE7FA;
+}
+
+.allimi-wrap-bg-gray{
+
+	background: #F4F4F4;
+}
+
+.header-notice-wrap{
+
+	width:28px;
+	height:30px;
+	right:10px!important;
+
+}
+
+
