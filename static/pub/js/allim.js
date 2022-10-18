@@ -1481,8 +1481,8 @@ function allimi_send(shop_name){
                         })
                     }
 
-                    document.getElementById('msg1_txt').innerText = '알리미가 전송되었습니다.';
-                    pop.open('reserveAcceptMsg1');
+                    document.getElementById('close_msg').innerText = '알리미가 전송되었습니다.';
+                    pop.open('allimiClosePop');
                 }
             }
 
