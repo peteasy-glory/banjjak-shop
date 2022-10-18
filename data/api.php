@@ -139,6 +139,14 @@ if($r_mode) {
 
         $return_data = array("code"=>"000000","data"=>$result);
 
+    }else if($r_mode === "pet_info"){
+
+
+        $pet_seq = $_POST['pet_seq'];
+
+        $pet_info = $api->get('/partner/booking/pet/'.$pet_seq);
+
+        $return_data = array("code"=>"000000","data"=>$pet_info);
     }else if($r_mode === 'post_allimi'){
 
         $payment_log_seq = $_POST['payment_log_seq'];

@@ -1206,6 +1206,35 @@ function allimi_send(shop_name){
         let cellphone = el.getAttribute('data-cellphone');
         let pet_name = el.getAttribute('data-pet_name');
 
+        let pet_name_owner = '';
+        $.ajax({
+            url:'/data/api.php',
+            type:'post',
+            async:false,
+            data:{
+                mode:'pet_info',
+                pet_seq:pet_seq,
+            },
+            success:function(res) {
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+                    console.log(body)
+                    if(body.length === undefined){
+                        body = [body];
+                    }
+
+                    if(body.length>0){
+
+                        pet_name_owner = body[0].name_for_owner;
+                    }
+                }
+            }
+        })
+
         let etiquette = document.querySelector('input[name="attitude"]:checked') === null ? '' : document.querySelector('input[name="attitude"]:checked');
         let etiquette_1 = etiquette.value == '1' ? '1':'0';
         let etiquette_2 = etiquette.value == '2' ? '1':'0';
@@ -1410,11 +1439,19 @@ function allimi_send(shop_name){
                     console.log(body);
                     if(i === 0){
 
+                        let message= '';
+                        if(pet_name_owner === '' || pet_name_owner === undefined || pet_name_owner === null){
+                            message = `${pet_name} 보호자님 안녕하세요.\n` +
+                                `${shop_name}에서 ${pet_name}의 컨디션과 활동에 대한 알리미가 도착했어요.\n` +
+                                '\n' +
+                                '아래 알리미보기 버튼을 눌러 확인해보세요.'
+                        }else{
+                            message = `${pet_name_owner} 보호자님 안녕하세요.\n` +
+                                `${shop_name}에서 ${pet_name_owner}의 컨디션과 활동에 대한 알리미가 도착했어요.\n` +
+                                '\n' +
+                                '아래 알리미보기 버튼을 눌러 확인해보세요.'
+                        }
 
-                        let message = `${pet_name} 보호자님 안녕하세요.\n` +
-                            `${shop_name}에서 ${pet_name}의 컨디션과 활동에 대한 알리미가 도착했어요.\n` +
-                            '\n' +
-                            '아래 알리미보기 버튼을 눌러 확인해보세요.'
 
                         $.ajax({
 
@@ -1654,8 +1691,7 @@ function allimi_get_history_one(payment_idx,id){
 
                 if(none_count === 8){
 
-                    document.getElementById('allimi_preview_none').style.display = 'flex';
-                }
+                    document.getElementById('allimi_preview_none').style.display = 'flex';}
 
 
                 document.getElementById('allimi_preview_shop_title').innerText = body.shop_name;
