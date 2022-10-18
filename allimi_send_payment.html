@@ -107,7 +107,7 @@ $sh = sql_fetch_array($que);
                             <div class="allimi-body-cell-value" id="allimi_pet_list">
                                 <?php if($type !== '1'){?>
                                 <label class="allimi-form">
-                                    <input type="radio" name="allimi-pet" checked onclick="allimi_get_gallery(this,'<?=$artist_id?>')" data-artist_id="<?=$artist_id?>" data-pet_name="<?=$pet_name?>" data-cellphone="<?=$cellphone?>" data-payment_idx="<?=$payment_idx?>" data-pet_seq="<?=$pet_seq?>">
+                                    <input type="radio" name="allimi-pet" id="allimi_pet_btn" onclick="allimi_get_gallery(this,'<?=$artist_id?>')" data-artist_id="<?=$artist_id?>" data-pet_name="<?=$pet_name?>" data-cellphone="<?=$cellphone?>" data-payment_idx="<?=$payment_idx?>" data-pet_seq="<?=$pet_seq?>">
                                     <em></em>
                                     <span class="allimi-radio-span"><?=$pet_name?></span>
                                 </label>
@@ -458,6 +458,7 @@ $sh = sql_fetch_array($que);
 
                                         <div class="allimi-gallery-list" id="allimi_gallery_list">
                                             <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>
+                                            <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="allimi_MemofocusNcursor()"><span><em>이미지 추가</em></span></a></div>
 
                                         </div>
                                         <div style="display:block;position:absolute;top:-150px;" id="allimi_imgupfile_wrap"><input type="file" accept="image/*" name="allimi_imgupfile" id="allimi_addimgfile"></div>
@@ -748,7 +749,9 @@ $sh = sql_fetch_array($que);
         $(document).ready(function(){
             allimi_btn_event();
 
+
             <?php if($type==='1'){?>
+            document.getElementById('allimi_pet_btn').click();
             $.ajax({
 
                 url:'/data/api.php',
