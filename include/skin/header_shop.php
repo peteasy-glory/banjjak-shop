@@ -376,20 +376,19 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
     if(isset($header_right)) {
 
         echo $header_right;
-        if ($pos !== false) {
+        if ($pos !== false) {`
             echo '<div class="header-right">
                     <div class="label-group">
                         <div class="label-add-purple"><em>승인대기</em></div>
                     </div>
                 </div>';
-        }
+        }`
 
         if(isset($header_notice)){
             if($header_notice == true){
-                echo '<div class="header-right">
-                    <div class="label-group">
-                        <div class="label-add-purple"><em>공지사항</em></div>
-                    </div>
+                echo '<div class="header-right header-notice-wrap" onclick="location.href=`/mypage_notice_list`">
+                    <img src="/static/pub/images/icon/btn-top-noti@2x.png">
+                    <img src="images/new_item2.png" alt="" style="margin-bottom:25px; margin-left:-5px;max-width:5px !important;">
                 </div>';
             }
         }

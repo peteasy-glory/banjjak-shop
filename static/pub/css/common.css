@@ -4202,3 +4202,15 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 	background: #F4F4F4;
 }
+
+.header-notice-wrap{
+
+	width:28px;
+	height:30px;
+	right:10px!important;
+
+}
+.header-notice-wrap:after{
+
+
+}
