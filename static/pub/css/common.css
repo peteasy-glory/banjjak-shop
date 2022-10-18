@@ -4797,6 +4797,12 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 
 }
+.allimi-alert{
+	color: #ff4848;
+	font-size: 11px;
+	margin-bottom: 10px;
+}
+
 .allimi-preview-title{
 	display:flex;
 	flex-direction: column;
