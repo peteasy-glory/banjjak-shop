@@ -4293,7 +4293,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .allimi-left-footer{
 
 	width:100%;
-	height:120px;
+	height:150px;
 	display: flex;
 	align-items: center;
 	justify-content: flex-end;
@@ -4798,9 +4798,9 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 
 }
 .allimi-alert{
-	color: #ff4848;
-	font-size: 11px;
-	margin-bottom: 10px;
+	font-size: 13px;
+	margin-top: 15px;
+	margin-bottom:15px;
 }
 
 .allimi-preview-title{
