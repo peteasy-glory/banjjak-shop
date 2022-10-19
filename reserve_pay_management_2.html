@@ -31,6 +31,9 @@ $notice_yn = "Y";
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_pay_management_2?payment_log_seq='.$_GET['payment_log_seq'];
 
+unset($_SESSION['back_allimi']);
+$_SESSION['back_allimi'] = 'reserve_pay_management_2?payment_log_seq='.$_GET['payment_log_seq'];
+
 // 이전미용 상세보기시 뒤로가기 버튼
 $history_back = (isset($_GET['history_back']) && $_GET['history_back']) ? $_GET['history_back'] : 0;
 

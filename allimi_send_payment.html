@@ -31,7 +31,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 $notice_yn = "Y";
 
 
-// 이전미용 상세보기시 뒤로가기 버튼
 $history_back = (isset($_GET['history_back']) && $_GET['history_back']) ? $_GET['history_back'] : 0;
 
 
@@ -732,7 +731,7 @@ $sh = sql_fetch_array($que);
             document.getElementById('allimi_history_btn').setAttribute('data-pet_seq','<?=$pet_seq?>');
             <?php }?>
 
-            document.getElementById('btn_page_prev').setAttribute('onclick','history.back()')
+            document.getElementById('btn_page_prev').setAttribute('onclick','location.href="<?=$_SESSION['back_allimi']?>"')
         })
 
 

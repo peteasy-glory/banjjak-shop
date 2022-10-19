@@ -1,6 +1,43 @@
 var re_pet_seq = '';
 var re_payment_log_seq = '';
 
+
+function db_to_str(str){
+    let return_str = str;
+    $.ajax({
+        url: '/data/api.php',
+        data: {
+            mode: 'db_to_str',
+            str: str,
+        },
+        type: 'POST',
+        async:false,
+        success: function (res) {
+            let response = JSON.parse(res);
+            return_str = response.data;
+        }
+    })
+    return return_str;
+}
+
+// str to db 이모지
+function str_to_db(str){
+    let return_str = str;
+    $.ajax({
+        url: '/data/api.php',
+        data: {
+            mode: 'str_to_db',
+            str: str,
+        },
+        type: 'POST',
+        async:false,
+        success: function (res) {
+            let response = JSON.parse(res);
+            return_str = response.data;
+        }
+    })
+    return return_str;
+}
 function siblings(el,i){
 
     return [...el.parentElement.children][i];
@@ -1404,12 +1441,12 @@ function allimi_send(shop_name){
                 etiquette_2: etiquette_2,
                 etiquette_3: etiquette_3,
                 etiquette_etc: etiquette_etc,
-                etiquette_etc_memo: etiquette_etc_memo,
+                etiquette_etc_memo: str_to_db(etiquette_etc_memo),
                 condition_1: condition_1,
                 condition_2: condition_2,
                 condition_3: condition_3,
                 condition_etc: condition_etc,
-                condition_etc_memo: condition_etc_memo,
+                condition_etc_memo: str_to_db(condition_etc_memo),
                 tangles_1: tangles_1,
                 tangles_2: tangles_2,
                 tangles_3: tangles_3,
@@ -1418,7 +1455,7 @@ function allimi_send(shop_name){
                 tangles_6: tangles_6,
                 tangles_7: tangles_7,
                 tangles_etc: tangles_etc,
-                tangles_etc_memo: tangles_etc_memo,
+                tangles_etc_memo: str_to_db(tangles_etc_memo),
                 part_1: part_1,
                 part_2: part_2,
                 part_3: part_3,
@@ -1426,7 +1463,7 @@ function allimi_send(shop_name){
                 part_5: part_5,
                 part_6: part_6,
                 part_etc: part_etc,
-                part_etc_memo: part_etc_memo,
+                part_etc_memo: str_to_db(part_etc_memo),
                 skin_1: skin_1,
                 skin_2: skin_2,
                 skin_3: skin_3,
@@ -1435,18 +1472,18 @@ function allimi_send(shop_name){
                 skin_6: skin_6,
                 skin_7: skin_7,
                 skin_etc: skin_etc,
-                skin_etc_memo: skin_etc_memo,
+                skin_etc_memo: str_to_db(skin_etc_memo),
                 bath_1: bath_1,
                 bath_2: bath_2,
                 bath_3: bath_3,
                 bath_etc: bath_etc,
-                bath_etc_memo: bath_etc_memo,
+                bath_etc_memo: str_to_db(bath_etc_memo),
                 notice_1: notice_1,
                 notice_2: notice_2,
                 notice_3: notice_3,
                 notice_4: notice_4,
                 notice_etc: notice_etc,
-                notice_etc_memo: notice_etc_memo,
+                notice_etc_memo: str_to_db(notice_etc_memo),
                 file_path: file_path,
             },
             success:function(res) {

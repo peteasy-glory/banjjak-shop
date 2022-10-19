@@ -383,6 +383,21 @@ if($r_mode) {
         $result = $api -> post('/partner/booking/beauty-gallery' ,$data_json);
 
         $return_data = array("code"=>"000000","data"=>$result);
+    }else if($r_mode === "db_to_str"){
+
+        $str = $_POST['str'];
+
+        $str = $emoji->emojiDBToStr($str);
+
+        $return_data = array("code"=>"000000",'data'=>$str);
+
+    }else if($r_mode === "str_to_db"){
+
+        $str = $_POST['str'];
+
+        $str = $emoji->emojiStrToDB($str);
+
+        $return_data = array("code"=>"000000",'data'=>$str);
     }
 }
 

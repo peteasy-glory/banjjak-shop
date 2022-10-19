@@ -22,6 +22,10 @@ $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'customer_view?customer_cellphone='.$_GET['customer_cellphone'].'&pet_seq='.$_GET['pet_seq'];
 
+unset($_SESSION['back_allimi']);
+$_SESSION['back_allimi'] = 'customer_view?customer_cellphone='.$_GET['customer_cellphone'].'&pet_seq='.$_GET['pet_seq'];
+
+
 $shop_title	= $_GET['customer_cellphone'];
 $header_right	= '
 	<div class="header-right">
