@@ -4825,8 +4825,8 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .allimi-preview-gallery{
 
 
-	width:calc(100vw - 40px);
-	height:calc(100vw - 40px);
+	width:calc(100vw - 90px);
+	height:calc(100vw - 90px);
 	border-radius: 16px;
 	position: relative;
 }
