@@ -4,6 +4,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 $artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
 
+
 if ($artist_flag === true) {
     $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
     $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
@@ -61,6 +62,7 @@ $que = "SELECT * FROM tb_shop WHERE customer_id = '{$artist_id}'";
 $sh = sql_fetch_array($que);
 
 ?>
+
 
 
     <!-- container -->
@@ -781,6 +783,13 @@ $sh = sql_fetch_array($que);
                 contentType: false,
                 cache: false,
                 type: 'POST',
+                beforeSend:function(){
+
+                    if(document.getElementById('loading')){
+
+                        document.getElementById('loading').style.display ='flex';
+                    }
+                },
                 success: function(data) {
                     allimi_get_gallery2('<?=$artist_id?>');
                     if(data != "Fail") { // 성공
@@ -797,6 +806,12 @@ $sh = sql_fetch_array($que);
                     alert(error + "네트워크에러");
                     if(xhr.status != 0){
                         alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                },complete:function(){
+
+                    if(document.getElementById('loading')){
+
+                        document.getElementById('loading').style.display ='none';
                     }
                 }
             });

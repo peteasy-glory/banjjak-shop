@@ -4825,8 +4825,8 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .allimi-preview-gallery{
 
 
-	width:calc(100% - 40px);
-	height:250px;
+	width:calc(100vw - 40px);
+	height:calc(100vw - 40px);
 	border-radius: 16px;
 	position: relative;
 }
@@ -4836,10 +4836,12 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	height: 100% !important;
 	border-radius:16px;
 }
-
+.allimi-slide{
+	display:flex;
+	align-items: center;
+}
 .allimi-slide img{
 	width:100%;
-	height:100%;
 }
 
 .allimi-prev{

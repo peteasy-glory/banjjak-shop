@@ -1064,6 +1064,14 @@ function allimi_beauty_gallery_add(id,pet_seq,payment_idx){
             data:formData,
             processData:false,
             contentType:false,
+            beforeSend:function(){
+
+
+                if(document.getElementById('loading')){
+
+                    document.getElementById('loading').style.display ='flex';
+                }
+            },
             success:function(res) {
                 console.log(res)
                 let response = JSON.parse(res);
@@ -1077,6 +1085,12 @@ function allimi_beauty_gallery_add(id,pet_seq,payment_idx){
                         allimi_get_gallery2(id);
 
                     }
+                }
+            },complete:function(){
+
+                if(document.getElementById('loading')){
+
+                    document.getElementById('loading').style.display ='none';
                 }
             }
 
@@ -1133,7 +1147,6 @@ function allimi_MemofocusNcursor() {
 }
 
 function allimi_get_gallery2(id){
-
     let target = document.getElementById('allimi_open_gallery');
 
     let payment_idx = target.getAttribute('data-payment_idx');
@@ -1161,7 +1174,6 @@ function allimi_get_gallery2(id){
             if (head.code === 401) {
                 pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
             } else if (head.code === 200) {
-                console.log(body);
 
                 if(body.length === undefined){
                     body = [body];
