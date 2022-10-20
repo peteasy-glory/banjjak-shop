@@ -991,6 +991,7 @@ function allimi_select_photo(target,bool){
     let pet_seq = target.getAttribute('data-pet_seq');
 
 
+
     let elements = document.querySelectorAll('input[name="allimi-gallery-select"]:checked');
 
     let photos = [];
@@ -1005,7 +1006,7 @@ function allimi_select_photo(target,bool){
 
     if(bool){
 
-        document.getElementById('allimi_gallery_wrap').innerHTML = `<div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="pop.open('allimi_gallery')">
+        document.getElementById('allimi_gallery_wrap').innerHTML = `<div class="allimi-gallery-cell allimi-gallery-cell-icon" data-payment_idx="${payment_idx}" data-pet_seq="${pet_seq}" data-cellphone="${cellphone}" id="allimi_open_gallery" style="cursor:pointer;" onclick="pop.open('allimi_gallery')">
                                                                         <img src="/static/pub/images/icon/photo_icon.png" alt="">
                                                                         <span class="allimi-gallery-span">사진첨부</span>
                                                                     </div>`
@@ -1626,6 +1627,8 @@ function allimi_select_pet_pop_confirm(id){
         return;
 
     }
+
+    document.getElementById('allimi_select_photo').setAttribute('data-pet_seq',target.getAttribute('data-pet_seq'))
 
 
     console.log(target);
