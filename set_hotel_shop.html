@@ -60,8 +60,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					<!-- 내용이 없을 경우 -->
 					<div class="btn-group vertical">
 						<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">호텔상품 등록하기</button></div>
-					</div>					
-					<div class="common-none-data">
+					</div>
+					<div class="common-none-data display_none" id="hotel_product_none_data">
 						<div class="none-inner">
 							<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
 							<div class="item-info">등록된 상품이 없습니다.</div>
@@ -72,7 +72,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					<!-- 내용이 있을을 경우 -->
 					<div class="basic-data-group middle">
 						<div class="wide-tab card">
-							<div class="wide-tab-inner">
+							<div class="wide-tab-inner" id="wide-tab-inner">
 								<!-- 활성화시 actived클래스 추가 -->
 								<div class="tab-cell actived"><a href="#" class="btn-tab-item">강아지</a></div>
 								<div class="tab-cell"><a href="#" class="btn-tab-item">고양이</a></div>
@@ -81,9 +81,9 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						<div class="tab-data-group basic-data-group vvsmall2">
 							<!-- actived클래스 추가시 활성화 -->
 							<!-- 강아지 -->
-							<div class="tab-data-cell actived">
+							<div class="tab-data-cell actived" >
 								<!-- 내용이 없을 경우 -->
-								<div class="common-none-data">
+								<div class="common-none-data" id="hotel_dog_product_none_data">
 									<div class="none-inner">
 										<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
 										<div class="item-info">등록된 상품이 없습니다.</div>
@@ -92,7 +92,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								<!-- //내용이 없을 경우 -->
 								<!-- 내용이 있을 경우 -->
 								<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
-								<ul class="accordion-list first-none-line">    
+								<ul class="accordion-list first-none-line" id="hotel_dog_product_exist_data">
 									<li class="accordion-cell actived">			
 										<button type="button" class="btn-accordion-menu">
 											<span class="accordion-menu-subject">호텔요금표</span>
@@ -100,21 +100,16 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 										<div class="accordion-content">
 											<div class="read-table">
 												<table>
-													<colgroup>
-														<col style="width:auto;">
+													<colgroup id="hotel_dog_colgroup">
 														<col style="width:auto;">
 													</colgroup>
 													<thead>
-														<tr>
+														<tr id="hotel_dog_room_list">
 															<th>무게</th>
-															<th>객실명</th>
 														</tr>
 													</thead>
-													<tbody>
-														<tr>
-															<td>~1.0kg</td>
-															<td>35</td>
-														</tr>
+													<tbody id="hotel_dog_product_tbody">
+
 													</tbody>
 												</table>
 											</div>
@@ -213,7 +208,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							<!-- 고양이 -->
 							<div class="tab-data-cell">
 								<!-- 내용이 없을 경우 -->
-								<div class="common-none-data">
+								<div class="common-none-data display_none" id="hotel_cat_product_none_data">
 									<div class="none-inner">
 										<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
 										<div class="item-info">등록된 상품이 없습니다.</div>
@@ -259,6 +254,21 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 	<!-- //page-body -->	
 </section>
 <!-- //container -->
+
+
+
+
+<script src="/static/pub/js/hotel.js"></script>
+<script>
+
+    const artist_id = '<?=$artist_id?>'
+    get_hotel_product(artist_id).then(function(data){
+
+        get_hotel_product_dog(data);
+    });
+
+    wide_tab()
+</script>
 
 <?
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
