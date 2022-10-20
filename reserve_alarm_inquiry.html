@@ -89,7 +89,7 @@ if ($payment_log_seq != "" && $cellphone != "") {
             $plus_query .= "
 				UNION
 				SELECT *, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$str_union." WHERE recipient_num = '".$cellphone."' 
-				AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003')
+				AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003', '1000004530_20018')
 				AND SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') = '".$payment_log_seq."'
 			";
         }
@@ -98,7 +98,7 @@ if ($payment_log_seq != "" && $cellphone != "") {
     $startYearMonth = str_replace('-', '', $startYearMonth);
     $query = "
 		SELECT *, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$startYearMonth." WHERE recipient_num = '".$cellphone."' 
-		AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003') 
+		AND template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003', '1000004530_20018') 
 		AND SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') = '".$payment_log_seq."'
 		".$plus_query."
 		ORDER BY date_client_req
@@ -198,6 +198,8 @@ if ($payment_log_seq != "" && $cellphone != "") {
                                     case "1000004530_20003" : $template_code = "전날<br>알림";
                                         break;
                                     case "1000004530_14044" : $template_code = "예약<br>취소<br>알림";
+                                        break;
+                                    case "1000004530_20018" : $template_code = "알리미";
                                         break;
 
                                 }
