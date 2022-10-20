@@ -398,6 +398,14 @@ if($r_mode) {
         $str = $emoji->emojiStrToDB($str);
 
         $return_data = array("code"=>"000000",'data'=>$str);
+    }else if($r_mode ==='get_hotel_product'){
+
+
+        $artist_id = $_POST['artist_id'];
+
+        $result = $api ->get('/partner/setting/hotel-product/'.$artist_id);
+
+        $return_data = array("code"=>"000000",'data'=>$result);
     }
 }
 

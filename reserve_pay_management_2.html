@@ -5161,7 +5161,17 @@ $r = sql_fetch($res);
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
                         console.log(body)
+                        if(body.length === undefined){
 
+                            body = [body];
+                        }
+
+                        if(body.length>0){
+
+                            document.getElementById('pay_deposit_btn').setAttribute('data-bank',body[0].bank_name);
+                            document.getElementById('pay_deposit_btn').setAttribute('data-account',body[0].account_num);
+
+                        }
                         //
                         // document.getElementById('deposit_input').value = body[0].reserve_price;
                         //
@@ -5186,8 +5196,6 @@ $r = sql_fetch($res);
                         //
                         // document.getElementById('deposit_bank_account').value = body[0].account_num;
 
-                        document.getElementById('pay_deposit_btn').setAttribute('data-bank',body[0].bank_name);
-                        document.getElementById('pay_deposit_btn').setAttribute('data-account',body[0].account_num);
 
                     }
 
