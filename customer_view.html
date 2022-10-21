@@ -776,7 +776,9 @@ $diary_recent_time = sql_fetch($res)['diary_recent_time'];
                                                                                 $extra2_1 = "/".$extra2[0];
                                                                                 $extra3 = ($beauty[6])? explode(':',$beauty[6]):"";
                                                                                 $extra3_1 = "/".$extra3[0];
-                                                                                echo $extra1[0].$extra2_1.$extra3_1;
+                                                                                $extra4 = ($beauty[7])? explode(':',$beauty[7]):"";
+                                                                                $extra4_1 = ($extra4)? "/".$extra4[0]."mm" : "";
+                                                                                echo $extra1[0].$extra2_1.$extra3_1.$extra4_1;
                                                                             ?>
                                                                         </div>
                                                                     </div>
