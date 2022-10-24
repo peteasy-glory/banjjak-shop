@@ -279,7 +279,6 @@ if ($check_cnt <= 0) {
 
     $search_data = mysqli_fetch_object($search_result);
     $worker = $search_data->name;
-    $worker_check=$search_data->name;
 //    $artist['nicname'] = $search_data->nicname;
 
 }
@@ -809,8 +808,6 @@ if(count($arr_holiday)>0){
         $working_day[$arr_holiday[$i]['week']] = ['start'=>$arr_holiday[$i]['time_start'], 'end'=>$arr_holiday[$i]['time_end'] ];
     }
 }
-alert($worker_id);
-alert($worker_check);
 ?>
 
 <!-- container -->
@@ -875,7 +872,7 @@ alert($worker_check);
                         <?php
                         foreach ((array) $data['artist'] as $key => $artist) {
                             ?>
-                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-toggle-button <?php echo (trim($worker_id) == $artist['name'] || trim($worker_check) == $artist['name'])?'actived':''; ?>" onclick="location.href='./reserve_main_week?ch=week&yy=<?php echo $_GET['yy'];?>&mm=<?php echo $_GET['mm'];?>&&dd=<?php echo $_GET['dd'];?>&worker=<?php echo $artist['name'];?>';"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></button></div>
+                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-toggle-button <?php echo (trim($worker_id) == $artist['name'])?'actived':''; ?>" onclick="location.href='./reserve_main_week?ch=week&yy=<?php echo $_GET['yy'];?>&mm=<?php echo $_GET['mm'];?>&&dd=<?php echo $_GET['dd'];?>&worker=<?php echo $artist['name'];?>';"><?= $artist['nicname'] ?><?=($artist['is_out'] == '1')? ' (퇴)' : '' ?></button></div>
 
                         <?php } ?>
                         <!--<div class="grid-layout-cell flex-auto"><button type="button" class="btn-toggle-button actived">실장</button></div>
