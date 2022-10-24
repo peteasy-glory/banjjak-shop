@@ -92,12 +92,12 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 								<!-- //내용이 없을 경우 -->
 								<!-- 내용이 있을 경우 -->
 								<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
-								<ul class="accordion-list first-none-line" id="hotel_dog_product_exist_data">
-									<li class="accordion-cell actived">			
-										<button type="button" class="btn-accordion-menu">
+								<ul class="accordion-list first-none-line" >
+									<li class="accordion-cell actived" id="hotel_product_wrap">
+										<button type="button" class="btn-accordion-menu" data-type="dog" id="btn_accordion_menu">
 											<span class="accordion-menu-subject">호텔요금표</span>
 										</button>
-										<div class="accordion-content" id="hotel_dog_wrap">
+										<div class="accordion-content"  id="hotel_dog_wrap" >
 											<div class="read-table">
 												<table>
 													<colgroup id="hotel_dog_colgroup">
@@ -266,7 +266,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                         <div class="msg-txt">호텔 상품 전체가 삭제됩니다.<br>삭제하시겠습니까?</div>
                     </div>
                     <div class="pop-footer">
-                        <button type="button" class="btn btn-confirm" onclick="hotel_product_delete_all(artist_id,'dog')">확인</button>
+                        <button type="button" class="btn btn-confirm" id="hotel_product_delete_btn" data-type="dog" onclick="hotel_product_delete_all(artist_id,this)">확인</button>
                         <button type="button" class="btn btn-confirm" onclick="pop.close2('hotelProductDeleteAll')">취소</button>
                     </div>
                 </div>
@@ -293,6 +293,27 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
     get_hotel_coupon(artist_id);
 
     wide_tab_set_hotel();
+
+    $('#btn_accordion_menu').on('click',function(){
+
+        console.log($(this).attr('data-type'));
+
+        if($(this).attr('data-type') === 'cat'){
+
+            if($('#hotel_cat_wrap').css('display') === 'block'){
+                $('#hotel_cat_wrap').hide();
+            }else{
+                $('#hotel_cat_wrap').show();
+            }
+        }else if($(this).attr('data-type') === 'dog'){
+
+            if($('#hotel_dog_wrap').css('display') === 'block'){
+                $('#hotel_dog_wrap').hide();
+            }else{
+                $('#hotel_dog_wrap').show();
+            }
+        }
+    })
 </script>
 
 <?

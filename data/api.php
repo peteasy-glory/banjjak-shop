@@ -429,8 +429,20 @@ if($r_mode) {
         $return_data = array("code"=>"000000",'data'=>$result);
     }else if($r_mode === 'delete_all_hotel_product'){
 
+        $artist_id = $_POST['artist_id'];
         $hp_seq = $_POST['hp_seq'];
-        $del_msg = '판매';
+        $del_msg = $artist_id.'|판매상품 관리에서 직접 삭제';
+
+        $data = array(
+            'hp_seq'=>intval($hp_seq),
+            'del_msg'=>$del_msg
+        );
+
+        $data_json = json_encode($data);
+        $result = $api -> delete('/partner/setting/hotel-product',$data_json);
+
+        $return_data = array("code"=>"000000",'data'=>$result);
+
     }
 }
 

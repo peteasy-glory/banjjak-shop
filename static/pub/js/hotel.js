@@ -155,78 +155,96 @@ function get_hotel_product_dog(data){
 
     let kg_list = new Set();
 
-    data.dog.forEach(function(d){
+    if(data.dog.length > 0){
 
-        d.fee_list.forEach(function(f){
-
-            kg_list.add(f.kg);
-
-        })
-    })
-    Array.from(document.getElementById('hotel_dog_product_tbody').children).forEach(function(c){
-
-        console.log(c);
         data.dog.forEach(function(d){
 
-            let d_kg_list = [];
-
             d.fee_list.forEach(function(f){
-                d_kg_list.push(f.kg);
+
+                kg_list.add(f.kg);
+
             })
-
-            let diff = Array.from(kg_list).filter(x => !d_kg_list.includes(x));
-
-            d.fee_list.forEach(function(f){
-                if(c.children[0].innerText === f.kg){
-                    c.innerHTML += `<td>${f.normal_price/1000}</td>`
-                }
-            })
-
-            if(diff.includes(c.children[0].innerText)){
-                c.innerHTML += `<td></td>`
-            }
-
         })
-    })
+        Array.from(document.getElementById('hotel_dog_product_tbody').children).forEach(function(c){
+
+            data.dog.forEach(function(d){
+
+                let d_kg_list = [];
+
+                d.fee_list.forEach(function(f){
+                    d_kg_list.push(f.kg);
+                })
+
+                let diff = Array.from(kg_list).filter(x => !d_kg_list.includes(x));
+
+                d.fee_list.forEach(function(f){
+                    if(c.children[0].innerText === f.kg){
+                        c.innerHTML += `<td>${f.normal_price/1000}</td>`
+                    }
+                })
+
+                if(diff.includes(c.children[0].innerText)){
+                    c.innerHTML += `<td></td>`
+                }
+
+            })
+        })
+        document.getElementById('dog_tab').setAttribute('data-exist',1);
+
+    }else{
+
+        document.getElementById('hotel_product_wrap').style.display='none';
+        document.getElementById('hotel_dog_product_none_data').style.display ='flex';
+        document.getElementById('dog_tab').setAttribute('data-exist',0);
+
+
+    }
 
 }
 function get_hotel_product_cat(data){
 
     let kg_list = new Set();
 
-    data.cat.forEach(function(c){
+    if(data.cat.length> 0){
 
-        c.fee_list.forEach(function(f){
-
-            kg_list.add(f.kg);
-
-        })
-    })
-    Array.from(document.getElementById('hotel_cat_product_tbody').children).forEach(function(ch){
 
         data.cat.forEach(function(c){
 
-            let c_kg_list = [];
-
             c.fee_list.forEach(function(f){
-                c_kg_list.push(f.kg);
+
+                kg_list.add(f.kg);
+
             })
-
-            let diff = Array.from(kg_list).filter(x => !c_kg_list.includes(x));
-
-            console.log(diff);
-            c.fee_list.forEach(function(f){
-                if(ch.children[0].innerText === f.kg){
-                    ch.innerHTML += `<td>${f.normal_price/1000}</td>`
-                }
-            })
-
-            if(diff.includes(ch.children[0].innerText)){
-                ch.innerHTML += `<td></td>`
-            }
-
         })
-    })
+        Array.from(document.getElementById('hotel_cat_product_tbody').children).forEach(function(ch){
+
+            data.cat.forEach(function(c){
+
+                let c_kg_list = [];
+
+                c.fee_list.forEach(function(f){
+                    c_kg_list.push(f.kg);
+                })
+
+                let diff = Array.from(kg_list).filter(x => !c_kg_list.includes(x));
+
+                c.fee_list.forEach(function(f){
+                    if(ch.children[0].innerText === f.kg){
+                        ch.innerHTML += `<td>${f.normal_price/1000}</td>`
+                    }
+                })
+
+                if(diff.includes(ch.children[0].innerText)){
+                    ch.innerHTML += `<td></td>`
+                }
+
+            })
+        })
+        document.getElementById('cat_tab').setAttribute('data-exist',1);
+    }else{
+
+        document.getElementById('cat_tab').setAttribute('data-exist',0);
+    }
 
 }
 
@@ -292,10 +310,11 @@ function get_hotel_info(id){
 
 }
 
-function hotel_product_delete_all(id,type){
+function hotel_product_delete_all(id,target){
 
     let hp_seq = [];
 
+    let type = target.getAttribute('data-type');
     if(type === 'dog'){
 
 
@@ -328,15 +347,70 @@ function hotel_product_delete_all(id,type){
 
 
         })
+    }else{
+
+        $.ajax({
+
+            url:'/data/api.php',
+            type:'post',
+            async:false,
+            data:{
+                mode:'get_hotel_product',
+                artist_id:id,
+
+
+            },success:function(res) {
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+                    console.log(body)
+
+                    body.cat.forEach(function(cat){
+
+                        hp_seq.push(cat.hp_seq);
+
+                    })
+                }
+            }
+
+
+        })
     }
 
-    console.log(hp_seq);
 
-    hp_seq.forEach(function(seq){
+    if(hp_seq.length>0){
+
+        hp_seq.forEach(function(seq){
+
+            $.ajax({
+                url:'/data/api.php',
+                type:'post',
+                data:{
+                    mode:'delete_all_hotel_product',
+                    artist_id:id,
+                    hp_seq:seq,
+                },
+                success:function(res) {
+                    console.log(res)
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+
+                        location.reload();
+                    }
+                }
+
+            })
 
 
-
-    })
+        })
+    }
 
 
 }
@@ -413,12 +487,40 @@ function wide_tab_set_hotel(){
                 console.log(el.getAttribute('id'))
                 if(el.getAttribute('id') === 'dog_tab'){
 
-                    document.getElementById('hotel_cat_wrap').style.display = 'none';
-                    document.getElementById('hotel_dog_wrap').style.display ='block';
+
+                    document.getElementById('hotel_product_delete_btn').setAttribute('data-type','dog');
+                    if(el.getAttribute('data-exist') === '1'){
+                        document.getElementById('hotel_product_wrap').style.display='block';
+                        document.getElementById('hotel_cat_wrap').style.display = 'none';
+                        document.getElementById('hotel_dog_wrap').style.display ='block';
+                        document.getElementById('btn_accordion_menu').setAttribute('data-type','dog');
+
+                    }else{
+                        document.getElementById('hotel_product_wrap').style.display='none';
+                        document.getElementById('hotel_cat_wrap').style.display = 'none';
+                        document.getElementById('hotel_dog_wrap').style.display ='none';
+                        document.getElementById('hotel_dog_product_none_data').style.display ='flex';
+                    }
+
 
                 }else if(el.getAttribute('id') === 'cat_tab'){
-                    document.getElementById('hotel_cat_wrap').style.display = 'block';
-                    document.getElementById('hotel_dog_wrap').style.display ='none';
+
+                    document.getElementById('hotel_product_delete_btn').setAttribute('data-type','cat');
+                    if(el.getAttribute('data-exist') === '1'){
+
+                        document.getElementById('hotel_product_wrap').style.display='block';
+                        document.getElementById('hotel_dog_wrap').style.display ='none';
+                        document.getElementById('hotel_cat_wrap').style.display = 'block';
+                        document.getElementById('hotel_dog_product_none_data').style.display ='none';
+                        document.getElementById('btn_accordion_menu').setAttribute('data-type','cat');
+                    }else{
+                        document.getElementById('hotel_product_wrap').style.display='none';
+                        document.getElementById('hotel_dog_wrap').style.display ='none';
+                        document.getElementById('hotel_cat_wrap').style.display = 'none';
+                        document.getElementById('hotel_dog_product_none_data').style.display ='flex';
+
+
+                    }
 
 
                 }
@@ -434,8 +536,62 @@ function wide_tab_set_hotel(){
     })
 }
 
+function wide_tab_set_hotel_add(){
+    let tab_cell = document.getElementById('wide-tab-inner').children;
 
-function get_hotel_basic_info(id){
+    Array.from(tab_cell).forEach(function (el) {
+
+        el.addEventListener('click', function () {
+            if (!this.classList.contains('actived')) {
+
+
+                Array.from(tab_cell).forEach(function (el) {
+                    el.classList.remove('actived');
+                })
+
+                this.classList.add('actived');
+
+                if(document.getElementById('dog_tab')){
+
+                    if(el.getAttribute('id') === 'dog_tab'){
+
+                        document.getElementById('hotel_cat_wrap').style.display = 'none';
+                        document.getElementById('hotel_dog_wrap').style.display ='block';
+
+                    }else if(el.getAttribute('id') === 'cat_tab'){
+                        document.getElementById('hotel_cat_wrap').style.display = 'block';
+                        document.getElementById('hotel_dog_wrap').style.display ='none';
+
+
+                    }
+                }else if(document.getElementById('hotel_dog_tab')){
+                    if(el.getAttribute('id') === 'hotel_dog_tab'){
+
+                        document.getElementById('hotel_add_cat').style.display = 'none';
+                        document.getElementById('hotel_add_dog').style.display ='block';
+
+                    }else if(el.getAttribute('id') === 'hotel_cat_tab'){
+                        document.getElementById('hotel_add_cat').style.display = 'block';
+                        document.getElementById('hotel_add_dog').style.display ='none';
+
+
+                    }
+
+                }
+
+
+            } else {
+                return;
+            }
+
+
+
+
+        })
+    })
+}
+
+function add_get_hotel_info(id){
 
 
 
@@ -460,11 +616,57 @@ function get_hotel_basic_info(id){
 
                 switch(body.pet_type){
 
-                    case 'dog' : break;
-                    case 'cat' : break;
-                    case 'both' : break;
+                    case 'dog' : document.getElementById('dog_switch_toggle').checked = true; break;
+                    case 'cat' : document.getElementById('cat_switch_toggle').checked = true; break;
+                    case 'both' : document.getElementById('dog_switch_toggle').checked = true; document.getElementById('cat_switch_toggle').checked = true; break;
                 }
             }
         }
     })
+}
+
+function add_get_hotel_product(id){
+    $.ajax({
+
+        url:'/data/api.php',
+        type:'post',
+        data:{
+            mode:'get_hotel_product',
+            artist_id:id,
+        },
+        success:function(res) {
+            let response = JSON.parse(res);
+            let head = response.data.head;
+            let body = response.data.body;
+            if (head.code === 401) {
+                pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+            } else if (head.code === 200) {
+                console.log(body)
+            }
+        }
+    })
+
+}
+
+function change_hotel_grade_dog(target){
+
+
+    document.getElementById('hotel_grade_dog_tbody').innerHTML = '';
+
+
+    for(let i=0; i<target.value; i++){
+
+        document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력"/>
+                                                                </div>
+                                                            </td><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력"/>
+                                                                </div>
+                                                            </td></tr>`
+
+    }
+
+
 }
