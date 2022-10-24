@@ -140,6 +140,8 @@ function get_hotel_product(id){
                         }
                     }
 
+
+
                     resolve(body);
                 }
             }
@@ -625,30 +627,10 @@ function add_get_hotel_info(id){
     })
 }
 
-function add_get_hotel_product(id){
-    $.ajax({
+function change_hotel_grade_dog(id,target){
 
-        url:'/data/api.php',
-        type:'post',
-        data:{
-            mode:'get_hotel_product',
-            artist_id:id,
-        },
-        success:function(res) {
-            let response = JSON.parse(res);
-            let head = response.data.head;
-            let body = response.data.body;
-            if (head.code === 401) {
-                pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
-            } else if (head.code === 200) {
-                console.log(body)
-            }
-        }
-    })
 
-}
 
-function change_hotel_grade_dog(target){
 
 
     document.getElementById('hotel_grade_dog_tbody').innerHTML = '';
@@ -667,6 +649,228 @@ function change_hotel_grade_dog(target){
                                                             </td></tr>`
 
     }
+
+
+}
+
+function change_hotel_grade_cat(id,target){
+
+
+
+
+
+
+    document.getElementById('hotel_grade_cat_tbody').innerHTML = '';
+
+
+    for(let i=0; i<target.value; i++){
+
+        document.getElementById('hotel_grade_cat_tbody').innerHTML += `<tr><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력"/>
+                                                                </div>
+                                                            </td><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력"/>
+                                                                </div>
+                                                            </td></tr>`
+
+    }
+
+
+}
+
+
+
+function add_get_hotel_product(id){
+
+
+    return new Promise(function(resolve){
+        $.ajax({
+            url:'/data/api.php',
+            type:'post',
+            data:{
+                mode:'get_hotel_product',
+                artist_id:id,
+            },
+            success:function(res) {
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+                    console.log(body)
+
+                    let dog_arr = [];
+                    let cat_arr = [];
+
+
+
+                    if(body.dog.length > 0){
+
+                        body.dog.forEach(function(d){
+
+
+                            d.fee_list.forEach(function(fee){
+
+                                let item = {name:d.room_name,kg:fee.kg,normal_price:fee.normal_price,peak_price:fee.peak_price};
+                                dog_arr.push(item);
+
+                            })
+
+
+                            document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력" value="${d.room_name}"/>
+                                                                </div>
+                                                            </td><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="number" placeholder="입력" value="${d.room_cnt}"/>
+                                                                </div>
+                                                            </td></tr>`
+
+                            document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
+
+                        })
+
+
+                        for(let i=0; i<document.getElementById('select_hotel_grade_dog').options.length; i++){
+
+                            if(body.dog.length === parseInt(document.getElementById('select_hotel_grade_dog').options[i].value)){
+
+                                document.getElementById('select_hotel_grade_dog').options[i].selected = true;
+                                // document.getElementById('select_hotel_grade_dog').dispatchEvent(new Event('change'));
+                            }
+
+
+                        }
+
+                    }
+
+
+
+                    if(body.cat.length>0){
+
+
+                        body.cat.forEach(function(c){
+
+                            c.fee_list.forEach(function(fee){
+
+                                let item = {name:c.room_name,kg:fee.kg,normal_price:fee.normal_price,peak_price:fee.peak_price};
+                                cat_arr.push(item);
+
+                            })
+
+                            document.getElementById('hotel_grade_cat_tbody').innerHTML += `<tr><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력" value="${c.room_name}"/>
+                                                                </div>
+                                                            </td><td class="no-padding">
+                                                                <div class="form-table-select">
+                                                                    <input type="text" placeholder="입력" value="${c.room_cnt}"/>
+                                                                </div>
+                                                            </td></tr>`
+                            document.getElementById('hotel_grade_cat_sep_weight').innerHTML += `<th>${c.room_name}</th>`
+
+                        })
+
+                        for(let i=0; i<document.getElementById('select_hotel_grade_cat').options.length; i++){
+
+                            if(body.cat.length === parseInt(document.getElementById('select_hotel_grade_cat').options[i].value)){
+
+                                document.getElementById('select_hotel_grade_cat').options[i].selected = true;
+                                // document.getElementById('select_hotel_grade_cat').dispatchEvent(new Event('change'));
+                            }
+
+                        }
+
+                    }
+
+
+
+
+                    console.log(dog_arr);
+                    console.log(cat_arr);
+
+
+
+
+
+
+                    let dog_weight = new Set();
+                    let cat_weight = new Set();
+                    dog_arr.forEach(function(d){
+
+                        dog_weight.add(d.kg);
+
+                    })
+
+                    cat_arr.forEach(function(c){
+
+                        cat_weight.add(c.kg);
+                    })
+
+
+                    console.log(dog_weight)
+                    console.log(cat_weight);
+
+
+                    for(let i=0; i<Array.from(dog_weight).length; i++){
+
+                        document.getElementById('hotel_grade_dog_sep_tbody').innerHTML += `<tr id="hotel_grade_dog_sep_tr_${i}"></tr>`
+                    }
+
+                    let room = [dog_arr,cat_arr,dog_weight,cat_weight];
+
+                    resolve(room);
+                }
+            }
+
+        })
+
+
+
+
+    })
+
+
+}
+
+function select_weight(){
+
+   let options = '';
+
+   for(let i=1; i<40; i++){
+
+       for(let j=0; j<10; j++){
+
+           options += `<option value="${i}.${j}">${i}.${j}kg</option>`
+       }
+
+   }
+
+   return options;
+
+}
+
+function add_get_hotel_product_price_set(room){
+
+    console.log(room);
+
+    const dog_room = room[0];
+    const cat_room = room[1];
+    const dog_weight = room[2];
+    const cat_weight = room[3];
+
+
+    Array.from(dog_weight).forEach(function(d_w,i){
+
+        document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_weight()}</select></div></td>`
+
+
+    })
+
 
 
 }

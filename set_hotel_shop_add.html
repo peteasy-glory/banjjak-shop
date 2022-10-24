@@ -64,7 +64,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                         <div class="form-group-item">
                                             <div class="form-item-label">객실의 등급은 몇 개로 구분되나요?</div>
                                             <div class="form-item-data type-2" >
-                                                <select onchange="change_hotel_grade_dog(this)">
+                                                <select id="select_hotel_grade_dog" onchange="change_hotel_grade_dog(artist_id,this)">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
@@ -86,18 +86,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                         </tr>
                                                         </thead>
                                                         <tbody id="hotel_grade_dog_tbody">
-                                                        <tr>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
-                                                                </div>
-                                                            </td>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -113,41 +102,20 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                 <div class="form-group vmiddle">
                                     <div class="form-group-cell middle">
                                         <div class="form-group-item">
-                                            <div class="form-item-label">객실의 등급은 몇 개로 구분되나요?</div>
+<!--                                            <div class="form-item-label">객실의 등급은 몇 개로 구분되나요?</div>-->
                                             <div class="form-item-data type-8">
                                                 <div class="read-table">
                                                     <table>
-                                                        <colgroup>
-                                                            <col style="width:40%;">
-                                                            <col style="width:60%;">
+                                                        <colgroup id="hotel_grade_dog_colgroup">
+
                                                         </colgroup>
                                                         <thead>
-                                                        <tr>
+                                                        <tr id="hotel_grade_dog_sep_weight">
                                                             <th>무게</th>
-                                                            <th>[2]에서 입력한 객실명 노출</th>
+
                                                         </tr>
                                                         </thead>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+                                                        <tbody id="hotel_grade_dog_sep_tbody">
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -618,7 +586,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                         <div class="form-group-item">
                                             <div class="form-item-label">객실의 등급은 몇 개로 구분되나요?</div>
                                             <div class="form-item-data type-2">
-                                                <select>
+                                                <select id="select_hotel_grade_cat" onchange="change_hotel_grade_cat(artist_id,this)">
                                                     <option value="1">1</option>
                                                     <option value="2">2</option>
                                                     <option value="3">3</option>
@@ -639,19 +607,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                             <th>객실수</th>
                                                         </tr>
                                                         </thead>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
-                                                                </div>
-                                                            </td>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+                                                        <tbody id="hotel_grade_cat_tbody">
+
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -671,33 +628,21 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-8">
                                                 <div class="read-table">
                                                     <table>
-                                                        <colgroup>
-                                                            <col style="width:40%;">
-                                                            <col style="width:60%;">
+                                                        <colgroup id="hotel_grade_cat_colgroup">
                                                         </colgroup>
                                                         <thead>
-                                                        <tr>
+                                                        <tr id="hotel_grade_cat_sep_weight">
                                                             <th>무게</th>
-                                                            <th>[2]에서 입력한 객실명 노출</th>
                                                         </tr>
                                                         </thead>
                                                         <tbody>
-                                                        <tr>
+                                                        <tr id="hotel_grade_cat_sep_price">
                                                             <td class="no-padding">
                                                                 <div class="form-table-select">
                                                                     <select>
                                                                         <option value="">1.0kg</option>
                                                                         <option value="">1.0kg</option>
                                                                         <option value="">1.0kg</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
                                                                     </select>
                                                                 </div>
                                                             </td>
@@ -1187,8 +1132,15 @@ $(function(){
 
     add_get_hotel_info(artist_id);
 
-    add_get_hotel_product(artist_id);
+
     wide_tab_set_hotel_add();
+    add_get_hotel_product(artist_id).then(function(room){
+
+
+        add_get_hotel_product_price_set(room);
+
+
+    });
 
 
 	$('.drag-sort-wrap').each(function(){
