@@ -1,28 +1,32 @@
-<!DOCTYPE html>
-<html lang="ko" class="">
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title>반짝</title>
-	<meta name="format-detection" content="telephone=no">
-	<link href="/static/pub/css/style.css" rel="stylesheet">
-	<script src="/static/pub/js/jquery-3.4.1.min.js"></script>    
-	<script src="/static/pub/js/jquery-ui.min.js"></script>    
-	<script src="/static/pub/js/swiper.min.js"></script>
-	<script src="/static/pub/js/common.js"></script>
-</head>
-<body>        
+<?
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
 
-<!-- header -->
-<header id="header">	
-	<div class="header-left">
-		<a href="#" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
-	</div>
-	<!-- page-title 클래스의 태그가 div일 경우 가운데 정렬 , h1일 경우 왼쪽 정렬 -->
-	<div class="page-title">호텔상품 등록/수정</div>
-</header>
-<!-- //header -->
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
 
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+
+
+
+
+
+
+$shop_title	= "호텔상품 등록/수정";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+
+
+?>
 <!-- container -->
 <section id="container"> 
 	<!-- page-body -->    
@@ -617,10 +621,19 @@
 	<!-- //page-bottom -->
 </section>
 <!-- //container -->
+<script src="/static/pub/js/hotel.js"></script>
 <script src="/static/pub/js/Sortable.min.js"></script>
 <script>
+
+    const artist_id='<?=$artist_id?>';
+
 $(function(){
 	//https://github.com/SortableJS/Sortable
+
+
+    get_hotel_basic_info(artist_id);
+
+
 
 	$('.drag-sort-wrap').each(function(){
 		var sortable = Sortable.create($(this)[0] , {

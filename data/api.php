@@ -406,6 +406,31 @@ if($r_mode) {
         $result = $api ->get('/partner/setting/hotel-product/'.$artist_id);
 
         $return_data = array("code"=>"000000",'data'=>$result);
+    }else if($r_mode ==='get_coupon'){
+
+        $artist_id = $_POST['artist_id'];
+        $service_type = $_POST['service_type'];
+
+        $data = array('service_type'=>$service_type);
+
+        $data_json = json_encode($data);
+
+        $result = $api -> get('/partner/setting/coupon/'.$artist_id,$data_json);
+
+        $return_data = array("code"=>"000000",'data'=>$result);
+
+
+    }else if($r_mode ==='get_hotel_info'){
+
+        $artist_id = $_POST['artist_id'];
+
+        $result = $api ->get('/partner/setting/hotel/'.$artist_id);
+
+        $return_data = array("code"=>"000000",'data'=>$result);
+    }else if($r_mode === 'delete_all_hotel_product'){
+
+        $hp_seq = $_POST['hp_seq'];
+        $del_msg = '판매';
     }
 }
 

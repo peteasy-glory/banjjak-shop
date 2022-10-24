@@ -59,7 +59,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 				<div class="basic-data-group middle">
 					<!-- 내용이 없을 경우 -->
 					<div class="btn-group vertical">
-						<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round">호텔상품 등록하기</button></div>
+						<div class="btn-group-cell"><button type="button" class="btn btn-purple btn-middle-size btn-round" style="cursor:pointer;" onclick="location.href='/set_hotel_shop_add'">호텔상품 등록하기</button></div>
 					</div>
 					<div class="common-none-data display_none" id="hotel_product_none_data">
 						<div class="none-inner">
@@ -74,8 +74,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						<div class="wide-tab card">
 							<div class="wide-tab-inner" id="wide-tab-inner">
 								<!-- 활성화시 actived클래스 추가 -->
-								<div class="tab-cell actived"><a href="#" class="btn-tab-item">강아지</a></div>
-								<div class="tab-cell"><a href="#" class="btn-tab-item">고양이</a></div>
+								<div class="tab-cell actived" id="dog_tab"><a href="#" class="btn-tab-item">강아지</a></div>
+								<div class="tab-cell" id="cat_tab"><a href="#" class="btn-tab-item">고양이</a></div>
 							</div>
 						</div>
 						<div class="tab-data-group basic-data-group vvsmall2">
@@ -97,7 +97,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 										<button type="button" class="btn-accordion-menu">
 											<span class="accordion-menu-subject">호텔요금표</span>
 										</button>
-										<div class="accordion-content">
+										<div class="accordion-content" id="hotel_dog_wrap">
 											<div class="read-table">
 												<table>
 													<colgroup id="hotel_dog_colgroup">
@@ -114,8 +114,26 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 												</table>
 											</div>
 											<div class="read-table-info">(단위:천원)</div>
-										</div>			
-									</li>      
+										</div>
+                                        <div class="accordion-content" style="display:none;" id="hotel_cat_wrap">
+                                            <div class="read-table">
+                                                <table>
+                                                    <colgroup id="hotel_cat_colgroup">
+                                                        <col style="width:auto;">
+                                                    </colgroup>
+                                                    <thead>
+                                                    <tr id="hotel_cat_room_list">
+                                                        <th>무게</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="hotel_cat_product_tbody">
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="read-table-info">(단위:천원)</div>
+                                        </div>
+                                    </li>
 									<li class="accordion-cell actived">			
 										<button type="button" class="btn-accordion-menu">
 											<span class="accordion-menu-subject">쿠폰(횟수)상품</span>
@@ -125,8 +143,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 												<table>
 													<colgroup>
 														<col style="width:auto;">
-														<col style="width:auto;">
-														<col style="width:auto;">
 													</colgroup>
 													<thead>
 														<tr>
@@ -135,17 +151,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 															<th>가격(단위:원)</th>
 														</tr>
 													</thead>
-													<tbody>
-														<tr>
-															<td>상품명</td>
-															<td>5회</td>
-															<td>20,000</td>
-														</tr>
-														<tr>
-															<td>상품명</td>
-															<td>5회</td>
-															<td>20,000</td>
-														</tr>
+													<tbody id="hotel_coupon_C_product_tbody">
+
 													</tbody>
 												</table>
 											</div>
@@ -160,8 +167,6 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 												<table>
 													<colgroup>
 														<col style="width:auto;">
-														<col style="width:auto;">
-														<col style="width:auto;">
 													</colgroup>
 													<thead>
 														<tr>
@@ -170,27 +175,25 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 															<th>실 적립금</th>
 														</tr>
 													</thead>
-													<tbody>
-														<tr>
-															<td>상품명</td>
-															<td>20,000</td>
-															<td>20,000</td>
-														</tr>
-														<tr>
-															<td>상품명</td>
-															<td>20,000</td>
-															<td>20,000</td>
-														</tr>
+													<tbody id="hotel_coupon_F_product_tbody">
+
 													</tbody>
 												</table>
 											</div>
-											<div class="form-bottom-info">- 중성화 안된 경우 추가요금 :$$,$$$원<br>- 픽업서비스를 제공 안함<br>- 체크인/아웃 시간:오전 09:00 ~ 오후 06:00<br>(이 시간 외 체크인/아웃은 추가요금 발생할 수 있음)</div>
-											<div class="basic-data-group vmiddle">
-												<div class="memo-item large">
-													<div class="memo-item-title">상품별 안내사항</div>
-													<div class="memo-item-txt">프론트 샵페이지 상품하단에 위치하는 안내입니다.</div>
-												</div>
-											</div>
+											<div class="form-bottom-info">
+                                                <span id="hotel_info_neutral" class="hotel-info">- 중성화 안된 경우 추가요금 :<span id="hotel_info_neutral_price"></span>원</span>
+                                                <span class="hotel-info" id="hotel_info_pickup_1">- 픽업서비스를 제공 함</span>
+                                                <span class="hotel-info" id="hotel_info_pickup_2">- 픽업서비스를 제공 안함</span>
+                                                <span class="">- 체크인/아웃 시간:<span id="hotel_info_check"></span><br>
+                                                (이 시간 외 체크인/아웃은 추가요금 발생할 수 있음)
+                                                </span>
+                                            </div>
+<!--											<div class="basic-data-group vmiddle">-->
+<!--												<div class="memo-item large">-->
+<!--													<div class="memo-item-title">상품별 안내사항</div>-->
+<!--													<div class="memo-item-txt">프론트 샵페이지 상품하단에 위치하는 안내입니다.</div>-->
+<!--												</div>-->
+<!--											</div>-->
 											<div class="btn-basic-action">
 												<div class="grid-layout btn-grid-group">
 													<div class="grid-layout-inner">
@@ -229,8 +232,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 									<div class="form-group-item">
 										<div class="form-item-label">공통 안내</div>
 										<div class="form-item-data">
-											<input type="text" class="form-control" placeholder="입력"/>
-											<div class="form-input-info">0/1000</div>
+											<input type="text" class="form-control" id="hotel_common_notice" max-length="1000" placeholder="입력"/>
+                                            <div class="form-input-info"><span id="hotel_common_notice_length"></span>/1000</div>
 										</div>
 									</div>
 								</div>
@@ -241,7 +244,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 						<div class="grid-layout btn-grid-group">
 							<div class="grid-layout-inner">
 								<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">저장</a></div>
-								<div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round">삭제</a></div>
+								<div class="grid-layout-cell grid-2" id="hotel_product_delete_all"><a href="#" class="btn btn-outline-gray btn-middle-size btn-round" >삭제</a></div>
 							</div>
 						</div>
 					</div>
@@ -255,19 +258,41 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 </section>
 <!-- //container -->
 
+    <article id="hotelProductDeleteAll" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <div class="msg-txt">호텔 상품 전체가 삭제됩니다.<br>삭제하시겠습니까?</div>
+                    </div>
+                    <div class="pop-footer">
+                        <button type="button" class="btn btn-confirm" onclick="hotel_product_delete_all(artist_id,'dog')">확인</button>
+                        <button type="button" class="btn btn-confirm" onclick="pop.close2('hotelProductDeleteAll')">취소</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+
 
 
 
 <script src="/static/pub/js/hotel.js"></script>
 <script>
 
+
     const artist_id = '<?=$artist_id?>'
+
+    get_hotel_info(artist_id);
     get_hotel_product(artist_id).then(function(data){
 
-        get_hotel_product_dog(data);
-    });
 
-    wide_tab()
+        get_hotel_product_dog(data);
+        get_hotel_product_cat(data);
+    });
+    get_hotel_coupon(artist_id);
+
+    wide_tab_set_hotel();
 </script>
 
 <?
