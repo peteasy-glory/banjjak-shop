@@ -860,11 +860,11 @@ function add_get_hotel_product_price_set(room){
 
     const dog_room = room[0];
     const cat_room = room[1];
-    const dog_weight = room[2];
-    const cat_weight = room[3];
+    const dog_weight = Array.from(room[2]);
+    const cat_weight = Array.from(room[3]);
 
 
-    Array.from(dog_weight).forEach(function(d_w,i){
+    dog_weight.forEach(function(d_w,i){
 
         document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_weight()}</select></div></td>`
 
