@@ -119,7 +119,7 @@ textarea.form-control:focus{border-bottom-color:#6840b1;}
 /* 토글 버튼 커스텀 */
 .form-toggle-box {position:relative; display:inline-flex;}
 .form-toggle-box > input {position:absolute;top:0;left:0;width:100%;height:100%;z-index:5; opacity:0;}
-.form-toggle-box > em {display:inline-flex; align-items:center; justify-content:center; width:auto; height:32px;padding:0 5px;font-size:14px;line-height:20px;font-weight:400;text-align:center;box-sizing:border-box; border-radius:0; border:1px solid #b4b4b4; border-radius:5px;}
+.form-toggle-box > em {display:inline-flex; align-items:center; justify-content:center; width:auto; height:32px;padding:0 5px;font-size:14px;line-height:20px;font-weight:400;text-align:center;box-sizing:border-box; border-radius:0; border:1px solid #cecece; border-radius:5px;}
 .form-toggle-box > input:checked + em {background-color:#6840b1; border-color:#6840b1; color:#fff;}
 .form-toggle-box > input:checked + em span,
 .form-toggle-box > input:checked + em span.date {color:#fff;}
@@ -142,7 +142,7 @@ textarea.form-control:focus{border-bottom-color:#6840b1;}
 .form-toggle-options > input:checked {height:calc( 100% - 39px );}
 .form-toggle-options > input:checked ~ .form-toggle-options-data {background-color:#6840b1; border-color:#6840b1; color:#fff;}
 .form-toggle-options > input:checked ~ .form-toggle-options-data .form-amount-input {display:flex; background: #fff;}
-.form-toggle-options .form-toggle-options-data {display:block; padding:5px 0; background:#fff; border:1px solid #ebebeb; border-radius:5px;}
+.form-toggle-options .form-toggle-options-data {display:block; padding:5px 0; background:#fff; border:1px solid #b4b4b4; border-radius:5px;}
 .form-toggle-options .options-labels {display:block; padding:0 5px; font-size:12px; line-height:20px; font-weight:400; text-align:center;}
 .form-toggle-options .options-labels > span,
 .form-toggle-options .options-labels > strong {display:block; width:100%;}
