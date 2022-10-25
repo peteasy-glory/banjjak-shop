@@ -635,18 +635,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                             <th>무게</th>
                                                         </tr>
                                                         </thead>
-                                                        <tbody>
-                                                        <tr id="hotel_grade_cat_sep_price">
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+                                                        <tbody id="hotel_grade_cat_sep_tbody">
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -1137,7 +1126,10 @@ $(function(){
     add_get_hotel_product(artist_id).then(function(room){
 
 
-        add_get_hotel_product_price_set(room);
+        add_get_hotel_product_price_set(room).then(function(room){
+
+            add_get_hotel_product_price_set_2(room);
+        });
 
 
     });
