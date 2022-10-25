@@ -826,7 +826,7 @@ function add_get_hotel_product(id){
                         document.getElementById('hotel_grade_cat_sep_tbody').innerHTML += `<tr id="hotel_grade_cat_sep_tr_${i}"></tr>`
                     }
 
-                    let room = [dog_arr,cat_arr,dog_weight,cat_weight];
+                    let room = [dog_arr,cat_arr,dog_weight,cat_weight,body];
 
                     resolve(room);
                 }
@@ -880,43 +880,43 @@ function add_get_hotel_product_price_set(room){
         const cat_room = room[1];
         const dog_weight = Array.from(room[2]);
         const cat_weight = Array.from(room[3]);
+        const data = room[4];
+
+
         console.log(room);
-
-        let dog_set = new Set();
-
-        dog_room.forEach(function(d_r){
-            dog_set.add(d_r.hp_seq);
-        })
-
 
         dog_weight.forEach(function(d_w,i){
 
-            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding weight-check" data-weight="${d_w}"><div class="form-table-select"><select id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
 
-
-            
-            for(let j=0; j<Array.from(dog_set).length;j++){
-
-                document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select data-hp_seq="${Array.from(dog_set)[j]}"  id="dog_price_select_${Array.from(dog_set)[j]}">${select_price()}</select></div></td>`
-            }
 
         })
 
 
-        // cat_weight.forEach(function(c_w,i){
+
+        // data.dog.forEach(function(d){
         //
-        //     document.getElementById(`hotel_grade_cat_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select id="cat_weight_select_${i}" data-weight="${c_w}">${select_weight()}</select></div></td>`
         //
-        //     cat_room.forEach(function(c_r,i2){
+        //     let d_kg_list = [];
         //
-        //         if(c_r.kg === c_w){
-        //
-        //             document.getElementById(`hotel_grade_cat_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select id="cat_price_select_${i2}" data-price="${c_r.normal_price}">${select_price()}</select></div></td>`
-        //         }
-        //
+        //     d.fee_list.forEach(function(f){
+        //         d_kg_list.push(f.kg);
         //
         //     })
+        //
+        //     let diff = dog_weight.filter(x => !d_kg_list.includes(x));
+        //
+        //
+        //     console.log(diff);
+        //
+        //     d.fee_list.forEach(function(f,i){
+        //
+        //         document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_price()}</select></div></td>`
+        //     })
         // })
+
+
+
 
 
         resolve(room);
@@ -953,21 +953,45 @@ function add_get_hotel_product_price_set_2(room){
     }
 
 
-
-    for(let i=0; i<dog_room.length*dog_weight.length;i++){
-
-        if(document.getElementById(`dog_price_select_${i}`)){
-
-            for(let j=0; j<document.getElementById(`dog_price_select_${i}`).options.length;j++){
-                if(document.getElementById(`dog_price_select_${i}`).getAttribute('data-price') === document.getElementById(`dog_price_select_${i}`).options[j].value){
+    Array.from(document.getElementsByClassName('weight-check')).forEach(function(el){
 
 
-                    document.getElementById(`dog_price_select_${i}`).options[j].selected = true;
+        dog_room.forEach(function(d_r,i){
+
+
+            if(el.parentElement){
+
+
+                if(el.getAttribute('data-weight') === d_r.kg){
+
+
+
+                    el.parentElement.innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_price()}</select></div></td>`;
+
                 }
 
             }
-        }
-    }
+
+        })
+
+
+    })
+
+
+    // for(let i=0; i<dog_room.length*dog_weight.length;i++){
+    //
+    //     if(document.getElementById(`dog_price_select_${i}`)){
+    //
+    //         for(let j=0; j<document.getElementById(`dog_price_select_${i}`).options.length;j++){
+    //             if(document.getElementById(`dog_price_select_${i}`).getAttribute('data-price') === document.getElementById(`dog_price_select_${i}`).options[j].value){
+    //
+    //
+    //                 document.getElementById(`dog_price_select_${i}`).options[j].selected = true;
+    //             }
+    //
+    //         }
+    //     }
+    // }
 
 
 }
