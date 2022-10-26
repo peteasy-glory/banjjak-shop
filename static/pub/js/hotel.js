@@ -5,11 +5,25 @@ function am_pm_check(hours){
     }else if(hours === 12){
         hours = `오후 ${hours}`
     }else{
-        hours = `오전 ${hours}`
+        hours = `오전 ${hours.toString().length <2 ? '0' : ''}${hours}`
     }
 
     return hours;
 }
+
+function fill_zero(time){
+
+    if(time.toString().length < 2){
+
+        time = `0${time}`
+    }else{
+        time = time;
+    }
+
+    return time;
+}
+
+
 
 function get_hotel_product(id){
 
@@ -622,6 +636,80 @@ function add_get_hotel_info(id){
                     case 'cat' : document.getElementById('cat_switch_toggle').checked = true; break;
                     case 'both' : document.getElementById('dog_switch_toggle').checked = true; document.getElementById('cat_switch_toggle').checked = true; break;
                 }
+
+
+
+                if(body.is_peak === '1'){
+
+                    document.getElementById('hotel_peak_dog_y').click();
+
+                }else{
+                    document.getElementById('hotel_peak_dog_n').click();
+                }
+
+                if(body.is_image === '1'){
+                    document.getElementById('hotel_room_photo_dog_y').click();
+
+                }else{
+                    document.getElementById('hotel_room_photo_dog_n').click();
+
+                }
+
+
+                if(body.is_coupon === '1'){
+
+                    document.getElementById('hotel_coupon_y').click();
+                }else{
+                    document.getElementById('hotel_coupon_n').click();
+                }
+
+                if(body.is_flat ==='1'){
+                    document.getElementById('hotel_flat_y').click();
+                }else{
+                    document.getElementById('hotel_flat_n').click();
+                }
+
+                if(body.is_neutral === '1'){
+                    document.getElementById('hotel_neutral_y').click();
+                }else{
+                    document.getElementById('hotel_neutral_n').click();
+                }
+
+                if(body.is_neutral_pay === '1'){
+                    document.getElementById('hotel_neutral_price_y').click();
+                    document.getElementById('hotel_neutral_price_select').innerHTML += select_neutral_price();
+                }else{
+                    document.getElementById('hotel_neutral_price_n').click();
+                    document.getElementById('hotel_neutral_price_select').innerHTML = '';
+                }
+
+                if(body.is_pickup === '1'){
+                    document.getElementById('hotel_pick_up_y').click();
+                }else{
+                    document.getElementById('hotel_pick_up_n').click();
+
+                }
+
+                if(body.is_24hour === '1'){
+
+                    document.getElementById('hotel_24hour_y').click();
+                    document.getElementById('hotel_check_in_time').innerHTML = '';
+                    document.getElementById('hotel_check_out_time').innerHTML = '';
+                }else{
+                    document.getElementById('hotel_24hour_n').click();
+                    document.getElementById('hotel_check_in_time').innerHTML += select_24hour();
+                    document.getElementById('hotel_check_out_time').innerHTML += select_24hour();
+                }
+
+
+                document.getElementById('hotel_common_notice').value = body.hotel_info;
+
+                document.getElementById('hotel_common_notice').addEventListener('input',function(){
+
+                    document.getElementById('hotel_common_notice_length').innerText = document.getElementById('hotel_common_notice').value.length;
+                })
+                document.getElementById('hotel_common_notice_length').innerText = body.hotel_info.length;
+
             }
         }
     })
@@ -707,9 +795,14 @@ function add_get_hotel_product(id){
 
 
 
+
                     if(body.dog.length > 0){
 
-                        body.dog.forEach(function(d){
+                        document.getElementById('hotel_extra_price').innerHTML += `${select_extra()}`
+
+
+
+                        body.dog.forEach(function(d,i){
 
 
                             d.fee_list.forEach(function(fee){
@@ -731,6 +824,9 @@ function add_get_hotel_product(id){
                                                             </td></tr>`
 
                             document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
+                            document.getElementById('hotel_peak_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
+                            document.getElementById('hotel_photo_dog_tr').innerHTML += `<th>${d.room_name}</th>`
+                            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${i}"><div class="upload-img-btn" data-rid="dog_${i}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;" ></div></td>`
 
                         })
 
@@ -790,10 +886,6 @@ function add_get_hotel_product(id){
 
 
 
-                    console.log(dog_arr);
-                    console.log(cat_arr);
-
-
 
 
 
@@ -812,21 +904,102 @@ function add_get_hotel_product(id){
                     })
 
 
-                    console.log(dog_weight)
-                    console.log(cat_weight);
-
-
                     for(let i=0; i<Array.from(dog_weight).length; i++){
 
-                        document.getElementById('hotel_grade_dog_sep_tbody').innerHTML += `<tr id="hotel_grade_dog_sep_tr_${i}"></tr>`
+                        document.getElementById('hotel_grade_dog_sep_tbody').innerHTML += `<tr class="hotel-grade-dog-sep-tr" id="hotel_grade_dog_sep_tr_${i}"></tr>`
+                        document.getElementById('hotel_peak_dog_sep_tbody').innerHTML += `<tr class="hotel-peak-dog-sep-tr" id="hotel_peak_dog_sep_tr_${i}"></tr>`
+
                     }
 
                     for(let i=0; i<Array.from(cat_weight).length; i++){
 
-                        document.getElementById('hotel_grade_cat_sep_tbody').innerHTML += `<tr id="hotel_grade_cat_sep_tr_${i}"></tr>`
+                        document.getElementById('hotel_grade_cat_sep_tbody').innerHTML += `<tr class="hotel-grade-cat-sep-tr" id="hotel_grade_cat_sep_tr_${i}"></tr>`
                     }
 
                     let room = [dog_arr,cat_arr,dog_weight,cat_weight,body];
+
+
+
+                    body.coupon.forEach(function(coupon){
+
+                        if(coupon.type === 'C'){
+
+                            document.getElementById('hotel_coupon_list').innerHTML = `<div class="form-vertical-cell middle hotel-coupon-div">
+                                                                                                    <div class="grid-layout basic">
+                                                                                                        <div class="grid-layout-inner">
+                                                                                                            <div class="grid-layout-cell grid-100">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">상품명</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <input type="text" class="" value="${coupon.name}" placeholder="입력" >
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell grid-30">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">이용횟수</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <select class="arrow" data-coupon_seq="${coupon.coupon_seq}" data-type="C-given">
+                                                                                                                            ${select_C_coupon()}
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell grid-40">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">요금</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <select class="arrow" data-coupon_seq="${coupon.coupon_seq}" data-type="C-price">
+                                                                                                                            ${select_F_coupon()}
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>`
+                        }else if(coupon.type ==='F'){
+                            document.getElementById('hotel_flat_list').innerHTML = `<div class="form-vertical-cell middle hotel-flat-div">
+                                                                                                    <div class="grid-layout basic">
+                                                                                                        <div class="grid-layout-inner">
+                                                                                                            <div class="grid-layout-cell grid-100">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">상품명</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <input type="text" class="" value="${coupon.name}" placeholder="입력" >
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell grid-30">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">가격</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <select class="arrow" data-coupon_seq="${coupon.coupon_seq}" data-type="F-price">
+                                                                                                                            ${select_F_coupon()}
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell grid-40">
+                                                                                                                <div class="form-group-item card">
+                                                                                                                    <div class="form-item-label">실적립금</div>
+                                                                                                                    <div class="form-item-data">
+                                                                                                                        <select class="arrow" data-coupon_seq="${coupon.coupon_seq}" data-type="F-given">
+                                                                                                                            ${select_F_coupon()}
+                                                                                                                        </select>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                            </div>
+                                                                                                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                                                                                                        </div>
+                                                                                                    </div>
+                                                                                                </div>`
+
+                        }
+
+
+                    })
 
                     resolve(room);
                 }
@@ -873,6 +1046,71 @@ function select_price(){
 }
 
 
+function select_C_coupon(){
+
+    let options = '';
+
+    for(let i=1; i<=30; i++){
+
+        options += `<option value="${i}">${i}회</option>`
+    }
+
+    return options;
+}
+
+function select_F_coupon(){
+
+    let options ='';
+
+    for(let i=1000; i<=1500000; i+=1000){
+
+        options += `<option value="${i}">${i}원</option>`
+    }
+
+    return options ;
+}
+
+
+function select_neutral_price(){
+
+
+    let options ='';
+    for(let i=500; i<=500000; i+=500){
+
+        options += `<option value="${i}">${i}원</option>`
+    }
+    return options;
+}
+
+function select_24hour(){
+
+    let options = '';
+
+    for(let i=0; i<24; i++){
+
+        options += `<option value="${fill_zero(i)}">${am_pm_check(i)} 시</option>`
+    }
+
+    return options;
+}
+
+function select_extra(){
+
+
+    let options ='';
+    options += `<option value="">선택안함</option>`
+
+
+    for(let i=500; i<=500000; i+=500){
+
+        options += `<option value="${i}">${i}원</option>`
+
+    }
+
+    return options;
+}
+
+
 function add_get_hotel_product_price_set(room){
 
     return new Promise(function(resolve){
@@ -887,34 +1125,77 @@ function add_get_hotel_product_price_set(room){
 
         dog_weight.forEach(function(d_w,i){
 
-            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding weight-check" data-weight="${d_w}"><div class="form-table-select"><select id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding " id="grade_dog_sep_tr_${i}" data-weight="${d_w}"><div class="form-table-select"><select class="weight-check" id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+            document.getElementById(`hotel_peak_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding " id="peak_dog_sep_tr_${i}" data-weight="${d_w}"><div class="form-table-select"><select class="weight-check" id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+
 
 
         })
 
 
 
-        // data.dog.forEach(function(d){
-        //
-        //
-        //     let d_kg_list = [];
-        //
-        //     d.fee_list.forEach(function(f){
-        //         d_kg_list.push(f.kg);
-        //
-        //     })
-        //
-        //     let diff = dog_weight.filter(x => !d_kg_list.includes(x));
-        //
-        //
-        //     console.log(diff);
-        //
-        //     d.fee_list.forEach(function(f,i){
-        //
-        //         document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_price()}</select></div></td>`
-        //     })
-        // })
+        Array.from(document.getElementById('hotel_grade_dog_sep_tbody').children).forEach(function(c,k){
 
+
+
+            data.dog.forEach(function(d,j){
+
+                let d_kg_list =[];
+
+                d.fee_list.forEach(function(f){
+
+                    d_kg_list.push(f.kg);
+
+                })
+
+                let diff = dog_weight.filter(x => !d_kg_list.includes(x));
+
+                d.fee_list.forEach(function(f,i){
+
+                    if(c.children[0].getAttribute('data-weight')===f.kg){
+
+                        c.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check" id="dog_price_select_${d.hp_seq}_${k}" data-normal_price="${f.normal_price}">${select_price()}</select></div></td>`
+                    }
+
+                })
+
+                if(diff.includes(c.children[0].getAttribute('data-weight'))){
+                    c.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check" id="dog_price_select_${d.hp_seq}_${k}">${select_price()}</select></div></td>`
+                }
+            })
+        })
+
+
+        Array.from(document.getElementById('hotel_peak_dog_sep_tbody').children).forEach(function(c,k){
+
+
+
+            data.dog.forEach(function(d,j){
+
+                let d_kg_list =[];
+
+                d.fee_list.forEach(function(f){
+
+                    d_kg_list.push(f.kg);
+
+                })
+
+                let diff = dog_weight.filter(x => !d_kg_list.includes(x));
+
+                d.fee_list.forEach(function(f,i){
+
+                    if(c.children[0].getAttribute('data-weight')===f.kg){
+
+                        c.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check" id="dog_price_select_${d.hp_seq}_${k}" data-normal_price="${f.peak_price}">${select_price()}</select></div></td>`
+                    }
+
+                })
+
+                if(diff.includes(c.children[0].getAttribute('data-weight'))){
+                    c.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check" id="dog_price_select_${d.hp_seq}_${k}">${select_price()}</select></div></td>`
+                }
+            })
+        })
 
 
 
@@ -933,65 +1214,405 @@ function add_get_hotel_product_price_set_2(room){
     const cat_room = room[1];
     const dog_weight = Array.from(room[2]);
     const cat_weight = Array.from(room[3]);
+    const data = room[4];
 
-    for(let i=0; i<5;i++){
 
 
-        if(document.getElementById(`dog_weight_select_${i}`)){
 
-                for(let j=0; j<document.getElementById(`dog_weight_select_${i}`).options.length;j++){
+    Array.from(document.getElementsByClassName('arrow')).forEach(function(el){
 
-                    if(document.getElementById(`dog_weight_select_${i}`).getAttribute('data-weight') === document.getElementById(`dog_weight_select_${i}`).options[j].value){
 
-                        document.getElementById(`dog_weight_select_${i}`).options[j].selected = true;
-                    }
+        if(el.getAttribute('data-coupon_seq') && el.getAttribute('data-type')){
+
+            let type = '';
+            switch (el.getAttribute('data-type')){
+
+                case 'C-given' : case 'F-given' : type = 'given'; break;
+                case 'C-price' : case  'F-price' : type = 'price'; break;
 
             }
+
+            data.coupon.forEach(function(coupon){
+
+                if(coupon.coupon_seq === parseInt(el.getAttribute('data-coupon_seq'))){
+
+                    for(let i=0; i<el.options.length;i++){
+
+                        if(parseInt(el.options[i].value) === coupon[type]){
+                            el.options[i].selected = true;
+                        }
+                    }
+                }
+            })
         }
 
+    })
 
-    }
+
+
 
 
     Array.from(document.getElementsByClassName('weight-check')).forEach(function(el){
 
 
-        dog_room.forEach(function(d_r,i){
+        if(el.getAttribute('data-weight')){
 
+            for(let i=0; i<el.children.length; i++){
 
-            if(el.parentElement){
-
-
-                if(el.getAttribute('data-weight') === d_r.kg){
-
-
-
-                    el.parentElement.innerHTML += `<td class="no-padding"><div class="form-table-select"><select>${select_price()}</select></div></td>`;
-
+                if(el.getAttribute('data-weight') === el.options[i].value){
+                    el.options[i].selected = true;
                 }
-
             }
-
-        })
-
-
+        }
     })
 
-
-    // for(let i=0; i<dog_room.length*dog_weight.length;i++){
-    //
-    //     if(document.getElementById(`dog_price_select_${i}`)){
-    //
-    //         for(let j=0; j<document.getElementById(`dog_price_select_${i}`).options.length;j++){
-    //             if(document.getElementById(`dog_price_select_${i}`).getAttribute('data-price') === document.getElementById(`dog_price_select_${i}`).options[j].value){
-    //
-    //
-    //                 document.getElementById(`dog_price_select_${i}`).options[j].selected = true;
-    //             }
-    //
-    //         }
-    //     }
-    // }
+    Array.from(document.getElementsByClassName('price-check')).forEach(function(el){
 
 
+        if(el.getAttribute('data-normal_price')){
+
+            for(let i=0; i<el.children.length; i++) {
+
+                if (el.getAttribute('data-normal_price') === el.options[i].value) {
+
+                    el.options[i].selected = true;
+                }
+            }
+
+        }
+
+    })
+}
+
+
+function peak_price_toggle(bool,type){
+
+
+    if(bool){
+
+        if(type === 'dog'){
+
+            document.getElementById('hotel_peak_dog_wrap').style.display = 'block'
+        }else{
+
+        }
+
+    }else{
+
+        if(type === 'dog'){
+
+            document.getElementById('hotel_peak_dog_wrap').style.display ='none';
+        }else{
+
+        }
+    }
+}
+
+function room_picture_toggle(bool,type){
+
+
+    if(bool){
+
+        if(type === 'dog'){
+
+            document.getElementById('hotel_room_photo_dog_wrap').style.display = 'block'
+        }else{
+
+        }
+
+    }else{
+
+        if(type === 'dog'){
+
+            document.getElementById('hotel_room_photo_dog_wrap').style.display ='none';
+        }else{
+
+        }
+    }
+}
+
+function HotelMemofocusNcursor(target) {
+    html = "<div id='upimgarea'></div>";
+    //document.getElementById('dmemo').focus();
+    var sel, range;
+    if (window.getSelection) {
+        // IE9 and non-IE
+        sel = window.getSelection();
+        if (sel.getRangeAt && sel.rangeCount) {
+            range = sel.getRangeAt(0);
+            range.deleteContents();
+
+            // Range.createContextualFragment() would be useful here but is
+            // non-standard and not supported in all browsers (IE9, for one)
+            var el = document.createElement("div");
+            el.innerHTML = html;
+            var frag = document.createDocumentFragment(),
+                node, lastNode;
+            while ((node = el.firstChild)) {
+                lastNode = frag.appendChild(node);
+            }
+            range.insertNode(frag);
+
+            // Preserve the selection
+            if (lastNode) {
+                range = range.cloneRange();
+                range.setStartAfter(lastNode);
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+    } else if (document.selection && document.selection.type != "Control") {
+        // IE < 9
+        document.selection.createRange().pasteHTML(html);
+    }
+
+    // $("#fileupload").attr('data-rid',target.getAttribute('data-rid'));
+    $("#fileupload").trigger("click");
+
+}
+
+
+function hotel_photo_update(target){
+
+        let rid = target.getAttribute('data-rid');
+
+        let file = document.getElementById('fileupload').files[0];
+        let file_name = file.name;
+
+        let type = file_name.split('.')[1];
+
+
+
+
+        if(!['jpg','png','jpeg'].includes(type)){
+
+            alert('png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+            return;
+
+        }
+
+
+        let fReader = new FileReader();
+        fReader.readAsDataURL(file);
+        fReader.onload = function(event){
+
+
+            Array.from(document.getElementsByClassName('hotel-photo-dog-td')).forEach(function(el){
+
+                if(el.getAttribute('id') === rid){
+
+                    el.innerHTML += `<div class="list-cell" style="margin-top:10px;">
+                                        <div class="picture-thumb-view picture-thumb-view-add">
+                                        <div class="picture-thumb-view-delete" onclick="hotel_delete_photo(this)">
+                                                                                            <img src="/static/pub/images/icon/10-ic-24-close-white@2x.png" alt=""> 
+                                                                                        </div>
+                                            <div class="picture-obj"><img src="${event.target.result}" alt=""></div>
+                                        </div>
+                                    </div>`
+                }
+            })
+
+        }
+
+
+
+
+
+}
+
+function add_hotel_coupon(){
+
+    let coupon_div_count = $('.hotel-coupon-div').length;
+    if(coupon_div_count <5){
+        let div = `<div class="form-vertical-cell middle hotel-coupon-div">
+                    <div class="grid-layout basic">
+                        <div class="grid-layout-inner">
+                            <div class="grid-layout-cell grid-100">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">상품명</div>
+                                    <div class="form-item-data">
+                                        <input type="text" class="" value="" placeholder="입력" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell grid-30">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">이용횟수</div>
+                                    <div class="form-item-data">
+                                        <select class="arrow">
+                                            ${select_C_coupon()}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell grid-40">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">요금</div>
+                                    <div class="form-item-data">
+                                        <select class="arrow">
+                                            ${select_F_coupon()}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                        </div>
+                    </div>
+                </div>`
+        $('#hotel_coupon_list').append(div);
+    }
+}
+
+function add_hotel_flat(){
+    let flat_div_count = $('.hotel-flat-div').length;
+    if(flat_div_count <5){
+        let div = `<div class="form-vertical-cell middle hotel-flat-div">
+                    <div class="grid-layout basic">
+                        <div class="grid-layout-inner">
+                            <div class="grid-layout-cell grid-100">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">상품명</div>
+                                    <div class="form-item-data">
+                                        <input type="text" class="" value="" placeholder="입력" >
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell grid-30">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">가격</div>
+                                    <div class="form-item-data">
+                                        <select class="arrow">
+                                            ${select_F_coupon()}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell grid-40">
+                                <div class="form-group-item card">
+                                    <div class="form-item-label">실적립금</div>
+                                    <div class="form-item-data">
+                                        <select class="arrow">
+                                            ${select_F_coupon()}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
+                        </div>
+                    </div>
+                </div>`
+        $('#hotel_flat_list').append(div);
+    }
+
+}
+function add_hotel_dog_table(){
+
+    let grade_dt_count = $('.hotel-grade-dog-sep-tr').length;
+    if(grade_dt_count <5){
+        let grade_dt_div = $('.hotel-grade-dog-sep-tr:last-child').clone();
+        $('#hotel_grade_dog_sep_tbody').append(grade_dt_div);
+
+        let peak_dt_div = $('.hotel-peak-dog-sep-tr:last-child').clone();
+        $('#hotel_peak_dog_sep_tbody').append(peak_dt_div);
+
+
+    }
+
+
+
+
+}
+
+function delete_hotel_dog_table(){
+
+    let grade_total_cnt = $('.hotel-grade-dog-sep-tr').length;
+    if(grade_total_cnt > 1) {
+        $('.hotel-grade-dog-sep-tr:last-child').remove();
+    }
+
+    let peak_total_cnt = $('.hotel-peak-dog-sep-tr').length;
+
+    if(peak_total_cnt >1){
+        $('.hotel-peak-dog-sep-tr:last-child').remove();
+    }
+}
+
+function hotel_delete_photo(target){
+
+    target.parentElement.remove();
+}
+function hotel_coupon_toggle(bool){
+
+    if(bool){
+
+        document.getElementById('hotel_coupon_wrap').style.display ='block';
+
+    }else{
+        document.getElementById('hotel_coupon_wrap').style.display ='none';
+
+    }
+}
+
+function hotel_flat_toggle(bool){
+
+    if(bool){
+
+        document.getElementById('hotel_flat_wrap').style.display = 'block';
+    }else{
+        document.getElementById('hotel_flat_wrap').style.display ='none';
+    }
+}
+
+function test_send(){
+
+
+    $('#fileupload').fileupload({
+        formData: {
+            mode: "upload_img",
+            target: "tb_hotel_product.image",
+            folder: "hotel"
+        },
+        dataType: 'json',
+        done: function (e, data) {
+            console.log(data);
+        }
+
+    });
+
+}
+
+
+
+function hotel_neutral_toggle(bool){
+
+
+    if(bool){
+
+        document.getElementById('hotel_neutral_use').style.display = 'block';
+    }else{
+        document.getElementById('hotel_neutral_use').style.display = 'none';
+    }
+}
+
+function hotel_neutral_price_toggle(bool){
+
+    if(bool){
+
+        document.getElementById('hotel_neutral_price').style.display ='block'
+    }else{
+        document.getElementById('hotel_neutral_price').style.display ='none'
+
+    }
+}
+
+
+function hotel_24hour_toggle(bool){
+
+    if(bool){
+        document.getElementById('hotel_24hour_wrap').style.display ='block';
+    }else{
+        document.getElementById('hotel_24hour_wrap').style.display ='none';
+
+    }
 }

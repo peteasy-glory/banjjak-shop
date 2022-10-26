@@ -5117,3 +5117,30 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .hotel-info{
 	display:none;
 }
+
+.upload-img-btn img{
+	border:1px solid #ebebeb;
+}
+
+.picture-thumb-view-delete{
+	position: absolute;
+	border-radius: 10px;
+	background: rgba(0,0,0,0.4);
+	width: 20px;
+	height: 20px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	right: 3px;
+	top: 3px;
+	cursor: pointer;
+}
+.picture-thumb-view-delete img{
+	max-width:13px;
+}
+.picture-thumb-view-add{
+	position: relative;
+}
+.picture-obj img{
+	border-radius: 10px;
+}

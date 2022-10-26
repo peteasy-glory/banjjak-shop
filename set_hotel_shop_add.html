@@ -122,8 +122,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                 <div class="btn-basic-action">
                                                     <div class="grid-layout btn-grid-group">
                                                         <div class="grid-layout-inner">
-                                                            <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">구간추가</a></div>
-                                                            <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round">구간삭제</a></div>
+                                                            <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round" onclick="add_hotel_dog_table()">구간추가</a></div>
+                                                            <div class="grid-layout-cell grid-2"><a href="#" class="btn btn-outline-purple btn-middle-size btn-round" onclick="delete_hotel_dog_table()">구간삭제</a></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -136,45 +136,22 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio1"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio1"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" id="hotel_peak_dog_y" name="radio1" onclick="peak_price_toggle(true,'dog')"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" id="hotel_peak_dog_n" name="radio1" onclick="peak_price_toggle(false,'dog')"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-item-data type-8" style="display:block;">
+                                            <div class="form-item-data type-8" id="hotel_peak_dog_wrap" style="display:none;">
                                                 <div class="read-table">
                                                     <table>
-                                                        <colgroup>
-                                                            <col style="width:40%;">
-                                                            <col style="width:60%;">
+                                                        <colgroup id="hotel_peak_dog_colgroup">
                                                         </colgroup>
                                                         <thead>
-                                                        <tr>
+                                                        <tr id="hotel_peak_dog_sep_weight">
                                                             <th>무게</th>
-                                                            <th>댕댕이</th>
                                                         </tr>
                                                         </thead>
-                                                        <tbody>
-                                                        <tr>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                        <option value="">1.0kg</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                            <td class="no-padding">
-                                                                <div class="form-table-select">
-                                                                    <select>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
-                                                                        <option value="">선택안함</option>
-                                                                    </select>
-                                                                </div>
-                                                            </td>
-                                                        </tr>
+                                                        <tbody id="hotel_peak_dog_sep_tbody">
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -187,22 +164,33 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio2"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio2"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" id="hotel_room_photo_dog_y" name="radio2" onclick="room_picture_toggle(true,'dog')"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" id="hotel_room_photo_dog_n" name="radio2" onclick="room_picture_toggle(false,'dog')"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-item-data type-8" style="display:block;">
-                                                <div class="shop-gate-picture-select">
-                                                    <div class="list-inner">
-                                                        <div class="list-cell">
-                                                            <div class="picture-thumb-view">
-                                                                <div class="picture-obj"><img src="/static/pub/images/gate_picture.jpg" alt=""></div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="list-cell"><a href="#" class="btn-gate-picture-register"><span><em>이미지 추가</em></span></a></div>
-                                                        <div class="list-cell"><a href="#" class="btn-gate-picture-register capture"><span><em>사진 촬영</em></span></a></div>
-                                                    </div>
+                                            <div class="form-item-data type-8" id="hotel_room_photo_dog_wrap" style="display:none;">
+<!--                                                <div class="shop-gate-picture-select">-->
+<!--                                                    <div class="list-inner" id="hotel_room_photo_dog_list">-->
+<!--                                                        <div class="list-cell"><a href="#" class="btn-gate-picture-register capture" onclick="HotelMemofocusNcursor()"><span><em>사진 첨부</em></span></a></div>-->
+<!--                                                        <div style="display:none;position:absolute;top:-50px"><input type="file" accept="image/*" name="imgupfile" id="addimgfile"></div>-->
+<!--                                                    </div>-->
+<!--                                                </div>-->
+                                                <div class="read-table">
+                                                    <table>
+                                                        <colgroup id="hotel_photo_dog_colgroup">
+                                                        </colgroup>
+                                                        <thead>
+                                                        <tr id="hotel_photo_dog_tr">
+
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="hotel_photo_dog_tbody">
+                                                        <tr id="hotel_photo_dog_tbody_tr">
+
+                                                        </tr>
+                                                        </tbody>
+                                                    </table>
                                                 </div>
                                             </div>
                                         </div>
@@ -220,98 +208,19 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio2"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio2"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio3" id="hotel_coupon_y" onclick="hotel_coupon_toggle(true)"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio3" id="hotel_coupon_n" onclick="hotel_coupon_toggle(false)"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-item-data type-8" style="display:block;">
-                                                <div class="basic-data-group">
+                                            <div class="form-item-data type-8" id="hotel_coupon_wrap" style="display:none">
+                                                <div class="basic-data-group" id="hotel_coupon_list">
                                                     <!-- 하나의 영역 -->
-                                                    <div class="form-vertical-cell middle">
-                                                        <div class="grid-layout basic">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-100">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">상품명</div>
-                                                                        <div class="form-item-data">
-                                                                            <input type="text" class="" value="입력된 데이타" placeholder="입력" readonly>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-30">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">이용획수</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="" selected>입력된 데이타</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-40">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">요금(담위:원)</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="" selected>입력된 데이타</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- //하나의 영역 -->
-                                                    <!-- 하나의 영역 -->
-                                                    <div class="form-vertical-cell middle">
-                                                        <div class="grid-layout basic">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-100">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">상품명</div>
-                                                                        <div class="form-item-data">
-                                                                            <input type="text" class="" placeholder="입력">
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-30">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">이용획수</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-40">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">요금(담위:원)</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
+
                                                     <!-- //하나의 영역 -->
                                                 </div>
                                                 <div class="btn-basic-action">
-                                                    <button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+                                                    <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="add_hotel_coupon()">추가하기</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -329,98 +238,18 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio3"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio3"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio4" id="hotel_flat_y" onclick="hotel_flat_toggle(true)"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio4" id="hotel_flat_n" onclick="hotel_flat_toggle(false)"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-item-data type-8" style="display:block;">
-                                                <div class="basic-data-group">
-                                                    <!-- 하나의 영역 -->
-                                                    <div class="form-vertical-cell middle">
-                                                        <div class="grid-layout basic">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-100">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">상품명</div>
-                                                                        <div class="form-item-data">
-                                                                            <input type="text" class="" value="입력된 데이타" placeholder="입력" readonly>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-30">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">이용획수</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="" selected>입력된 데이타</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-40">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">요금(담위:원)</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="" selected>입력된 데이타</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- //하나의 영역 -->
-                                                    <!-- 하나의 영역 -->
-                                                    <div class="form-vertical-cell middle">
-                                                        <div class="grid-layout basic">
-                                                            <div class="grid-layout-inner">
-                                                                <div class="grid-layout-cell grid-100">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">상품명</div>
-                                                                        <div class="form-item-data">
-                                                                            <input type="text" class="" placeholder="입력">
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-30">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">이용획수</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell grid-40">
-                                                                    <div class="form-group-item card">
-                                                                        <div class="form-item-label">요금(담위:원)</div>
-                                                                        <div class="form-item-data">
-                                                                            <select class="arrow">
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                                <option value="">선택</option>
-                                                                            </select>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="grid-layout-cell flex-auto"><button type="button" class="btn-data-trash large">휴지통</button></div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <!-- //하나의 영역 -->
+                                            <div class="form-item-data type-8" id="hotel_flat_wrap" style="display:none;">
+                                                <div class="basic-data-group" id="hotel_flat_list">
+
+
                                                 </div>
                                                 <div class="btn-basic-action">
-                                                    <button type="button" class="btn btn-outline-purple btn-middle-size btn-round">추가하기</button>
+                                                    <button type="button" class="btn btn-outline-purple btn-middle-size btn-round" onclick="add_hotel_flat()">추가하기</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -438,32 +267,32 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio4"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio4"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio5" id="hotel_neutral_y" onclick="hotel_neutral_toggle(false)"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio5" id="hotel_neutral_n" onclick="hotel_neutral_toggle(true)"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group-cell middle" style="display:block;">
+                                    <div class="form-group-cell middle" id="hotel_neutral_use" style="display:none;">
                                         <div class="form-group-item">
                                             <div class="form-item-label">중성화 유무에 따른 추가 요금이 있나요?</div>
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio5"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio5"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio6" id="hotel_neutral_price_y" onclick="hotel_neutral_price_toggle(true)"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio6" id="hotel_neutral_price_n" onclick="hotel_neutral_price_toggle(false)"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group-cell middle" style="display:block;">
+                                    <div class="form-group-cell middle" style="display:none;" id="hotel_neutral_price">
                                         <div class="form-group-item">
                                             <div class="form-item-label">중성화 추가요금</div>
                                             <div class="form-item-data type-2">
-                                                <select>
-                                                    <option value="">0원</option>
+                                                <select id="hotel_neutral_price_select">
+
                                                 </select>
                                             </div>
                                         </div>
@@ -481,8 +310,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio6"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio6"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio7" id="hotel_pick_up_y"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio7" id="hotel_pick_up_n"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                                 <div class="form-bottom-info">(픽업요금은 픽업시 직접 받으시면 됩니다.)</div>
@@ -502,31 +331,25 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                             <div class="form-item-data type-2">
                                                 <div class="grid-layout toggle-button-group">
                                                     <div class="grid-layout-inner">
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio7"><em>예</em></label></div>
-                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio7"><em>아니오</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio8" id="hotel_24hour_y" onclick="hotel_24hour_toggle(false)"><em>예</em></label></div>
+                                                        <div class="grid-layout-cell grid-3"><label class="form-toggle-box middle"><input type="radio" name="radio8" id="hotel_24hour_n" onclick="hotel_24hour_toggle(true)"><em>아니오</em></label></div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="form-group-cell middle" style="display:block;">
+                                    <div class="form-group-cell middle" id="hotel_24hour_wrap" style="display:none;">
                                         <div class="form-group-item">
                                             <div class="form-item-label">가능시간 설정</div>
                                             <div class="form-item-data type-2">
                                                 <div class="form-datepicker-group">
                                                     <div class="form-datepicker">
-                                                        <select>
-                                                            <option value="">오전 09:00</option>
-                                                            <option value="">오전 09:00</option>
-                                                            <option value="">오전 09:00</option>
+                                                        <select id="hotel_check_in_time">
                                                         </select>
                                                     </div>
                                                     <div class="form-unit">~</div>
                                                     <div class="form-datepicker">
-                                                        <select>
-                                                            <option value="">오후 09:00</option>
-                                                            <option value="">오후 09:00</option>
-                                                            <option value="">오후 09:00</option>
+                                                        <select id="hotel_check_out_time">
                                                         </select>
                                                     </div>
                                                 </div>
@@ -545,10 +368,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                         <div class="form-group-item">
                                             <div class="form-item-label">1시간당 초과요금</div>
                                             <div class="form-item-data type-2">
-                                                <select>
-                                                    <option value="">6000원</option>
-                                                    <option value="">6000원</option>
-                                                    <option value="">6000원</option>
+                                                <select id="hotel_extra_price">
                                                 </select>
                                             </div>
                                         </div>
@@ -561,8 +381,8 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                         <div class="form-group-item">
                                             <div class="form-item-label">호텔 시설 및 기타 설명 입력</div>
                                             <div class="form-item-data">
-                                                <input type="text" class="form-control" placeholder="설명을 입력해 주세요">
-                                                <div class="form-input-info">0/1000</div>
+                                                <input type="text" class="form-control" id="hotel_common_notice" max-length="1000" placeholder="입력"/>
+                                                <div class="form-input-info"><span id="hotel_common_notice_length"></span>/1000</div>
                                             </div>
                                         </div>
                                     </div>
@@ -661,7 +481,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                     </div>
                                                 </div>
                                             </div>
-                                            <div class="form-item-data type-8" style="display:block;">
+                                            <div class="form-item-data type-8">
                                                 <div class="read-table">
                                                     <table>
                                                         <colgroup>
@@ -1106,11 +926,13 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 		-->
 		<a href="#" class="btn-page-bottom">저장하기</a>
 	</div>
+    <div style="display:none;"><input type="file" accept="image/*" name="files[]" id="fileupload" data-url="/data/fileupload_ajax.php" multiple ></div>
 	<!-- //page-bottom -->
 </section>
 <!-- //container -->
 <script src="/static/pub/js/hotel.js"></script>
 <script src="/static/pub/js/Sortable.min.js"></script>
+<script src="/static/pub/js/jquery.fileupload.js"></script>
 <script>
 
     const artist_id='<?=$artist_id?>';
