@@ -7,7 +7,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 <!-- header -->
 <header id="header">
     <div class="header-left">
-        <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
+        <a href="#" class="btn-page-ui btn-page-prev" id="btn_page_prev_1"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
     </div>
     <div class="page-title">공지사항</div>
 
@@ -70,7 +70,13 @@ include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
     <!-- //page-body -->
 </section>
 <!-- //container -->
+<script>
 
+    document.getElementById('btn_page_prev_1').addEventListener('click',function(){
+
+        location.href = '/<?=$_SESSION['backurl_notice']?>';
+    })
+</script>
 
 </body>
 </html>

@@ -17,12 +17,16 @@ $yy = (isset($_GET['yy']) && $_GET['yy']) ? $_GET['yy'] : date('Y');
 $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
+$header_right ='';
+$header_notice = true;
 
 
 $shop_title	= "예약관리";
 
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
 
 ?>
 
@@ -40,10 +44,16 @@ $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 $week = $_GET['week'];
 
+
+
 $backurl = $_GET['backurl'];
 
 unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'reserve_main_list?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+unset($_SESSION['backurl_notice']);
+$_SESSION['backurl_notice'] = 'reserve_main_list?ch=day&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+
+
 
 $daily = array('일', '월', '화', '수', '목', '금', '토');
 $selected_date = $yy . "-" . $mm . "-" . $dd;
