@@ -761,23 +761,71 @@ function change_hotel_grade_dog(id,target){
 
 
 
-    document.getElementById('hotel_grade_dog_tbody').innerHTML = '';
+    // document.getElementById('hotel_grade_dog_tbody').innerHTML = '';
+    //
+    //
+    // for(let i=0; i<target.value; i++){
+    //
+    //     document.getElementById('hotel_grade_dog_tbody').innerHTML +=
+    //
+    // }
 
 
-    for(let i=0; i<target.value; i++){
+    let tbody = document.getElementById('hotel_grade_dog_tbody');
 
-        document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr><td class="no-padding">
+    let weight_tr = document.getElementById('hotel_grade_dog_sep_weight');
+
+    let now_length = tbody.children.length;
+
+    let select_length = parseInt(target.value);
+
+    console.log(now_length);
+    console.log(select_length);
+
+    if(select_length > now_length){
+
+
+        for(let i=0; i<select_length-now_length; i++){
+
+            tbody.innerHTML += `<tr class="grade-dog-tr"><td class="no-padding">
                                                                 <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
+                                                                    <input type="text" oninput="typing_change(this)" placeholder="입력"/>
                                                                 </div>
                                                             </td><td class="no-padding">
                                                                 <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력"/>
+                                                                    <input type="number" placeholder="입력"/>
                                                                 </div>
                                                             </td></tr>`
 
-    }
+            weight_tr.innerHTML += '<th class="grade-dog-sep-th"></th>'
 
+            Array.from(document.getElementsByClassName('hotel-grade-dog-sep-tr')).forEach(function(el){
+
+
+                el.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check">${select_price()}</select></div></td>`
+
+            })
+
+        }
+
+
+
+
+    }else if(now_length>select_length){
+
+        for(let i=0; i<now_length-select_length;i++){
+
+            $('.grade-dog-tr:last-child').remove();
+            $('.grade-dog-sep-th:last-child').remove();
+
+            Array.from(document.getElementsByClassName('hotel-grade-dog-sep-tr')).forEach(function(el){
+                console.log(el.children[el.children.length-1])
+                el.children[el.children.length-1].remove();
+            })
+        }
+
+
+    }
 
 }
 
@@ -874,9 +922,9 @@ function add_get_hotel_product(id){
                             })
 
 
-                            document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr><td class="no-padding">
+                            document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr class="grade-dog-tr"><td class="no-padding">
                                                                 <div class="form-table-select">
-                                                                    <input type="text" placeholder="입력" value="${d.room_name}"/>
+                                                                    <input type="text" placeholder="입력" oninput="typing_change(this)" value="${d.room_name}"/>
                                                                 </div>
                                                             </td><td class="no-padding">
                                                                 <div class="form-table-select">
@@ -884,7 +932,7 @@ function add_get_hotel_product(id){
                                                                 </div>
                                                             </td></tr>`
 
-                            document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
+                            document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th class="grade-dog-sep-th">${d.room_name}</th>`
                             document.getElementById('hotel_peak_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
                             document.getElementById('hotel_photo_dog_tr').innerHTML += `<th>${d.room_name}</th>`
                             document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${i}"><div class="upload-img-btn" data-rid="dog_${i}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;" ></div></td>`
@@ -1186,8 +1234,8 @@ function add_get_hotel_product_price_set(room){
 
         dog_weight.forEach(function(d_w,i){
 
-            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding " id="grade_dog_sep_tr_${i}" data-weight="${d_w}"><div class="form-table-select"><select class="weight-check" id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
-            document.getElementById(`hotel_peak_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding " id="peak_dog_sep_tr_${i}" data-weight="${d_w}"><div class="form-table-select"><select class="weight-check" id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+            document.getElementById(`hotel_grade_dog_sep_tr_${i}`).innerHTML += `<td class="no-padding " id="grade_dog_sep_tr_${i}" data-weight="${d_w}"><div class="form-table-select"><select class="weight-check" onchange="change_dog_price_select(this)" id="dog_weight_select_${i}" data-weight="${d_w}">${select_weight()}</select></div></td>`
+            document.getElementById(`hotel_peak_dog_sep_tr_${i}`).innerHTML += `<td id="peak_dog_sep_tr_${i}" style="line-height: 40px;" data-weight="${d_w}">${d_w}kg</td>`
 
 
 
@@ -1679,4 +1727,44 @@ function hotel_24hour_toggle(bool){
         document.getElementById('hotel_24hour_wrap').style.display ='none';
 
     }
+}
+
+function typing_change(target){
+
+
+    let value = target.value;
+
+    let index = $(target).parent().parent().parent().index();
+
+    Array.from(document.getElementsByClassName('grade-dog-sep-th'))[index].innerText = value;
+
+
+}
+
+function change_dog_price_select(target){
+
+    let value = target.value;
+
+
+
+    target.setAttribute('data-weight',value);
+
+    let index = $(target).parent().parent().parent().index();
+
+
+    console.log(index);
+
+
+    document.getElementById('hotel_peak_dog_sep_tbody').children[index].children[0].setAttribute('data-weight',value);
+    document.getElementById('hotel_peak_dog_sep_tbody').children[index].children[0].innerText = `${value}kg`;
+
+
+    // document.getElementById(`peak_dog_sep_tr_${index}`).setAttribute('data-weight',value);
+    // document.getElementById(`peak_dog_sep_tr_${index}`).innerText = `${value}kg`
+
+
+
+
+
+
 }
