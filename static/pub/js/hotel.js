@@ -836,10 +836,31 @@ function add_get_hotel_product(id){
 
 
 
+
                     if(body.dog.length > 0){
 
-                        document.getElementById('hotel_extra_price').innerHTML += `${select_extra()}`
+                        hotel_extra_price_div = document.getElementById('hotel_extra_price');
 
+
+
+                        hotel_extra_price_div.innerHTML += `${select_extra()}`
+
+
+                        document.getElementById('hotel_common_notice_length').innerText =body.dog[0].comment.length;
+                        document.getElementById('hotel_common_notice').value = body.dog[0].comment;
+                        document.getElementById('hotel_common_notice').dispatchEvent(new Event('change'));
+
+
+                        setTimeout(function(){
+
+                            for(let i = 0; i<hotel_extra_price_div.options.length; i++){
+
+                                if(parseInt(hotel_extra_price_div.options[i].value) === body.dog[0].extra_price){
+
+                                    hotel_extra_price_div.options[i].selected = true;
+                                }
+                            }
+                        },100)
 
 
                         body.dog.forEach(function(d,i){
