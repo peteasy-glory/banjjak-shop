@@ -702,14 +702,54 @@ function add_get_hotel_info(id){
                 }
 
 
-                document.getElementById('hotel_common_notice').value = body.hotel_info;
-
                 document.getElementById('hotel_common_notice').addEventListener('input',function(){
 
                     document.getElementById('hotel_common_notice_length').innerText = document.getElementById('hotel_common_notice').value.length;
                 })
-                document.getElementById('hotel_common_notice_length').innerText = body.hotel_info.length;
+                document.getElementById('hotel_common_notice_length').innerText =0;
 
+                setTimeout(function(){
+
+                    if(document.getElementById('hotel_neutral_price_select').options.length >0 && body.is_neutral_pay === '1'){
+
+                        for(let i=0; i<document.getElementById('hotel_neutral_price_select').options.length; i++){
+
+                            if(parseInt(document.getElementById('hotel_neutral_price_select').options[i].value) === body.neutral_price){
+
+                                document.getElementById('hotel_neutral_price_select').options[i].selected = true;
+                            }
+
+                        }
+                    }
+
+
+                    if(document.getElementById('hotel_check_in_time').options.length>0){
+
+                        for(let i=0; i<document.getElementById('hotel_check_in_time').options.length; i++){
+
+
+
+
+                            if(document.getElementById('hotel_check_in_time').options[i].value === body.check_in){
+                                document.getElementById('hotel_check_in_time').options[i].selected = true;
+                            }
+                        }
+                    }
+
+                    if(document.getElementById('hotel_check_out_time').options.length>0){
+
+                        for(let i=0; i<document.getElementById('hotel_check_out_time').options.length; i++){
+
+
+
+
+                            if(document.getElementById('hotel_check_out_time').options[i].value === body.check_out){
+                                document.getElementById('hotel_check_out_time').options[i].selected = true;
+                            }
+                        }
+                    }
+
+                },100)
             }
         }
     })
@@ -1247,6 +1287,9 @@ function add_get_hotel_product_price_set_2(room){
         }
 
     })
+
+
+
 
 
 
