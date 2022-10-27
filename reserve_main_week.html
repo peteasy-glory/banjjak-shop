@@ -23,7 +23,8 @@ $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
 
-
+$header_right ='';
+$header_notice = true;
 $shop_title	= "예약관리";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
@@ -242,6 +243,9 @@ $_SESSION['backurl1'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET
 
 unset($_SESSION['backurl_wait']);
 $_SESSION['backurl_wait'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
+
+unset($_SESSION['backurl_notice']);
+$_SESSION['backurl_notice'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
 
 
 $now = new DateTime($yy . '-' . $mm . '-' . $dd);
