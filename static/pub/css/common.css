@@ -1529,7 +1529,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 .page-contents.small {padding:8px 0 0 0;}
 .page-contents.no-margin {padding:0;}
 .page-labels {height:52px; display:flex; align-items:center; padding:0 36px;}
-.page-bottom .btn-grid-group {padding:12px 20px 12px 20px; border-top:1px solid #f4f4f4;}
+.page-bottom .btn-grid-group {padding:12px 20px 12px 20px; border-top:1px solid #cecece;}
 
 .header-right .btn:last-child {margin-right:20px;}
 .header-right .btn.btn-middle-size {height:40px; min-width:80px;}
@@ -1560,7 +1560,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 .gnb-wrap .btn-gnb-toggle-menu .icons .on {position:absolute;top:0;left:0;width:100%;height:100%;margin:0;opacity:0;}
 
 /* navigation */
-.common-navigation {position:relative; background-color:#fff; display:flex; border-top:1px solid #ebebeb; z-index:100;}
+.common-navigation {position:relative; background-color:#fff; display:flex; border-top:1px solid #cecece; z-index:100;}
 .btn-navigation-item {flex:1; position:relative; display:block; width:20%; height:56px; padding:10px 0 0 0; box-sizing:border-box; text-align:center; overflow:hidden;}
 .btn-navigation-item .icon {position:relative;width:24px;height:24px;margin:0 auto; display:block;}
 .btn-navigation-item .icon:before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background-size:100% auto;background-repeat:no-repeat;background-position:center center;opacity:1;}
@@ -2235,7 +2235,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .pay-card-group.border-none {border-top:none;}
 .pay-card-group.top {margin-top:-20px;}
 .pay-card-cell {padding:18px 0; line-height:1;}
-.pay-card-cell.all {border-bottom:1px solid #f4f4f4;}
+.pay-card-cell.all {border-bottom:1px solid #cecece;}
 .pay-card-cell .pay-card-rule {margin-bottom:-18px;}
 .pay-card-cell.line + .pay-card-cell.line {border-top:1px solid #f4f4f4;}
 
@@ -2243,7 +2243,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .pay-card-rule-wrap.actived .pay-card-rule {display:block;}
 .pay-card-rule-wrap.actived .btn-pay-card-toggle {transform:rotate(-180deg);}
 
-.pay-card-agree {padding:20px; height:280px; box-sizing:border-box; border:1px solid #ebebeb; border-radius:12px; font-size:14px;line-height:20px;text-align:left;overflow-x:hidden;overflow-y:auto;}
+.pay-card-agree {padding:20px; height:280px; box-sizing:border-box; border:1px solid #cecece; border-radius:12px; font-size:14px;line-height:20px;text-align:left;overflow-x:hidden;overflow-y:auto;}
 
 .pay-card-check {position:relative; padding-right:18px;}
 .pay-card-check .btn-pay-card-toggle {position:absolute;top:-2px;right:-8px;display:block;width:26px;height:26px; font-size:0;background:url(../images/icon/btn-info-spread@2x.png) center center no-repeat; background-size:10px auto;}
@@ -3358,7 +3358,7 @@ table.customer-table > tbody > tr > td.no-padding {padding-left:0 !important; pa
 .phone-add-input .form-group-cell + .form-group-cell {margin-top:0;}
 .phone-add-input .form-input-info {margin-top:8px; padding:0;}
 
-.user-sign-wrap {margin-top:10px; height:213px; border:1px solid #ebebeb; border-radius:12px;background:#fff;}
+.user-sign-wrap {margin-top:10px; height:213px; border:1px solid #cecece; border-radius:12px;background:#fff;}
 .customer-view-agree-info {margin-top:10px; font-size:14px; line-height:20px;}
 .customer-view-agree .pay-card-group {margin-top:20px; border-top:none;}
 .customer-view-agree .pay-card-check .btn-pay-card-toggle {right:0; background-position:right center; width:auto; font-size:13px; line-height:20px; padding-right:15px; background:none;}
@@ -3464,7 +3464,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 /* 알림 / 표시 관리 > 알림설정 */
 .set-notice-type {padding-top:20px;}
 .set-notice-type-item + .set-notice-type-item {margin-top:20px;}
-.set-notice-type-item {display:flex; width:100%; padding:10px 0; align-items:flex-start; border-bottom:1px solid #f4f4f4;}
+.set-notice-type-item {display:flex; width:100%; padding:10px 0; align-items:flex-start; border-bottom:1px solid #cecece;}
 .set-notice-type-item .item-info-wrap {width:100%; flex:1;}
 .set-notice-type-item .item-check {flex:0 0 auto; margin-left:5px;}
 .set-notice-type-item .item-title {font-size:16px;line-height:20px;font-weight:700;}
@@ -4947,7 +4947,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .allimi-preview-info-title{
 	height:45px;
 	width:100%;
-	border:1px solid #d4d4d4;
+	border:1px solid #cecece;
 	display: flex;
 	align-items: center;
 	justify-content: center;
