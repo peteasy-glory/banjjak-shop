@@ -240,7 +240,7 @@ textarea.form-control:focus{border-bottom-color:#6840b1;}
 .form-item-data.type-9 {margin-top:20px;}
 .form-item-label .btn-form-more {position:absolute; top:-8px; right:0;font-size:14px; line-height:20px; font-weight:400; padding:8px 30px 8px 26px; display:block; z-index:2; background:url(../images/icon/btn-info-more-black@2x.png) right 12px center no-repeat; background-size:10px auto;}
 .form-item-label .btn-form-add {position:absolute; top:-8px; right:0;font-size:14px; line-height:20px; font-weight:400; padding:8px 30px 8px 26px; display:block; z-index:2; background:url(../images/icon/icon_plus_black.png) right 12px center no-repeat; background-size:10px auto;}
-.form-group-item.card {padding:8px 14px 13px 8px; border:1px solid #e8e8e8; background:#fff; box-sizing:border-box; text-align:left; border-radius:5px;}
+.form-group-item.card {padding:8px 14px 13px 8px; border:1px solid #cecece; background:#fff; box-sizing:border-box; text-align:left; border-radius:5px;}
 .form-group-item.card .form-item-label {font-size:12px; line-height:20px; color:#8f8f8f; font-weight:500;}
 .form-group-item.card .form-item-data {margin-top:2px; font-size:14px; line-height:17px; color:#202020; font-weight:500;}
 .form-group-item.card .form-item-data > input,
