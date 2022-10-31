@@ -617,7 +617,7 @@ $r = sql_fetch($res);
                 if($pay['status'] == 'R1' && ($pay['total_price']+$pay['spend_point']) > 0){
                     ?>
                     <div class="basic-data-group vvsmall3">
-                        <p class="btn btn-yellow btn-middle-size btn-round" style="margin-top:-10px;font-weight:bold;">사전 결제완료 : <span style="color:red;">&nbsp;<?php echo number_format($pay['total_price']+$pay['spend_point'])."원" ?></span></p>
+                        <p class="btn btn-yellow btn-middle-size btn-round" style="margin-top:10px;font-weight:bold;">사전 결제완료 : <span style="color:red;">&nbsp;<?php echo number_format($pay['total_price']+$pay['spend_point'])."원" ?></span></p>
                     </div>
                     <?php
                 }
