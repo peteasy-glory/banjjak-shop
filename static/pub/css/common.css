@@ -898,7 +898,7 @@ h6.con-title {font-size:15px; line-height:20px;}
 .basic-item.actived .basic-item-ui-list {display:block;}
 .basic-item .basic-list-item .item-name {padding-right:26px; box-sizing:border-box;}
 .basic-item-ui {position:absolute;top:0;right:0;}
-.basic-item-ui-list {position:absolute; top:26px; right:0; display:none; width:146px;z-index:10; border-radius:5px; background:#fff;border:1px solid #ebebeb;}
+.basic-item-ui-list {position:absolute; top:26px; right:0; display:none; width:146px;z-index:10; border-radius:5px; background:#fff;border:1px solid #8f8f8f;}
 .basic-item-ui-list .btn-basic-item-ui-item + .btn-basic-item-ui-item {border-top:1px solid #ebebeb;}
 .btn-basic-item-ui-nav {position:absolute; top:-18px; right:-20px; display:inline-flex; align-items:center; justify-content:center; width:56px; height:56px; z-index:15;font-size:0;}
 .btn-basic-item-ui-item {display:flex; font-size:14px; line-height:20px; height:45px; align-items:center; justify-content:center; width:100%; text-align:center; box-sizing:border-box;}
@@ -2500,7 +2500,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 /*.calendar-day-current-time .bar:before {content:'';position:absolute;top:50%;left:0;display:block;width:6px;height:6px;margin:-3px 0 0 -3px;background:#ff6a6a;border-radius:50%;}*/
 
 /* 예약하기 > 캘린더 (리스트) */
-.reserve-calendar-list {padding-top:12px; border-top:1px solid #f4f4f4;}
+.reserve-calendar-list {padding-top:12px; border-top:1px solid #cecece;}
 .reserve-calendar-list-items {position:relative;display:flex; width:100%; box-sizing:border-box; padding:11px 14px; border:1px solid #cecece; border-radius:10px; background:#fff;}
 .reserve-calendar-list-items:before {content:''; position:absolute;top:0;right:auto;bottom:0;left:0;width:4px;height:auto;margin:10px auto 10px 10px; background:#000; border-radius:2px;}
 .reserve-calendar-list-items + .reserve-calendar-list-items {margin-top:10px;}
@@ -2517,7 +2517,7 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .reserve-calendar-list-items .item-time-start > strong,
 .reserve-calendar-list-items .item-time-end > strong {display:block; font-size:15px;line-height:20px;font-weight:500;color:#202020;}
 .reserve-calendar-list-items .item-info {flex:1; width:100%; box-sizing:border-box; text-align:left; overflow:hidden;}
-.reserve-calendar-list-items .item-time + .item-info {padding-left:14px; border-left:1px solid #ebebeb;}
+.reserve-calendar-list-items .item-time + .item-info {padding-left:14px; border-left:1px solid #cecece;}
 .reserve-calendar-list-items .item-name {font-size:14px; line-height:20px; display:flex; align-items:flex-start; width:100%; box-sizing:border-box;}
 .reserve-calendar-list-items .item-name-division {margin:0 5px;}
 .reserve-calendar-list-items .item-name-txt {max-width:100%; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;}
@@ -2917,9 +2917,9 @@ table.terms-table > tbody > tr > td {padding:5px 10px; font-size:12px; line-heig
 .btn-picture-ui:before {content:''; position:absolute;top:50%;left:50%;display:block;width:24px;height:24px;background:#fff url(../images/icon/btn-comment-set@2x.png) center center no-repeat; background-size:16px auto; border-radius:50%; transform:translate(-50% , -50%);}
 .btn-picture-ui.press:before {background:#f0f0f0}
 .picture-ui-list {position:absolute;top:0;left:0;display:none;width:100%;height:100%;align-items:center; justify-content:center; padding:8px; box-sizing:border-box;}
-.picture-ui-list-inner {width:100%;overflow:hidden; background:#fff; border-radius:8px;}
+.picture-ui-list-inner {width:100%;overflow:hidden; background:#fff; border-radius:8px; border: 1px solid #cecece;}
 .picture-ui-list-inner > a {display:flex; font-size:14px; line-height:20px; height:45px; align-items:center; justify-content:center; width:100%; text-align:center; box-sizing:border-box;}
-.picture-ui-list-inner > a + a {border-top:1px solid #ebebeb;}
+.picture-ui-list-inner > a + a {border-top:1px solid #cecece;}
 .picture-ui-list-inner > a.press {background:#f0f0f0;}
 .picture-thumb-view.actived .picture-ui-list {display:flex;}
 .picture-thumb-view .picture-date {position:absolute;top:10px;left:10px;}
@@ -4591,7 +4591,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .diary-not-exist{
 
 	width:100%;
-	height:30px;
+	height:45px;
 	background: #6840b1;
 	color:#fff;
 	display: flex;
@@ -4605,7 +4605,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .diary-exist{
 
 	width:100%;
-	height:30px;
+	height:45px;
 	background: #ebebeb;
 	display: flex;
 	justify-content: center;

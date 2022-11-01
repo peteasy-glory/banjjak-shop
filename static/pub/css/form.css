@@ -287,7 +287,7 @@ h6.con-title + .form-group-item {margin-top:20px;}
 .form-vertical-group textarea:disabled{background-color:#f4f4f4; border-color:#f4f4f4; color:#202020;} 
 .card-check-group .card-check-box + .card-check-box {margin-top:12px;}
 .card-check-box {display:flex; height:45px; align-items:center; padding:13px 14px; box-sizing:border-box; background:#f4f4f4; border-radius:5px; text-align:left; border:1px solid #f4f4f4;}
-.card-check-box.white {background:#fff; border-color:#ebebeb;}
+.card-check-box.white {background:#fff; border-color:#cecece;}
 .card-check-box > label {flex:0 0 auto;}
 .card-check-box > input {width:100%;margin-left:6px;}
 .card-check-box .form-transparent {height:30px; border:none;padding:0;}
