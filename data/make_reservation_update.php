@@ -274,6 +274,7 @@ if($pet[0]['type']=='dog') {
 
         if(!$_POST['tmp_seq'])  $_POST['tmp_seq'] = NULL;
 
+<<<<<<< HEAD
         $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon 
                         WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' 
                           AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
@@ -288,6 +289,18 @@ if($pet[0]['type']=='dog') {
                         AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' 
                         AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
         } else {
+=======
+//        $sql = "SELECT COUNT(*) AS cnt, user_coupon_seq, given  FROM tb_user_coupon WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}'";
+//        //echo $sql."<br>";
+//        $row = sql_fetch_array($sql);
+//    //        print_r($row);
+//        if ($row[0]['cnt'] > 0) {
+//            $sql1 = "UPDATE tb_user_coupon SET ";
+//            $sql1 .= "given             = '".($tbc[0]['given']+$row[0]['given'])."', ";
+//            $sql1 .= "update_date       = NOW() ";
+//            $sql1 .= " WHERE customer_id = '{$_POST['customer_id']}' AND tmp_seq = '{$_POST['tmp_seq']}' AND artist_id = '{$_POST['artist_id']}' AND coupon_seq = '{$_POST['cp'][$b]}' AND type = '{$tbc[0]['type']}' ";
+//        } else {
+>>>>>>> 249ffb14409d9309d8315ef082c70c68a9cf742b
             $sql1  = "INSERT INTO tb_user_coupon SET ";
             $sql1 .= "customer_id       = '{$_POST['customer_id']}', ";
             $sql1 .= "artist_id         = '{$_POST['artist_id']}', ";
@@ -299,7 +312,7 @@ if($pet[0]['type']=='dog') {
             $sql1 .= "given             = '{$tbc[0]['given']}', ";
             $sql1 .= "reg_date          = NOW() ";
 
-        }
+//        }
         //echo $sql1."<p>";
         $result = sql_query($sql1);
         $id = mysqli_insert_id($connection);
@@ -375,7 +388,6 @@ if ($goods_cnt > 0) {
         }
     }
 
-
     for ($i = 0; $i < count($_POST['feed']); $i++) {
         if ($_POST['feed_chkbox'][$i] == 'y') {
             $product .= $_POST['feed_seq'][$i] . ':';
@@ -401,9 +413,9 @@ if ($goods_cnt > 0) {
     //echo $product."<p>";
 
     // 최종가격 업데이트(현금결제로 하더라도 일단 카드로 바꾼 후 가격 적용)
-    if($is_vat == '1'){
-        $total_price = $total_price*1.1;
-    }
+//    if($is_vat == '1'){
+//        $total_price = $total_price*1.1;
+//    }
 
     $que = "UPDATE tb_payment_log SET ";
     $que .= "local_price        = '{$total_price}', ";

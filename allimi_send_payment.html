@@ -1,0 +1,947 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
+$mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
+$dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
+
+$shop_title	= "알리미 작성";
+$header_right	= '
+	
+';
+$header_menu =false;
+$allimi_history = true;
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+$notice_yn = "Y";
+
+
+$history_back = (isset($_GET['history_back']) && $_GET['history_back']) ? $_GET['history_back'] : 0;
+
+
+$cellphone = (isset($_GET['cellphone'])) ? $_GET['cellphone'] : '';
+$pet_seq = (isset($_GET['pet_seq'])) ? $_GET['pet_seq'] : '';
+$payment_idx = (isset($_GET['payment_idx'])) ? $_GET['payment_idx'] : '';
+$year = (isset($_GET['year'])) ? $_GET['year'] : '';
+$month = (isset($_GET['month'])) ? $_GET['month'] : '';
+$day = (isset($_GET['day'])) ? $_GET['day'] : '';
+$hour = (isset($_GET['hour'])) ? $_GET['hour'] : '';
+$minute = (isset($_GET['minute'])) ? $_GET['minute'] : '';
+$pet_name = (isset($_GET['pet_name'])) ? $_GET['pet_name'] : '';
+$type = (isset($_GET['type'])) ? $_GET['type'] : '';
+
+if(intval($hour) > 12){
+    $am_pm_hour = '오후 '.(intval($hour)-12);
+}else if(intval($hour) == 12){
+    $am_pm_hour = '오후 '.intval($hour);
+}else{
+    $am_pm_hour = '오전 '.intval($hour);
+}
+
+$beauty_date = $year.'년 '.$month.'월 '.$day.'일 ';
+
+
+
+$que = "SELECT * FROM tb_shop WHERE customer_id = '{$artist_id}'";
+$sh = sql_fetch_array($que);
+
+?>
+
+
+
+    <!-- container -->
+    <section id="container">
+
+        <!-- page-body -->
+        <div class="page-body" id="page-body">
+            <div class="allimi-left-body">
+
+                <div class="allimi-left-body-left">
+
+                    <div class="allimi-body-title">
+
+                        <span>미용 알리미</span>
+
+                    </div>
+                    <div class="allimi-body-list">
+                        <div class="allimi-body-cell">
+                            <div class="allimi-body-cell-title">
+                                <strong>이용일</strong>
+                            </div>
+                            <div class="allimi-body-cell-value">
+                                <?php if($type === '1'){?>
+                                    <div class="allimi-date-select-wrap">
+                                        <select class="allimi-date-select" id="allimi_date_select" data-cellphone="<?=$cellphone?>" onchange="allimi_date_select(this,'<?=$artist_id?>')">
+
+
+                                        </select>
+
+                                    </div>
+                                <?php }else{?>
+                                <span id="allimi_date"><?=$beauty_date?></span>
+                                <?php }?>
+                            </div>
+                            <div class="allimi-body-cell-icon">
+                                <!--                                                <img src="/static/images/icon/10_ic-24-calendar@2x.png" alt="">-->
+                            </div>
+                        </div>
+
+                        <div class="allimi-body-cell">
+                            <div class="allimi-body-cell-title">
+                                <strong>이용펫</strong>
+                            </div>
+                            <div class="allimi-body-cell-value" id="allimi_pet_list">
+                                <?php if($type !== '1'){?>
+                                <label class="allimi-form">
+                                    <input type="radio" name="allimi-pet" id="allimi_pet_btn" onclick="allimi_get_gallery(this,'<?=$artist_id?>')" data-artist_id="<?=$artist_id?>" data-pet_name="<?=$pet_name?>" data-cellphone="<?=$cellphone?>" data-payment_idx="<?=$payment_idx?>" data-pet_seq="<?=$pet_seq?>">
+                                    <em></em>
+                                    <span class="allimi-radio-span"><?=$pet_name?></span>
+                                </label>
+                                <?php }?>
+                            </div>
+                        </div>
+
+                        <div class="allimi-body-cell">
+                            <div class="allimi-body-cell-title">
+                                <strong>미용사진</strong>
+                            </div>
+                        </div>
+
+                        <div class="allimi-body-cell">
+
+                            <div class="allimi-gallery-wrap" id="allimi_gallery_wrap">
+                                <div class="allimi-gallery-cell allimi-gallery-cell-icon" id="allimi_open_gallery" style="cursor:pointer;" onclick="<?php if($type==='1'){?>allimi_select_pet_pop()<?php }else{?>pop.open('allimi_gallery')<?php }?>">
+                                    <img src="/static/pub/images/icon/photo_icon.png" alt="">
+                                    <span class="allimi-gallery-span">사진첨부</span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="allimi-check-container">
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="attitude_btn">
+                                <strong>미용예절</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_attitude">
+
+                                <label class="allimi-form-one">
+
+                                    <input type="radio" name="attitude" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">아주 잘 했어요. 칭찬해 주세요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="attitude" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">좋아요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="attitude" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">힘들어해요.</span>
+                                </label>
+                                <label class="allimi-form-one" id="attitude_etc">
+                                    <input type="radio" name="attitude" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span">기타</span>
+
+                                </label>
+                                <textarea id="allimi_attitude_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="tangle_btn">
+                                <strong>엉킴(부위)</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_tangle">
+
+                                <label class="allimi-form-one">
+
+                                    <input type="checkbox" name="tangle" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">없어요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="tangle" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">얼굴</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="tangle" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">귀</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="tangle" value="4">
+                                    <em></em>
+                                    <span class="allimi-radio-span">겨드랑이</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="tangle" value="5">
+                                    <em></em>
+                                    <span class="allimi-radio-span">다리</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="tangle" value="6">
+                                    <em></em>
+                                    <span class="allimi-radio-span">꼬리</span>
+                                </label>
+                                <label class="allimi-form-one" id="tangle_etc">
+                                    <input type="checkbox" name="tangle" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span">기타</span>
+                                </label>
+
+                                <textarea id="allimi_tangle_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="bath_btn">
+                                <strong>목욕/드라이</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_bath">
+
+                                <label class="allimi-form-one">
+
+                                    <input type="radio" name="bath" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">잘해요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="bath" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">조금 싫어해요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="bath" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">거부감이 있어요.</span>
+                                </label>
+                                <label class="allimi-form-one" id="bath_etc">
+                                    <input type="radio" name="bath" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span" >기타</span>
+
+                                </label>
+                                <textarea id="allimi_bath_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="skin_btn">
+                                <strong>피부</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_skin">
+
+                                <label class="allimi-form-one">
+
+                                    <input type="checkbox" name="skin" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">깨끗해요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">피부염</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">각질</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="4">
+                                    <em></em>
+                                    <span class="allimi-radio-span">붉은기</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="5">
+                                    <em></em>
+                                    <span class="allimi-radio-span">습진</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="6">
+                                    <em></em>
+                                    <span class="allimi-radio-span">농피증</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="skin" value="7">
+                                    <em></em>
+                                    <span class="allimi-radio-span">알로페시아</span>
+                                </label>
+                                <label class="allimi-form-one" id="skin_etc">
+                                    <input type="checkbox" name="skin" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span" >기타</span>
+
+                                </label>
+                                <textarea id="allimi_skin_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="condition_btn">
+                                <strong>컨디션</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_condition">
+
+                                <label class="allimi-form-one">
+
+                                    <input type="radio" name="condition" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">좋아요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="condition" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">긴장했어요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="radio" name="condition" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">피곤해 해요.</span>
+                                </label>
+                                <label class="allimi-form-one" id="condition_etc">
+                                    <input type="radio" name="condition" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span">기타</span>
+
+                                </label>
+                                <textarea id="allimi_condition_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="dislike_btn">
+                                <strong>싫어했던 부위</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_dislike">
+
+
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">얼굴</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">귀</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">앞발</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="4">
+                                    <em></em>
+                                    <span class="allimi-radio-span">뒷발</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="5">
+                                    <em></em>
+                                    <span class="allimi-radio-span">발톱</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="dislike" value="6">
+                                    <em></em>
+                                    <span class="allimi-radio-span">꼬리</span>
+                                </label>
+                                <label class="allimi-form-one" id="dislike_etc">
+                                    <input type="checkbox" name="dislike" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span">기타</span>
+                                </label>
+
+                                <textarea id="allimi_dislike_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+
+                        <div class="allimi-check-wrap">
+                            <div class="allimi-check-title" id="self_btn">
+                                <strong>미용 후 전달사항</strong>
+                            </div>
+                            <div class="allimi-check-list flex-column" id="check_list_self">
+
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="self" value="1">
+                                    <em></em>
+                                    <span class="allimi-radio-span">피부 자극으로 긁거나 핥을 수 있으니 주의해주세요.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="self" value="2">
+                                    <em></em>
+                                    <span class="allimi-radio-span">스트레스로 인하여 식욕 부진, 구토 및 설사 증상을 보일 수 있습니다.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="self" value="3">
+                                    <em></em>
+                                    <span class="allimi-radio-span">항문을 끌고 다니거나 꼬리를 감추는 증상을 보일 수 있습니다.</span>
+                                </label>
+                                <label class="allimi-form-one">
+                                    <input type="checkbox" name="self" value="4">
+                                    <em></em>
+                                    <span class="allimi-radio-span">이중모(포메,스피츠 등)의 경우 미용 후 알로페시아(클리퍼 증후군) 현상이 나타날 수 있습니다.</span>
+                                </label>
+                                <label class="allimi-form-one" id="self_etc">
+                                    <input type="checkbox" name="self" value="0">
+                                    <em></em>
+                                    <span class="allimi-radio-span">기타</span>
+                                </label>
+                                <textarea id="allimi_self_textarea" class="allimi-textarea" ></textarea>
+
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="allimi-left-footer">
+
+                        <div class="allimi-alert">&#8251; <span style="color:#ff4848">샵에 등록된 펫이름이 고객에게 발송되니 </span> <br> &nbsp;부적절한 이름은 변경 후 발송해주세요.&nbsp; &#8251;</div>
+                        <div class="allimi-footer-1">
+                            <div class="allimi-footer-cell cell-border-purple" id="allimi_preview_btn" data-artist_id="<?=$artist_id?>" onclick="allimi_open_preview(this,'',true)">미리보기</div>
+
+                        </div>
+                        <div class="allimi-footer-2">
+                            <div class="allimi-footer-cell" onclick="history.back()">취소</div>
+                            <div class="allimi-footer-cell cell-fill-purple" onclick="allimi_send(shop_name)" style="margin-left:20px;">보내기</div>
+                        </div>
+
+
+
+
+                    </div>
+
+                </div>
+
+        </div>
+        <!-- //page-body -->
+
+
+            <article id="allimi_gallery" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body">
+                                <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_gallery'); ">닫기</button>
+
+                                <div class="allimi-right-wrap">
+                                    <div class="allimi-title-box" style="justify-content: center">
+                                        <div class="allimi-title">
+                                            미용 갤러리
+                                        </div>
+                                    </div>
+                                    <div class="allimi-right-body-gallery" id="allimi_gallery">
+
+                                        <div class="allimi-gallery-list" id="allimi_gallery_list">
+                                            <div class="allimi-gallery-list-cell"><a href="#" class="btn-gate-picture-register" onclick="file_view()"><span><em>이미지 추가</em></span></a></div>
+
+                                        </div>
+                                        <div style="display:block;position:absolute;top:-150px;" id="allimi_imgupfile_wrap"><input type="file" accept="image/*" name="allimi_imgupfile" id="allimi_addimgfile"></div>
+
+
+                                        <div class="allimi-gallery-footer">
+                                            <?php if($type === '1'){?>
+                                                <div class="allimi-footer-cell cell-fill-purple" style="width:100%; margin-bottom:30px; margin-top:30px;" id="allimi_select_photo" onclick="allimi_select_photo(this,false)">사진 선택 완료</div>
+
+
+                                            <?php }else{?>
+                                            <div class="allimi-footer-cell cell-fill-purple" style="width:100%; margin-bottom:30px; margin-top:30px;" id="allimi_select_photo" data-pet_seq="<?=$pet_seq?>" onclick="allimi_select_photo(this,true)">사진 선택 완료</div>
+
+                                            <?php }?>
+
+                                            <span>이미지는 최대 25개까지 등록할 수 있습니다.</span>
+                                            <span>gif,png,jpg,jpeg 형식의 이미지만 등록됩니다.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </article>
+
+            <article id="allimi_history" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body">
+                                <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_history'); ">닫기</button>
+                                <div class="allimi-right-body-history" id="allimi_history" style="margin-top:30px">
+
+                                    <div class="allimi-title-box" style="justify-content: center">
+                                        <div class="allimi-title">
+                                            알리미 발송이력
+                                        </div>
+                                    </div>
+                                    <div class="allimi-history-wrap">
+
+                                        <select class="allimi-body-title" id="allimi_history_select" onchange="allimi_history_change(this);">
+                                        </select>
+
+                                        <div class="allimi-history-list" id="allimi_history_list">
+
+                                        </div>
+                                        <div class="allimi-history-none" style="display:none;" id="allimi_history_none">
+                                            <img src="/static/pub/images/img-illust-3@2x.png" alt="">
+                                            <div class="item-info">발송된 알리미 내역이 없습니다.</div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+            <article id="allimi_preview" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body">
+                                <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_preview'); ">닫기</button>
+
+                                <div class="allimi-right-body-preview" id="allimi_preview">
+
+                                    <div class="allimi-title-box" style="justify-content: center">
+                                        <div class="allimi-title">
+                                            알리미 미리보기
+                                        </div>
+                                    </div>
+
+                                    <div class="allimi-preview-wrap">
+                                        <div class="allimi-preview-title">
+                                        <span class="allimi-preview-name" id="allimi_preview_name">
+
+                                        </span>
+                                            <span class="allimi-preview-date" id="allimi_preview_date">
+
+                                        </span>
+                                        </div>
+                                        <div class="allimi-preview-gallery" id="allimi_preview_gallery">
+
+                                            <div class="swiper-container allimi-swiper-container">
+                                                <div class="swiper-wrapper" id="allimi-preview-swiper">
+
+                                                </div>
+                                                <div class="next allimi-next" id="allimi_next"><i class="left-arrow""></i></div>
+                                                <div class="prev allimi-prev" id="allimi_prev"><i class="right-arrow"></i></div>
+                                                <div class="swiper-pagination allimi-pagination"></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="allimi-preview-info">
+                                            <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">미용 다이어리</span></div>
+
+                                            <div class="allimi-preview-info-content">
+                                                <ul style="display:flex; flex-direction: column;align-items: flex-start">
+                                                    <li class="list-style-basic" id="allimi_preview_attitude_wrap"><strong class="before-dot">미용예절</strong><span id="allimi_preview_attitude"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_tangle_wrap"><strong class="before-dot">엉킴(부위)</strong><span id="allimi_preview_tangle"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_bath_wrap"><strong class="before-dot">목욕/드라이</strong><span id="allimi_preview_bath"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_skin_wrap"><strong class="before-dot">피부</strong><span id="allimi_preview_skin"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_condition_wrap"><strong class="before-dot">컨디션</strong><span id="allimi_preview_condition"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_dislike_wrap"><strong class="before-dot">싫어했던 부위</strong><span id="allimi_preview_dislike"></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_self_wrap"><strong class="before-dot">미용 후 전달사항</strong><span id="allimi_preview_self" style=""></span></li>
+                                                    <li class="list-style-basic" id="allimi_preview_none"><strong class="before-dot">알림 내용이 없습니다.</strong></li>
+
+                                                </ul>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="allimi-preview-info" style="margin-bottom:30px;">
+                                            <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">샵 정보</span></div>
+
+                                            <div class="allimi-preview-info-content" style="padding-left:20px;">
+
+                                                <div class="allimi-preview-shop-title"><span id="allimi_preview_shop_title"></span></div>
+                                                <div class="allimi-preview-shop-phone">연락처<span id="allimi_preview_shop_phone"></span></div>
+                                                <div class="allimi-preview-shop-address">샵 위치<span id="allimi_preview_shop_address"></span></div>
+                                                <div class="allimi-preview-shop-map" id="allimi_preview_shop_map"></div>
+                                            </div>
+
+                                        </div>
+                                        <div class="blank-space"></div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </article>
+
+            <article id="reserveAcceptMsg1" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body">
+                                <div class="msg-txt" id="msg1_txt"></div>
+                            </div>
+                            <div class="pop-footer">
+                                <button type="button" class="btn btn-confirm" onclick="pop.close2('reserveAcceptMsg1')">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article id="allimiClosePop" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body">
+                                <div class="msg-txt" id="close_msg"></div>
+                            </div>
+                            <div class="pop-footer">
+                                <button type="button" class="btn btn-confirm" onclick="pop.close2('allimiClosePop'); history.back();">확인</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+
+            <article id="allimi_select_pet" class="layer-pop-wrap">
+                <div class="layer-pop-parent">
+                    <div class="layer-pop-children">
+                        <div class="pop-data alert-pop-data">
+                            <div class="pop-body" >
+                                <div class="msg-txt" id="msg4_txt">사진을 가져올 펫을 선택해주세요.</div>
+
+                                <div class="allimi-select-pet-list-wrap" id="allimi_select_pet_list">
+
+
+                                </div>
+                            </div>
+                            <div class="pop-footer">
+                                <button type="button" class="btn btn-confirm " onclick="allimi_select_pet_pop_confirm('<?=$artist_id?>')">확인</button>
+                                <button type="button" class="btn btn-confirm" onclick="pop.close2('allimi_select_pet');">취소</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+
+
+
+
+
+    </section>
+    <!-- //container -->
+    <script src="/static/pub/js/allim.js"></script>
+    <script>
+
+        const shop_name = '<?=$sh[0]['name'];?>';
+        $(document).ready(function(){
+            allimi_btn_event();
+
+
+            <?php if($type==='1'){?>
+
+            $.ajax({
+
+                url:'/data/api.php',
+                type:'post',
+                data:{
+                    mode:'get_diary_date',
+                    artist_id:'<?=$artist_id?>',
+                    cellphone:'<?=$cellphone?>',
+                },
+                success:function(res) {
+                    let response = JSON.parse(res);
+                    let head = response.data.head;
+                    let body = response.data.body;
+                    if (head.code === 401) {
+                        pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                    } else if (head.code === 200) {
+
+                        if(body.length === undefined){
+                            body = [body];
+                        }
+                        console.log(body)
+                        if(body.length>0){
+
+                            let week = ['일','월','화','수','목','금','토'];
+                            body.forEach(function(el){
+
+                                let beauty_date = new Date(`${el.beauty_date.substr(0,4)}`,`${el.beauty_date.substr(4,2)}`,`${el.beauty_date.substr(6,2)}`);
+
+
+
+                                document.getElementById('allimi_date_select').innerHTML += `<option value="${el.beauty_date}">${beauty_date.getFullYear()}년 ${beauty_date.getMonth()}월 ${beauty_date.getDate()}일 (${week[beauty_date.getDay()]})</option>`
+                            })
+                        }
+
+                        setTimeout(function(){
+
+                            document.getElementById('allimi_date_select').dispatchEvent(new Event('change'));
+                        },200);
+
+                    }
+                }
+            })
+
+            <?php }else{ ?>
+
+            document.getElementById('allimi_pet_btn').click();
+            <?php }?>
+        })
+
+        $(document).ready(function(){
+
+            document.getElementById('allimi_history_btn').setAttribute('data-artist_id','<?=$artist_id?>');
+            document.getElementById('allimi_history_btn').setAttribute('data-cellphone','<?=$cellphone?>');
+            <?php if($type === '1'){?>
+            document.getElementById('allimi_history_btn').setAttribute('data-pet_seq','0');
+            <?php }else{?>
+            document.getElementById('allimi_history_btn').setAttribute('data-pet_seq','<?=$pet_seq?>');
+            <?php }?>
+
+            document.getElementById('btn_page_prev').setAttribute('onclick','location.href="<?=$_SESSION['back_allimi']?>"')
+        })
+
+
+        let popup_swiper = new Swiper('.allimi-swiper-container', {
+
+            direction:'horizontal',
+            slidesPerView:1,
+            pagination:{
+                el:".swiper-pagination",
+                type:"fraction"
+            },
+
+            observer:true,
+            observeParents:true,
+
+            navigation:{
+                nextEl:".prev",
+                prevEl:".next",
+            },
+            watchOverflow:true,
+
+
+        });
+
+
+        function galleryup() {
+            window.Android.openGallery();
+        }
+
+        function cameraup() {
+            window.Android.openCamera();
+        }
+
+        //안드에서 업로드가 끝나면 무조건 호출..
+        function uploadEnd(fileName) {
+            // var filename = $("input[name=imgupfile]")[0].files[0].name;
+            var newfilename = GetPhotoFilename('pet_gallery', '<?=$artist_id?>', fileName);
+            var formData = new FormData();
+            formData.append("myfile", fileName);
+            formData.append("filepath", newfilename);
+            formData.append("pet_seq", re_pet_seq);
+            formData.append("payment_log_seq", re_payment_log_seq);
+            formData.append("artist_id", '<?=$artist_id?>');
+            $.ajax({
+                url: '/data/upload_user_photo_pet_gallery',	// 미용사진 갤러리 전용 업로드
+                data: formData,
+                processData: false,
+                contentType: false,
+                cache: false,
+                type: 'POST',
+                beforeSend:function(){
+
+                    if(document.getElementById('loading')){
+
+                        document.getElementById('loading').style.display ='flex';
+                    }
+                },
+                success: function(data) {
+                    allimi_get_gallery2('<?=$artist_id?>');
+                    if(data != "Fail") { // 성공
+
+                        location.reload();
+
+                    } else {
+                        alert('미용사진 업로드에 실패하였습니다.');
+                        //rv = false;
+                    }
+
+                },
+                error: function(xhr, status, error) {
+                    alert(error + "네트워크에러");
+                    if(xhr.status != 0){
+                        alert("code = "+ xhr.status + " message = " + xhr.responseText + " error = " + error); // 실패 시 처리
+                    }
+                },complete:function(){
+
+                    if(document.getElementById('loading')){
+
+                        document.getElementById('loading').style.display ='none';
+                    }
+                }
+            });
+        }
+
+        function file_view(){
+            var is_android = checkMobile();
+            if(is_android == true){
+                galleryup();
+            } else {
+                $("#allimi_addimgfile").click();
+
+            }
+        }
+
+
+        function checkMobile(){
+
+            var varUA = navigator.userAgent.toLowerCase(); //userAgent 값 얻기
+
+            if ( varUA.indexOf('android') > -1) {
+                //안드로이드
+                return true;
+            } else if ( varUA.indexOf("iphone") > -1||varUA.indexOf("ipad") > -1||varUA.indexOf("ipod") > -1 ) {
+                //IOS
+                return 'ios';
+            } else {
+                //아이폰, 안드로이드 외
+                return 'other';
+            }
+
+        }
+
+        function img_link_change(img){
+            var img 	= img.replace("/pet/images", "/images");
+            var img 	= img.replace("/pet/upload", "/upload");
+
+            return "https://image.banjjakpet.com"+img;
+        }
+
+        var pop = {
+
+            element: null,
+            elementArr: [],
+            isActive: false,
+            zIndex: 99959,
+
+            init: function () {
+                //팝업 컨텐츠 외 영역 클릭시 닫기 이벤트
+                $(document).on('click', '.layer-pop-wrap', function (e) {
+                    if (pop.isActive) {
+                        if ($(e.target).parents('.pop-data').length == 0) {
+                            pop.close();
+                        }
+                    }
+                });
+            },
+
+            // 팝업 열기
+            open: function (_id, _item) {
+                pop.isActive = true;
+                $('html').addClass('fix');
+                this.element = $('#' + _id);
+                $('#' + _id + " .msg-txt").text(_item);
+                this.element.addClass('actived').css({'z-index': pop.zIndex});
+                this.elementArr.push(this.element);
+                pop.zIndex += 1;
+            },
+
+            //팝업 닫기
+            close: function (_item) {
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+                /*
+                if(_item){
+                    $(_item).parents('.layer-pop-wrap').removeClass('actived');
+                }else{
+                    this.element.removeClass('actived');
+                }
+                */
+                if (_item) {
+                    $element = $(_item);
+                    $element.removeClass('actived');
+                } else {
+
+                    $element = pop.elementArr[pop.elementArr.length - 1];
+                    console.log($element)
+                    $element.removeClass('actived');
+                }
+                pop.elementArr.pop();
+
+
+            },
+
+            change: function () {
+
+            },
+
+            close2: function(_item){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+
+                if(_item){
+
+                    document.getElementById(`${_item}`).classList.remove('actived');
+                }else{
+                    pop.elementArr.pop();
+                }
+
+
+            }
+        };
+
+
+        function fill_zero(time){
+
+            if(time.toString().length < 2){
+
+                time = `0${time}`
+            }else{
+                time = time;
+            }
+
+            return time;
+        }
+
+
+    </script>
+
+<?php
+//include($_SERVER['DOCUMENT_ROOT']."/include/skin/footer_shop.php");
+?>

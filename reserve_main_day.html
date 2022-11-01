@@ -19,7 +19,8 @@ $yy = (isset($_GET['yy']) && $_GET['yy']) ? $_GET['yy'] : date('Y');
 $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
-
+$header_right ='';
+$header_notice = true;
 
 $shop_title	= "예약관리";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
@@ -31,6 +32,8 @@ unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'reserve_main_day';
 unset($_SESSION['backurl_wait']);
 $_SESSION['backurl_wait'] = 'reserve_main_day?ch=da&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
+unset($_SESSION['backurl_notice']);
+$_SESSION['backurl_notice'] = 'reserve_main_day?ch=da&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'];
 
 $from = $_GET['from'];
 
@@ -505,7 +508,7 @@ $GetReservationChkDay = $reserve_sql->qry_get_reservation_chk_day($artist_id, $s
 if(TFunc::checkPC() == "PC") {
     $memo_count = 0;
     foreach ($GetReservationChkDay as $val){
-        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['cellphone'], $artist_id, $val['reservation_date']);
+        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['pet_seq'], $artist_id, $val['reservation_date']);
         $GetReservationChkDay[$memo_count]['etc_memo'] = $tmp_memo[0]['before_memo'];
         $memo_count ++;
     }
@@ -1029,8 +1032,14 @@ $await_cnt = $gram[0]['cnt'];
                                                                                     }
                                                                                     ?>
                                                                                 <?php } else { ?>
-                                                                                    <div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+                                                                                    <div class="item-master" style="left:0"><div class="icon icon-reservation-selfadd"></div></div>
                                                                                 <?php }} ?>
+                                                                                <?php if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 0){
+
+                                                                                    echo '<div class="deposit-icon">예</div>';
+                                                                                }else if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 1){
+                                                                                    echo '<div class="deposit-icon-fin">예</div>';
+                                                                                } ?>
                                                                             </div>
                                                                             <div class="item-memo"><?php echo $chk_rev[$a]['etc_memo']?></div>
                                                                         </div>
@@ -2138,6 +2147,21 @@ $await_cnt = $gram[0]['cnt'];
                 }
             })
 
+            Array.from(document.getElementsByClassName('deposit-icon')).forEach(function(el){
+
+                if(el.parentElement.parentElement.parentElement.offsetHeight > 120 && el.parentElement.parentElement.parentElement.offsetWidth > 70){
+
+                    el.style.display = 'flex'
+                }
+            })
+
+            Array.from(document.getElementsByClassName('deposit-icon-fin')).forEach(function(el){
+                if(el.parentElement.parentElement.parentElement.offsetHeight > 120 && el.parentElement.parentElement.parentElement.offsetWidth > 70){
+
+                    el.style.display = 'flex'
+                }
+            })
+
 
 
         })
@@ -2147,6 +2171,8 @@ $await_cnt = $gram[0]['cnt'];
 
             sessionStorage.removeItem('waiting');
         },300)
+
+
 
     </script>
 

@@ -273,4 +273,47 @@ class Allimtalk{
         return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
     }
 
+    // 예약금 안내
+    public function sendReservePay($petName, $shopName, $pay, $date, $bankName, $accountNum, $deadLine){
+        $templateNo = "20016_2";
+        $message =
+            "{$petName} 보호자님"
+            ."\n{$shopName}에서 {$petName} 미용예약 확정을 위한 예약금 입금 안내를 드립니다."
+            ."\n\n저희 {$shopName}에서는 예약금 {$pay} 입금 후에 예약이 확정됩니다."
+            ."\n\n1. 예약내용"
+            ."\n- 예약일시 : {$date}"
+            ."\n\n2. 예약금 입금계좌"
+            ."\n- 예약금 : {$pay}"
+            ."\n- ".addslashes($bankName)." / ".addslashes($accountNum)
+            ."\n- 결제기한 : {$deadLine}"
+            ."\n\n▶ 결제기한 경과시 예약은 자동취소 되오니 기한 내 꼭 입금부탁드립니다.";
+
+        return $this->sendMessage($templateNo, $message);
+    }
+
+    // 예약금 미입금 취소안내
+    public function sendReservePayCancel($petName, $shopName, $date, $deadLine){
+        $templateNo = "20017";
+        $message =
+            "{$petName} 보호자님"
+            ."\n{$shopName}에서 {$petName} 미용 예약이"
+            ."\n예약금 입금시간 초과로 취소되었음을 안내드립니다."
+            ."\n\n- 취소예약 : {$date}"
+            ."\n- 결제기한 : {$deadLine}";
+
+        return $this->sendMessage($templateNo, $message);
+    }
+
+    // 알림장발송
+    public function sendDiary($petName, $shopName, $btnLink){
+        $templateNo = "20018";
+        $btnName = "알리미 보기";
+        $message =
+            "{$petName} 보호자님 안녕하세요."
+            ."\n{$shopName}에서 {$petName}의 컨디션과 활동에 대한 알리미가 도착했어요."
+            ."\n\n아래 알리미보기 버튼을 눌러 확인해보세요.";
+
+        return $this->sendMessage($templateNo, $message, $btnName, $btnLink);
+    }
+
 }

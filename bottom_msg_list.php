@@ -21,6 +21,19 @@
     #popup_wrap .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
     #popup_wrap .swiper-pagination-bullet { margin: 0px 5px; }
     #popup_wrap .swiper-pagination-bullet-active { background-color: #999; }
+    #popup_wrap2 { display: none; }
+    #popup_wrap2 .custom-modal-content { margin: 0px auto; width: 100%; }
+    #popup_wrap2 .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
+    #popup_wrap2 .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important; }
+    #popup_wrap2 .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap2 .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important }
+    #popup_wrap2 .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
+    #popup_wrap2 .swiper-wrapper { height: auto; }
+    #popup_wrap2 .swiper-slide {  }
+    #popup_wrap2 .swiper-slide img { width: 100%; height: auto; vertical-align: top; }
+    #popup_wrap2 .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
+    #popup_wrap2 .swiper-pagination-bullet { margin: 0px 5px; }
+    #popup_wrap2 .swiper-pagination-bullet-active { background-color: #999; }
 </style>
 
 
@@ -165,7 +178,34 @@
     </div>
 </div>
 
+<div id="popup_wrap2">
+    <div class="custom-modal-content">
+        <div class="popup_img">
+            <div class="swiper-container_front swiper-container">
+                <div class="swiper-wrapper" id="popup-wraper2">
+                    <div class="swiper-slide">
+                        <a href="https://partner-pc.banjjakpet.com/?partner_pc=<?=$artist_id?>" target="_blank">
+                            <img src="https://image.banjjakpet.com/images/partnerpc_pop.jpg" alt="" />
+                        </a>
+                    </div>
+                    <!--                            <div class="swiper-slide">-->
+                    <!--                                <a href="javascript:location.href='mypage_notice_view?notice_seq=';">-->
+                    <!--                                    <img src="/images/banner/pop_recommendation_event.jpg" alt="" />-->
+                    <!--                                </a>-->
+                    <!--                            </div>-->
+
+                </div>
+                <!-- Add Arrows -->
+                <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
+                <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
+                <div class="swiper-pagination_front"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let mql = window.matchMedia("screen and (min-width: 1025px)");
 
     function set_reserve_main(){
         var change_reserve_main = $('input[name=reserve_main]:checked').val();
@@ -215,42 +255,83 @@
     }
 
     $(document).ready(function(){
-        if (getCookie_popup('guide_beauty_shop_reserve') != 'Y') {
-            $("#popup_wrap").dialog({
-                modal: true,
-                title: "",
-                autoOpen: true,
-                //maxWidth: "96%",
-                //minHeight: Number($(window).height()) - 40,
-                //width: 'auto',
-                //height: 'auto',
-                autoSize: false,
-                resize: 'auto',
-                resizable: false,
-                draggable: false,
-                buttons: {
-                    '닫기': function() {
-                        // setCookie_popup('guide_beauty_shop ', 'Y', 1);
-                        $(this).dialog("close");
+        if(!mql.matches){
+            if (getCookie_popup('guide_beauty_shop_reserve') != 'Y') {
+                $("#popup_wrap").dialog({
+                    modal: true,
+                    title: "",
+                    autoOpen: true,
+                    //maxWidth: "96%",
+                    //minHeight: Number($(window).height()) - 40,
+                    //width: 'auto',
+                    //height: 'auto',
+                    autoSize: false,
+                    resize: 'auto',
+                    resizable: false,
+                    draggable: false,
+                    buttons: {
+                        '닫기': function() {
+                            // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                            $(this).dialog("close");
+                        },
+                        "다시 보지 않기": function() {
+                            // location.href = "mypage_notice_view?notice_seq=19";
+                            setCookie_popup('guide_beauty_shop_reserve', 'Y', 100);
+                            $(this).dialog("close");
+                        }
                     },
-                    "다시 보지 않기": function() {
-                        // location.href = "mypage_notice_view?notice_seq=19";
-                        setCookie_popup('guide_beauty_shop_reserve', 'Y', 100);
-                        $(this).dialog("close");
+                    open: function(event, ui) {
+                        // swiper2.update();
+                        $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                        $(event.target).parent().css('top', '50%'); // dialog fixed
+                        $(event.target).parent().css('left', '50%'); // dialog fixed
+                        $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                        // $('.ui-dialog').position({ my: "center", at: "center", of: window });
+                    },
+                    close: function() {
                     }
-                },
-                open: function(event, ui) {
-                    // swiper2.update();
-                    $(event.target).parent().css('position', 'fixed'); // dialog fixed
-                    $(event.target).parent().css('top', '50%'); // dialog fixed
-                    $(event.target).parent().css('left', '50%'); // dialog fixed
-                    $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
-                    // $('.ui-dialog').position({ my: "center", at: "center", of: window });
-                },
-                close: function() {
-                }
-            });
+                });
+            }
+        }else if(mql.matches){
+            if (getCookie_popup('guide_beauty_shop_pc') != 'Y') {
+                $("#popup_wrap2").dialog({
+                    modal: true,
+                    title: "",
+                    autoOpen: true,
+                    //maxWidth: "96%",
+                    //minHeight: Number($(window).height()) - 40,
+                    //width: 'auto',
+                    //height: 'auto',
+                    autoSize: false,
+                    resize: 'auto',
+                    resizable: false,
+                    draggable: false,
+                    buttons: {
+                        '닫기': function() {
+                            // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                            $(this).dialog("close");
+                        },
+                        "오늘 그만보기": function() {
+                            // location.href = "mypage_notice_view?notice_seq=19";
+                            setCookie_popup('guide_beauty_shop_pc', 'Y', 1);
+                            $(this).dialog("close");
+                        }
+                    },
+                    open: function(event, ui) {
+                        // swiper2.update();
+                        $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                        $(event.target).parent().css('top', '50%'); // dialog fixed
+                        $(event.target).parent().css('left', '50%'); // dialog fixed
+                        $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                        // $('.ui-dialog').position({ my: "center", at: "center", of: window });
+                    },
+                    close: function() {
+                    }
+                });
+            }
+
         }
+
     });
 
     let slide_length = document.querySelector("#popup-wraper").children.length-1;

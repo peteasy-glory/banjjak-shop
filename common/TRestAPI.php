@@ -46,7 +46,10 @@ class TRestAPI
 
     public function post($path, $data)
     {
+<<<<<<< HEAD
         $data = json_decode($data);
+=======
+>>>>>>> 249ffb14409d9309d8315ef082c70c68a9cf742b
         $method = "POST";
         $url = $this->url . $path;
         $ch = curl_init();
@@ -70,7 +73,10 @@ class TRestAPI
 
     public function put($path, $data)
     {
+<<<<<<< HEAD
         $data = json_decode($data);
+=======
+>>>>>>> 249ffb14409d9309d8315ef082c70c68a9cf742b
         $method = "PUT";
         $url = $this->url . $path;
         $ch = curl_init();
@@ -93,7 +99,10 @@ class TRestAPI
 
     public function delete($path, $data)
     {
+<<<<<<< HEAD
         $data = json_encode($data);
+=======
+>>>>>>> 249ffb14409d9309d8315ef082c70c68a9cf742b
         $method = "DELETE";
         $url = $this->url . $path;
         $ch = curl_init();
@@ -114,7 +123,11 @@ class TRestAPI
         return json_decode($response, true);
     }
 
+<<<<<<< HEAD
 
 
 
 }
+=======
+}
+>>>>>>> 249ffb14409d9309d8315ef082c70c68a9cf742b

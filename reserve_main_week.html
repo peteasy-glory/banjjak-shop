@@ -23,7 +23,8 @@ $mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
 $dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
 
 
-
+$header_right ='';
+$header_notice = true;
 $shop_title	= "예약관리";
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
@@ -242,6 +243,9 @@ $_SESSION['backurl1'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET
 
 unset($_SESSION['backurl_wait']);
 $_SESSION['backurl_wait'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
+
+unset($_SESSION['backurl_notice']);
+$_SESSION['backurl_notice'] = 'reserve_main_week?ch=week&yy='.$_GET['yy'].'&mm='.$_GET['mm'].'&&dd='.$_GET['dd'].'&worker='.$worker;
 
 
 $now = new DateTime($yy . '-' . $mm . '-' . $dd);
@@ -734,7 +738,7 @@ $GetReservationChk = $reserve_sql->qry_get_reservation_chk($artist_id, $worker, 
 if(TFunc::checkPC() == "PC") {
     $memo_count = 0;
     foreach ($GetReservationChk as $val){
-        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['cellphone'], $artist_id, $val['reservation_date']);
+        $tmp_memo = $reserve_sql->qry_get_reservation_chk_memo($val['pet_seq'], $artist_id, $val['reservation_date']);
         $GetReservationChk[$memo_count]['etc_memo'] = $tmp_memo[0]['before_memo'];
         $memo_count ++;
     }
@@ -1217,6 +1221,7 @@ if(count($arr_holiday)>0){
                                                                             <?php
                                                                                 $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = {$chk_rev[$a]['payment_log_seq']}";
                                                                                 $paq = sql_fetch_array($que);
+//                                                                                echo print_r($paq[0]);
                                                                             if(!empty($binfo[3]) && $binfo[3]!='all:0'){
                                                                                 ?>
                                                                                 <div class="item-cash">
@@ -1256,8 +1261,14 @@ if(count($arr_holiday)>0){
                                                                                         }
                                                                                 ?>
                                                                             <?php } else { ?>
-                                                                                <div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+                                                                                <div class="item-master" style="left:0"><div class="icon icon-reservation-selfadd"></div></div>
                                                                             <?php }} ?>
+                                                                            <?php if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 0){
+
+                                                                                echo '<div class="deposit-icon">예</div>';
+                                                                           }else if($paq[0]['is_reserve_pay'] == 1 && $paq[0]['reserve_pay_yn'] == 1){
+                                                                                echo '<div class="deposit-icon-fin">예</div>';
+                                                                            } ?>
                                                                     </div>
                                                                     <!-- 해당 일자 일정 표시 끝-->
                                                                     <?php
@@ -2355,6 +2366,21 @@ if(count($arr_holiday)>0){
         })
 
 
+        Array.from(document.getElementsByClassName('deposit-icon')).forEach(function(el){
+
+            if(el.parentElement.offsetHeight > 120){
+
+                el.style.display = 'flex'
+            }
+        })
+
+        Array.from(document.getElementsByClassName('deposit-icon-fin')).forEach(function(el){
+
+            if(el.parentElement.offsetHeight > 120){
+
+                el.style.display = 'flex'
+            }
+        })
 
     })
 

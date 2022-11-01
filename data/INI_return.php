@@ -495,7 +495,6 @@
 						$admin_message = substr($row["cellphone"], -4) . "(".explode(",", $row["guest_info"])[1].")님이 [".$row["product_name"]."]을 구매(".$pushPayType."). 상품결제 관리를 확인하세요";
 						a_push("pickmon@pickmon.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
                         a_push("joseph@peteasy.kr", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
-                        a_push("itseokbeom@gmail.com", "반짝_전문몰상품구매알림(파트너앱)", $admin_message, $pushPath, $pushImage,"customer");
 
 						// 거래완료 페이지 이동
 						?><script language="javascript">

@@ -22,6 +22,10 @@ $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'customer_view?customer_cellphone='.$_GET['customer_cellphone'].'&pet_seq='.$_GET['pet_seq'];
 
+unset($_SESSION['back_allimi']);
+$_SESSION['back_allimi'] = 'customer_view?customer_cellphone='.$_GET['customer_cellphone'].'&pet_seq='.$_GET['pet_seq'];
+
+
 $shop_title	= $_GET['customer_cellphone'];
 $header_right	= '
 	<div class="header-right">
@@ -226,6 +230,21 @@ $user_beauty_cnt = $row["beauty_cnt"];
 $user_hotel_cnt = $row["hotel_cnt"];
 $user_play_cnt = $row["play_cnt"];
 $another_reserve = 0;
+
+// 알림장 최근 발송 시간 가져오기
+$que = "
+	SELECT update_time AS diary_recent_time FROM tb_diary_mgr WHERE cellphone = '".$phone."'
+	AND artist_id = '".$user_id."'
+	ORDER BY update_time DESC LIMIT 1;
+        
+";
+$res = sql_query($que);
+$diary_recent_time = sql_fetch($res)['diary_recent_time'];
+/*
+알림장 변수
+    $diary_recent_time => 최근 발송시간(없으면 발송이력 0)
+*/
+
 ?>
 
 <!-- container -->
@@ -234,6 +253,15 @@ $another_reserve = 0;
 	<!-- page-body -->
 	<div class="page-body">
 		<div class="customer-view-wrap">
+
+            <div class="btn-wrap-custom">
+
+                <a href="#" class="btn btn-purple btn-inline btn-basic-wide" id="allimi_customer_btn" style="width:100%; border-radius: 5px;" onclick="location.href='/allimi_send_payment?cellphone=<?=$phone?>&pet_seq=<?=$pet_seq?>&type=1'">알리미 보내기</a>
+                <div class="form-bottom-info text-align-center" style="display:flex; justify-content: flex-end;"><span id="diary_recent" style="position: absolute; right:120px;"></span> <div class="allimi-title-right" style="cursor: pointer; margin-right:0px; margin-left:10px;" id="allimi_history_btn_2"  data-cellphone="<?=$phone?>" data-artist_id="<?=$artist_id?>" data-pet_seq="0" onclick="pop.open('allimi_history'); allimi_open_history(this);">
+                        <img src="/static/pub/images/icon/NoPath@2x.png" alt="">
+                        <span>히스토리</span>
+                    </div></div>
+            </div>
 			<!-- 고객정보 -->
 			<div class="basic-data-group customer-view-user">
                 <?php
@@ -591,12 +619,13 @@ $another_reserve = 0;
                                         #AND is_cancel = 0 
                                         AND approval = 1
                                         AND etc_memo != ''
-                                        AND pet_seq = '{$_GET['pet_seq']}'   
-                                        AND CONCAT(year,'-',month,'-',day) < DATE_FORMAT(NOW(),'%Y-%c-%e')
+                                        AND pet_seq = '{$_GET['pet_seq']}'
+                                        And Date_format(concat(year,'-',month,'-',day), '%y-%m-%d') < date_format(now(), '%y-%m-%d')
                                         ORDER BY  CONCAT(year,'-',month,'-',day) DESC
                                 ";
-                            //echo $sql;
+//                            echo $sql;
                             $arr = sql_fetch_array($sql);
+//                            echo $arr;
                             if(count($arr)>0){
                             foreach($arr as $rs){
                             ?>
@@ -614,7 +643,7 @@ $another_reserve = 0;
                                 <?php } ?>
 								<!--<div class="grid-layout-cell grid-2"><a href="javascript:set_beauty_sign();" class="btn btn-outline-purple btn-middle-size btn-round">미용동의서 작성</a></div>-->
 								<div class="grid-layout-cell grid-2"><a href="javascript:popalert.open('msgAlert');" class="btn btn-outline-purple btn-middle-size btn-round">호텔동의서 작성</a></div>
-								<div class="grid-layout-cell grid-1"><a href="javascript:direct_rev();" class="btn btn-purple btn-middle-size btn-round">즉시 예약</a></div>
+								<div class="grid-layout-cell grid-1"><a href="javascript:direct_rev();" class="btn btn-yellow btn-middle-size btn-round">즉시 예약</a></div>
 							</div>
 						</div>
 						<div class="bottom-info">*<strong>[즉시예약]</strong>은 주간 스케줄에서만 사용 가능</div>
@@ -747,7 +776,9 @@ $another_reserve = 0;
                                                                                 $extra2_1 = "/".$extra2[0];
                                                                                 $extra3 = ($beauty[6])? explode(':',$beauty[6]):"";
                                                                                 $extra3_1 = "/".$extra3[0];
-                                                                                echo $extra1[0].$extra2_1.$extra3_1;
+                                                                                $extra4 = ($beauty[7])? explode(':',$beauty[7]):"";
+                                                                                $extra4_1 = ($extra4)? "/".$extra4[0]."mm" : "";
+                                                                                echo $extra1[0].$extra2_1.$extra3_1.$extra4_1;
                                                                             ?>
                                                                         </div>
                                                                     </div>
@@ -1008,6 +1039,116 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
             </div>
         </div>
     </article>
+    <article id="allimi_history" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_history'); ">닫기</button>
+                        <div class="allimi-right-body-history" id="allimi_history" style="margin-top:30px">
+
+                            <div class="allimi-title-box" style="justify-content: center">
+                                <div class="allimi-title">
+                                    알리미 발송이력
+                                </div>
+                            </div>
+                            <div class="allimi-history-wrap">
+
+                                <select class="allimi-body-title" id="allimi_history_select" onchange="allimi_history_change(this);">
+                                </select>
+
+                                <div class="allimi-history-list" id="allimi_history_list">
+
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </article>
+    <article id="allimi_preview" class="layer-pop-wrap">
+        <div class="layer-pop-parent">
+            <div class="layer-pop-children">
+
+                <div class="pop-data alert-pop-data">
+                    <div class="pop-body">
+                        <button type="button" class="btn-pop-close" onclick="pop.close2('allimi_preview'); ">닫기</button>
+
+                        <div class="allimi-right-body-preview" id="allimi_preview">
+
+                            <div class="allimi-title-box" style="justify-content: center">
+                                <div class="allimi-title">
+                                    알리미 미리보기
+                                </div>
+                            </div>
+
+                            <div class="allimi-preview-wrap">
+                                <div class="allimi-preview-title">
+                                        <span class="allimi-preview-name" id="allimi_preview_name">
+
+                                        </span>
+                                    <span class="allimi-preview-date" id="allimi_preview_date">
+
+                                        </span>
+                                </div>
+                                <div class="allimi-preview-gallery" id="allimi_preview_gallery">
+
+                                    <div class="swiper-container allimi-swiper-container">
+                                        <div class="swiper-wrapper" id="allimi-preview-swiper">
+
+                                        </div>
+                                        <div class="next allimi-next" id="allimi_next"><i class="left-arrow""></i></div>
+                                        <div class="prev allimi-prev" id="allimi_prev"><i class="right-arrow"></i></div>
+                                        <div class="swiper-pagination allimi-pagination"></div>
+                                    </div>
+                                </div>
+
+                                <div class="allimi-preview-info">
+                                    <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">미용 다이어리</span></div>
+
+                                    <div class="allimi-preview-info-content">
+                                        <ul>
+                                            <li class="list-style-basic" id="allimi_preview_attitude_wrap"><strong>미용예절</strong><br><span id="allimi_preview_attitude"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_tangle_wrap"><strong>엉킴(부위)</strong><br><span id="allimi_preview_tangle"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_bath_wrap"><strong>목욕/드라이</strong><br><span id="allimi_preview_bath"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_skin_wrap"><strong>피부</strong><br><span id="allimi_preview_skin"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_condition_wrap"><strong>컨디션</strong><br><span id="allimi_preview_condition"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_dislike_wrap"><strong>싫어했던 부위</strong><br><span id="allimi_preview_dislike"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_self_wrap"><strong>미용 후 전달사항</strong><br><span id="allimi_preview_self" style="white-space: pre-line"></span></li>
+                                            <li class="list-style-basic" id="allimi_preview_none"><strong>알림 내용이 없습니다.</strong></li>
+
+                                        </ul>
+                                    </div>
+
+                                </div>
+
+
+                                <div class="allimi-preview-info" style="margin-bottom:30px;">
+                                    <div class="allimi-preview-info-title"><span style="font-size:16px; font-weight: 500;">샵 정보</span></div>
+
+                                    <div class="allimi-preview-info-content" style="padding-left:20px;">
+
+                                        <div class="allimi-preview-shop-title"><span id="allimi_preview_shop_title"></span></div>
+                                        <div class="allimi-preview-shop-phone">연락처<span id="allimi_preview_shop_phone"></span></div>
+                                        <div class="allimi-preview-shop-address">샵 위치<span id="allimi_preview_shop_address"></span></div>
+                                        <div class="allimi-preview-shop-map" id="allimi_preview_shop_map"></div>
+                                    </div>
+
+                                </div>
+                                <div class="blank-space"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </article>
 
     <article id="memberGradeComPop" class="layer-pop-wrap">
         <div class="layer-pop-parent">
@@ -1183,8 +1324,33 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
         </article>    
 </section>
 <!-- //container -->
+<script src="/static/pub/js/allim.js"></script>
     <script>
+        let popup_swiper = new Swiper('.allimi-swiper-container', {
+
+            direction:'horizontal',
+            slidesPerView:1,
+            pagination:{
+                el:".swiper-pagination",
+                type:"fraction"
+            },
+
+            observer:true,
+            observeParents:true,
+
+            navigation:{
+                nextEl:".prev",
+                prevEl:".next",
+            },
+            watchOverflow:true,
+
+
+        });
+
         $(document).ready(function(){
+
+
+
             //등급수정
             $('.set-grade').on('click',function(){
                 popalert.open('memberGradeAddPop');
@@ -1197,7 +1363,35 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 
             $('#btn_page_prev').prop('href','<?php echo $_SESSION['backurl1'];?>');
 
+            allimi_recent('<?=$artist_id?>','<?=$phone?>')
+
         });
+        function am_pm_check(hours){
+
+            if(hours > 12){
+                hours = `오후 ${(hours-12).toString().length <2 ? '0' : ''}${hours-12}`
+            }else if(hours === 12){
+                hours = `오후 ${hours}`
+            }else{
+                hours = `오전 ${hours}`
+            }
+
+            return hours;
+        }
+
+
+        function fill_zero(time){
+
+            if(time.toString().length < 2){
+
+                time = `0${time}`
+            }else{
+                time = time;
+            }
+
+            return time;
+        }
+
 
         function showImage(img_url){
             var pop_img = document.getElementById("pet_pop_img");
@@ -1652,6 +1846,81 @@ FROM tb_user_reserve_log WHERE customer_id = '{$data["customer"]["id"]}' AND tmp
 
         setInputFilter(document.getElementById("family_tel"), function(value) {
             return /^-?\d*$/.test(value); });
+
+        var pop = {
+
+            element: null,
+            elementArr: [],
+            isActive: false,
+            zIndex: 99959,
+
+            init: function () {
+                //팝업 컨텐츠 외 영역 클릭시 닫기 이벤트
+                $(document).on('click', '.layer-pop-wrap', function (e) {
+                    if (pop.isActive) {
+                        if ($(e.target).parents('.pop-data').length == 0) {
+                            pop.close();
+                        }
+                    }
+                });
+            },
+
+            // 팝업 열기
+            open: function (_id, _item) {
+                pop.isActive = true;
+                $('html').addClass('fix');
+                this.element = $('#' + _id);
+                $('#' + _id + " .msg-txt").text(_item);
+                this.element.addClass('actived').css({'z-index': pop.zIndex});
+                this.elementArr.push(this.element);
+                pop.zIndex += 1;
+            },
+
+            //팝업 닫기
+            close: function (_item) {
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+                /*
+                if(_item){
+                    $(_item).parents('.layer-pop-wrap').removeClass('actived');
+                }else{
+                    this.element.removeClass('actived');
+                }
+                */
+                if (_item) {
+                    $element = $(_item);
+                    $element.removeClass('actived');
+                } else {
+
+                    $element = pop.elementArr[pop.elementArr.length - 1];
+                    console.log($element)
+                    $element.removeClass('actived');
+                }
+                pop.elementArr.pop();
+
+
+            },
+
+            change: function () {
+
+            },
+
+            close2: function(_item){
+                var $element;
+                pop.isActive = false;
+                $('html').removeClass('fix');
+
+                if(_item){
+
+                    document.getElementById(`${_item}`).classList.remove('actived');
+                }else{
+                    pop.elementArr.pop();
+                }
+
+
+            }
+        };
 
     </script>
 <?

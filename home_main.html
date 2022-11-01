@@ -21,9 +21,15 @@ unset($_SESSION['backurl1']);
 $_SESSION['backurl1'] = 'home_main';
 unset($_SESSION['backurl2']);
 $_SESSION['backurl2'] = 'home_main';
+unset($_SESSION['back_allimi']);
+$_SESSION['back_allimi'] = 'home_main';
+unset($_SESSION['backurl_notice']);
+$_SESSION['backurl_notice'] = 'home_main';
 
 $shop_title	= "MY SHOP";
 $header_menu	= true;
+$header_right = '';
+$header_notice = true;
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
@@ -380,6 +386,20 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
         #popup_wrap .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
         #popup_wrap .swiper-pagination-bullet { margin: 0px 5px; }
         #popup_wrap .swiper-pagination-bullet-active { background-color: #999; }
+
+        #popup_wrap2 { display: none; }
+        #popup_wrap2 .custom-modal-content { margin: 0px auto; width: 100%; }
+        #popup_wrap2 .swiper-container_front { margin: 0px auto; overflow: hidden; position: relative; z-index: 1; }
+        #popup_wrap2 .swiper-container_front .next { position: absolute; left: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important; }
+        #popup_wrap2 .swiper-container_front .next.swiper-button-disabled { color: rgba(0,0,0,0); }
+        #popup_wrap2 .swiper-container_front .prev { position: absolute; right: 10px; top: 50%; color: #000; font-size: 24px; z-index: 1; outline: none; display: block !important }
+        #popup_wrap2 .swiper-container_front .prev.swiper-button-disabled { color: rgba(0,0,0,0); }
+        #popup_wrap2 .swiper-wrapper { height: auto; }
+        #popup_wrap2 .swiper-slide {  }
+        #popup_wrap2 .swiper-slide img { width: 100%; height: auto; vertical-align: top; }
+        #popup_wrap2 .swiper-pagination_front { position: absolute; left: 0px; bottom: 0px; width: 100%; text-align: center; margin-bottom: 20px; z-index: 1; }
+        #popup_wrap2 .swiper-pagination-bullet { margin: 0px 5px; }
+        #popup_wrap2 .swiper-pagination-bullet-active { background-color: #999; }
     </style>
 
 
@@ -513,19 +533,21 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
 
 
                                 $que1 = "
-                                SELECT * FROM tb_payment_log 
-                                WHERE artist_id = '" . $user_id . "' 
-                                AND year = '" . $yy . "' 
-                                AND month = '" . intval($mm) . "' 
-                                AND day = '" . $dd . "'
-                                AND worker = '" . $pl1['worker'] . "'
-                                AND is_cancel = 0
-                                AND is_no_show = 0      
-                                ORDER BY hour ASC                         
+                                SELECT a.*, b.idx as diary_idx, b.update_time as diary_time FROM tb_payment_log a
+                                LEFT JOIN tb_diary_mgr b on a.payment_log_seq = b.payment_log_seq
+                                WHERE a.artist_id = '" . $user_id . "' 
+                                AND a.year = '" . $yy . "' 
+                                AND a.month = '" . intval($mm) . "' 
+                                AND a.day = '" . $dd . "'
+                                AND a.worker = '" . $pl1['worker'] . "'
+                                AND a.is_cancel = 0
+                                AND a.is_no_show = 0      
+                                ORDER BY a.hour ASC                         
                             ";
                                 //echo $que1;
                                 $pl = sql_fetch_array($que1);
                                 foreach($pl as $pl){
+                                    //print_r($pl);
                                     $beauty_info = explode("|",$pl['product']);
 
                                     $que = "SELECT * FROM tb_mypet WHERE pet_seq = '{$pl['pet_seq']}'";
@@ -547,6 +569,12 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                     if($tm[0]['pet_type'] == '기타'){
                                         $yellow_type = $tm[0]['pet_type2'];
                                     }
+
+                                    /*
+                                    알림장 변수
+                                        $pl['diary_idx'] => 없으면 미작성
+                                        $pl['diary_time'] => 알림장 작성 시간
+                                    */
                                     ?>
                                     <div class="list-cell">
                                         <div class="customer-card-item">
@@ -580,6 +608,39 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                             <div class="item-btns">
                                                 <a href="tel:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">통화하기</a>
                                                 <a href="sms:<?php echo $pl['cellphone'];?>" class="btn btn-outline-gray btn-small-size btn-border-radius-4">문자하기</a>
+                                            </div>
+                                            <div class="item-diary">
+                                                <?php if($pl['diary_idx'] === null){?>
+
+                                                    <div class="diary-not-exist" data-cellphone="<?=$pl['cellphone']?>" data-pet_seq="<?=$pl['pet_seq']?>" data-payment_idx="<?=$pl['payment_log_seq']?>" data-date="<?= $pl['year'].'-'.$pl['month'].'-'.$pl['day'].' '.$pl['hour'].':'.$pl['minute']?>" data-pet_name="<?=explode('|',$pl['product'])[0]?>" onclick="location.href ='/allimi_send_payment?cellphone=<?=$pl['cellphone']?>&pet_seq=<?=$pl['pet_seq']?>&payment_idx=<?=$pl['payment_log_seq']?>&year=<?=$pl['year']?>&month=<?=$pl['month']?>&day=<?=$pl['day']?>&hour=<?=$pl['hour']?>&minute=<?=$pl['minute']?>&pet_name=<?=explode('|',$pl['product'])[0]?>'">알리미 보내기</div>
+
+                                            <?php }else{
+                                                    $diary_time = explode(' ',$pl['diary_time'])[0];
+                                                    $diary_year = explode('-',$diary_time)[0];
+                                                    $diary_month = explode('-',$diary_time)[1];
+                                                    $diary_day = explode('-',$diary_time)[2];
+
+                                                    $diary_time2 = explode(' ',$pl['diary_time'])[1];
+                                                    $diary_hour = explode(':',$diary_time2)[0];
+                                                    $diary_minute = explode(':',$diary_time2)[1];
+
+                                                    if(intval($diary_hour) > 12){
+                                                        $diary_hour = '오후 '.(intval($diary_hour)-12);
+
+                                                    }else if(intval($diary_hour) == 12){
+                                                        $diary_hour = '오후 '.intval($diary_hour);
+                                                    }else{
+                                                        $diary_hour = '오전 '.intval($diary_hour);
+                                                    }
+
+
+                                                    ?>
+
+
+
+                                                    <div class="diary-exist" data-cellphone="<?=$pl['cellphone']?>" data-pet_seq="<?=$pl['pet_seq']?>" data-payment_idx="<?=$pl['payment_log_seq']?>" data-date="<?= $pl['year'].'-'.$pl['month'].'-'.$pl['day'].' '.$pl['hour'].':'.$pl['minute']?>" data-pet_name="<?=explode('|',$pl['product'])[0]?>">알리미 발송완료</div>
+                                                    <div class="diary-date"><span>(<?=$diary_year?>. <?=$diary_month?>. <?=$diary_day?>. <?=$diary_hour?>시 <?=$diary_minute?>분)</span></div>
+                                            <?php }?>
                                             </div>
                                         </div>
                                     </div>
@@ -699,8 +760,13 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
                                 </a>
                             </div>
                             <div class="swiper-slide">
-                                <a href="shop_mall">
-                                    <img src="/images/banner/partner_shop.png" alt="" />
+                                <a href="javascript:location.href='mypage_notice_view?notice_seq=26';">
+                                    <img src="https://image.banjjakpet.com/images/event/deposit_pop.jpg" alt="" />
+                                </a>
+                            </div>
+                            <div class="swiper-slide">
+                                <a href="javascript:location.href='mypage_notice_view?notice_seq=29';">
+                                    <img src="/static/pub/images/banner/allimi_notice.jpg" alt="" />
                                 </a>
                             </div>
 <!--                            <div class="swiper-slide">-->
@@ -719,10 +785,41 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
             </div>
         </div>
 
+        <div id="popup_wrap2">
+            <div class="custom-modal-content">
+                <div class="popup_img">
+                    <div class="swiper-container_front swiper-container">
+                        <div class="swiper-wrapper" id="popup-wraper2">
+                            <div class="swiper-slide">
+                                <a href="https://partner-pc.banjjakpet.com/?partner_pc=<?=$artist_id?>" target="_blank">
+                                    <img src="https://image.banjjakpet.com/images/partnerpc_pop.jpg" alt="" />
+                                </a>
+                            </div>
+                            <!--                            <div class="swiper-slide">-->
+                            <!--                                <a href="javascript:location.href='mypage_notice_view?notice_seq=';">-->
+                            <!--                                    <img src="/images/banner/pop_recommendation_event.jpg" alt="" />-->
+                            <!--                                </a>-->
+                            <!--                            </div>-->
+
+                        </div>
+                        <!-- Add Arrows -->
+                        <div class="next"><i class="fa-solid fa-chevron-left"></i></div>
+                        <div class="prev"><i class="fa-solid fa-chevron-right"></i></div>
+                        <div class="swiper-pagination_front"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
     </section>
+
+
     <!-- //container -->
+
+    <script src="/static/pub/js/allim.js"></script>
     <script>
+
+        let mql = window.matchMedia("screen and (min-width: 1025px)");
 
         function getCookie_popup(name) {
             var obj = name + "=";
@@ -747,42 +844,87 @@ for ($opinionkey = 0; $review_rows = mysqli_fetch_array($review_result); $opinio
         }
 
         $(document).ready(function(){
-            if (getCookie_popup('guide_beauty_shop') != 'Y') {
-                $("#popup_wrap").dialog({
-                    modal: true,
-                    title: "",
-                    autoOpen: true,
-                    //maxWidth: "96%",
-                    //minHeight: Number($(window).height()) - 40,
-                    //width: 'auto',
-                    //height: 'auto',
-                    autoSize: false,
-                    resize: 'auto',
-                    resizable: false,
-                    draggable: false,
-                    buttons: {
-                        '닫기': function() {
-                            // setCookie_popup('guide_beauty_shop ', 'Y', 1);
-                            $(this).dialog("close");
+            if(!mql.matches){
+                if (getCookie_popup('guide_beauty_shop') != 'Y') {
+                    $("#popup_wrap").dialog({
+                        modal: true,
+                        title: "",
+                        autoOpen: true,
+                        //maxWidth: "96%",
+                        //minHeight: Number($(window).height()) - 40,
+                        //width: 'auto',
+                        //height: 'auto',
+                        autoSize: false,
+                        resize: 'auto',
+                        resizable: false,
+                        draggable: false,
+                        buttons: {
+                            '닫기': function() {
+                                // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                                $(this).dialog("close");
+                            },
+                            "오늘 그만보기": function() {
+                                // location.href = "mypage_notice_view?notice_seq=19";
+                                setCookie_popup('guide_beauty_shop', 'Y', 1);
+                                $(this).dialog("close");
+                            }
                         },
-                        "오늘 그만보기": function() {
-                            // location.href = "mypage_notice_view?notice_seq=19";
-                            setCookie_popup('guide_beauty_shop', 'Y', 1);
-                            $(this).dialog("close");
+                        open: function(event, ui) {
+                            // swiper2.update();
+                            $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                            $(event.target).parent().css('top', '50%'); // dialog fixed
+                            $(event.target).parent().css('left', '50%'); // dialog fixed
+                            $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                            // $('.ui-dialog').position({ my: "center", at: "center", of: window });
+                        },
+                        close: function() {
                         }
-                    },
-                    open: function(event, ui) {
-                        // swiper2.update();
-                        $(event.target).parent().css('position', 'fixed'); // dialog fixed
-                        $(event.target).parent().css('top', '50%'); // dialog fixed
-                        $(event.target).parent().css('left', '50%'); // dialog fixed
-                        $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
-                        // $('.ui-dialog').position({ my: "center", at: "center", of: window });
-                    },
-                    close: function() {
-                    }
-                });
+                    });
+                }
+
+            }else if(mql.matches){
+                if (getCookie_popup('guide_beauty_shop_pc') != 'Y') {
+                    $("#popup_wrap2").dialog({
+                        modal: true,
+                        title: "",
+                        autoOpen: true,
+                        //maxWidth: "96%",
+                        //minHeight: Number($(window).height()) - 40,
+                        //width: 'auto',
+                        //height: 'auto',
+                        autoSize: false,
+                        resize: 'auto',
+                        resizable: false,
+                        draggable: false,
+                        buttons: {
+                            '닫기': function() {
+                                // setCookie_popup('guide_beauty_shop ', 'Y', 1);
+                                $(this).dialog("close");
+                            },
+                            "오늘 그만보기": function() {
+                                // location.href = "mypage_notice_view?notice_seq=19";
+                                setCookie_popup('guide_beauty_shop_pc', 'Y', 1);
+                                $(this).dialog("close");
+                            }
+                        },
+                        open: function(event, ui) {
+                            // swiper2.update();
+                            $(event.target).parent().css('position', 'fixed'); // dialog fixed
+                            $(event.target).parent().css('top', '50%'); // dialog fixed
+                            $(event.target).parent().css('left', '50%'); // dialog fixed
+                            $(event.target).parent().css('transform', 'translate(-50%, -50%)'); // dialog fixed
+                            // $('.ui-dialog').position({ my: "center", at: "center", of: window });
+                        },
+                        close: function() {
+                        }
+                    });
+                }
             }
+
+
+
+
+
         });
 
         var artist_id = '<?=$artist_id ?>';

@@ -10,11 +10,11 @@ $pet_type = (isset($_COOKIE['pet_type']))? $_COOKIE['pet_type'] : "dog";
 //$pet_type = (isset($_GET['pet_type']))? $_GET['pet_type'] : "dog";
 
 //if($pet_type == "cat"){
-    $type = "5";
-    $big_banner = "a.odr_5";
-    $md_item = "a.is_view_main_1";
-    $best_item = "a.is_view_main_5";
-    $new_item = "a.is_view_main_2";
+$type = "5";
+$big_banner = "a.odr_5";
+$md_item = "a.is_view_main_1";
+$best_item = "a.is_view_main_5";
+$new_item = "a.is_view_main_2";
 //}else{
 //    $type = "3";
 //    $big_banner = "a.odr_3";
@@ -78,15 +78,9 @@ $_SESSION['backurl2'] = $_SERVER[ "REQUEST_URI" ];
 
 <!-- header -->
 <header id="header">
-    <?php
-    if($_SESSION['partner_pc'] != 1){
-    ?>
-        <div class="header-left">
-            <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>
-        </div>
-    <?php
-    }
-    ?>
+<!--    <div class="header-left">-->
+<!--        <a href="home_main" class="btn-page-ui btn-page-prev"><div class="icon icon-size-24 icon-page-prev">페이지 뒤로가기</div></a>-->
+<!--    </div>-->
     <div class="page-title">반짝 복지몰</div>
     <div class="header-right">
         <a href="shop_search_list" class="btn-page-ui btn-page-search"><div class="icon icon-size-24 icon-page-search">검색</div></a>

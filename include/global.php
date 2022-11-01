@@ -63,6 +63,13 @@ include($document_root."/include/navigation.php");
 include($document_root."/common/TAwsS3.php");
 //include($document_root."/common/TEmoji.php");
 
+$pc_id = $_GET['partner_pc'];
+if($pc_id != ''){
+	$_SESSION['gobeauty_user_id'] = $pc_id;
+	$_SESSION['my_shop_flag'] = 1;
+	$_SESSION['partner_pc'] = 1;
+}
+
 if ($isSiteStoreOwner) {
 	if(!$_SESSION['gobeauty_user_id']){
 		if (isset($_COOKIE['user_hash']) ? $_COOKIE['user_hash'] : "") {
