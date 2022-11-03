@@ -4032,7 +4032,7 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 	.table_header{position:sticky;top:79px;}
 	.bottom_fixed_div{position:sticky;bottom:0;background:#fff;height:100px;border-top:1px solid #ccc;}
 	.sell_page_div{padding-bottom:0px;}
-	.basic-data-group{margin-top:0px;}
+	/*.basic-data-group{margin-top:0px;}*/
 	/*
 	.pc-header  .btn-page-alarm {position:absolute; left:100%; top:50%; width:24px; height:24px; margin:-12px 0 0 22px;}
 	*/
