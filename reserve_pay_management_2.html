@@ -18,10 +18,11 @@ $yy = (isset($_REQUEST['yy']) && $_REQUEST['yy']) ? $_REQUEST['yy'] : date('Y');
 $mm = (isset($_REQUEST['mm']) && $_REQUEST['mm']) ? $_REQUEST['mm'] : date('m');
 $dd = (isset($_REQUEST['dd']) && $_REQUEST['dd']) ? $_REQUEST['dd'] : date('d');
 
-$shop_title	= "작업 / 결제관리";
+$shop_title	= "";
 $header_right	= '
 	
 ';
+$diary = true;
 include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
 include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 
@@ -617,7 +618,7 @@ $r = sql_fetch($res);
                 if($pay['status'] == 'R1' && ($pay['total_price']+$pay['spend_point']) > 0){
                     ?>
                     <div class="basic-data-group vvsmall3">
-                        <p class="btn btn-yellow btn-middle-size btn-round" style="margin-top:-10px;font-weight:bold;">사전 결제완료 : <span style="color:red;">&nbsp;<?php echo number_format($pay['total_price']+$pay['spend_point'])."원" ?></span></p>
+                        <p class="btn btn-yellow btn-middle-size btn-round" style="margin-top:10px;font-weight:bold;">사전 결제완료 : <span style="color:red;">&nbsp;<?php echo number_format($pay['total_price']+$pay['spend_point'])."원" ?></span></p>
                     </div>
                     <?php
                 }
@@ -1256,40 +1257,7 @@ $r = sql_fetch($res);
                             </div>
                         </div>
                     </div>
-                    <div class="item-diary">
 
-                        <?php if($pay['diary_idx'] === null){?>
-
-                            <div class="diary-not-exist" data-cellphone="<?=$pay['cellphone']?>" data-pet_seq="<?=$pay['pet_seq']?>" data-payment_idx="<?=$pay['payment_log_seq']?>" data-date="<?= $pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']?>" data-pet_name="<?=explode('|',$pay['product'])[0]?>" onclick="location.href ='/allimi_send_payment?cellphone=<?=$pay['cellphone']?>&pet_seq=<?=$pay['pet_seq']?>&payment_idx=<?=$pay['payment_log_seq']?>&year=<?=$pay['year']?>&month=<?=$pay['month']?>&day=<?=$pay['day']?>&hour=<?=$pay['hour']?>&minute=<?=$pay['minute']?>&pet_name=<?=explode('|',$pay['product'])[0]?>'">알리미 보내기</div>
-
-                        <?php }else{
-                            $diary_time = explode(' ',$pay['diary_time'])[0];
-                            $diary_year = explode('-',$diary_time)[0];
-                            $diary_month = explode('-',$diary_time)[1];
-                            $diary_day = explode('-',$diary_time)[2];
-
-                            $diary_time2 = explode(' ',$pay['diary_time'])[1];
-                            $diary_hour = explode(':',$diary_time2)[0];
-                            $diary_minute = explode(':',$diary_time2)[1];
-
-                            if(intval($diary_hour) > 12){
-                                $diary_hour = '오후 '.(intval($diary_hour)-12);
-
-                            }else if(intval($diary_hour) == 12){
-                                $diary_hour = '오후 '.intval($diary_hour);
-                            }else{
-                                $diary_hour = '오전 '.intval($diary_hour);
-                            }
-
-
-                            ?>
-
-
-
-                            <div class="diary-exist" data-cellphone="<?=$pay['cellphone']?>" data-pet_seq="<?=$pay['pet_seq']?>" data-payment_idx="<?=$pay['payment_log_seq']?>" data-date="<?= $pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute']?>" data-pet_name="<?=explode('|',$pay['product'])[0]?>">알리미 발송완료</div>
-                            <div class="diary-date"><span>(<?=$diary_year?>. <?=$diary_month?>. <?=$diary_day?>. <?=$diary_hour?>시 <?=$diary_minute?>분)</span></div>
-                        <?php }?>
-                    </div>
                 </div>
             </form>
             <!-- 서비스 정보 변경 -->
@@ -1948,6 +1916,7 @@ $r = sql_fetch($res);
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
                                                             <div class="grid-layout-inner flex-dir">
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="hair_kg" class="cat-hair-price"><em><span>선택안함</span><strong>0원</strong></em></label></div>
                                                                 <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" value="단모:<?php echo $cat['short_price'];?>" data-cat_hair="단모" class="cat-hair-price" <?php echo ($beauty_info[5]=="단모:".$cat['short_price'])?'checked':'';?>><em><span>단모_미용</span><strong>+<?php echo number_format($cat['short_price']);?>원</strong></em></label></div>
                                                                 <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair2">
@@ -1989,9 +1958,10 @@ $r = sql_fetch($res);
                                                 <div class="form-item-data type-2">
                                                     <div class="grid-layout toggle-button-group">
                                                         <div class="grid-layout-inner">
+                                                            <?php if($cat['toenail_price'] !== ''){?>
                                                             <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face1">
                                                                     <input type="checkbox" class="cat-etc" name="cat_toenail" value="<?php echo $cat['toenail_price'];?>" <?php echo ($beauty_info[6]==$cat['toenail_price'])?'checked':'';?> class="extra-face"><em><span>발톱</span><strong>+<?php echo number_format($cat['toenail_price']);?>원</strong></em></label></div>
-
+                                                            <?php }?>
                                                             <?php
                                                             $etc_start = 9;
                                                             $a = $etc_start+1;
