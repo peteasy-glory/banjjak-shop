@@ -5114,3 +5114,67 @@ button.btn-surtax-set{height:26px;  padding:0 10px 0 4px; border-radius:13px;}
 .display_none{
 	display:none;
 }
+
+/* 고객조회 상세 */
+.btn.btn-inline01 {
+	display: inline-flex;
+	width: 335px;
+}
+
+.btn-wrap-custom {
+	text-align: center;
+}
+
+.btn-alimtalk {
+	font-size: 14px;
+	background: #FEE500;
+	width: 126px;
+	border-radius: 16px;
+	height: 26px;
+}
+
+/* 작업결제관리 알리미 */
+.diary-not-exist1{
+
+	width:40%;
+	height:40px;
+	background: #6840b1;
+	color:#fff;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top:-10px;
+	border-radius: 5px;
+}
+
+.diary-exist1{
+
+	width: 40%;
+	height: 25px;
+	background: #ebebeb;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin-top:-3px;
+	border-radius: 5px;
+	font-size: 13px;
+}
+
+.alim_btn {
+	position: fixed;
+	background: #fff;
+	width: 328px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: flex-end;
+	top: 101px;
+	border: 1px solid #cecece;
+}
+.item-diary{
+	display: flex;
+	width: 100%;
+	flex-direction: column;
+	align-items: flex-end;
+	margin-top: 8px;
+}

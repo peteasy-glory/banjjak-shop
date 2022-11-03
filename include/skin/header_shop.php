@@ -356,7 +356,23 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
 
 </script>
 
-<header id="header">	
+    <?php
+
+    $payment_log_seq = $_GET['payment_log_seq'];
+
+    $que = "
+    SELECT a.*, b.idx as diary_idx, b.update_time as diary_time FROM tb_payment_log a
+    LEFT JOIN tb_diary_mgr b on a.payment_log_seq = b.payment_log_seq
+    WHERE a.payment_log_seq = {$payment_log_seq}
+        
+";
+    $res = sql_query($que);
+    $pay = sql_fetch($res);
+
+    ?>
+
+
+<header id="header" <?php if($diary ==true){echo 'style="border: 1px solid #cecece;"';}?>>
 	<?php if($header_menu===true){?>
 	<!-- 20220110 수정 -->
 	<div class="header-left">
@@ -380,7 +396,49 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                                     </div>';
             }
         }
+
+
+        if(isset($diary)){
+            if($diary == true){
+
+                echo '<div class="item-diary">';
+                if($pay['diary_idx'] === null){
+
+                    echo '<div class="diary-not-exist1" data-cellphone="'.$pay['cellphone'].'" data-pet_seq="'.$pay['pet_seq'].'" data-payment_idx="'.$pay['payment_log_seq'].'" data-date="'.$pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'].'" data-pet_name="'.explode('|',$pay['product'])[0].'" onclick="location.href =\'/allimi_send_payment?cellphone='.$pay['cellphone'].'&pet_seq='.$pay['pet_seq'].'&payment_idx='.$pay['payment_log_seq'].'&year='.$pay['year'].'&month='.$pay['month'].'&day='.$pay['day'].'&hour='.$pay['hour'].'&minute='.$pay['minute'].'&pet_name='.explode('|',$pay['product'])[0].'\'"><img src="https://image.banjjakpet.com/images/icon/icon_send.png" style="width: 18px; margin-right: 3px" alt="">알리미</div>';
+
+                }else{
+                    $diary_time = explode(' ',$pay['diary_time'])[0];
+                    $diary_year = explode('-',$diary_time)[0];
+                    $diary_month = explode('-',$diary_time)[1];
+                    $diary_day = explode('-',$diary_time)[2];
+
+                    $diary_time2 = explode(' ',$pay['diary_time'])[1];
+                    $diary_hour = explode(':',$diary_time2)[0];
+                    $diary_minute = explode(':',$diary_time2)[1];
+
+                    if(intval($diary_hour) > 12){
+                        $diary_hour = '오후 '.(intval($diary_hour)-12);
+
+                    }else if(intval($diary_hour) == 12){
+                        $diary_hour = '오후 '.intval($diary_hour);
+                    }else{
+                        $diary_hour = '오전 '.intval($diary_hour);
+                    }
+
+                    echo '<div class="diary-exist1" data-cellphone="'.$pay['cellphone'].'" data-pet_seq="'.$pay['pet_seq'].'" data-payment_idx="'.$pay['payment_log_seq'].'" data-date="'.$pay['year'].'-'.$pay['month'].'-'.$pay['day'].' '.$pay['hour'].':'.$pay['minute'].'" data-pet_name="'.explode('|',$pay['product'])[0].'"><img src="https://image.banjjakpet.com/images/icon/icon_send_ok.png" style="width: 18px; margin-right: 3px" alt="">발송완료</div>';
+                    echo '<div class="diary-date"><span>('.$diary_year.'. '.$diary_month.'. '.$diary_day.'. '.$diary_hour.'시 '.$diary_minute.'분)</span></div>';
+                }
+                echo '</div>';
+            }
+        }
+
+
+
+
         ?>
+
+
+
 
     </div>
 	<!-- //20220110 수정 -->
@@ -408,6 +466,13 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
                 </div>';
             }
         }
+
+
+
+
+
+
+
     }else if(isset($reserve_waiting)){
         if ($pos1 !== false) {
             echo '<div class="header-right">
