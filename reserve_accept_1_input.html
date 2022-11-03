@@ -767,7 +767,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                             <div class="basic-data-group allimi-wrap-bg-gray" style="width:100vw; left:-20px;padding:20px;">
                                 <div class="con-title-group" style="justify-content: flex-start; background: transparent">
                                     <h4 class="con-title">예약금 안내발송</h4>
-                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick="deposit_toggle(artist_id,this);  if(this.checked === true){document.getElementById('is_reserve_pay').value = 1; document.getElementById('deposit_check_').value ='Y'}else{document.getElementById('is_reserve_pay').value=0; document.getElementById('deposit_check_').value ='N'}"><span class="bar"></span></label>
+                                    <label for="switch-toggle" class="form-switch-toggle" style="margin-left:20px;"><input type="checkbox" id="deposit_btn" onclick="deposit_toggle(artist_id,this); deposit_function(this); "><span class="bar"></span></label>
 
                                     <div class="grid-layout-cell grid-4" style="margin-left:20px;"><button type="button" class="btn btn-outline-gray btn-middle-size btn-round" onclick="popalert.open('depositExam');">미리보기</button></div>
                                 </div>
@@ -1342,7 +1342,7 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                                                     <div class="form-item-data type-2">
                                                         <div class="grid-layout toggle-button-group">
                                                             <div class="grid-layout-inner flex-dir">
-
+                                                                <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hairBeauty1"><input type="radio" name="hair_kg" class="cat-hair-price" data-cat_hair=""><em><span>선택안함</span><strong>0원</strong></em></label></div>
                                                                 <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair1">
                                                                         <input type="radio" name="hair_kg" value="<?php echo "단모:".$cat['short_price'];?>" data-cat_hair="단모" class="cat-hair-price"><em><span>단모_미용</span><strong>+<?php echo number_format($cat['short_price']);?>원</strong></em></label></div>
                                                                 <div class="grid-layout-cell"><label class="form-toggle-box form-toggle-price middle" for="hair2">
@@ -1385,9 +1385,11 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                                                         <div class="form-item-data type-2">
                                                             <div class="grid-layout toggle-button-group">
                                                                 <div class="grid-layout-inner">
+                                                                    <?php if($cat['toenail_price'] !== ''){?>
                                                                     <div class="grid-layout-cell grid-2"><label class="form-toggle-box form-toggle-price middle" for="face1">
                                                                             <input type="checkbox" class="cat-etc" name="cat_toenail" value="<?php echo $cat['toenail_price'];?>" class="extra-face"><em><span>발톱</span><strong>+<?php echo number_format($cat['toenail_price']);?>원</strong></em></label></div>
 
+                                                                    <?php }?>
                                                                     <?php
                                                                     $face = split_text($cat['addition_option_product']);
                                                                     for($i=0;$i<count($face['name']);$i++){
@@ -2379,9 +2381,13 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                     if ($(this).is(':checked') == true) {
                         if ($(this).val() != '') {
 
-                            choose_info += '<div class="service-selected-list-cell">';
-                            choose_info += '    <div class="list-data">미용 : ' + $(this).data('cat_hair') + '</div>';
-                            choose_info += '</div>';
+                            if($(this).data('cat_hair') == ''){
+                                choose_info += '';
+                            }else{
+                                choose_info += '<div class="service-selected-list-cell">';
+                                choose_info += '    <div class="list-data">미용 : ' + $(this).data('cat_hair') + '</div>';
+                                choose_info += '</div>';
+                            }
                         }
                     }
                 });
@@ -2619,7 +2625,10 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
                             }
 
 
-                            document.getElementById('reserve_deposit_input').value = body[0].reserve_price
+                            if(target.checked !== true){
+
+                                document.getElementById('reserve_deposit_input').value = body[0].reserve_price
+                            }
 
                             for(let i=0; i<document.getElementById('reserve_deposit_time').options.length; i++){
 
@@ -2948,6 +2957,19 @@ $data["reserve_money"] = mysqli_fetch_assoc($result);
 
             }
         };
+
+        function deposit_function(target){
+
+
+            if(target.checked === true){
+                document.getElementById('is_reserve_pay').value = 1;
+                document.getElementById('deposit_check_').value ='Y'
+
+            }else{
+                document.getElementById('is_reserve_pay').value=0;
+                document.getElementById('reserve_deposit_input').value = 0;
+                document.getElementById('deposit_check_').value ='N'}
+        }
     </script>
 <?
 //include($_SERVER['DOCUMENT_ROOT'] . "/include/skin/footer_shop.php");
