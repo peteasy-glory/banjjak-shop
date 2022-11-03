@@ -372,7 +372,7 @@ $pos1 = strpos($pars_url, 'reserve_waiting');
     ?>
 
 
-<header id="header" <?php if($diary ==true){echo 'style="border: 1px solid #cecece;"';}?>>
+<header id="header" <?php if($diary ==true){echo 'style="border-bottom: 1px solid #cecece;"';}?>>
 	<?php if($header_menu===true){?>
 	<!-- 20220110 수정 -->
 	<div class="header-left">
