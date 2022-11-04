@@ -21,8 +21,8 @@ $top_region = ($_POST["top_region"] && $_POST["top_region"] != "")? $_POST["top_
 $middle_region = ($_POST["middle_region"] && $_POST["middle_region"] != "")? $_POST["middle_region"] : "";
 $offline = ($_POST["offline"] && $_POST["offline"] != "" && $_POST["offline"] == 1)? $_POST["offline"] : "";
 $zipcode = ($_POST["zipcode"] && $_POST["zipcode"] != "")? $_POST["zipcode"] : "";
-$lat = ($_POST["lat"] && $_POST["lat"] != "")? $_POST["lat"] : "";
-$lng = ($_POST["lng"] && $_POST["lng"] != "")? $_POST["lng"] : "";
+$lat = ($_POST["lat"] && $_POST["lat"] != "")? $_POST["lat"] : "0";
+$lng = ($_POST["lng"] && $_POST["lng"] != "")? $_POST["lng"] : "0";
 $region = ($_POST["shop_area"] && $_POST["shop_area"] != "")? $_POST["shop_area"] : "";
 $business_addr = ($_POST["business_addr"] && $_POST["business_addr"] != "")? $_POST["business_addr"] : "";
 $business_addr_detail = ($_POST["business_addr_detail"] && $_POST["business_addr_detail"] != "")? $_POST["business_addr_detail"] : "";
@@ -67,6 +67,7 @@ $result = mysqli_query($connection, $sql);
 if($result){
     echo "success";
 }else{
+//    echo $user_id,$name,$cellphone,$is_personal,$is_business,$business_number,$business_photo,$top_region,$middle_region,$offline,$offline_shop_name,$offline_shop_phonenumber,$shop_address,$working_years,$lat,$lng,$cate;
     echo $sql;
 }
 ?>

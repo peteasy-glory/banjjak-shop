@@ -926,10 +926,11 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 		-->
 		<a href="#" class="btn-page-bottom">저장하기</a>
 	</div>
-    <div style="display:none;"><input type="file" accept="image/*" name="files[]" id="fileupload" data-url="/data/fileupload_ajax.php" multiple ></div>
+    <div style="display:none;"><input type="file" accept="image/*" name="imgupfile" id="addimgfile" style="display: none;" onchange="hotel_photo_update(this,artist_id)" /></div>
 	<!-- //page-bottom -->
 </section>
 <!-- //container -->
+<script src="/static/pub/js/dev_common.js"></script>
 <script src="/static/pub/js/hotel.js"></script>
 <script src="/static/pub/js/Sortable.min.js"></script>
 <script src="/static/pub/js/jquery.fileupload.js"></script>
@@ -991,6 +992,22 @@ $(function(){
 	$(document).on('click' , '.btn-data-trash' , function(){
 		$(this).parents('.form-vertical-cell').remove();
 	});
+
+
+    // $('#fileupload').fileupload({
+    //
+    //     formData: {
+    //         mode: "upload_img",
+    //         target: "tb_hotel_product.image",
+    //         folder: "hotel"
+    //     },
+    //     dataType: 'json',
+    //     done: function (e, data) {
+    //         console.log(e)
+    //         console.log(data);
+    //     }
+    // })
+
 });
 
 function sampleAdd(){

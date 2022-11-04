@@ -46,112 +46,118 @@ function get_hotel_product(id){
                 } else if (head.code === 200) {
                     console.log(body)
 
-                    if(body.cat.length === 0 && body.coupon.length ===0 && body.dog.length === 0){
+                    if(location.href.match('set_hotel')){
+                        if(body.cat.length === 0 && body.coupon.length ===0 && body.dog.length === 0){
 
-                        if(document.getElementById('hotel_product_none_data')){
+                            if(document.getElementById('hotel_product_none_data')){
 
-                            document.getElementById('hotel_product_none_data').style.display = 'flex';
+                                document.getElementById('hotel_product_none_data').style.display = 'flex';
+                            }
+
                         }
 
-                    }
+
+                        if(body.dog.length === 0 ){
+
+                            if(document.getElementById('hotel_dog_product_none_data')){
+
+                                document.getElementById('hotel_dog_product_none_data').style.display = 'flex';
+                            }
+
+                        }else{
+                            if(document.getElementById('hotel_dog_product_none_data')){
+
+                                document.getElementById('hotel_dog_product_none_data').style.display = 'none';
+                            }
+
+                            let set = new Set();
+
+                            if(document.getElementById('hotel_dog_colgroup') && document.getElementById('hotel_dog_room_list')){
 
 
-                    if(body.dog.length === 0 ){
+                                body.dog.forEach(function(v){
 
-                        if(document.getElementById('hotel_dog_product_none_data')){
+                                    document.getElementById('hotel_dog_colgroup').innerHTML += `<col style="width:auto;">`
+                                    document.getElementById('hotel_dog_room_list').innerHTML += `<th>${v.room_name}</th>`
 
-                            document.getElementById('hotel_dog_product_none_data').style.display = 'flex';
+                                    v.fee_list.forEach(function(v2){
+
+                                        set.add(v2.kg);
+
+                                    })
+
+                                })
+                            }
+
+                            let i = 0;
+
+                            if(document.getElementById('hotel_dog_product_tbody')){
+
+
+                                set.forEach(function(s){
+
+                                    i+=1;
+
+                                    document.getElementById('hotel_dog_product_tbody').innerHTML += `<tr ><th id="hotel_dog_product_row_${i}">${s}</th></tr>`
+
+
+                                })
+                            }
+                        }
+
+
+
+                        if(body.cat.length === 0 ){
+
+                            if(document.getElementById('hotel_dog_product_none_data')){
+
+                                document.getElementById('hotel_dog_product_none_data').style.display = 'flex';
+                            }
+
+                        }else{
+                            if(document.getElementById('hotel_dog_product_none_data')){
+
+                                document.getElementById('hotel_dog_product_none_data').style.display = 'none';
+                            }
+
+                            let set = new Set();
+
+
+                            if(document.getElementById('hotel_cat_colgroup') && document.getElementById('hotel_cat_room_list')){
+
+
+                                body.cat.forEach(function(v){
+
+                                    document.getElementById('hotel_cat_colgroup').innerHTML += `<col style="width:auto;">`
+                                    document.getElementById('hotel_cat_room_list').innerHTML += `<th>${v.room_name}</th>`
+
+                                    v.fee_list.forEach(function(v2){
+
+                                        set.add(v2.kg);
+
+                                    })
+
+                                })
+                            }
+
+                            let i = 0;
+
+                            if(document.getElementById('hotel_cat_product_tbody')){
+
+                                set.forEach(function(s){
+
+                                    i+=1;
+
+                                    document.getElementById('hotel_cat_product_tbody').innerHTML += `<tr ><th id="hotel_dog_product_row_${i}">${s}</th></tr>`
+
+
+                                })
+                            }
                         }
 
                     }else{
-                        if(document.getElementById('hotel_dog_product_none_data')){
-
-                            document.getElementById('hotel_dog_product_none_data').style.display = 'none';
-                        }
-
-                        let set = new Set();
-
-                        if(document.getElementById('hotel_dog_colgroup') && document.getElementById('hotel_dog_room_list')){
 
 
-                            body.dog.forEach(function(v){
-
-                                document.getElementById('hotel_dog_colgroup').innerHTML += `<col style="width:auto;">`
-                                document.getElementById('hotel_dog_room_list').innerHTML += `<th>${v.room_name}</th>`
-
-                                v.fee_list.forEach(function(v2){
-
-                                    set.add(v2.kg);
-
-                                })
-
-                            })
-                        }
-
-                        let i = 0;
-
-                        if(document.getElementById('hotel_dog_product_tbody')){
-
-
-                            set.forEach(function(s){
-
-                                i+=1;
-
-                                document.getElementById('hotel_dog_product_tbody').innerHTML += `<tr ><th id="hotel_dog_product_row_${i}">${s}</th></tr>`
-
-
-                            })
-                        }
-                    }
-
-
-
-                    if(body.cat.length === 0 ){
-
-                        if(document.getElementById('hotel_dog_product_none_data')){
-
-                            document.getElementById('hotel_dog_product_none_data').style.display = 'flex';
-                        }
-
-                    }else{
-                        if(document.getElementById('hotel_dog_product_none_data')){
-
-                            document.getElementById('hotel_dog_product_none_data').style.display = 'none';
-                        }
-
-                        let set = new Set();
-
-
-                        if(document.getElementById('hotel_cat_colgroup') && document.getElementById('hotel_cat_room_list')){
-
-
-                            body.cat.forEach(function(v){
-
-                                document.getElementById('hotel_cat_colgroup').innerHTML += `<col style="width:auto;">`
-                                document.getElementById('hotel_cat_room_list').innerHTML += `<th>${v.room_name}</th>`
-
-                                v.fee_list.forEach(function(v2){
-
-                                    set.add(v2.kg);
-
-                                })
-
-                            })
-                        }
-
-                        let i = 0;
-
-                        if(document.getElementById('hotel_cat_product_tbody')){
-
-                            set.forEach(function(s){
-
-                                i+=1;
-
-                                document.getElementById('hotel_cat_product_tbody').innerHTML += `<tr ><th id="hotel_dog_product_row_${i}">${s}</th></tr>`
-
-
-                            })
-                        }
                     }
 
 
@@ -282,44 +288,51 @@ function get_hotel_info(id){
             } else if (head.code === 200) {
                 console.log(body)
 
-                if(parseInt(body.is_neutral) === 1){
+                if(location.href.match('set_hotel')){
 
-                    if(parseInt(body.is_neutral_pay) === 1){
+                    if(parseInt(body.is_neutral) === 1){
 
-                        document.getElementById('hotel_info_neutral').style.display='block';
-                        document.getElementById('hotel_info_neutral_price').innerText = body.neutral_price.toLocaleString();
+                        if(parseInt(body.is_neutral_pay) === 1){
+
+                            document.getElementById('hotel_info_neutral').style.display='block';
+                            document.getElementById('hotel_info_neutral_price').innerText = body.neutral_price.toLocaleString();
 
 
+                        }
+
+                    }else{
+                        document.getElementById('hotel_info_neutral').style.display='none';
                     }
 
-                }else{
-                    document.getElementById('hotel_info_neutral').style.display='none';
-                }
+
+                    if(parseInt(body.is_pickup) === 1){
+                        document.getElementById('hotel_info_pickup_1').style.display ='block';
+                    }else{
+                        document.getElementById('hotel_info_pickup_2').style.display = 'block';
+                    }
 
 
-                if(parseInt(body.is_pickup) === 1){
-                    document.getElementById('hotel_info_pickup_1').style.display ='block';
-                }else{
-                    document.getElementById('hotel_info_pickup_2').style.display = 'block';
-                }
+                    document.getElementById('hotel_info_check').innerText = `${am_pm_check(body.check_in)}:00 ~ ${am_pm_check(body.check_out)}:00`
 
 
-                document.getElementById('hotel_info_check').innerText = `${am_pm_check(body.check_in)}:00 ~ ${am_pm_check(body.check_out)}:00`
+                    document.getElementById('hotel_common_notice').value = body.hotel_info;
+
+                    document.getElementById('hotel_common_notice').addEventListener('input',function(){
+
+                        document.getElementById('hotel_common_notice_length').innerText = document.getElementById('hotel_common_notice').value.length;
+                    })
+                    document.getElementById('hotel_common_notice_length').innerText = body.hotel_info.length;
 
 
-                document.getElementById('hotel_common_notice').value = body.hotel_info;
-
-                document.getElementById('hotel_common_notice').addEventListener('input',function(){
-
-                    document.getElementById('hotel_common_notice_length').innerText = document.getElementById('hotel_common_notice').value.length;
-                })
-                document.getElementById('hotel_common_notice_length').innerText = body.hotel_info.length;
-
-
-                document.getElementById('hotel_product_delete_all').addEventListener('click',function(){
+                    document.getElementById('hotel_product_delete_all').addEventListener('click',function(){
 
                         pop.open('hotelProductDeleteAll');
-                })
+                    })
+                }else{
+
+
+                }
+
             }
         }
     })
@@ -775,6 +788,9 @@ function change_hotel_grade_dog(id,target){
 
     let weight_tr = document.getElementById('hotel_grade_dog_sep_weight');
 
+    let peak_tr = document.getElementById('hotel_peak_dog_sep_weight');
+
+    let photo_tr = document.getElementById('hotel_photo_dog_tr');
     let now_length = tbody.children.length;
 
     let select_length = parseInt(target.value);
@@ -798,6 +814,8 @@ function change_hotel_grade_dog(id,target){
                                                             </td></tr>`
 
             weight_tr.innerHTML += '<th class="grade-dog-sep-th"></th>'
+            peak_tr.innerHTML += '<th class="peak-dog-sep-th"></th>'
+            photo_tr.innerHTML += '<th class="photo-dog-sep-th"></th>'
 
             Array.from(document.getElementsByClassName('hotel-grade-dog-sep-tr')).forEach(function(el){
 
@@ -805,6 +823,20 @@ function change_hotel_grade_dog(id,target){
                 el.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check">${select_price()}</select></div></td>`
 
             })
+
+            Array.from(document.getElementsByClassName('hotel-peak-dog-sep-tr')).forEach(function(el){
+
+                el.innerHTML += `<td class="no-padding"><div class="form-table-select"><select class="price-check">${select_price()}</select></div></td>`
+            })
+
+
+            let count = 0;
+            Array.from(document.getElementsByClassName('hotel-photo-dog-td')).forEach(function(el){
+
+                count = el.getAttribute('id').split('_')[1];
+            })
+            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${parseInt(count)+1}"><div class="upload-img-btn" data-rid="dog_${parseInt(count)+1}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;"></div></td>`
+
 
         }
 
@@ -817,11 +849,18 @@ function change_hotel_grade_dog(id,target){
 
             $('.grade-dog-tr:last-child').remove();
             $('.grade-dog-sep-th:last-child').remove();
+            $('.peak-dog-sep-th:last-child').remove();
+            $('.photo-dog-sep-th:last-child').remove();
+
 
             Array.from(document.getElementsByClassName('hotel-grade-dog-sep-tr')).forEach(function(el){
-                console.log(el.children[el.children.length-1])
                 el.children[el.children.length-1].remove();
             })
+
+            Array.from(document.getElementsByClassName('hotel-peak-dog-sep-tr')).forEach(function(el){
+                el.children[el.children.length-1].remove();
+            })
+            document.getElementById('hotel_photo_dog_tbody_tr').children[document.getElementById('hotel_photo_dog_tbody_tr').children.length-1].remove();
         }
 
 
@@ -933,8 +972,8 @@ function add_get_hotel_product(id){
                                                             </td></tr>`
 
                             document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th class="grade-dog-sep-th">${d.room_name}</th>`
-                            document.getElementById('hotel_peak_dog_sep_weight').innerHTML += `<th>${d.room_name}</th>`
-                            document.getElementById('hotel_photo_dog_tr').innerHTML += `<th>${d.room_name}</th>`
+                            document.getElementById('hotel_peak_dog_sep_weight').innerHTML += `<th class="peak-dog-sep-th">${d.room_name}</th>`
+                            document.getElementById('hotel_photo_dog_tr').innerHTML += `<th class="photo-dog-sep-th">${d.room_name}</th>`
                             document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${i}"><div class="upload-img-btn" data-rid="dog_${i}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;" ></div></td>`
 
                         })
@@ -1479,59 +1518,138 @@ function HotelMemofocusNcursor(target) {
         document.selection.createRange().pasteHTML(html);
     }
 
-    // $("#fileupload").attr('data-rid',target.getAttribute('data-rid'));
-    $("#fileupload").trigger("click");
+    $("#addimgfile").attr('data-rid',target.getAttribute('data-rid'));
+    $("#addimgfile").trigger("click");
 
 }
+// data-url="/data/fileupload_ajax.php"
+
+function hotel_photo_update(target,id) {
+    //
+    // console.log(target);
+    // console.log(target.files);
+    //
+    // $.ajax({
+    //
+    //     url:'/data/fileupload_ajax.php',
+    //     type:'post',
+    //     data:{
+    //
+    //         mode: "test",
+    //         file: target.files[0].name,
+    //         target: "tb_hotel_product.image",
+    //         folder: "hotel"
+    //     },
+    //     success:function(res) {
+    //         console.log(res);
+    //         let response = JSON.parse(res);
+    //         let head = response.data.head;
+    //         let body = response.data.body;
+    //         if (head.code === 401) {
+    //             pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+    //         } else if (head.code === 200) {
+    //             console.log(body)
+    //         }
+    //     }
+    // })
+    // let rid = target.getAttribute('data-rid');
+    //
+    // let file = document.getElementById('fileupload').files[0];
+    // let file_name = file.name;
+    //
+    // let type = file_name.split('.')[1];
+    //
+    //
+    //
+    //
+    // if(!['jpg','png','jpeg'].includes(type)){
+    //
+    //     alert('png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+    //     return;
+    //
+    // }
+    //
+    //
+    // let fReader = new FileReader();
+    // fReader.readAsDataURL(file);
+    // fReader.onload = function(event){
+    //
+    //
+    //     Array.from(document.getElementsByClassName('hotel-photo-dog-td')).forEach(function(el){
+    //
+    //         if(el.getAttribute('id') === rid){
+    //
+    //             el.innerHTML += `<div class="list-cell" style="margin-top:10px;">
+    //                                 <div class="picture-thumb-view picture-thumb-view-add">
+    //                                 <div class="picture-thumb-view-delete" onclick="hotel_delete_photo(this)">
+    //                                                                                     <img src="/static/pub/images/icon/10-ic-24-close-white@2x.png" alt="">
+    //                                                                                 </div>
+    //                                     <div class="picture-obj"><img src="${event.target.result}" alt=""></div>
+    //                                 </div>
+    //                             </div>`
+    //         }
+    //     })
+    //
+    // }
 
 
-function hotel_photo_update(target){
-
-        let rid = target.getAttribute('data-rid');
-
-        let file = document.getElementById('fileupload').files[0];
-        let file_name = file.name;
-
-        let type = file_name.split('.')[1];
-
-
-
-
-        if(!['jpg','png','jpeg'].includes(type)){
-
-            alert('png,jpg,jpeg 파일만 업로드 할수 있습니다.');
+    var upload_chk = "0";
+    if (upload_chk == "0") {
+        upload_chk = "1";
+        var ext = $('#addimgfile').val().split('.').pop().toLowerCase();
+        if ($.inArray(ext, ['gif', 'png', 'jpg', 'jpeg']) == -1) {
+            alert('gif,png,jpg,jpeg 파일만 업로드 할수 있습니다.');
             return;
-
         }
 
+        var filename = $("input[name=imgupfile]")[0].files[0].name;
+        var newfilename = GetPhotoFilename('hotelProduct', id, filename);
+        var formData = new FormData();
 
-        let fReader = new FileReader();
-        fReader.readAsDataURL(file);
-        fReader.onload = function(event){
+        formData.append("myfile", $("input[name=imgupfile]")[0].files[0]);
+        formData.append("filepath", newfilename);
 
-
-            Array.from(document.getElementsByClassName('hotel-photo-dog-td')).forEach(function(el){
-
-                if(el.getAttribute('id') === rid){
-
-                    el.innerHTML += `<div class="list-cell" style="margin-top:10px;">
-                                        <div class="picture-thumb-view picture-thumb-view-add">
-                                        <div class="picture-thumb-view-delete" onclick="hotel_delete_photo(this)">
-                                                                                            <img src="/static/pub/images/icon/10-ic-24-close-white@2x.png" alt=""> 
-                                                                                        </div>
-                                            <div class="picture-obj"><img src="${event.target.result}" alt=""></div>
-                                        </div>
-                                    </div>`
+        $.ajax({
+            url: 'data/upload_hotel_product.php',
+            data: formData,
+            processData: false,
+            contentType: false,
+            type: 'POST',
+            beforeSend: function () {
+                $("#loading").addClass("actived");
+            },
+            success: function (data) {
+                console.log(data);
+                $("#loading").removeClass("actived");
+                if (/(MSIE|Trident)/.test(navigator.userAgent)) {
+                    // ie 일때 input[type=file] init.
+                    $("#addimgfile").replaceWith($("#addimgfile").clone(true));
+                } else {
+                    // other browser 일때 input[type=file] init.
+                    $("#addimgfile").val("");
                 }
-            })
 
-        }
+                //if ($("#con_img").val() == "" || $("#con_img").val() == undefined) {
+                $("#con_img").attr('src', "https://image.banjjakpet.com/upload/" + newfilename);
+                $(".file-preview-data").addClass('actived');
+                //}
+                $('#photo_counseling').val(data);
 
 
+            },
+            error: function (xhr, status, error) {
+                alert(error+"에러발생");
+            }
+        });
 
-
+    } else {
+        alert("사진파일 업로드 중입니다.");
+    }
 
 }
+
+
+
 
 function add_hotel_coupon(){
 
@@ -1737,6 +1855,8 @@ function typing_change(target){
     let index = $(target).parent().parent().parent().index();
 
     Array.from(document.getElementsByClassName('grade-dog-sep-th'))[index].innerText = value;
+    Array.from(document.getElementsByClassName('peak-dog-sep-th'))[index].innerText = value;
+    Array.from(document.getElementsByClassName('photo-dog-sep-th'))[index].innerText = value;
 
 
 }

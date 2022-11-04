@@ -839,9 +839,9 @@ if(count($arr_holiday)>0){
                     <button type="button" class="btn-reserve-calendar-sort" onclick="location.href='reserve_main_list?ch=list&yy=<?=$yy?>&mm=<?=$mm?>&dd=<?=$dd?>';"><span class="icon icon-type-list-gray off"></span><span class="icon icon-type-list-white on"></span></button>
                 </div>
                 <div class="sort-right">
-                    <select name="choose_type" id="choose_type" onchange="show_alert(this.value);">
+                    <select name="choose_type" id="choose_type" onchange="location.href = `${this.value}`;">
                         <option value="beauty" selected>미용</option>
-                        <option value="hotel">호텔</option>
+                        <option value="reserve_main_hotel_week" >호텔</option>
                         <option value="playroom">유치원</option>
                     </select>
                 </div>

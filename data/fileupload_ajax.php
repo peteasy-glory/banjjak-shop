@@ -86,7 +86,8 @@ if($r_mode != ""){
                     $return_data = array("code" => "000000", "data" => $data);
                     //echo '{"status":"success", "files":{"0":{"id":"1","name":"asdf","path":"pet_dog.png"}}}';
                 }else{
-                    $return_data = array("code" => "010105", "data" => "파일 업로드에 실패했습니다.");
+
+                    $return_data = array("code" => "010105", "data" => "파일 업로드에 실패했습니다.","result"=>$result,"tmp_name"=>$_FILES['files']['tmp_name'][0],"file_name"=>$new_filename,"file_path"=>$upload_direcoty_full_path,"file_type"=>$ext,"img_x"=>$img_x,"img_y"=>$img_y,"target"=>$r_target,"upload_static_directory"=>$upload_static_directory,"upload_direcoty_full_path"=>$upload_direcoty_full_path,"upload_directory"=>$upload_directory);
                 }
             }
         }
@@ -182,6 +183,26 @@ if($r_mode != ""){
         }else{
             $return_data = array("code" => "010301", "data" => "파일 삭제에 실패했습니다.");
         }
+    }else if($r_mode == 'test') {
+
+
+        $r_target = ($_POST["target"] && $_POST["target"] != "")? $_POST["target"] : "";
+        $r_folder = ($_POST["folder"] && $_POST["folder"] != "")? $_POST["folder"] : "";
+        $img_x = 0;
+        $img_y = 0;
+
+        // create folder
+        make_user_directory($upload_static_directory.$upload_directory, $r_folder);
+
+        // 설정
+        $allowed_ext = array('jpg','jpeg','png','gif');
+
+        // 변수 정리
+        $error = $_FILES['files']['error'][0];
+        $name = $_FILES['files']['name'][0];
+
+        $return_data = array("code" => "000000", "data" =>$error,$name,$r_target,$r_folder);
+
     }else{
         $return_data = array("code" => "999997", "data" => "허용되지 않은 접근입니다.");
     }

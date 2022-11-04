@@ -1,0 +1,769 @@
+<?php
+include($_SERVER['DOCUMENT_ROOT']."/include/global.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TFunc.php");
+include($_SERVER['DOCUMENT_ROOT'] . "/common/TSql.php");
+
+$hptop_start_time = mktime();
+TFunc::console("시작: ".date("Y-m-d h:i:s", $hptop_start_time));
+
+$artist_flag = (isset($_SESSION['artist_flag'])) ? $_SESSION['artist_flag'] : "";
+
+if ($artist_flag === true) {
+    $artist_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_id = (isset($_SESSION['shop_user_id'])) ? $_SESSION['shop_user_id'] : "";
+    $user_name = (isset($_SESSION['shop_user_nickname'])) ? $_SESSION['shop_user_nickname'] : "";
+} else {
+    $artist_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_id = (isset($_SESSION['gobeauty_user_id'])) ? $_SESSION['gobeauty_user_id'] : "";
+    $user_name = (isset($_SESSION['gobeauty_user_nickname'])) ? $_SESSION['gobeauty_user_nickname'] : "";
+}
+
+$yy = (isset($_GET['yy']) && $_GET['yy']) ? $_GET['yy'] : date('Y');
+$mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
+$dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
+
+
+$header_right ='';
+$header_notice = true;
+$shop_title	= "예약관리";
+include($_SERVER['DOCUMENT_ROOT']."/include/skin/header_shop.php");
+include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
+
+
+//print_r($_SESSION);
+
+
+$from = $_GET['from'];
+
+$sql = array();
+$data = array();
+$wait_count = 0;
+
+$ch = (isset($_GET['ch']) && $_GET['ch']) ? $_GET['ch'] : 'month';
+$yy = (isset($_GET['yy']) && $_GET['yy']) ? $_GET['yy'] : date('Y');
+$mm = (isset($_GET['mm']) && $_GET['mm']) ? $_GET['mm'] : date('m');
+$dd = (isset($_GET['dd']) && $_GET['dd']) ? $_GET['dd'] : date('d');
+$week = $_GET['week'];
+
+$backurl = $_GET['backurl'];
+unset($_SESSION['backurl2']);
+$_SESSION['backurl2'] = 'reserve_main_week';
+
+
+
+$daily = array('일', '월', '화', '수', '목', '금', '토');
+$selected_date = $yy . "-" . $mm . "-" . $dd;
+
+$y_yy = date("Y", strtotime($selected_date . "-1day"));
+$y_mm = date("m", strtotime($selected_date . "-1day"));
+$y_dd = date("d", strtotime($selected_date . "-1day"));
+$t_yy = date("Y", strtotime($selected_date . "+1day"));
+$t_mm = date("m", strtotime($selected_date . "+1day"));
+$t_dd = date("d", strtotime($selected_date . "+1day"));
+
+// 오늘 날짜
+$today_year = date("Y");
+$today_month = date("m");
+$today_day = date("d");
+
+
+$now = new DateTime($yy . '-' . $mm . '-' . $dd);
+$now_date = date_format($now, 'Y-m-d');
+$week_index = date_format($now, 'w');
+
+$first_date = date('Y-m-d', strtotime($now_date . " -{$week_index} days")); // 주중 첫날
+$last_date = date('Y-m-d', strtotime($first_date . " +6 days")); //  주중 마지막날
+
+$que = " SELECT * FROM `tb_artist_list` WHERE artist_id='{$artist_id}' AND is_view = '2' AND is_out = '2' GROUP BY name ORDER BY sequ_prnt asc, is_main DESC, nicname ASC";
+//echo $que;
+$result = mysqli_query($connection, $que);
+while ($artist_rows = mysqli_fetch_assoc($result)) {
+    $data['artist'][] = $artist_rows;
+}
+
+$worker_id = $_GET['worker'];
+if(empty($worker_id)){
+//    print_r($data['artist']);
+    $worker_id = $data['artist'][0]['artist_id'];
+}
+
+//미용사 및 날짜 변경시
+if(isset($_GET['payment_log_seq'])){
+    $que = "SELECT * FROM tb_payment_log WHERE payment_log_seq = '{$_GET['payment_log_seq']}'";
+    $res = sql_query($que);
+    $pls = sql_fetch($res);
+    $_SESSION['payment_seq'] = $_GET['payment_log_seq'];
+}
+
+
+
+// 2019.01.07 developlay - 요일별 정기휴일여부 추출 [START]
+$holiweek_arr = array();
+$sql_regular = "select * from tb_regular_holiday where customer_id = '" . $artist_id . "';";
+//echo $sql_regular."<br>";
+$sql_regular_result = mysqli_query($connection, $sql_regular);
+if ($sql_regular_row = mysqli_fetch_object($sql_regular_result)) {
+    $holiweek_arr[0] = $sql_regular_row->is_sunday;
+    $holiweek_arr[1] = $sql_regular_row->is_monday;
+    $holiweek_arr[2] = $sql_regular_row->is_tuesday;
+    $holiweek_arr[3] = $sql_regular_row->is_wednesday;
+    $holiweek_arr[4] = $sql_regular_row->is_thursday;
+    $holiweek_arr[5] = $sql_regular_row->is_friday;
+    $holiweek_arr[6] = $sql_regular_row->is_saturday;
+}
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [END]
+
+$date_week_list = array();
+
+for ($w = 0; $w <= 6; $w++) {
+    $next_date = date('Y-m-d', strtotime($first_date . " +{$w}days"));
+
+    $next_year = date('Y', strtotime($first_date . " +{$w}days"));
+    $next_month = date('m', strtotime($first_date . " +{$w}days"));
+    $next_day = date('d', strtotime($first_date . " +{$w}days"));
+    $next_hour = date('H', strtotime($first_date . " +{$w}days"));
+    $next_minute = date('i', strtotime($first_date . " +{$w}days"));
+    $date_week_list[$next_date] = array();
+
+    // 일일 오픈시간과 종료시간을 가지고 온다.
+    $sql = "select * from tb_working_schedule where customer_id='{$artist_id}'";
+    $result = mysqli_query($connection, $sql);
+    $rows = mysqli_fetch_object($result);
+    $order_my = isset($order_my) ? $order_my : array();
+    ksort($order_my);
+    // echo '<pre>';
+    // var_dump($order_my);
+    // echo '</pre>';
+
+    $date_week_list[$next_date] = array();
+    $date_week_list[$next_date]['working_start'] =  $rows_working_start = $rows->working_start;
+    $date_week_list[$next_date]['working_end'] = $rows_working_end = $rows->working_end;
+    // var_dump($date_week_list[$next_date]);
+
+
+    //필요한 쿼리 인지 확인 필요함
+    $sql = "
+    SELECT 
+        res.* 
+        , pay.order_id
+        , pay.payment_log_seq
+    FROM 
+        `tb_reservation` res 
+        LEFT JOIN `tb_payment_log` pay on ( pay.session_id=res.session_id )
+    WHERE 
+        1
+        and res.artist_id = '{$_SESSION['gobeauty_cart_artist_id']}'
+        and res.year = '{$next_year}'
+        and res.month = '{$next_month}'
+        and res.day = '{$next_day}'
+        and res.worker = '{$worker}'
+    ";
+    $result = mysqli_query($connection, $sql);
+    $date_week_list[$next_date]['reservation'] = array();
+    while ($rows = mysqli_fetch_object($result)) {
+        // var_dump($rows);
+
+
+        // var_dump($rows);
+        $rows_year = $rows->year;
+        $rows_month = $rows->month;
+        $rows_day = $rows->day;
+        $rows_hour = $rows->hour;
+        $rows_minute = $rows->minute;
+        $rows_rowspan = $rows->rowspan;
+        $rows_my_order = $rows->my_order;
+        $rows_session_id = $rows->session_id;
+
+        $date =  $rows_year . '-' . $rows_month . '-' . $rows_day . ' ' . $rows_hour . ":" . $rows_minute . ":00";
+        // echo '<Br/>';
+        $now = date_create($date);
+        $time = date_format($now, "H:i");
+
+        $date_week_list[$next_date]['reservation'][] = $time;
+
+        $reservation[$time][] = $time;
+        $rowspan[$time] = $rows_rowspan;
+        $session_id[$time] = $rows_session_id;
+        if ($rows_my_order) $order_my[$time][] = $time;
+        for ($t = 0; $t < $rows->rowspan - 1; $t++) {
+            // echo $t.'<br/>';
+            $date_add = date_add($now, date_interval_create_from_date_string("30 minutes"));
+            $reservation[$time][] = date_format($date_add, "H:i");
+            if ($rows_my_order) $order_my[$time][] = date_format($date_add, "H:i");
+        }
+    }
+}
+
+// 일일 오픈시간과 종료시간을 가지고 온다.
+$sql = "select * from tb_working_schedule where customer_id='{$artist_id}'";
+$result = mysqli_query($connection, $sql);
+$rows = mysqli_fetch_object($result);
+ksort($order_my);
+
+$data['week_time'] = array();
+$data['week_time']['working_start'] = $rows->working_start;
+$data['week_time']['working_end'] = $rows->working_end;
+// var_dump( $data['week_time'] );
+
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [START]
+$data['holiweek'] = array();
+$sql_holiweek = "SELECT * FROM tb_regular_holiday WHERE customer_id = '" . $artist_id . "';";
+$result_holiweek = mysqli_query($connection, $sql_holiweek);
+if ($rows = mysqli_fetch_object($result_holiweek)) {
+    $data['holiweek'][0] = $rows->is_sunday;
+    $data['holiweek'][1] = $rows->is_monday;
+    $data['holiweek'][2] = $rows->is_tuesday;
+    $data['holiweek'][3] = $rows->is_wednesday;
+    $data['holiweek'][4] = $rows->is_thursday;
+    $data['holiweek'][5] = $rows->is_friday;
+    $data['holiweek'][6] = $rows->is_saturday;
+}
+// 2019.01.07 developlay - 요일별 휴일여부 추출 [END]
+
+
+
+// 임시휴일[START]
+$data['private_holiday'] = array();
+
+
+?>
+<!-- container -->
+<section id="container"> 
+	<!-- page-body -->    
+	<div class="page-body">
+		<div class="reserve-calendar-wrap">
+<!--			<button type="button" class="btn btn-outline-purple btn-middle-size btn-round">빈시간 판매하기</button>-->
+			<!-- 캘린더 정렬 -->
+			<div class="reserve-calendar-sort">
+				<div class="sort-left">
+					<!-- actived클래스 추가시 활성화 -->
+					<button type="button" class="btn-reserve-calendar-sort">월</button>
+					<button type="button" class="btn-reserve-calendar-sort actived">주</button>
+				</div>
+				<div class="sort-right">
+                    <select name="choose_type" id="choose_type" onchange="location.href = `${this.value}`;">
+                        <option value="reserve_main_week">미용</option>
+                        <option value="reserve_main_hotel_week" selected >호텔</option>
+                        <opt-ion value="playroom">유치원</opt-ion>
+                    </select>
+				</div>
+			</div>
+			<!-- //캘린더 정렬 -->
+			<!-- 캘린더 상단 -->
+			<div class="reserve-calendar-top">
+				<button type="button" class="btn-reserve-calendar-ui btn-month-prev"><span class="icon icon-calendar-prev-small"></span></button>
+				<div class="reserve-calendar-title">
+					<div class="txt"></div>
+					<!--
+					//	select태그는 투명을로 위로 띄웟고 , change 시 txt클래스내 문구 변경으로 디자인 처리
+					-->
+                    <select>
+                        <?for($i=-48;$i<0;$i++){?>
+                            <option value="<?= (int) date('Y', strtotime($first_date)-86400*7*$i) ?>.<?= (int) date('m', strtotime($first_date)-86400*7*$i) ?>.<?= (int) date('d', strtotime($first_date)-86400*7*$i) ?>" data-rol1="<?= date('m.d', strtotime($first_date)-86400*7*$i) ?>" data-rol2="<?= date('m.d', strtotime($last_date)-86400*7*$i) ?>"><?= (int) date('m', strtotime($first_date)-86400*7*$i) ?>월 <?= (int) date('d', strtotime($first_date)-86400*7*$i) ?>일 ~
+                                <?= (int) date('m', strtotime($last_date)-86400*7*$i) ?>월 <?= (int) date('d', strtotime($last_date)-86400*7*$i) ?>일</option>
+                        <?}?>
+                        <?for($i=0;$i<48;$i++){?>
+                            <option <?if($i==0) echo "selected";?> value="<?= (int) date('Y', strtotime($first_date)-86400*7*$i) ?>.<?= (int) date('m', strtotime($first_date)-86400*7*$i) ?>.<?= (int) date('d', strtotime($first_date)-86400*7*$i) ?>" data-rol1="<?= date('m.d', strtotime($first_date)-86400*7*$i) ?>" data-rol2="<?= date('m.d', strtotime($last_date)-86400*7*$i) ?>"><?= (int) date('m', strtotime($first_date)-86400*7*$i) ?>월 <?= (int) date('d', strtotime($first_date)-86400*7*$i) ?>일 ~
+                                <?= (int) date('m', strtotime($last_date)-86400*7*$i) ?>월 <?= (int) date('d', strtotime($last_date)-86400*7*$i) ?>일</option>
+                        <?}?>
+                    </select>
+				</div>
+				<button type="button" class="btn-reserve-calendar-ui btn-month-next"><span class="icon icon-calendar-next-small"></span></button>
+			</div>
+			<!-- //캘린더 상단 -->
+			<!-- 20220223  수정 : 탭 추가 -->
+			<div class="reserve-calendar-tab">
+				<div class="wide-tab">
+					<div class="wide-tab-inner">
+						<!-- 활성화시 actived클래스 추가 -->
+						<div class="tab-cell actived"><a href="#" class="btn-tab-item">강아지</a></div>
+						<div class="tab-cell"><a href="#" class="btn-tab-item">고양이</a></div>
+					</div>
+				</div>
+			</div>
+			<!-- //20220223  수정 : 탭 추가 -->
+			<!-- 캘린더 라벨 -->
+			<div class="reserve-calendar-label">
+				<div class="grid-layout reserve-calendar-label-group">
+					<div class="grid-layout-inner">
+						<div class="grid-layout-cell"><div class="reserve-calendar-label-items"><div class="reserve-calendar-label-state yellow"></div>앱-선결제</div></div>
+						<div class="grid-layout-cell"><div class="reserve-calendar-label-items"><div class="reserve-calendar-label-state purple"></div>앱-매장결제</div></div>
+						<div class="grid-layout-cell"><div class="reserve-calendar-label-items"><div class="reserve-calendar-label-state green"></div>매장예약</div></div>
+						<div class="grid-layout-cell"><div class="reserve-calendar-label-items"><div class="reserve-calendar-label-state red"></div>NoShow</div></div>
+					</div>
+				</div>	
+			</div>
+			<!-- //캘린더 라벨 -->
+			<!-- 캘린더 상세 -->
+			<div>
+				<div class="reserve-calendar-data">
+					<div class="reserve-calendar-inner">
+						<!--
+						// calendar-month-header-col 클래스 정의
+						//	sunday : 일요일
+						//	saturday : 토요일
+
+						// calendar-month-body-col 클래스 정의
+						//	sunday : 일요일
+						//	saturday : 토요일
+						//	break : 휴무 및 예약금지
+						//	holiday :공휴일
+						// today : 오늘
+						// calendar-drag-item-group : 드래그 가능한 영역
+						// calendar-drag-item : 드래그 아이템
+						-->
+						<!--
+						// calendar-week-time-item 상황별 클래스값
+						// yellow : 앱-선결제
+						// purple : 앱-매장결제
+						// green : 매장예약
+						// red : NoShow
+						// gray : 승인대기
+						-->
+						<div class="calendar-week-wrap">
+                            <div class="calendar-week-header">
+                                <div class="calendar-week-header-row">
+                                    <div class="calendar-week-header-col time"></div>
+                                    <?php foreach ($date_week_list as $key => $val) { ?>
+                                        <div class="calendar-week-header-col <? if (date('Y-m-d', strtotime($key)) == date('Y-m-d')) { ?>today<? } ?>">
+                                            <div class="th"><?= $daily[date('w', strtotime($key))] ?></div>
+                                            <div class="day"><a href="reserve_main_hotel_day?ch=day&yy=<?= date('Y', strtotime($key)) ?>&mm=<?= date('m', strtotime($key)) ?>&dd=<?= date('d', strtotime($key)) ?>&backurl=<?= urlencode($_SERVER['PHP_SELF']) ?>" class="text_day" style=""><?= (int) date('d', strtotime($key)) ?></a>
+                                            </div>
+                                        </div>
+                                    <?}?>
+                                </div>
+                            </div>
+							<div class="calendar-week-body calendar-hotel-week-body">
+								<!-- 방 하나의 그룹 -->
+								<div class="calendar-week-body-row-group">
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whitepink">
+											<div class="day-hotel-label"><div class="label-txt">Small<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group">
+												<div class="calendar-week-time-item hotel-time-item purple" style="width:calc( 200% - 1px );">
+													<!-- 20220223 수정 -->
+													<!-- 체크인,체크아웃,이름 위치 변경-->
+													<div class="item-name">공돌이/코카스파니</div>
+													<div class="item-check-in">IN 1900</div>
+													<div class="item-check-out">OUT 0000</div>
+													<div class="item-cash">
+														<div class="icon icon-reservation-cash-off"></div>
+														<!--
+														<div class="icon icon-reservation-cash-on"></div>
+														<div class="icon icon-reservation-card-off"></div>
+														<div class="icon icon-reservation-card-on"></div>
+														-->
+													</div>
+													<div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+													<!-- // 20220223 수정 -->
+												</div>
+											</div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group">
+												<div class="calendar-week-time-item hotel-time-item yellow" style="width:calc( 200% - 1px );">
+													<div class="item-name">공돌이/코카스파니</div>
+													<div class="item-check-in">IN 1900</div>
+													<div class="item-check-out">OUT 0000</div>
+													<div class="item-cash">
+														<div class="icon icon-reservation-cash-on"></div>
+														<!--
+														<div class="icon icon-reservation-cash-off"></div>
+														<div class="icon icon-reservation-card-off"></div>
+														<div class="icon icon-reservation-card-on"></div>
+														-->
+													</div>
+													<!--
+													<div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+													-->
+												</div>
+											</div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											정기휴일
+										</div>
+									</div>
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whitepink">
+											<div class="day-hotel-label"><div class="label-txt">Small<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group">
+												<div class="calendar-week-time-item hotel-time-item green" style="width:calc( 200% - 1px );">
+													<div class="item-name">공돌이/코카스파니</div>
+													<div class="item-check-in">IN 1900</div>
+													<div class="item-check-out">OUT 0000</div>
+													<div class="item-cash">
+														<div class="icon icon-reservation-card-off"></div>
+														<!--
+														<div class="icon icon-reservation-cash-off"></div>
+														<div class="icon icon-reservation-card-off"></div>
+														<div class="icon icon-reservation-card-on"></div>
+														-->
+													</div>
+													<!--
+													<div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+													-->
+												</div>
+											</div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whitepink">
+											<div class="day-hotel-label"><div class="label-txt">Small<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group">
+												<div class="calendar-week-time-item hotel-time-item red" style="width:calc( 200% - 1px );">
+													<div class="item-name">공돌이/코카스파니</div>
+													<div class="item-check-in">IN 1900</div>
+													<div class="item-check-out">OUT 0000</div>
+													<div class="item-cash">
+														<div class="icon icon-reservation-card-on"></div>
+														<!--
+														<div class="icon icon-reservation-cash-off"></div>
+														<div class="icon icon-reservation-card-off"></div>
+														<div class="icon icon-reservation-card-on"></div>
+														-->
+													</div>
+													<!--
+													<div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+													-->
+												</div>
+											</div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+								</div>
+								<!-- //방 하나의 그룹 -->
+								<!-- 방 하나의 그룹 -->
+								<div class="calendar-week-body-row-group">
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whiteapricot">
+											<div class="day-hotel-label"><div class="label-txt">Mid<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group">
+												<div class="calendar-week-time-item hotel-time-item yellow" style="width:calc( 600% - 1px );">
+													<div class="item-name">공돌이/코카스파니</div>
+													<div class="item-check-in">IN 1900</div>
+													<div class="item-check-out">OUT 0000</div>
+													<div class="item-cash">
+														<div class="icon icon-reservation-cash-on"></div>
+														<!--
+														<div class="icon icon-reservation-cash-off"></div>
+														<div class="icon icon-reservation-card-off"></div>
+														<div class="icon icon-reservation-card-on"></div>
+														-->
+													</div>
+													<!--
+													<div class="item-master"><div class="icon icon-reservation-selfadd"></div></div>
+													-->
+												</div>
+											</div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+								</div>
+								<!-- //방 하나의 그룹 -->
+								<!-- 방 하나의 그룹 -->
+								<div class="calendar-week-body-row-group">
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whitegreen">
+											<div class="day-hotel-label"><div class="label-txt">Suite<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+								</div>
+								<!-- //방 하나의 그룹 -->
+								<!-- 방 하나의 그룹 -->
+								<div class="calendar-week-body-row-group">
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whitemint">
+											<div class="day-hotel-label"><div class="label-txt">Standard<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+								</div>
+								<!-- //방 하나의 그룹 -->
+								<!-- 방 하나의 그룹 -->
+								<div class="calendar-week-body-row-group">
+									<div class="calendar-week-body-row">
+										<div class="calendar-week-body-col hotel-label whiteblue">
+											<div class="day-hotel-label"><div class="label-txt">Twin<br>Room</div></div>
+										</div>
+										<div class="calendar-week-body-col sunday">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col">
+											<div class="calendar-drag-item-group"></div>
+										</div>
+										<div class="calendar-week-body-col break saturday">
+											
+										</div>
+									</div>
+								</div>
+								<!-- //방 하나의 그룹 -->
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- //캘린더 상세 -->
+		</div>
+		<div class="reserve-calendar-float">
+			<div class="reserve-calendar-float-cell">
+				<button type="button" class="btn-reserve-calendar-today"><span class="icon icon-circle-float-today"></span></button>
+			</div>
+			<div class="reserve-calendar-float-cell">
+				<button type="button" class="btn-reserve-calendar-menu btn-reserve-calendar-toggle"><span class="icon icon-circle-float-menu"></span><em>12</em></button>
+				<div class="reserve-calendar-float-menu">
+					<button type="button" class="btn-float-menu">고객조회</button>
+					<button type="button" class="btn-float-menu">신규등록</button>
+					<button type="button" class="btn-float-menu">상담 승인 대기 : 10</button>
+					<button type="button" class="btn-float-menu">예약 승인 대기 : 2</button>
+					<button type="button" class="btn-float-menu">빈시간 판매하기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- //page-body -->	
+	<!-- page-bottom -->
+	<div class="page-bottom">
+		<div class="common-navigation">
+			<!--
+				btn-navigation-item 클래스에 actived클래스 추가시 활성화
+			-->
+			<a href="#" class="btn-navigation-item navigation-1"><div class="icon"></div><div class="txt">홈</div></a>
+			<a href="#" class="btn-navigation-item navigation-6  actived"><div class="icon"></div><div class="txt">예약관리</div></a>
+			<a href="#" class="btn-navigation-item navigation-7"><div class="icon"></div><div class="txt">고객관리</div></a>
+			<a href="#" class="btn-navigation-item navigation-8"><div class="icon"></div><div class="txt">샵관리</div></a>
+			<a href="#" class="btn-navigation-item navigation-9"><div class="icon"></div><div class="txt">설정</div></a>
+		</div>
+	</div>
+	<!-- //page-bottom -->
+</section>
+<!-- //container -->
+<!-- 20220225 수정 : 페이지 전체용 커버 추가 -->
+<div class="page-cover"></div>
+<!-- //20220225 수정 -->
+<script src="/static/pub/js/Sortable.min.js"></script>
+<script src="/static/pub/js/hotel.js"></script>
+<script>
+    let artist_id = '<?=$artist_id?>';
+
+    get_hotel_info(artist_id);
+    get_hotel_product(artist_id);
+
+    $(".reserve-calendar-top .txt").text($(".reserve-calendar-top select option:selected").attr("data-rol1")+" ~ "+$(".reserve-calendar-top select option:selected").attr("data-rol2"));
+    let idx = $(".reserve-calendar-top select option").index( $(".reserve-calendar-top select option:selected") );
+    if(idx==0){
+        $(".btn-month-next").hide();
+    }
+
+    if(idx==11){
+        $(".btn-month-prev").hide();
+    }
+
+    $(".reserve-calendar-top select").change(function () {
+
+        var yymm    = $(this).val().split(".");
+        var worker = '<?php echo $worker_id;?>';
+        if(yymm[1]>=10){
+            location.href="reserve_main_hotel_week?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2]+'&worker='+worker;
+        }else if(yymm[1]<10 && yymm[2]<10){
+            location.href="reserve_main_hotel_week?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2].replace("0","")+'&worker='+worker;
+        }else if(yymm[1]>10 && yymm[2]<10){
+            location.href="reserve_main_hotel_week?ch=week&yy="+yymm[0]+"&mm="+yymm[1]+"&dd="+yymm[2].replace("0","")+'&worker='+worker;
+        }else{
+            location.href="reserve_main_hotel_week?ch=week&yy="+yymm[0]+"&mm="+yymm[1].replace("0","")+"&dd="+yymm[2]+'&worker='+worker;
+        }
+
+    });
+
+    $(".btn-month-prev").on('click',function (e) {
+        var idx = $(".reserve-calendar-top select option").index( $(".reserve-calendar-top select option:selected") );
+        $('.reserve-calendar-top select option:eq(' + (idx+1) + ')').prop('selected', 'selected').change();
+        e.preventDefault();
+    });
+
+    $(".btn-month-next").click(function (e) {
+        var idx = $(".reserve-calendar-top select option").index( $(".reserve-calendar-top select option:selected") );
+        $('.reserve-calendar-top select option:eq(' + (idx-1) + ')').attr('selected', 'selected').change();
+        e.preventDefault();
+
+    });
+
+</script>
+<script>
+$(function(){
+	/*
+	$( "#sortable" ).sortable({
+		placeholder: "ui-state-highlight",
+		cancel:''
+    });
+	$( "#sortable" ).disableSelection();
+	*/
+
+	//https://github.com/SortableJS/Sortable
+
+
+	$('.calendar-week-body-col').each(function(){
+		if(!$(this).hasClass('break') && !$(this).hasClass('time') && !$(this).hasClass('hotel-label')){
+			//휴무가 아닐 경우 드래그앤 드롭 가능 처리
+			var sortable = Sortable.create($(this).find('.calendar-drag-item-group')[0] , {
+				group : 'shared',
+				delay : 500,
+				delayOnTouchOnly : true,
+				ghostClass: 'guide',
+				draggable : '.calendar-week-time-item',
+				onStart : function(evt){
+					//드래그 시작 
+					console.log('drag start');
+				},
+				onEnd : function(evt){
+					//드래그 끝
+					console.log('drag end');
+					//evt.to;    // 현재 아이템
+					//evt.from;  // 이전 아이템
+					//evt.oldIndex;  // 이전 인덱스값
+					//evt.newIndex;  // 새로운 인덱스값
+				},
+				onUpdate : function(evt){
+					console.log('update');
+				},
+				onUpdate : function(evt){
+					console.log('onChange');
+				},
+				onRemove: function (evt) {
+					console.log('remove');
+				}
+				
+			});
+		}
+	});
+
+});
+</script>
+
+	
+</body>
+</html>
