@@ -181,7 +181,7 @@
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" value="<?php echo $extra['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" onfocusout="check_name(this)" value="<?php echo $extra['text'][$a];?>" placeholder="입력"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="extra_price[]">
                                                             <option value="">선택안함</option>
@@ -213,7 +213,7 @@
                                 <div class="grid-layout basic">
                                     <div class="grid-layout-inner flex-nowrap">
                                         <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                        <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="extra_text[]" onfocusout="check_name(this)" placeholder="입력"></div>
                                         <div class="grid-layout-cell flex-1">
                                             <select name="extra_price[]" >
                                                 <option value="">선택안함</option>
@@ -333,7 +333,7 @@
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" value="<?php echo $work['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" onfocusout="check_name(this)" value="<?php echo $work['text'][$a];?>" placeholder="입력"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="out_price[]">
                                                             <option value="" >선택안함</option>
@@ -366,7 +366,7 @@
                                 <div class="grid-layout basic">
                                     <div class="grid-layout-inner flex-nowrap">
                                         <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                        <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" placeholder="입력" onfocusout="check_name(this)"></div>
                                         <div class="grid-layout-cell flex-1">
                                             <select name="out_price[]">
                                                 <option value="" <?= ($data["product_dog_common"][0]["dyeing_price"] == "" || $data["product_dog_common"][0]["dyeing_price"] == null) ? "selected" : "" ?>>선택안함</option>
@@ -427,6 +427,22 @@
 	</div>
 	<!-- //page-bottom -->
 </section>
+
+<article id="checkName" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt" id="msg1_txt">상품이름이 중복되었습니다.</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
 <!-- //container -->
 <script src="/static/pub/js/Sortable.min.js"></script>
 <script>
@@ -493,7 +509,7 @@ function sampleAdd(){
 	_html += '	<div class="grid-layout basic">';
 	_html += '		<div class="grid-layout-inner flex-nowrap">';
 	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>';
-	_html += '			<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력"></div>';
+	_html += '			<div class="grid-layout-cell flex-1"><input type="text" placeholder="입력" onfocusout="check_name(this)"></div>';
 	_html += '			<div class="grid-layout-cell flex-1">';
 	_html += '				<select>';
 	_html += '					<option value="">선택안함</option>';
@@ -511,6 +527,41 @@ function sampleAdd(){
 $(document).ready(function(){
             $('#btn_page_prev').prop('href','set_beauty_option');
         });
+
+
+function check_name(target){
+
+
+
+    let count = 0;
+
+    Array.from($(':input[type=text]')).forEach(function(el){
+
+
+
+        if(target.value !== ''){
+
+            if(el.value.trim() === target.value.trim()){
+
+                count++;
+
+                if(count > 1){
+
+                    document.querySelector('.btn-page-bottom').classList.add('disabled');
+
+                    pop.open('checkName');
+                }else{
+                    document.querySelector('.btn-page-bottom').classList.remove('disabled');
+                }
+
+
+            }
+        }
+    })
+
+
+}
+
 
 </script>
 

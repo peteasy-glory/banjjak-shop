@@ -2821,6 +2821,13 @@ $r = sql_fetch($res);
                                         <div class="list-value"><strong style="color: #ff4848">(-)<span id="total_reserve_price" style="color: #ff4848"><?php echo ($pay['reserve_pay_price']>0)?number_format($pay['reserve_pay_price']):'0';?></span>원</strong></div>
 
                                     </div>
+                                    <div class="list-cell">
+                                        <div class="list-title"><strong style="color:blue; font-size:18px;">받을 금액</strong></div>
+                                        <div class="list-value"><strong style="color:blue; font-size:18px;"><span id="total_reserve_price" style="color:blue; font-size:18px;">
+                                                    <?php echo ($pay['reserve_pay_price']>0) ? number_format(intval($pay['local_price'])+intval($pay['local_price_cash'])-intval($pay['reserve_pay_price'])) : '0';?>
+                                                </span>원</strong></div>
+
+                                    </div>
                                 <?php } ?>
                             </div>
                         </div>
@@ -2833,7 +2840,7 @@ $r = sql_fetch($res);
                                             $t1 = ($sum+$vat-$pay['reserve_point'])-str_replace(",","",$discount_price);
                                             $t2 = ($pay['reserve_pay_price']>0) ? $pay['reserve_pay_price'] : 0;
                                             //echo number_format($t1);
-                                            echo number_format($pay['local_price']+$pay['local_price_cash']+$vat-$t2);
+                                            echo number_format($pay['local_price']+$pay['local_price_cash']);
                                             ?>
                                             원</strong></div>
                                     <input type="hidden" name="total_pay_price" id="total_pay_price" value="<?php echo $t1;?>" size="3">
@@ -2853,13 +2860,13 @@ $r = sql_fetch($res);
                             <div class="form-change-wrap">
                                 <div class="form-change-item">
                                     <div class="form-change-label"><strong>카드</strong> (단위:원)</div>
-                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price'])+$vat-intval($pay['reserve_pay_price']));?>">
+                                    <div class="form-change-data"><input type="text" name="use_card" id="use_card" value="<?php echo number_format(intval($pay['local_price']));?>">
                                     </div>
                                 </div>
                                 <button type="button" class="btn-data-change">전환하기</button>
                                 <div class="form-change-item">
                                     <div class="form-change-label"><strong>현금</strong> (단위:원)</div>
-                                    <div class="form-change-data"><input type="text" name="use_cash" id="use_cash" value="<?php echo number_format($pay['local_price_cash']);?>"></div>
+                                    <div class="form-change-data"><input type="text" name="use_cash" id="use_cash" value="<?php echo ($pay['reserve_pay_price'] >0) ? number_format($pay['local_price_cash']) :number_format($pay['local_price_cash']);?>"></div>
                                 </div>
                             </div>
                         </div>

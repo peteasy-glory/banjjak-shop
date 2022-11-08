@@ -396,9 +396,9 @@ if ($goods_cnt > 0) {
     //echo $product."<p>";
 
     // 최종가격 업데이트(현금결제로 하더라도 일단 카드로 바꾼 후 가격 적용)
-//    if($is_vat == '1'){
-//        $total_price = $total_price*1.1;
-//    }
+    if($is_vat == '1'){
+        $total_price = $total_price*1.1;
+    }
 
     $que = "UPDATE tb_payment_log SET ";
     $que .= "local_price        = '{$total_price}', ";

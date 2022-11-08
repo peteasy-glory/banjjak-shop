@@ -82,17 +82,7 @@ if (($startDate != "" && $startDate != null) && ($endDate != "" && $endDate != n
 //
 
     // 상세내역
-    $query = "
-		SELECT a.*, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$startYearMonth." a
-		JOIN tb_payment_log b ON b.artist_id ='".$artist_id."'
-		WHERE a.recipient_num = '".$cellphone."' AND b.payment_log_seq = SUBSTRING_INDEX(SUBSTRING_INDEX(a.kko_btn_info, '=', '-1' ), '\"', '1')
-		AND a.template_code IN ('1000004530_14040', '1000004530_14041', '1000004530_14042', '1000004530_14042_1', '1000004530_14043', '1000004530_14044', '1000004530_20001', '1000004530_20002', '1000004530_20003', '1000004530_20018')
-		AND DATE_FORMAT(a.date_client_req, '%Y-%m-%d')
-			BETWEEN DATE_FORMAT('".$startDate."', '%Y-%m-%d')
-			AND DATE_FORMAT('".$endDate."', '%Y-%m-%d')
-		".$plus_query."
-		ORDER BY date_client_req
-";
+
     $result = mysqli_query($connection,$query);
 
     while ($data = mysqli_fetch_array($result)) {
