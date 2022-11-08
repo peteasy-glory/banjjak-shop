@@ -264,7 +264,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                         <div class="grid-layout basic">
                                             <div class="grid-layout-inner flex-nowrap">
                                                 <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                <div class="grid-layout-cell flex-1"><input type="text" name="face_add[]" value="<?php echo $face['text'][$a];?>" placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" name="face_add[]" onfocusout="check_name(this)"  value="<?php echo $face['text'][$a];?>" placeholder="입력"></div>
                                                 <div class="grid-layout-cell flex-1">
                                                     <select name="p_fave_price[]" >
                                                         <option value="">선택안함</option>
@@ -548,7 +548,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="double_hair[]" value="<?php echo $rs['title'];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="double_hair[]" onfocusout="check_name(this)" value="<?php echo $rs['title'];?>" placeholder="입력"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="double_hair_price[]">
                                                             <option value="">선택안함</option>
@@ -580,7 +580,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                 <div class="grid-layout basic">
                                     <div class="grid-layout-inner flex-nowrap">
                                         <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                        <div class="grid-layout-cell flex-1"><input type="text" name="double_hair[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="double_hair[]" onfocusout="check_name(this)" placeholder="입력"></div>
                                         <div class="grid-layout-cell flex-1">
                                             <select name="double_hair_price[]">
                                                 <option value="">선택안함</option>
@@ -700,7 +700,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" value="<?php echo $work['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" onfocusout="check_name(this)" value="<?php echo $work['text'][$a];?>" placeholder="입력"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="out_price[]">
                                                             <option value="" >선택안함</option>
@@ -733,7 +733,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                 <div class="grid-layout basic">
                                     <div class="grid-layout-inner flex-nowrap">
                                         <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                        <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" placeholder="입력"></div>
+                                        <div class="grid-layout-cell flex-1"><input type="text" name="out_text[]" onfocusout="check_name(this)" placeholder="입력"></div>
                                         <div class="grid-layout-cell flex-1">
                                             <select name="out_price[]">
                                                 <option value="">선택안함</option>
@@ -861,7 +861,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                                 <div class="grid-layout basic">
                                                     <div class="grid-layout-inner flex-nowrap">
                                                         <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                        <div class="grid-layout-cell flex-1"><input type="text" name="etc_leg_text[]" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
+                                                        <div class="grid-layout-cell flex-1"><input type="text" name="etc_leg_text[]" onfocusout="check_name(this)" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
                                                         <div class="grid-layout-cell flex-1">
                                                             <select name="etc_leg_price[]">
                                                                 <option value="">선택안함</option>
@@ -889,7 +889,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                         <div class="grid-layout basic">
                                             <div class="grid-layout-inner flex-nowrap">
                                                 <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                <div class="grid-layout-cell flex-1"><input type="text" name="etc_leg_text[]" placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" name="etc_leg_text[]"  onfocusout="check_name(this)" placeholder="입력"></div>
                                                 <div class="grid-layout-cell flex-1">
                                                     <select name="etc_leg_price[]">
                                                         <option value="">선택안함</option>
@@ -940,7 +940,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                         <div class="grid-layout basic">
                                             <div class="grid-layout-inner flex-nowrap">
                                                 <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                <div class="grid-layout-cell flex-1"><input type="text" name="spa_text[]" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
+                                                <div class="grid-layout-cell flex-1"><input type="text" name="spa_text[]" onfocusout="check_name(this)" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
                                                 <div class="grid-layout-cell flex-1">
                                                     <select name="spa_price[]">
                                                         <option value="">선택안함</option>
@@ -968,7 +968,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                     <div class="grid-layout basic">
                                         <div class="grid-layout-inner flex-nowrap">
                                             <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                            <div class="grid-layout-cell flex-1"><input type="text" name="spa_text[]" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="spa_text[]" onfocusout="check_name(this)" placeholder="입력"></div>
                                             <div class="grid-layout-cell flex-1">
                                                 <select name="spa_price[]">
                                                     <option value="">선택안함</option>
@@ -1017,7 +1017,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="color_text[]" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="color_text[]" onfocusout="check_name(this)" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="color_price[]">
                                                             <option value="">선택안함</option>
@@ -1045,7 +1045,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                     <div class="grid-layout basic">
                                         <div class="grid-layout-inner flex-nowrap">
                                             <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                            <div class="grid-layout-cell flex-1"><input type="text" name="color_text[]" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="color_text[]" placeholder="입력" onfocusout="check_name(this)"></div>
                                             <div class="grid-layout-cell flex-1">
                                                 <select name="color_price[]">
                                                     <option value="" <?= ($data["product_dog_common"][0]["dyeing_price"] == "" || $data["product_dog_common"][0]["dyeing_price"] == null) ? "selected" : "" ?>>선택안함</option>
@@ -1094,7 +1094,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                             <div class="grid-layout basic">
                                                 <div class="grid-layout-inner flex-nowrap">
                                                     <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                                    <div class="grid-layout-cell flex-1"><input type="text" name="etc_text[]" value="<?php echo $etc1['text'][$a];?>" placeholder="입력"></div>
+                                                    <div class="grid-layout-cell flex-1"><input type="text" name="etc_text[]" value="<?php echo $etc1['text'][$a];?>" placeholder="입력" onfocusout="check_name(this)"></div>
                                                     <div class="grid-layout-cell flex-1">
                                                         <select name="etc_price[]">
                                                             <option value="">선택안함</option>
@@ -1122,7 +1122,7 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
                                     <div class="grid-layout basic">
                                         <div class="grid-layout-inner flex-nowrap">
                                             <div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>
-                                            <div class="grid-layout-cell flex-1"><input type="text" name="etc_text[]" placeholder="입력"></div>
+                                            <div class="grid-layout-cell flex-1"><input type="text" name="etc_text[]" placeholder="입력" onfocusout="check_name(this)"></div>
                                             <div class="grid-layout-cell flex-1">
                                                 <select name="etc_price[]">
                                                     <option value="">선택안함</option>
@@ -1189,6 +1189,22 @@ $data['bath_option_list_data'] = substr($data['bath_option_list_data'], 0, -1);
 
 	<!-- //page-bottom -->
 </section>
+
+<article id="checkName" class="layer-pop-wrap">
+    <div class="layer-pop-parent">
+        <div class="layer-pop-children">
+            <div class="pop-data alert-pop-data">
+                <div class="pop-body">
+                    <div class="msg-txt" id="msg1_txt">상품이름이 중복되었습니다.</div>
+                </div>
+                <div class="pop-footer">
+                    <button type="button" class="btn btn-confirm" onclick="pop.close();">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</article>
+
 <!-- //container -->
 <script src="/static/pub/js/Sortable.min.js"></script>
 <script>
@@ -1197,6 +1213,10 @@ $(function(){
 
     //저장시
     $(document).on('click','.btn-save',function(){
+
+        if(this.classList.contains('disabled')){
+            return;
+        }
         document.f.submit();
     });
     
@@ -1297,7 +1317,7 @@ function sampleAdd(){
 	_html += '	<div class="grid-layout basic">';
 	_html += '		<div class="grid-layout-inner flex-nowrap">';
 	_html += '			<div class="grid-layout-cell flex-auto w-px-55"><button type="button" class="btn-data-handler">드래그바</button></div>';
-	_html += '			<div class="grid-layout-cell flex-1"><input type="text" name="face_add[]" placeholder="입력"></div>';
+	_html += '			<div class="grid-layout-cell flex-1"><input type="text" name="face_add[]" placeholder="입력" onfocusout="check_name(this)"></div>';
 	_html += '			<div class="grid-layout-cell flex-1">';
 	_html += '				<select name="p_fave_price[]">';
 	<?php for ($pi = 0; $pi < 150001; $pi = $pi + 500) { ?>
@@ -1317,6 +1337,40 @@ function sampleAdd(){
 $(document).ready(function(){
             $('#btn_page_prev').prop('href','set_beauty_option');
         });
+
+
+function check_name(target){
+
+
+
+    let count = 0;
+
+    Array.from($(':input[type=text]')).forEach(function(el){
+
+
+
+        if(target.value !== ''){
+
+            if(el.value.trim() === target.value.trim()){
+
+                count++;
+
+                if(count > 1){
+
+                    document.querySelector('.btn-page-bottom').classList.add('disabled');
+
+                    pop.open('checkName');
+                }else{
+                    document.querySelector('.btn-page-bottom').classList.remove('disabled');
+                }
+
+
+            }
+        }
+    })
+
+
+}
 
 </script>
 <?
