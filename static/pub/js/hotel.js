@@ -288,6 +288,8 @@ function get_hotel_info(id){
             } else if (head.code === 200) {
                 console.log(body)
 
+                localStorage.setItem('h_seq',body.h_seq);
+
                 if(location.href.match('set_hotel')){
 
                     if(parseInt(body.is_neutral) === 1){
@@ -867,6 +869,8 @@ function change_hotel_grade_dog(id,target){
 
     }
 
+
+
 }
 
 function change_hotel_grade_cat(id,target){
@@ -1060,6 +1064,7 @@ function add_get_hotel_product(id){
 
                     }
 
+
                     for(let i=0; i<Array.from(cat_weight).length; i++){
 
                         document.getElementById('hotel_grade_cat_sep_tbody').innerHTML += `<tr class="hotel-grade-cat-sep-tr" id="hotel_grade_cat_sep_tr_${i}"></tr>`
@@ -1069,11 +1074,13 @@ function add_get_hotel_product(id){
 
 
 
-                    body.coupon.forEach(function(coupon){
+                    if(body?.coupon){
 
-                        if(coupon.type === 'C'){
+                        body.coupon.forEach(function(coupon){
 
-                            document.getElementById('hotel_coupon_list').innerHTML = `<div class="form-vertical-cell middle hotel-coupon-div">
+                            if(coupon.type === 'C'){
+
+                                document.getElementById('hotel_coupon_list').innerHTML = `<div class="form-vertical-cell middle hotel-coupon-div">
                                                                                                     <div class="grid-layout basic">
                                                                                                         <div class="grid-layout-inner">
                                                                                                             <div class="grid-layout-cell grid-100">
@@ -1108,8 +1115,8 @@ function add_get_hotel_product(id){
                                                                                                         </div>
                                                                                                     </div>
                                                                                                 </div>`
-                        }else if(coupon.type ==='F'){
-                            document.getElementById('hotel_flat_list').innerHTML = `<div class="form-vertical-cell middle hotel-flat-div">
+                            }else if(coupon.type ==='F'){
+                                document.getElementById('hotel_flat_list').innerHTML = `<div class="form-vertical-cell middle hotel-flat-div">
                                                                                                     <div class="grid-layout basic">
                                                                                                         <div class="grid-layout-inner">
                                                                                                             <div class="grid-layout-cell grid-100">
@@ -1145,10 +1152,12 @@ function add_get_hotel_product(id){
                                                                                                     </div>
                                                                                                 </div>`
 
-                        }
+                            }
 
 
-                    })
+                        })
+                    }
+
 
                     resolve(room);
                 }
@@ -1573,7 +1582,7 @@ function hotel_photo_update(target,id) {
                 $(".file-preview-data").addClass('actived');
                 //}
 
-                document.getElementById(`${rid}`).setAttribute('data-photos',`${document.getElementById(`${rid}`).getAttribute('data-photos') === '' ? '' : document.getElementById(`${rid}`).getAttribute('data-photos')},${data}`);
+                document.getElementById(`${rid}`).setAttribute('data-photos',`${document.getElementById(`${rid}`).getAttribute('data-photos') === '' ? '' : document.getElementById(`${rid}`).getAttribute('data-photos')}${document.getElementById(`${rid}`).getAttribute('data-photos') === '' ? '':','}${data}`);
 
 
 
@@ -1933,41 +1942,90 @@ function save_hotel_set(id){
 
 
 
-        // $.ajax({
-        //
-        //     url:'/data/api.php',
-        //     type:'post',
-        //     data:{
-        //         mode:'post_set_hotel_product',
-        //         h_seq:localStorage.getItem('h_seq'),
-        //         partner_id:id,
-        //         room_pet_type:room_pet_type,
-        //         room_name :room_name,
-        //         room_cnt : room_cnt
-        //         weight:weight,
-        //         normal_price:normal_price,
-        //         peak_price:peak_price,
-        //         is_neutral:is_neutral,
-        //         is_neutral_pay:is_neutral_pay,
-        //         neutral_price:neutral_price,
-        //         extra_price:extra_price,
-        //         is_peak:is_peak,
-        //         is_image:is_image,
-        //         comment:comment,
-        //         image:image,
-        //
-        //     },
-        //     success:function(res) {
-        //         let response = JSON.parse(res);
-        //         let head = response.data.head;
-        //         let body = response.data.body;
-        //         if (head.code === 401) {
-        //             pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
-        //         } else if (head.code === 200) {
-        //             console.log(body)
-        //         }
-        //     }
-        // })
+        $.ajax({
+
+            url:'/data/api.php',
+            type:'post',
+            data:{
+                mode:'post_set_hotel_product',
+                h_seq:localStorage.getItem('h_seq'),
+                partner_id:id,
+                room_pet_type:room_pet_type,
+                room_name :room_name,
+                room_cnt : room_cnt,
+                weight:weight,
+                normal_price:normal_price,
+                peak_price:peak_price,
+                is_neutral:is_neutral,
+                is_neutral_pay:is_neutral_pay,
+                neutral_price:neutral_price,
+                extra_price:extra_price,
+                is_peak:is_peak,
+                is_image:is_image,
+                comment:comment,
+                image:image,
+
+            },
+            success:function(res) {
+                let response = JSON.parse(res);
+                let head = response.data.head;
+                let body = response.data.body;
+                if (head.code === 401) {
+                    pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+                } else if (head.code === 200) {
+                    console.log(body)
+                }
+            }
+        })
 
     }
+}
+
+
+function hotel_product_init(id){
+
+    let room_pet_type = document.getElementById('dog_tab').classList.contains('actived') ? 'dog':'cat';
+
+    $.ajax({
+
+        url:'/data/api.php',
+        type:'post',
+        data:{
+            mode:'post_set_hotel_product',
+            h_seq:localStorage.getItem('h_seq'),
+            partner_id:id,
+            room_pet_type:room_pet_type,
+            room_name:' ',
+            room_cnt:1,
+            weight:'1.0',
+            normal_price:'5000',
+            peak_price:'5000',
+            is_neutral: '2',
+            is_neutral_pay: '2',
+            neutral_price:0,
+            extra_price:0,
+            is_peak:'2',
+            is_image:'2',
+            comment:'',
+            image:'',
+
+        },
+        success:function(res) {
+            let response = JSON.parse(res);
+            let head = response.data.head;
+            let body = response.data.body;
+            if (head.code === 401) {
+                pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+            } else if (head.code === 200) {
+                console.log(body)
+
+                location.href='/set_hotel_shop_add'
+                
+            }
+        }
+    })
+
+
+
+
 }
