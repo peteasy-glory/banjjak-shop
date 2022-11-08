@@ -642,6 +642,7 @@ function add_get_hotel_info(id){
             } else if (head.code === 200) {
                 console.log(body)
 
+                localStorage.setItem('h_seq',body.h_seq);
 
                 switch(body.pet_type){
 
@@ -693,7 +694,7 @@ function add_get_hotel_info(id){
                     document.getElementById('hotel_neutral_price_select').innerHTML += select_neutral_price();
                 }else{
                     document.getElementById('hotel_neutral_price_n').click();
-                    document.getElementById('hotel_neutral_price_select').innerHTML = '';
+                    document.getElementById('hotel_neutral_price_select').innerHTML = select_neutral_price();
                 }
 
                 if(body.is_pickup === '1'){
@@ -804,7 +805,7 @@ function change_hotel_grade_dog(id,target){
         for(let i=0; i<select_length-now_length; i++){
 
             tbody.innerHTML += `<tr class="grade-dog-tr"><td class="no-padding">
-                                                                <div class="form-table-select">
+                                                                <div class="form-table-select dog-room-name">
                                                                     <input type="text" oninput="typing_change(this)" placeholder="입력"/>
                                                                 </div>
                                                             </td><td class="no-padding">
@@ -835,7 +836,7 @@ function change_hotel_grade_dog(id,target){
 
                 count = el.getAttribute('id').split('_')[1];
             })
-            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${parseInt(count)+1}"><div class="upload-img-btn" data-rid="dog_${parseInt(count)+1}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;"></div></td>`
+            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${parseInt(count)+1}" data-photos=""><div class="upload-img-btn" data-rid="dog_${parseInt(count)+1}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;"></div></td>`
 
 
         }
@@ -962,7 +963,7 @@ function add_get_hotel_product(id){
 
 
                             document.getElementById('hotel_grade_dog_tbody').innerHTML += `<tr class="grade-dog-tr"><td class="no-padding">
-                                                                <div class="form-table-select">
+                                                                <div class="form-table-select dog-room-name">
                                                                     <input type="text" placeholder="입력" oninput="typing_change(this)" value="${d.room_name}"/>
                                                                 </div>
                                                             </td><td class="no-padding">
@@ -974,7 +975,7 @@ function add_get_hotel_product(id){
                             document.getElementById('hotel_grade_dog_sep_weight').innerHTML += `<th class="grade-dog-sep-th">${d.room_name}</th>`
                             document.getElementById('hotel_peak_dog_sep_weight').innerHTML += `<th class="peak-dog-sep-th">${d.room_name}</th>`
                             document.getElementById('hotel_photo_dog_tr').innerHTML += `<th class="photo-dog-sep-th">${d.room_name}</th>`
-                            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" id="dog_${i}"><div class="upload-img-btn" data-rid="dog_${i}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;" ></div></td>`
+                            document.getElementById('hotel_photo_dog_tbody_tr').innerHTML += `<td class="hotel-photo-dog-td" data-photos="" id="dog_${i}"><div class="upload-img-btn" data-rid="dog_${i}" onclick="HotelMemofocusNcursor(this)"><img src="/static/pub/images/icon/icon-picture-add.png" width="30%" style="max-width: 30px;" ></div></td>`
 
                         })
 
@@ -1525,72 +1526,9 @@ function HotelMemofocusNcursor(target) {
 // data-url="/data/fileupload_ajax.php"
 
 function hotel_photo_update(target,id) {
-    //
-    // console.log(target);
-    // console.log(target.files);
-    //
-    // $.ajax({
-    //
-    //     url:'/data/fileupload_ajax.php',
-    //     type:'post',
-    //     data:{
-    //
-    //         mode: "test",
-    //         file: target.files[0].name,
-    //         target: "tb_hotel_product.image",
-    //         folder: "hotel"
-    //     },
-    //     success:function(res) {
-    //         console.log(res);
-    //         let response = JSON.parse(res);
-    //         let head = response.data.head;
-    //         let body = response.data.body;
-    //         if (head.code === 401) {
-    //             pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
-    //         } else if (head.code === 200) {
-    //             console.log(body)
-    //         }
-    //     }
-    // })
-    // let rid = target.getAttribute('data-rid');
-    //
-    // let file = document.getElementById('fileupload').files[0];
-    // let file_name = file.name;
-    //
-    // let type = file_name.split('.')[1];
-    //
-    //
-    //
-    //
-    // if(!['jpg','png','jpeg'].includes(type)){
-    //
-    //     alert('png,jpg,jpeg 파일만 업로드 할수 있습니다.');
-    //     return;
-    //
-    // }
-    //
-    //
-    // let fReader = new FileReader();
-    // fReader.readAsDataURL(file);
-    // fReader.onload = function(event){
-    //
-    //
-    //     Array.from(document.getElementsByClassName('hotel-photo-dog-td')).forEach(function(el){
-    //
-    //         if(el.getAttribute('id') === rid){
-    //
-    //             el.innerHTML += `<div class="list-cell" style="margin-top:10px;">
-    //                                 <div class="picture-thumb-view picture-thumb-view-add">
-    //                                 <div class="picture-thumb-view-delete" onclick="hotel_delete_photo(this)">
-    //                                                                                     <img src="/static/pub/images/icon/10-ic-24-close-white@2x.png" alt="">
-    //                                                                                 </div>
-    //                                     <div class="picture-obj"><img src="${event.target.result}" alt=""></div>
-    //                                 </div>
-    //                             </div>`
-    //         }
-    //     })
-    //
-    // }
+
+    let rid = target.getAttribute('data-rid');
+
 
 
     var upload_chk = "0";
@@ -1618,8 +1556,9 @@ function hotel_photo_update(target,id) {
             beforeSend: function () {
                 $("#loading").addClass("actived");
             },
-            success: function (data) {
+            success: function (data,res) {
                 console.log(data);
+                console.log(res);
                 $("#loading").removeClass("actived");
                 if (/(MSIE|Trident)/.test(navigator.userAgent)) {
                     // ie 일때 input[type=file] init.
@@ -1633,7 +1572,34 @@ function hotel_photo_update(target,id) {
                 $("#con_img").attr('src', "https://image.banjjakpet.com/upload/" + newfilename);
                 $(".file-preview-data").addClass('actived');
                 //}
-                $('#photo_counseling').val(data);
+
+                document.getElementById(`${rid}`).setAttribute('data-photos',`${document.getElementById(`${rid}`).getAttribute('data-photos') === '' ? '' : document.getElementById(`${rid}`).getAttribute('data-photos')},${data}`);
+
+
+
+                $.ajax({
+
+                    url:'/data/api.php',
+                    type:'post',
+                    data:{
+                        mode:'get_file_img',
+                        f_seq:data,
+                    },
+                    success:function(res) {
+                        console.log(res);
+                        let response = JSON.parse(res);
+                        let head = response.data.head;
+                        let file_path = response.data.file_path
+
+                        console.log(file_path);
+
+                        document.getElementById(`${rid}`).innerHTML+=`<img src="${file_path}" alt="">`
+
+                    }
+
+                })
+
+
 
 
             },
@@ -1883,10 +1849,125 @@ function change_dog_price_select(target){
     // document.getElementById(`peak_dog_sep_tr_${index}`).innerText = `${value}kg`
 
 
+}
+
+function save_hotel_set(id){
+
+
+    const room_pet_type = document.getElementById('hotel_dog_tab').classList.contains('actived') ? 'dog' : 'cat';
+
+    let weight = '';
+    const weight_check = document.getElementsByClassName('weight-check');
+    Array.from(weight_check).forEach(function(el,i){
+        if(weight_check.length-1 === i){
+            weight += `${el.value}`
+        }else{
+            weight += `${el.value},`
+        }
+    })
+
+    const dog_sep_tr = document.getElementsByClassName('hotel-grade-dog-sep-tr');
+
+    const dog_peak_sep_tr = document.getElementsByClassName('hotel-peak-dog-sep-tr');
+
+
+    const is_neutral = document.querySelector('input[name="radio5"]:checked').getAttribute('id') === 'hotel_neutral_y' ? 1 : 2;
+
+    const is_neutral_pay = document.querySelector('input[name="radio6"]:checked').getAttribute('id') === 'hotel_neutral_price_y' ? 1 : 2;
+
+    const neutral_price = document.getElementById('hotel_neutral_price_select').value;
+
+    const extra_price = document.getElementById('hotel_extra_price').value;
+
+    const is_peak = document.querySelector('input[name="radio1"]:checked').getAttribute('id') === 'hotel_peak_dog_y' ? 1 : 2;
+    const is_image = document.querySelector('input[name="radio2"]:checked').getAttribute('id') === 'hotel_room_photo_dog_y' ? 1 : 2;
+
+    const comment = document.getElementById('hotel_common_notice').value;
+
+
+    for(let i=0; i<document.getElementById('select_hotel_grade_dog').value; i++){
+
+        let dog_room_name = document.getElementsByClassName('dog-room-name');
+        let room_name = dog_room_name[i].children[0].value;
+        let room_cnt = dog_room_name[i].parentElement.parentElement.children[1].children[0].children[0].value;
+
+        let normal_price ='';
+        for(let j=0; j<dog_sep_tr.length; j++){
+            if(j === dog_sep_tr.length -1){
+                if(dog_sep_tr[j].children[i+1].children[0].children[0].value === ''){
+                    normal_price += `0`
+                }else{
+                    normal_price += `${dog_sep_tr[j].children[i+1].children[0].children[0].value}`;
+                }
+            }else{
+                if(dog_sep_tr[j].children[i+1].children[0].children[0].value === ''){
+                    normal_price += `0,`
+                }else{
+                    normal_price += `${dog_sep_tr[j].children[i+1].children[0].children[0].value},`;
+                }
+            }
+        }
+
+
+        let peak_price = '';
+
+        for(let j=0; j<dog_peak_sep_tr.length; j++){
+            if(j === dog_peak_sep_tr.length -1){
+                if(dog_peak_sep_tr[j].children[i+1].children[0].children[0].value === ''){
+                    peak_price += `0`
+                }else{
+                    peak_price += `${dog_peak_sep_tr[j].children[i+1].children[0].children[0].value}`;
+                }
+            }else{
+                if(dog_peak_sep_tr[j].children[i+1].children[0].children[0].value === ''){
+                    peak_price += `0,`
+                }else{
+                    peak_price += `${dog_peak_sep_tr[j].children[i+1].children[0].children[0].value},`;
+                }
+            }
+
+        }
+
+        let image = document.getElementsByClassName('hotel-photo-dog-td')[i].getAttribute('data-photos');
 
 
 
 
+        // $.ajax({
+        //
+        //     url:'/data/api.php',
+        //     type:'post',
+        //     data:{
+        //         mode:'post_set_hotel_product',
+        //         h_seq:localStorage.getItem('h_seq'),
+        //         partner_id:id,
+        //         room_pet_type:room_pet_type,
+        //         room_name :room_name,
+        //         room_cnt : room_cnt
+        //         weight:weight,
+        //         normal_price:normal_price,
+        //         peak_price:peak_price,
+        //         is_neutral:is_neutral,
+        //         is_neutral_pay:is_neutral_pay,
+        //         neutral_price:neutral_price,
+        //         extra_price:extra_price,
+        //         is_peak:is_peak,
+        //         is_image:is_image,
+        //         comment:comment,
+        //         image:image,
+        //
+        //     },
+        //     success:function(res) {
+        //         let response = JSON.parse(res);
+        //         let head = response.data.head;
+        //         let body = response.data.body;
+        //         if (head.code === 401) {
+        //             pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
+        //         } else if (head.code === 200) {
+        //             console.log(body)
+        //         }
+        //     }
+        // })
 
-
+    }
 }

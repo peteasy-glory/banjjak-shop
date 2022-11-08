@@ -96,7 +96,15 @@ $_SESSION['backurl_shop'] = $_SERVER[ "REQUEST_URI" ];
         var banner = ["https://image.banjjakpet.com/images/event/mall_hiO2.jpg"];
         var sub_title =[''];
         var event_item_list0 = ['ETCB-STU-B01','ETCB-STU-B02','ETCB-STU-B03','ETCB-STU-B04','ETCB-STU-B05','ETCB-STU-B06'];
+    }else if(seq == '82'){
+
+        <?php
+        unset($_SESSION['backurl_shop']);
+        $_SESSION['backurl_shop'] = $_SESSION["backurl1"];
+        ?>
+        location.replace("shop_view?product_no=ETCB-DRMEDICOS-B01");
     }
+
 
 
     var lastScrollTop = 0;

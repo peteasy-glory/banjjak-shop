@@ -42,7 +42,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 					<div class="wide-tab">
 						<div class="wide-tab-inner" id="wide-tab-inner">
 							<!-- 활성화시 actived클래스 추가 -->
-							<div class="tab-cell actived" id="hotel_dog_tab"><button type="button" class="btn-tab-item">강아지호텔</button></div>
+							<div class="tab-cell actived" id="hotel_dog_tab"><button type="button" class="btn-tab-item" >강아지호텔</button></div>
 							<div class="tab-cell" id="hotel_cat_tab"><button type="button" class="btn-tab-item">고양이호텔</button></div>
 						</div>
 					</div>
@@ -731,7 +731,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
                                                                 </div>
                                                                 <div class="grid-layout-cell grid-30">
                                                                     <div class="form-group-item card">
-                                                                        <div class="form-item-label">이용획수</div>
+                                                                        <div class="form-item-label">이용횟수</div>
                                                                         <div class="form-item-data">
                                                                             <select class="arrow">
                                                                                 <option value="">선택</option>
@@ -924,7 +924,7 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 		// - a태그는 disabled 클래스 추가
 		// - button 태그는 disabled 속성 추가
 		-->
-		<a href="#" class="btn-page-bottom">저장하기</a>
+		<a href="#" class="btn-page-bottom" onclick="save_hotel_set(artist_id)">저장하기</a>
 	</div>
     <div style="display:none;"><input type="file" accept="image/*" name="imgupfile" id="addimgfile" style="display: none;" onchange="hotel_photo_update(this,artist_id)" /></div>
 	<!-- //page-bottom -->

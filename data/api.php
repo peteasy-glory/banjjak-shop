@@ -443,6 +443,66 @@ if($r_mode) {
 
         $return_data = array("code"=>"000000",'data'=>$result);
 
+    }else if($r_mode ==='get_file_img'){
+
+        $f_seq = $_POST['f_seq'];
+
+        $sql ="
+
+            SELECT file_path FROM tb_file WHERE f_seq =".$f_seq."
+            ";
+
+        $result = sql_query($sql);
+        $row = sql_fetch($result);
+
+        $return_data = array("code"=>"000000","data"=>$row);
+    }else if($r_mode === 'post_set_hotel_product'){
+
+        $h_seq = $_POST['h_seq'];
+        $partner_id = $_POST['partner_id'];
+        $room_pet_type = $_POST['room_pet_type'];
+        $room_name = $_POST['room_name'];
+        $room_cnt = $_POST['room_cnt'];
+        $weight = $_POST['weight'];
+        $normal_price = $_POST['normal_price'];
+        $peak_price = $_POST['peak_price'];
+        $is_neutral = $_POST['is_neutral'];
+        $is_neutral_pay = $_POST['is_neutral_pay'];
+        $neutral_price = $_POST['neutral_price'];
+        $extra_price = $_POST['extra_price'];
+        $is_peak = $_POST['is_peak'];
+        $is_image = $_POST['is_image'];
+        $comment = $_POST['comment'];
+        $image = $_POST['image'];
+
+        $data = array(
+            "h_seq"=>intval($h_seq),
+            "partner_id"=>$partner_id,
+            "room_pet_type"=>$room_pet_type,
+            "room_name"=>$room_name,
+            "room_cnt"=>intval($room_cnt),
+            "weight"=>$weight,
+            "normal_price"=>$normal_price,
+            "peak_price"=>$peak_price,
+            "is_neutral"=>$is_neutral,
+            "is_neutral_pay"=>$is_neutral_pay,
+            "neutral_price"=>intval($neutral_price),
+            "extra_price"=>intval($extra_price),
+            "is_peak"=>$is_peak,
+            "is_image"=>$is_image,
+            "comment"=>$comment,
+            "image"=>$image
+
+
+        );
+
+        $data_json = json_encode($data);
+
+        $result = $api -> post('/partner/setting/hotel-product',$data_json);
+
+
+        $return_data = array("code"=>"000000",'data'=>$result);
+
     }
 }
 
