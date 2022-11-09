@@ -936,6 +936,23 @@ function add_get_hotel_product(id){
                         document.getElementById('hotel_peak_dog_n').click();
                     }
 
+                    if(body.dog[0].is_neutral === '1'){
+
+                        document.getElementById('hotel_neutral_y').click();
+
+                    }else{
+                        document.getElementById('hotel_neutral_n').click();
+                    }
+
+                    if(body.dog[0].is_neutral_pay === '1'){
+
+                        document.getElementById('hotel_neutral_price_y').click();
+
+                    }else{
+                        document.getElementById('hotel_neutral_price_n').click();
+                    }
+
+
 
                     if(body.dog.length > 0){
 
@@ -1875,14 +1892,29 @@ function save_hotel_set(id){
     const room_pet_type = document.getElementById('hotel_dog_tab').classList.contains('actived') ? 'dog' : 'cat';
 
     let weight = '';
+
+    let weight_bool = false;
+
     const weight_check = document.getElementsByClassName('weight-check');
     Array.from(weight_check).forEach(function(el,i){
+
+        let weights = weight.split(',');
+        if(weights.includes(el.value)){
+            weight_bool = true;
+            pop.open('weightCheck');
+            return;
+        };
         if(weight_check.length-1 === i){
             weight += `${el.value}`
         }else{
             weight += `${el.value},`
         }
     })
+    if(weight_bool){
+
+        return;
+    }
+
 
     const dog_sep_tr = document.getElementsByClassName('hotel-grade-dog-sep-tr');
 
@@ -1987,6 +2019,7 @@ function save_hotel_set(id){
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
                         console.log(body)
+                        location.reload();
                     }
                 }
             })
@@ -2029,6 +2062,7 @@ function save_hotel_set(id){
                         pop.open('firstRequestMsg1', '잠시 후 다시 시도 해주세요.');
                     } else if (head.code === 200) {
                         console.log(body)
+                        location.reload();
                     }
                 }
             })
