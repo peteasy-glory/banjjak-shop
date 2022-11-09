@@ -44,7 +44,7 @@ if ($payment_log_seq != "" && $cellphone != "") {
                 break;
             }
             $query="
-				SELECT *, SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$test." 
+				SELECT *, SUBST RING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') AS payment_log FROM ita_talk_log_".$test." 
 				WHERE template_code in ('1000004530_14040', '1000004530_20001') 
 				AND SUBSTRING_INDEX(SUBSTRING_INDEX(kko_btn_info, '=', '-1' ), '\"', '1') = '".$payment_log_seq."'
 			";
