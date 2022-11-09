@@ -1211,7 +1211,7 @@ if(count($arr_holiday)>0){
                                                                         if($chk_rev[$a]['status'] == 'R1'){
                                                                             $pay_price = number_format($chk_rev[$a]['total_price']+$chk_rev[$a]['spend_point']);
                                                                         }else{
-                                                                            $pay_price = number_format($chk_rev[$a]['local_price']+$chk_rev[$a]['local_price_cash']);
+                                                                            $pay_price = number_format($chk_rev[$a]['local_price']+$chk_rev[$a]['local_price_cash']+$chk_rev[$a]['reserve_pay_price']);
                                                                         }
                                                                         ?>
                                                                         <div class="item-price"><?php echo $pay_price; ?></div>
