@@ -503,6 +503,53 @@ if($r_mode) {
 
         $return_data = array("code"=>"000000",'data'=>$result);
 
+    }else if($r_mode === 'put_set_hotel_product'){
+
+
+        $hp_seq = $_POST['hp_seq'];
+        $room_name = $_POST['room_name'];
+        $room_cnt = $_POST['room_cnt'];
+        $weight = $_POST['weight'];
+        $normal_price = $_POST['normal_price'];
+        $sort = $_POST['sort'];
+        $peak_price = $_POST['peak_price'];
+        $is_neutral = $_POST['is_neutral'];
+        $is_neutral_pay = $_POST['is_neutral_pay'];
+        $neutral_price = $_POST['neutral_price'];
+        $extra_price = $_POST['extra_price'];
+        $is_peak = $_POST['is_peak'];
+        $is_image = $_POST['is_image'];
+        $comment = $_POST['comment'];
+        $image = $_POST['image'];
+
+        $data = array(
+            "hp_seq"=>intval($hp_seq),
+            "room_name"=>$room_name,
+            "room_cnt"=>intval($room_cnt),
+            "weight"=>$weight,
+            "normal_price"=>$normal_price,
+            "sort"=>intval($sort),
+            "peak_price"=>$peak_price,
+            "is_neutral"=>$is_neutral,
+            "is_neutral_pay"=>$is_neutral_pay,
+            "neutral_price"=>intval($neutral_price),
+            "extra_price"=>intval($extra_price),
+            "is_peak"=>$is_peak,
+            "is_image"=>$is_image,
+            "comment"=>$comment,
+            "image"=>$image
+
+
+        );
+
+        $data_json = json_encode($data);
+
+        $result = $api -> put('/partner/setting/hotel-product',$data_json);
+
+
+        $return_data = array("code"=>"000000",'data'=>$result);
+
+
     }
 }
 

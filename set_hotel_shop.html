@@ -83,12 +83,18 @@ include($_SERVER['DOCUMENT_ROOT']."/include/check_login_shop.php");
 							<!-- 강아지 -->
 							<div class="tab-data-cell actived" >
 								<!-- 내용이 없을 경우 -->
-								<div class="common-none-data" id="hotel_dog_product_none_data">
+								<div class="common-none-data" id="hotel_dog_product_none_data" style="display: none">
 									<div class="none-inner">
 										<div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
 										<div class="item-info">등록된 상품이 없습니다.</div>
 									</div>
 								</div>
+                                <div class="common-none-data" id="hotel_cat_product_none_data" style="display: none;">
+                                    <div class="none-inner">
+                                        <div class="item-visual"><img src="/static/pub/images/icon/img-illust-3@2x.png" alt="" width="103"></div>
+                                        <div class="item-info">등록된 상품이 없습니다.</div>
+                                    </div>
+                                </div>
 								<!-- //내용이 없을 경우 -->
 								<!-- 내용이 있을 경우 -->
 								<!-- accordion-cell 클래스에 기본으로 actived클래스를 추가하여 활성화된 상태로 처음에 표현 -->
