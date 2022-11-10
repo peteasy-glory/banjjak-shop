@@ -550,6 +550,18 @@ if($r_mode) {
         $return_data = array("code"=>"000000",'data'=>$result);
 
 
+    }else if($r_mode ==='delete_set_hotel_product'){
+        $hp_seq = $_POST['hp_seq'];
+        $del_msg = '상품저장시 삭제..';
+
+        $data = array("hp_seq"=>intval($hp_seq),"del_msg"=>$del_msg);
+
+        $data_json = json_encode($data);
+
+        $result = $api -> delete('/partner/setting/hotel-product',$data_json);
+
+        $return_data = array("code"=>"000000","data"=>$result);
+
     }
 }
 
